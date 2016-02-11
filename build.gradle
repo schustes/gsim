@@ -1,0 +1,91 @@
+apply plugin: "java"
+apply plugin: "maven"
+
+group = "de.2s.sim"
+version = 2.0
+
+repositories {
+    mavenCentral()
+}
+
+sourceSets.all { set ->
+    def jarTask = task("${set.name}Jar", type: Jar) {
+        baseName = baseName + "-$set.name"
+        from set.output
+    }
+
+    artifacts {
+        archives jarTask
+    }
+}
+
+sourceSets {
+    api
+    impl
+}
+
+dependencies {
+    apiCompile 'commons-codec:commons-codec:1.5'
+	apiCompile 'cern:colt:1.0'
+	apiCompile 'log4j:log4j:1.2.17'
+
+    implCompile sourceSets.api.output
+    implCompile 'commons-lang:commons-lang:2.6'
+    implCompile 'jdom:jdom:0.7'
+	implCompile 'log4j:log4j:1.2.17'
+	implCompile 'jgraph:jgraph:5.13.0.0'
+    implCompile 'jess:jess:7.0'
+    implCompile 'cern:colt:1.0'
+    
+    testCompile 'junit:junit:4.9'
+    testCompile sourceSets.api.output
+    testCompile sourceSets.impl.output
+    
+    runtime configurations.apiRuntime
+    runtime configurations.implRuntime
+}
+
+jar {
+    from sourceSets.api.output
+    from sourceSets.impl.output
+}
+
+repositories {
+	mavenCentral()
+    maven {
+		url 'http://ems-server:7002/nexus/content/repositories/snapshots/'
+	}    
+    maven {
+		url 'http://ems-server:7002/nexus/content/repositories/releases/'
+	}    
+    maven {
+		url 'http://ems-server:7002/nexus/content/repositories/thirdparty/'
+	}    
+}
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+			repository(url: "http://ems-server:7002/nexus/content/repositories/snapshots") {
+				authentication(userName: "ems", password: "18e1042ms")
+				//pom.version = '1.0-SNAPSHOT'
+				//pom.groupId = 'de.2s.sim'
+			}
+
+
+            addFilter("main") { artifact, file -> artifact.name == project.name }
+            ["api", "impl"].each { type ->
+                addFilter(type) { artifact, file -> artifact.name.endsWith("-$type") }
+                
+                // We now have to map our configurations to the correct maven scope for each pom
+                ["compile", "runtime"].each { scope ->
+                    configuration = configurations[type + scope.capitalize()]
+                    ["main", type].each { pomName ->
+                        pom(pomName).scopeMappings.addMapping 1, configuration, scope
+                    }
+                }
+            }
+
+        }
+    }
+}
