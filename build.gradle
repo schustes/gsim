@@ -2,7 +2,7 @@ apply plugin: "java"
 apply plugin: "maven"
 
 group = "de.2s.sim"
-version = 2.0
+version = "2.0-SNAPSHOT"
 
 repositories {
     mavenCentral()
@@ -68,20 +68,21 @@ uploadArchives {
         mavenDeployer {
 			repository(url: "http://ems-server:7002/nexus/content/repositories/snapshots") {
 				authentication(userName: "ems", password: "18e1042ms")
-				//pom.version = '1.0-SNAPSHOT'
-				//pom.groupId = 'de.2s.sim'
 			}
 
+           	def priority = 0
 
             addFilter("main") { artifact, file -> artifact.name == project.name }
             ["api", "impl"].each { type ->
                 addFilter(type) { artifact, file -> artifact.name.endsWith("-$type") }
                 
                 // We now have to map our configurations to the correct maven scope for each pom
+                
                 ["compile", "runtime"].each { scope ->
                     configuration = configurations[type + scope.capitalize()]
                     ["main", type].each { pomName ->
-                        pom(pomName).scopeMappings.addMapping 1, configuration, scope
+                        pom(pomName).scopeMappings.addMapping i, configuration, scope
+	                    priority++
                     }
                 }
             }
