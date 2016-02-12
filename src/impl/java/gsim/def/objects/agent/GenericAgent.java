@@ -10,7 +10,7 @@ public class GenericAgent extends Instance {
 
     public static final long serialVersionUID = 101191270000954720L;
 
-    protected Behaviour behaviour;
+    protected BehaviourDef behaviour;
 
     /**
      * Copy constructor.
@@ -20,7 +20,7 @@ public class GenericAgent extends Instance {
      */
     public GenericAgent(GenericAgent in) {
         super(in);
-        behaviour = new Behaviour((Behaviour) in.getBehaviour().clone());
+        behaviour = new BehaviourDef((BehaviourDef) in.getBehaviour().clone());
     }
 
     /**
@@ -35,7 +35,7 @@ public class GenericAgent extends Instance {
      */
     public GenericAgent(String name, GenericAgentClass cls) {
         super(name, cls);
-        behaviour = new Behaviour(cls.getBehaviour());
+        behaviour = new BehaviourDef(cls.getBehaviour());
     }
 
     protected GenericAgent() {
@@ -48,7 +48,7 @@ public class GenericAgent extends Instance {
         return a;
     }
 
-    public Behaviour getBehaviour() {
+    public BehaviourDef getBehaviour() {
         return behaviour;
     }
 
@@ -56,7 +56,7 @@ public class GenericAgent extends Instance {
         return getAttributes("properties");
     }
 
-    public void setBehaviour(Behaviour b) {
+    public void setBehaviour(BehaviourDef b) {
         behaviour = b;
     }
 

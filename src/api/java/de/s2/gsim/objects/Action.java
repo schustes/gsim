@@ -8,7 +8,7 @@ import java.io.Serializable;
  * @author Stephan
  *
  */
-public interface ActionIF extends Serializable {
+public interface Action extends Serializable {
 
     /**
      * Adds a parameter to this action.

@@ -2,25 +2,25 @@ package gsim.core.impl;
 
 import java.util.ArrayList;
 
-import de.s2.gsim.core.DefinitionEnvironment;
+import de.s2.gsim.core.ModelDefinitionEnvironment;
 import de.s2.gsim.core.GSimException;
-import de.s2.gsim.objects.AgentClassIF;
-import de.s2.gsim.objects.AgentInstanceIF;
-import de.s2.gsim.objects.ObjectClassIF;
-import de.s2.gsim.objects.ObjectInstanceIF;
+import de.s2.gsim.objects.AgentClass;
+import de.s2.gsim.objects.AgentInstance;
+import de.s2.gsim.objects.ObjectClass;
+import de.s2.gsim.objects.ObjectInstance;
 import gsim.def.Environment;
 import gsim.def.InheritanceHierarchy;
 import gsim.def.objects.Frame;
 import gsim.def.objects.Instance;
 import gsim.def.objects.agent.GenericAgent;
 import gsim.def.objects.agent.GenericAgentClass;
-import gsim.objects.impl.AgentClass;
-import gsim.objects.impl.AgentInstance;
-import gsim.objects.impl.ObjectClass;
-import gsim.objects.impl.ObjectInstance;
+import gsim.objects.impl.AgentClassDef;
+import gsim.objects.impl.AgentInstanceDef;
+import gsim.objects.impl.ObjectClassDef;
+import gsim.objects.impl.ObjectInstanceDef;
 import gsim.objects.impl.UnitWrapper;
 
-public abstract class AbstractEnv implements DefinitionEnvironment {
+public abstract class AbstractEnv implements ModelDefinitionEnvironment {
 
     /**
      *
@@ -33,7 +33,7 @@ public abstract class AbstractEnv implements DefinitionEnvironment {
     }
 
     @Override
-    public AgentClassIF createAgentClass(String name, String parent) throws GSimException {
+    public AgentClass createAgentClass(String name, String parent) throws GSimException {
         try {
             GenericAgentClass g = parent != null ? env.getAgentSubClass(parent) : env.getGenericAgentClass();
 
@@ -46,7 +46,7 @@ public abstract class AbstractEnv implements DefinitionEnvironment {
             }
 
             GenericAgentClass newAgentClass = env.createAgentSubclass(name, g);
-            return new AgentClass(env, newAgentClass);
+            return new AgentClassDef(env, newAgentClass);
 
         } catch (Exception e) {
             throw new GSimException("Exception", e);
@@ -54,14 +54,14 @@ public abstract class AbstractEnv implements DefinitionEnvironment {
     }
 
     @Override
-    public AgentClassIF createAgentClass(String name, String parentName, int order) throws GSimException {
-        AgentClassIF retVal = this.createAgentClass(name, parentName);
+    public AgentClass createAgentClass(String name, String parentName, int order) throws GSimException {
+        AgentClass retVal = this.createAgentClass(name, parentName);
         env.addOrSetAgentOrdering(order, name);
         return retVal;
     }
 
     @Override
-    public ObjectClassIF createObjectClass(String name, String parent) throws GSimException {
+    public ObjectClass createObjectClass(String name, String parent) throws GSimException {
         try {
             Frame g = name != null ? env.getObjectSubClass(name) : env.getObjectClass();
 
@@ -77,7 +77,7 @@ public abstract class AbstractEnv implements DefinitionEnvironment {
             }
 
             Frame newObjectClass = env.createObjectSubClass(name, g);
-            return new ObjectClass(env, newObjectClass);
+            return new ObjectClassDef(env, newObjectClass);
 
         } catch (Exception e) {
             throw new GSimException("Exception", e);
@@ -85,10 +85,10 @@ public abstract class AbstractEnv implements DefinitionEnvironment {
     }
 
     @Override
-    public ObjectInstanceIF createObjectInstance(String name, ObjectClassIF parent) throws GSimException {
+    public ObjectInstance createObjectInstance(String name, ObjectClass parent) throws GSimException {
         try {
             Frame f = (Frame) ((UnitWrapper) parent).toUnit();
-            return new ObjectInstance(env, env.instanciateFrame(f, name));
+            return new ObjectInstanceDef(env, env.instanciateFrame(f, name));
         } catch (Exception e) {
             throw new GSimException("Exception", e);
         }
@@ -115,7 +115,7 @@ public abstract class AbstractEnv implements DefinitionEnvironment {
     }
 
     @Override
-    public AgentInstanceIF getAgent(String name) throws GSimException {
+    public AgentInstance getAgent(String name) throws GSimException {
         try {
             GenericAgent a = env.getAgent(name);
 
@@ -123,7 +123,7 @@ public abstract class AbstractEnv implements DefinitionEnvironment {
                 return null;
             }
 
-            AgentInstance agent = new AgentInstance(env, a);
+            AgentInstanceDef agent = new AgentInstanceDef(env, a);
 
             return agent;
 
@@ -133,7 +133,7 @@ public abstract class AbstractEnv implements DefinitionEnvironment {
     }
 
     @Override
-    public AgentClassIF getAgentClass(String name) throws GSimException {
+    public AgentClass getAgentClass(String name) throws GSimException {
         try {
 
             GenericAgentClass a = env.getAgentSubClass(name);
@@ -143,18 +143,18 @@ public abstract class AbstractEnv implements DefinitionEnvironment {
                              // serialisation!
             }
 
-            return new AgentClass(env, a);
+            return new AgentClassDef(env, a);
         } catch (Exception e) {
             throw new GSimException("Exception", e);
         }
     }
 
     @Override
-    public AgentClassIF[] getAgentClasses(String parent) throws GSimException {
+    public AgentClass[] getAgentClasses(String parent) throws GSimException {
         try {
             if (parent == null) {
                 GenericAgentClass[] gc = env.getAgentSubClasses();
-                AgentClass[] res = new AgentClass[gc.length];
+                AgentClassDef[] res = new AgentClassDef[gc.length];
 
                 if (res == null) {
                     return null; // if proxy mode to prevent too massive
@@ -162,15 +162,15 @@ public abstract class AbstractEnv implements DefinitionEnvironment {
                 }
 
                 for (int i = 0; i < gc.length; i++) {
-                    AgentClass ac = new AgentClass(env, gc[i]);
+                    AgentClassDef ac = new AgentClassDef(env, gc[i]);
                     res[i] = ac;
                 }
                 return res;
             } else {
                 GenericAgentClass[] cls = env.getAllAgentClassSuccessors(parent);
-                AgentClass[] res = new AgentClass[cls.length];
+                AgentClassDef[] res = new AgentClassDef[cls.length];
                 for (int i = 0; i < cls.length; i++) {
-                    res[i] = new AgentClass(env, cls[i]);
+                    res[i] = new AgentClassDef(env, cls[i]);
                 }
                 return res;
             }
@@ -191,7 +191,7 @@ public abstract class AbstractEnv implements DefinitionEnvironment {
     }
 
     @Override
-    public AgentInstanceIF[] getAgents(String parent) throws GSimException {
+    public AgentInstance[] getAgents(String parent) throws GSimException {
         try {
             GenericAgent[] f = env.getAgents(parent);
 
@@ -201,20 +201,20 @@ public abstract class AbstractEnv implements DefinitionEnvironment {
             }
 
             if (parent == null) {
-                AgentInstance[] res = new AgentInstance[f.length];
+                AgentInstanceDef[] res = new AgentInstanceDef[f.length];
                 for (int i = 0; i < f.length; i++) {
-                    AgentInstance ac = new AgentInstance(env, f[i]);
+                    AgentInstanceDef ac = new AgentInstanceDef(env, f[i]);
                     res[i] = ac;
                 }
                 return res;
             } else {
-                ArrayList<AgentInstance> list = new ArrayList<AgentInstance>();
+                ArrayList<AgentInstanceDef> list = new ArrayList<AgentInstanceDef>();
                 for (int i = 0; i < f.length; i++) {
                     if (f[i].inheritsFrom(parent)) {
-                        list.add(new AgentInstance(env, f[i]));
+                        list.add(new AgentInstanceDef(env, f[i]));
                     }
                 }
-                AgentInstanceIF[] agent = new AgentInstanceIF[list.size()];
+                AgentInstance[] agent = new AgentInstance[list.size()];
                 list.toArray(agent);
                 return agent;
             }
@@ -225,7 +225,7 @@ public abstract class AbstractEnv implements DefinitionEnvironment {
     }
 
     @Override
-    public AgentInstanceIF[] getAgents(String parent, int offset, int count) throws GSimException {
+    public AgentInstance[] getAgents(String parent, int offset, int count) throws GSimException {
         try {
 
             GenericAgent[] f = env.getAgents(parent, offset, count);
@@ -235,20 +235,20 @@ public abstract class AbstractEnv implements DefinitionEnvironment {
             }
 
             if (parent == null) {
-                AgentInstance[] res = new AgentInstance[f.length];
+                AgentInstanceDef[] res = new AgentInstanceDef[f.length];
                 for (int i = 0; i < f.length; i++) {
-                    AgentInstance ac = new AgentInstance(env, f[i]);
+                    AgentInstanceDef ac = new AgentInstanceDef(env, f[i]);
                     res[i] = ac;
                 }
                 return res;
             } else {
-                ArrayList<AgentInstance> list = new ArrayList<AgentInstance>();
+                ArrayList<AgentInstanceDef> list = new ArrayList<AgentInstanceDef>();
                 for (int i = 0; i < f.length; i++) {
                     if (f[i].inheritsFrom(parent)) {
-                        list.add(new AgentInstance(env, f[i]));
+                        list.add(new AgentInstanceDef(env, f[i]));
                     }
                 }
-                AgentInstanceIF[] agent = new AgentInstanceIF[list.size()];
+                AgentInstance[] agent = new AgentInstance[list.size()];
                 list.toArray(agent);
                 return agent;
             }
@@ -263,7 +263,7 @@ public abstract class AbstractEnv implements DefinitionEnvironment {
     }
 
     @Override
-    public ObjectClassIF getObjectClass(String name) throws GSimException {
+    public ObjectClass getObjectClass(String name) throws GSimException {
         try {
             Frame a = env.getObjectSubClass(name);
 
@@ -272,14 +272,14 @@ public abstract class AbstractEnv implements DefinitionEnvironment {
                              // serialisation!
             }
 
-            return new ObjectClass(env, a);
+            return new ObjectClassDef(env, a);
         } catch (Exception e) {
             throw new GSimException("Exception", e);
         }
     }
 
     @Override
-    public ObjectClassIF[] getObjectClasses(String parent) throws GSimException {
+    public ObjectClass[] getObjectClasses(String parent) throws GSimException {
         try {
             if (parent == null) {
                 Frame[] f = env.getObjectSubClasses();
@@ -289,17 +289,17 @@ public abstract class AbstractEnv implements DefinitionEnvironment {
                                  // serialisation!
                 }
 
-                ObjectClass[] res = new ObjectClass[f.length];
+                ObjectClassDef[] res = new ObjectClassDef[f.length];
                 for (int i = 0; i < f.length; i++) {
-                    ObjectClass ac = new ObjectClass(env, f[i]);
+                    ObjectClassDef ac = new ObjectClassDef(env, f[i]);
                     res[i] = ac;
                 }
                 return res;
             } else {
                 Frame[] cls = env.getAllObjectSuccessors(parent);
-                ObjectClass[] res = new ObjectClass[cls.length];
+                ObjectClassDef[] res = new ObjectClassDef[cls.length];
                 for (int i = 0; i < cls.length; i++) {
-                    res[i] = new ObjectClass(env, cls[i]);
+                    res[i] = new ObjectClassDef(env, cls[i]);
                 }
                 return res;
             }
@@ -309,10 +309,10 @@ public abstract class AbstractEnv implements DefinitionEnvironment {
     }
 
     @Override
-    public ObjectInstanceIF[] getObjects(String parent) throws GSimException {
+    public ObjectInstance[] getObjects(String parent) throws GSimException {
         try {
 
-            ArrayList<ObjectInstance> res = new ArrayList<ObjectInstance>();
+            ArrayList<ObjectInstanceDef> res = new ArrayList<ObjectInstanceDef>();
             Frame[] f;
             if (parent == null) {
                 f = env.getObjectSubClasses();
@@ -325,7 +325,7 @@ public abstract class AbstractEnv implements DefinitionEnvironment {
                 ArrayList<Instance> in = env.getInstancesOfClass(f[i]);
 
                 for (Instance t : in) {
-                    ObjectInstance ac = new ObjectInstance(env, t);
+                    ObjectInstanceDef ac = new ObjectInstanceDef(env, t);
                     res.add(ac);
                 }
 
@@ -335,12 +335,12 @@ public abstract class AbstractEnv implements DefinitionEnvironment {
                 Frame tf = env.getObjectSubClass(parent);
                 ArrayList<Instance> in = env.getInstancesOfClass(tf);
                 for (Instance t : in) {
-                    ObjectInstance ac = new ObjectInstance(env, t);
+                    ObjectInstanceDef ac = new ObjectInstanceDef(env, t);
                     res.add(ac);
                 }
             }
 
-            ObjectInstanceIF[] ra = new ObjectInstanceIF[res.size()];
+            ObjectInstance[] ra = new ObjectInstance[res.size()];
             res.toArray(ra);
             return ra;
 
@@ -351,7 +351,7 @@ public abstract class AbstractEnv implements DefinitionEnvironment {
     }
 
     @Override
-    public AgentClassIF getTopAgentClass() throws GSimException {
+    public AgentClass getTopAgentClass() throws GSimException {
         try {
 
             GenericAgentClass g = env.getGenericAgentClass();
@@ -361,30 +361,30 @@ public abstract class AbstractEnv implements DefinitionEnvironment {
                              // serialisation!
             }
 
-            return new AgentClass(env, g);
+            return new AgentClassDef(env, g);
         } catch (Exception e) {
             throw new GSimException("Exception", e);
         }
     }
 
     @Override
-    public ObjectClassIF getTopObjectClass() throws GSimException {
+    public ObjectClass getTopObjectClass() throws GSimException {
         try {
-            return new ObjectClass(env, env.getObjectClass());
+            return new ObjectClassDef(env, env.getObjectClass());
         } catch (Exception e) {
             throw new GSimException("Exception", e);
         }
     }
 
     @Override
-    public AgentInstanceIF instanciateAgent(AgentClassIF parent, String name) throws GSimException {
+    public AgentInstance instanciateAgent(AgentClass parent, String name) throws GSimException {
         try {
             GenericAgent a = env.instanciateAgent((GenericAgentClass) ((UnitWrapper) parent).toUnit(), name, Environment.RAND_NONE, 0);
             if (a == null) {
                 return null; // if proxy mode to prevent too massive
             }
             // serialisation!
-            AgentInstance agent = new AgentInstance(env, a);
+            AgentInstanceDef agent = new AgentInstanceDef(env, a);
             return agent;
         } catch (Exception e) {
             throw new GSimException("Exception", e);
@@ -392,7 +392,7 @@ public abstract class AbstractEnv implements DefinitionEnvironment {
     }
 
     @Override
-    public AgentInstanceIF[] instanciateAgents(AgentClassIF parent, String prefix, int method, double svar, int count) throws GSimException {
+    public AgentInstance[] instanciateAgents(AgentClass parent, String prefix, int method, double svar, int count) throws GSimException {
         try {
             GenericAgent[] a = env.instanciateAgents((GenericAgentClass) ((UnitWrapper) parent).toUnit(), prefix, method, svar, count);
 
@@ -401,9 +401,9 @@ public abstract class AbstractEnv implements DefinitionEnvironment {
                              // serialisation!
             }
 
-            AgentInstance[] agents = new AgentInstance[a.length];
+            AgentInstanceDef[] agents = new AgentInstanceDef[a.length];
             for (int i = 0; i < a.length; i++) {
-                agents[i] = new AgentInstance(env, a[i]);
+                agents[i] = new AgentInstanceDef(env, a[i]);
             }
             return agents;
         } catch (Exception e) {
@@ -413,7 +413,7 @@ public abstract class AbstractEnv implements DefinitionEnvironment {
     }
 
     @Override
-    public void instanciateAgents2(AgentClassIF parent, String prefix, int method, double svar, int count) throws GSimException {
+    public void instanciateAgents2(AgentClass parent, String prefix, int method, double svar, int count) throws GSimException {
         try {
             env.instanciateAgents2((GenericAgentClass) ((UnitWrapper) parent).toUnit(), prefix, method, svar, count);
 

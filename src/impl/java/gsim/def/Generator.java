@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 
-import de.s2.gsim.objects.ObjectInstanceIF;
+import de.s2.gsim.objects.ObjectInstance;
 import de.s2.gsim.objects.attribute.Attribute;
 import de.s2.gsim.objects.attribute.DomainAttribute;
 import de.s2.gsim.objects.attribute.IntervalAttribute;
@@ -60,7 +60,7 @@ public class Generator {
         return agent;
     }
 
-    public ObjectInstanceIF randomiseAttributeValues(ObjectInstanceIF a, double svar, Method method) {
+    public ObjectInstance randomiseAttributeValues(ObjectInstance a, double svar, Method method) {
         if (method.equals(Method.Normal)) {
             Instance b = (Instance) ((UnitWrapper) a).toUnit();
             b = this.randomiseAttributeValues(b, svar);

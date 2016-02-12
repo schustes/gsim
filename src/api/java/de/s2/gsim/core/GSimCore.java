@@ -22,7 +22,7 @@ public interface GSimCore {
      * @return ScenarioConnector
      * @throws GSimException
      */
-    ScenarioConnector connectScenarioManager(String ns, HashMap<?, ?> props) throws GSimException;
+    SimulationController connectScenarioManager(String ns, HashMap<?, ?> props) throws GSimException;
 
     /**
      * Create a gsim Environment.
@@ -32,7 +32,7 @@ public interface GSimCore {
      * @return environment
      * @throws GSimException
      */
-    DefinitionEnvironment create(String ns, HashMap<?, ?> props) throws GSimException;
+    ModelDefinitionEnvironment create(String ns, HashMap<?, ?> props) throws GSimException;
 
     /**
      * 
@@ -44,7 +44,7 @@ public interface GSimCore {
      * @return DefinitionEnvironment
      * @throws GSimException
      */
-    DefinitionEnvironment create(String ns, InputStream setup, HashMap<?, ?> props) throws GSimException;
+    ModelDefinitionEnvironment create(String ns, InputStream setup, HashMap<?, ?> props) throws GSimException;
 
     /**
      * Creates a BatchManager. A BatchManager is a utility that executes a java class on behalf of the user. For example, the user writes a program
@@ -58,7 +58,7 @@ public interface GSimCore {
     BatchManager createBatchManager(Executable ex, HashMap<String, Object> props) throws GSimException;
 
     /**
-     * Creates a ScenarioManager (used to start and control simulation).
+     * Creates a ScenarioController (used to start and control simulation).
      * 
      * @param env DefinitionEnvironment
      * @param props runtime properties
@@ -67,7 +67,7 @@ public interface GSimCore {
      * @return ScenarioManager
      * @throws GSimException
      */
-    ScenarioManager createScenarioManager(DefinitionEnvironment env, HashMap<String, Object> props, int steps, int runs) throws GSimException;
+    SimulationController createScenarioManager(ModelDefinitionEnvironment env, HashMap<String, Object> props, int steps, int runs) throws GSimException;
 
     /**
      * Utility method to open a file containing a model definition in xml format.

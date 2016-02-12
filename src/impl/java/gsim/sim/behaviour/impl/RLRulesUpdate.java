@@ -7,7 +7,7 @@ import java.util.List;
 
 import de.s2.gsim.objects.attribute.Attribute;
 import de.s2.gsim.objects.attribute.DomainAttribute;
-import gsim.def.objects.behaviour.Expansion;
+import gsim.def.objects.behaviour.ExpansionDef;
 import gsim.def.objects.behaviour.RLRule;
 import gsim.sim.agent.RuntimeAgent;
 import gsim.sim.behaviour.impl.jessfunction.DynamicRuleBuilder;
@@ -33,7 +33,7 @@ public class RLRulesUpdate {
 
     public void update(DomainAttribute domainAttr, String newFiller, Context ctx) {
         for (RLRule r : agent.getBehaviour().getRLRules()) {
-            for (Expansion ex : r.getExpansions()) {
+            for (ExpansionDef ex : r.getExpansions()) {
                 // ok, because only attribute, not filler must be named in Expansion
                 // object
 

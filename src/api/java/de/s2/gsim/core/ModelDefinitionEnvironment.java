@@ -2,25 +2,23 @@ package de.s2.gsim.core;
 
 import java.io.Serializable;
 
-import de.s2.gsim.objects.AgentClassIF;
-import de.s2.gsim.objects.AgentInstanceIF;
-import de.s2.gsim.objects.ObjectClassIF;
-import de.s2.gsim.objects.ObjectInstanceIF;
+import de.s2.gsim.objects.AgentClass;
+import de.s2.gsim.objects.AgentInstance;
+import de.s2.gsim.objects.ObjectClass;
+import de.s2.gsim.objects.ObjectInstance;
 
 /**
- * The <code>DefinitionEnvironment</code> is a wrapper for the actual gsim environment managing agents and objects. The wrapped object can be a local
- * or remote reference.
- * <p>
- * The <code>DefinitionEnvironment</code> and its related interfaces (e.g. <code>AgentIF, AgentClassIF</code> provides convenience method for the gsim
- * environment that eases its use as a programming model and hides some of the ugly things necessary to maintain a consistent state of the frame and
- * instance hierarchies in the background.
- * <p>
+ * The <code>ModelDefinitionEnvironment</code> is a wrapper for the actual gsim environment managing agents and objects. Agents are instanciated by
+ * defining the Agent class to inherit from and some generation parameters or by creating single agents. The process of instanciation denotes the
+ * creation of instances from a parent frame (similar, but not identical to object instantiation). The parent frame acts as a template which defines
+ * properties and default values.
+ * 
  * Note: Names are unique identifiers. When creating single objects or agents, it must be made sure that the name does not exist yet.
  *
  * @author Stephan
  *
  */
-public interface DefinitionEnvironment extends Serializable {
+public interface ModelDefinitionEnvironment extends Serializable {
 
     /**
      * Constant for creating random attributes and weights (weights are only for fuzzy matching utility) during instanciation using a normal
@@ -67,7 +65,7 @@ public interface DefinitionEnvironment extends Serializable {
      * @return AgentClassIF
      * @throws GSimException
      */
-    public AgentClassIF createAgentClass(String name, String parentName) throws GSimException;
+    public AgentClass createAgentClass(String name, String parentName) throws GSimException;
 
     /**
      * Creates an AgentClass and sets the execution order, i.e. the position in which this agent is executed.
@@ -78,7 +76,7 @@ public interface DefinitionEnvironment extends Serializable {
      * @return AgentClassIF
      * @throws GSimException
      */
-    public AgentClassIF createAgentClass(String name, String parentName, int order) throws GSimException;
+    public AgentClass createAgentClass(String name, String parentName, int order) throws GSimException;
 
     /**
      * Creates an ObjectClass.
@@ -88,7 +86,7 @@ public interface DefinitionEnvironment extends Serializable {
      * @return ObjectClassIF
      * @throws GSimException
      */
-    public ObjectClassIF createObjectClass(String name, String parent) throws GSimException;
+    public ObjectClass createObjectClass(String name, String parent) throws GSimException;
 
     /**
      * Instanciates an object.
@@ -98,10 +96,10 @@ public interface DefinitionEnvironment extends Serializable {
      * @return ObjectInstanceIF
      * @throws GSimException
      */
-    public ObjectInstanceIF createObjectInstance(String name, ObjectClassIF parent) throws GSimException;
+    public ObjectInstance createObjectInstance(String name, ObjectClass parent) throws GSimException;
 
     /**
-     * Method required for memory management. In remote mode, it will remove the server objects.
+     * Destroys the environment and frees up any resources connected with it.
      */
     public void destroy();
 
@@ -112,7 +110,7 @@ public interface DefinitionEnvironment extends Serializable {
      * @return AgentInstanceIF
      * @throws GSimException
      */
-    public AgentInstanceIF getAgent(String name) throws GSimException;
+    public AgentInstance getAgent(String name) throws GSimException;
 
     /**
      * Return a particular agent class.
@@ -120,7 +118,7 @@ public interface DefinitionEnvironment extends Serializable {
      * @param name name of the agent class
      * @return AgentClassIF
      */
-    public AgentClassIF getAgentClass(String name) throws GSimException;
+    public AgentClass getAgentClass(String name) throws GSimException;
 
     /**
      * Return agent classes. If parent is null, all subclasses are returned.
@@ -128,8 +126,14 @@ public interface DefinitionEnvironment extends Serializable {
      * @param parent a parent frame
      * @return List of AgentClassIF
      */
-    public AgentClassIF[] getAgentClasses(String parent) throws GSimException;
+    public AgentClass[] getAgentClasses(String parent) throws GSimException;
 
+    /**
+     * Returns the name of all agents with the given parent.
+     * 
+     * @param parent the name of the parent agent
+     * @return the names of all subtypes of the parent
+     */
     public String[] getAgentNames(String parent) throws GSimException;
 
     /**
@@ -138,9 +142,8 @@ public interface DefinitionEnvironment extends Serializable {
      * 
      * @param parent a parent frame (if null, all agents are returned)
      * @return List of AgentInstanceIF
-     * 
      */
-    public AgentInstanceIF[] getAgents(String parent) throws GSimException;
+    public AgentInstance[] getAgents(String parent) throws GSimException;
 
     /**
      * Returns a list of agent instances of a particular type. All instances of lower levels of the frame hierarchy are returned. The offset and count
@@ -152,7 +155,7 @@ public interface DefinitionEnvironment extends Serializable {
      * @return List of AgentInstanceIF
      * @throws GSimException
      */
-    public AgentInstanceIF[] getAgents(String parent, int offset, int count) throws GSimException;
+    public AgentInstance[] getAgents(String parent, int offset, int count) throws GSimException;
 
     /**
      * Return a particular object class.
@@ -160,7 +163,7 @@ public interface DefinitionEnvironment extends Serializable {
      * @param name the name of the object class
      * @return ObjectClassIF
      */
-    public ObjectClassIF getObjectClass(String name) throws GSimException;
+    public ObjectClass getObjectClass(String name) throws GSimException;
 
     /**
      * Return object classes. If parent is null, all subclasses are returned.
@@ -168,7 +171,7 @@ public interface DefinitionEnvironment extends Serializable {
      * @param parent the parent class
      * @return ObjectClassIF[]
      */
-    public ObjectClassIF[] getObjectClasses(String parent) throws GSimException;
+    public ObjectClass[] getObjectClasses(String parent) throws GSimException;
 
     /**
      * 
@@ -176,7 +179,7 @@ public interface DefinitionEnvironment extends Serializable {
      * @return list of ObjectInstanceIF
      * @throws GSimException
      */
-    public ObjectInstanceIF[] getObjects(String parent) throws GSimException;
+    public ObjectInstance[] getObjects(String parent) throws GSimException;
 
     /**
      * Return the generic root (the system object from which all agent classes must inherit their properties)
@@ -184,7 +187,7 @@ public interface DefinitionEnvironment extends Serializable {
      * @return AgentClassIF
      * @throws GSimException
      */
-    public AgentClassIF getTopAgentClass() throws GSimException;
+    public AgentClass getTopAgentClass() throws GSimException;
 
     /**
      * Return the top level object class from which all objects must inherit.
@@ -192,7 +195,7 @@ public interface DefinitionEnvironment extends Serializable {
      * @return ObjectClassIF
      * @throws GSimException
      */
-    public ObjectClassIF getTopObjectClass() throws GSimException;
+    public ObjectClass getTopObjectClass() throws GSimException;
 
     /**
      * Instanciate a single agent.
@@ -202,7 +205,7 @@ public interface DefinitionEnvironment extends Serializable {
      * @return AgentInstanceIF
      * @throws GSimException
      */
-    public AgentInstanceIF instanciateAgent(AgentClassIF parent, String name) throws GSimException;
+    public AgentInstance instanciateAgent(AgentClass parent, String name) throws GSimException;
 
     /**
      * Creates a list of agents.
@@ -215,7 +218,7 @@ public interface DefinitionEnvironment extends Serializable {
      * @return List of AgentInstanceIF
      * @throws GSimException
      */
-    public AgentInstanceIF[] instanciateAgents(AgentClassIF parent, String prefix, int method, double standardVariation, int count)
+    public AgentInstance[] instanciateAgents(AgentClass parent, String prefix, int method, double standardVariation, int count)
             throws GSimException;
 
     /**
@@ -229,7 +232,7 @@ public interface DefinitionEnvironment extends Serializable {
      * @param count number of agents to instanciate
      * @throws GSimException
      */
-    public void instanciateAgents2(AgentClassIF parent, String prefix, int method, double svar, int count) throws GSimException;
+    public void instanciateAgents2(AgentClass parent, String prefix, int method, double svar, int count) throws GSimException;
 
     /**
      * Clears the environment from agents.

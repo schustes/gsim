@@ -19,9 +19,9 @@ import gsim.def.objects.Frame;
 import gsim.def.objects.Instance;
 import gsim.def.objects.agent.BehaviourFrame;
 import gsim.def.objects.agent.GenericAgentClass;
-import gsim.def.objects.behaviour.Action;
-import gsim.def.objects.behaviour.Condition;
-import gsim.def.objects.behaviour.Expansion;
+import gsim.def.objects.behaviour.ActionDef;
+import gsim.def.objects.behaviour.ConditionDef;
+import gsim.def.objects.behaviour.ExpansionDef;
 import gsim.def.objects.behaviour.RLRule;
 import gsim.def.objects.behaviour.UserRule;
 import gsim.def.objects.behaviour.UserRuleFrame;
@@ -107,7 +107,7 @@ public class JessHandler implements java.io.Serializable {
 
     public void checkRLParams() {
         for (RLRule r : owner.getBehaviour().getRLRules()) {
-            for (Expansion e : r.getExpansions()) {
+            for (ExpansionDef e : r.getExpansions()) {
                 String path = e.getParameterName();
                 DomainAttribute a = extractAtt(path);// (DomainAttribute) this.owner.getDefinition().resolveName(path.split("/"));
                 if (a.getType().equals(AttributeConstants.SET)) {
@@ -276,7 +276,7 @@ public class JessHandler implements java.io.Serializable {
 
     public void initRLRanges() {
         for (RLRule r : owner.getBehaviour().getRLRules()) {
-            for (Expansion e : r.getExpansions()) {
+            for (ExpansionDef e : r.getExpansions()) {
                 String path = e.getParameterName();
                 // DomainAttribute a = (DomainAttribute) this.owner.getDefinition().resolveName(path.split("/"));
                 DomainAttribute a = extractAtt(path);
@@ -295,7 +295,7 @@ public class JessHandler implements java.io.Serializable {
 
     public void initRLRanges_old() {
         for (RLRule r : owner.getBehaviour().getRLRules()) {
-            for (Expansion e : r.getExpansions()) {
+            for (ExpansionDef e : r.getExpansions()) {
                 String path = e.getParameterName();
                 DomainAttribute a = (DomainAttribute) owner.getDefinition().resolveName(path.split("/"));
                 if (a.getType().equals(AttributeConstants.SET)) {
@@ -454,7 +454,7 @@ public class JessHandler implements java.io.Serializable {
         }
 
         for (RLRule c : owner.getBehaviour().getRLRules()) {
-            Condition cond = c.getEvaluationFunction();
+            ConditionDef cond = c.getEvaluationFunction();
             if (cond != null) {
                 String attName = cond.getParameterName();
                 Attribute ref = (Attribute) owner.resolveName(attName.split("/"));
@@ -756,7 +756,7 @@ public class JessHandler implements java.io.Serializable {
             if (rule.getAttribute("retract-osbolete-actions") != null
                     && rule.getAttribute("retract-osbolete-actions").toValueString().equalsIgnoreCase("true")) {
                 for (Instance a : rule.getChildInstances(UserRuleFrame.INST_LIST_CONS)) {
-                    Action action = new Action(a);
+                    ActionDef action = new ActionDef(a);
                     String[] params = action.getObjectClassParams();
 
                     List<String> arg = null;

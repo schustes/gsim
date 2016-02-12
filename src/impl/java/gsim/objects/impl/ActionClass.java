@@ -1,11 +1,10 @@
 package gsim.objects.impl;
 
-import de.s2.gsim.objects.ActionIF;
 import de.s2.gsim.objects.GSimObjectException;
 import gsim.def.objects.Unit;
 import gsim.def.objects.behaviour.ActionFrame;
 
-public class ActionClass implements ActionIF, UnitWrapper {
+public class ActionClass implements de.s2.gsim.objects.Action, UnitWrapper {
 
     private static final long serialVersionUID = 1L;
 

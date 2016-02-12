@@ -4,9 +4,9 @@ import java.io.Serializable;
 
 import de.s2.gsim.objects.attribute.Attribute;
 
-public interface ObjectInstanceIF extends Serializable {
+public interface ObjectInstance extends Serializable {
 
-    public ObjectInstanceIF copy();
+    public ObjectInstance copy();
 
     public void destroy() throws GSimObjectException;
 

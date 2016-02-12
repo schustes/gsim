@@ -1,23 +1,23 @@
 package gsim.objects.impl;
 
-import de.s2.gsim.objects.ActionIF;
-import de.s2.gsim.objects.GSimObjectException;
-import de.s2.gsim.objects.RuleIF;
-import gsim.def.objects.Unit;
-import gsim.def.objects.behaviour.Action;
 
-public class ActionInstance implements ActionIF, UnitWrapper {
+import de.s2.gsim.objects.GSimObjectException;
+import de.s2.gsim.objects.Rule;
+import gsim.def.objects.Unit;
+import gsim.def.objects.behaviour.ActionDef;
+
+public class ActionInstance implements de.s2.gsim.objects.Action, UnitWrapper {
 
     /**
      *
      */
     private static final long serialVersionUID = 1L;
 
-    private RuleIF owner;
+    private Rule owner;
 
-    private Action real;
+    private ActionDef real;
 
-    public ActionInstance(RuleIF owner, Action real) {
+    public ActionInstance(Rule owner, ActionDef real) {
         this.real = real;
         this.owner = owner;
     }

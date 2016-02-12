@@ -40,16 +40,16 @@ public class UserRule extends Instance {
         }
     }
 
-    public void addCondition(Condition cond) {
+    public void addCondition(ConditionDef cond) {
         super.addChildInstance(UserRuleFrame.INST_LIST_COND, cond);
     }
 
-    public void addConsequence(Action cons) {
+    public void addConsequence(ActionDef cons) {
         super.addChildInstance(UserRuleFrame.INST_LIST_CONS, cons);
     }
 
-    public Condition createCondition(String var, String op, String val) {
-        Condition f = new Condition(var, op, val);
+    public ConditionDef createCondition(String var, String op, String val) {
+        ConditionDef f = new ConditionDef(var, op, val);
         return f;
     }
 
@@ -72,8 +72,8 @@ public class UserRule extends Instance {
 
         UserRule other = (UserRule) o;
 
-        Condition[] otherConditions = other.getConditions();
-        Condition[] myConditions = getConditions();
+        ConditionDef[] otherConditions = other.getConditions();
+        ConditionDef[] myConditions = getConditions();
 
         for (int i = 0; i < otherConditions.length; i++) {
             boolean b = false;
@@ -89,8 +89,8 @@ public class UserRule extends Instance {
 
         // all conditions were equal if we come to this point
 
-        Action[] otherActions = other.getConsequences();
-        Action[] myActions = getConsequences();
+        ActionDef[] otherActions = other.getConsequences();
+        ActionDef[] myActions = getConsequences();
 
         for (int i = 0; i < otherActions.length; i++) {
             boolean b = false;
@@ -109,35 +109,35 @@ public class UserRule extends Instance {
         return true;
     }
 
-    public Condition[] getConditions() {
+    public ConditionDef[] getConditions() {
         Instance[] inst = getChildInstances(UserRuleFrame.INST_LIST_COND);
 
         if (inst == null) {
-            return new Condition[0];
+            return new ConditionDef[0];
         }
 
-        Condition[] cond = new Condition[inst.length];
+        ConditionDef[] cond = new ConditionDef[inst.length];
 
         for (int i = 0; i < cond.length; i++) {
-            cond[i] = new Condition(inst[i]);
+            cond[i] = new ConditionDef(inst[i]);
         }
         return cond;
     }
 
-    public Action[] getConsequences() {
+    public ActionDef[] getConsequences() {
         Instance[] inst = getChildInstances(UserRuleFrame.INST_LIST_CONS);
-        Action[] cons = new Action[inst.length];
+        ActionDef[] cons = new ActionDef[inst.length];
         for (int i = 0; i < cons.length; i++) {
-            cons[i] = new Action(inst[i]);
+            cons[i] = new ActionDef(inst[i]);
         }
         return cons;
     }
 
-    public Action getConsequent(String name) {
+    public ActionDef getConsequent(String name) {
         Instance[] inst = getChildInstances(UserRuleFrame.INST_LIST_CONS);
         for (int i = 0; i < inst.length; i++) {
             if (inst[i].getName().equals(name)) {
-                return new Action(inst[i]);
+                return new ActionDef(inst[i]);
             }
         }
         return null;
@@ -167,11 +167,11 @@ public class UserRule extends Instance {
         return b.booleanValue();
     }
 
-    public void removeCondition(Condition cond) {
+    public void removeCondition(ConditionDef cond) {
         super.removeChildInstance(UserRuleFrame.INST_LIST_COND, cond.getName());
     }
 
-    public void removeConsequence(Action cons) {
+    public void removeConsequence(ActionDef cons) {
         super.removeChildInstance(UserRuleFrame.INST_LIST_CONS, cons.getName());
     }
 
@@ -180,11 +180,11 @@ public class UserRule extends Instance {
         this.setAttribute(UserRuleFrame.ATTR_LIST_ATTRS, a);
     }
 
-    public void setCondition(Condition cond) {
+    public void setCondition(ConditionDef cond) {
         super.setChildInstance(UserRuleFrame.INST_LIST_COND, cond);
     }
 
-    public void setConsequence(Action cons) {
+    public void setConsequence(ActionDef cons) {
         super.setChildInstance(UserRuleFrame.INST_LIST_CONS, cons);
     }
 

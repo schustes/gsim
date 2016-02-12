@@ -6,7 +6,7 @@ package de.s2.gsim.objects;
  * @author Stephan
  *
  */
-public interface AgentClassIF extends ObjectClassIF {
+public interface AgentClass extends ObjectClass {
 
     /**
      * Adds the object class if the object class is not yet defined, or updates it otherwise.
@@ -15,7 +15,7 @@ public interface AgentClassIF extends ObjectClassIF {
      * @param object the object class to add/set
      * @throws GSimObjectException
      */
-    public void addOrSetObject(String list, ObjectClassIF object) throws GSimObjectException;
+    public void addOrSetObject(String list, ObjectClass object) throws GSimObjectException;
 
     /**
      * Gets the behaviour associated with this agent.
@@ -23,7 +23,7 @@ public interface AgentClassIF extends ObjectClassIF {
      * @return the behaviour
      * @throws GSimObjectException
      */
-    public BehaviourIF getBehaviour() throws GSimObjectException;
+    public Behaviour getBehaviour() throws GSimObjectException;
 
     /**
      * Gets the names of all object lists that are defined for this agent.
@@ -40,7 +40,7 @@ public interface AgentClassIF extends ObjectClassIF {
      * @return object class
      * @throws GSimObjectException
      */
-    public ObjectClassIF getObjectListType(String listName) throws GSimObjectException;
+    public ObjectClass getObjectListType(String listName) throws GSimObjectException;
 
     /**
      * Gets the default objects in a list. This object classes would be used as a template during the instanciation process.
@@ -49,7 +49,7 @@ public interface AgentClassIF extends ObjectClassIF {
      * @return a list of object classes
      * @throws GSimObjectException
      */
-    public ObjectClassIF[] getObjects(String list) throws GSimObjectException;
+    public ObjectClass[] getObjects(String list) throws GSimObjectException;
 
     /**
      * Tests whether an object class was defined in this agent, or whether it was defined somewhere up in the inheritance hierarchy.
@@ -68,7 +68,7 @@ public interface AgentClassIF extends ObjectClassIF {
      * @param object the object class
      * @throws GSimObjectException
      */
-    public void removeObject(String list, ObjectClassIF object) throws GSimObjectException;
+    public void removeObject(String list, ObjectClass object) throws GSimObjectException;
 
     /**
      * Removes an object class, identified by name only, from a list.
@@ -98,6 +98,6 @@ public interface AgentClassIF extends ObjectClassIF {
      * @param behaviour the behaviour
      * @throws GSimObjectException
      */
-    public void setBehaviour(BehaviourIF behaviour) throws GSimObjectException;
+    public void setBehaviour(Behaviour behaviour) throws GSimObjectException;
 
 }

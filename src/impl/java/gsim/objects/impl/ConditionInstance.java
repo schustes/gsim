@@ -1,11 +1,11 @@
 package gsim.objects.impl;
 
-import de.s2.gsim.objects.ConditionIF;
+import de.s2.gsim.objects.Condition;
 import de.s2.gsim.objects.GSimObjectException;
 import gsim.def.objects.Unit;
-import gsim.def.objects.behaviour.Condition;
+import gsim.def.objects.behaviour.ConditionDef;
 
-public class ConditionInstance implements ConditionIF, UnitWrapper {
+public class ConditionInstance implements Condition, UnitWrapper {
 
     /**
      *
@@ -14,9 +14,9 @@ public class ConditionInstance implements ConditionIF, UnitWrapper {
 
     private RuleInstance owner;
 
-    private Condition real;
+    private ConditionDef real;
 
-    public ConditionInstance(RuleInstance owner, Condition real) {
+    public ConditionInstance(RuleInstance owner, ConditionDef real) {
         this.real = real;
         this.owner = owner;
     }

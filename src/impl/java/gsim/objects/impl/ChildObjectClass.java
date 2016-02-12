@@ -2,14 +2,14 @@ package gsim.objects.impl;
 
 import java.util.ArrayList;
 
-import de.s2.gsim.objects.AgentClassIF;
+import de.s2.gsim.objects.AgentClass;
 import de.s2.gsim.objects.GSimObjectException;
-import de.s2.gsim.objects.ObjectClassIF;
+import de.s2.gsim.objects.ObjectClass;
 import de.s2.gsim.objects.attribute.DomainAttribute;
 import gsim.def.objects.Frame;
 import gsim.def.objects.Unit;
 
-public class ChildObjectClass implements ObjectClassIF, UnitWrapper {
+public class ChildObjectClass implements ObjectClass, UnitWrapper {
 
     /**
      *
@@ -18,13 +18,13 @@ public class ChildObjectClass implements ObjectClassIF, UnitWrapper {
 
     private boolean destroyed = false;
 
-    private AgentClassIF env;
+    private AgentClass env;
 
     private String list = "";
 
     private Frame real;
 
-    public ChildObjectClass(AgentClassIF env, String list, Frame real) {
+    public ChildObjectClass(AgentClass env, String list, Frame real) {
         this.env = env;
         this.real = real;
         this.list = list;

@@ -1,7 +1,7 @@
 package gsim.sim.behaviour.impl;
 
 import de.s2.gsim.sim.engine.GSimEngineException;
-import gsim.def.objects.behaviour.Condition;
+import gsim.def.objects.behaviour.ConditionDef;
 import gsim.def.objects.behaviour.RLRule;
 import gsim.def.objects.behaviour.UserRule;
 import gsim.sim.agent.RuntimeAgent;
@@ -55,7 +55,7 @@ public class TreeExpansionBuilder {
 
         String n = "";
 
-        for (Condition condition : rule.getConditions()) {
+        for (ConditionDef condition : rule.getConditions()) {
             n += conditionBuilder.createCondition(agent, condition, objRefs, ruleSoFar);
         }
         return n;

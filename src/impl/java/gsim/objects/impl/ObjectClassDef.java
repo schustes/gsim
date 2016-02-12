@@ -3,14 +3,14 @@ package gsim.objects.impl;
 import java.util.ArrayList;
 
 import de.s2.gsim.objects.GSimObjectException;
-import de.s2.gsim.objects.ObjectClassIF;
+import de.s2.gsim.objects.ObjectClass;
 import de.s2.gsim.objects.attribute.Attribute;
 import de.s2.gsim.objects.attribute.DomainAttribute;
 import gsim.def.Environment;
 import gsim.def.objects.Frame;
 import gsim.def.objects.Unit;
 
-public class ObjectClass implements ObjectClassIF, UnitWrapper {
+public class ObjectClassDef implements ObjectClass, UnitWrapper {
 
     /**
      *
@@ -23,7 +23,7 @@ public class ObjectClass implements ObjectClassIF, UnitWrapper {
 
     protected Frame real;
 
-    public ObjectClass(Environment env, Frame real) {
+    public ObjectClassDef(Environment env, Frame real) {
         this.env = env;
         this.real = real;
     }

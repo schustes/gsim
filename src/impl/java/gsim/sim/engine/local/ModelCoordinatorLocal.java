@@ -14,9 +14,9 @@ import java.util.Random;
 
 import org.apache.log4j.Logger;
 
-import de.s2.gsim.core.DefinitionEnvironment;
+import de.s2.gsim.core.ModelDefinitionEnvironment;
 import de.s2.gsim.objects.AppAgent;
-import de.s2.gsim.objects.ObjectInstanceIF;
+import de.s2.gsim.objects.ObjectInstance;
 import de.s2.gsim.objects.attribute.Attribute;
 import de.s2.gsim.sim.agent.AgentState;
 import de.s2.gsim.sim.communication.AgentType;
@@ -315,7 +315,7 @@ public class ModelCoordinatorLocal implements ModelState, Steppable, Saveable {
     }
 
     @Override
-    public DefinitionEnvironment getDefinitionEnvironment() throws GSimEngineException {
+    public ModelDefinitionEnvironment getDefinitionEnvironment() throws GSimEngineException {
         EnvLocalImpl impl = new EnvLocalImpl(env);
         return impl;
     }
@@ -397,7 +397,7 @@ public class ModelCoordinatorLocal implements ModelState, Steppable, Saveable {
     public void modifyAgentState(AgentState agentState) throws GSimEngineException {
         RuntimeAgent agent = agents.get(agentState.getAgentName());
         for (String list : agentState.getAgentObjectListNames()) {
-            for (ObjectInstanceIF inst : agentState.getAgentObjects(list)) {
+            for (ObjectInstance inst : agentState.getAgentObjects(list)) {
                 agent.setChildInstance(list, (Instance) inst);
             }
         }

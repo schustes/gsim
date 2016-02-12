@@ -3,7 +3,7 @@ package gsim.util;
 import java.util.ArrayList;
 import java.util.HashSet;
 
-import de.s2.gsim.objects.AgentInstanceIF;
+import de.s2.gsim.objects.AgentInstance;
 import de.s2.gsim.objects.attribute.Attribute;
 import de.s2.gsim.objects.attribute.IntervalAttribute;
 import de.s2.gsim.objects.attribute.NumericalAttribute;
@@ -472,7 +472,7 @@ public class Utils {
         return (a instanceof NumericalAttribute);
     }
 
-    public static double numericalValue(AgentInstanceIF in, String list, String att) {
+    public static double numericalValue(AgentInstance in, String list, String att) {
         try {
             Attribute attribute = in.getAttribute(list, att);
             if (att != null && attribute instanceof NumericalAttribute) {

@@ -1,11 +1,11 @@
 package gsim.objects.impl;
 
-import de.s2.gsim.objects.ConditionIF;
+import de.s2.gsim.objects.Condition;
 import de.s2.gsim.objects.GSimObjectException;
 import gsim.def.objects.Unit;
 import gsim.def.objects.behaviour.ConditionFrame;
 
-public class ConditionClass implements ConditionIF, UnitWrapper {
+public class ConditionClass implements Condition, UnitWrapper {
 
     /**
      *

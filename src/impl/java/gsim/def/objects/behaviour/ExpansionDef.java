@@ -5,22 +5,22 @@ import de.s2.gsim.objects.attribute.SetAttribute;
 import de.s2.gsim.objects.attribute.StringAttribute;
 import gsim.def.objects.Instance;
 
-public class Expansion extends Instance {
+public class ExpansionDef extends Instance {
 
     /**
      * 
      */
     private static final long serialVersionUID = 1L;
 
-    public Expansion(Instance in) {
+    public ExpansionDef(Instance in) {
         super(in);
     }
 
-    public Expansion(String forParameter) {
+    public ExpansionDef(String forParameter) {
         super(forParameter + "-expansion-" + cern.jet.random.Uniform.staticNextDouble(), new ExpansionFrame(forParameter));
     }
 
-    public Expansion(String var, double min, double max) {
+    public ExpansionDef(String var, double min, double max) {
         this(var);
         setMax(max);
         setMin(min);

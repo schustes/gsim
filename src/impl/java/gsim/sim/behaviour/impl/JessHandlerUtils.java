@@ -8,11 +8,11 @@ import org.apache.log4j.Logger;
 import de.s2.gsim.objects.attribute.Attribute;
 import de.s2.gsim.objects.attribute.IntervalAttribute;
 import gsim.def.objects.Instance;
-import gsim.def.objects.agent.Behaviour;
+import gsim.def.objects.agent.BehaviourDef;
 import gsim.def.objects.agent.BehaviourFrame;
-import gsim.def.objects.behaviour.Action;
-import gsim.def.objects.behaviour.Condition;
-import gsim.def.objects.behaviour.Expansion;
+import gsim.def.objects.behaviour.ActionDef;
+import gsim.def.objects.behaviour.ConditionDef;
+import gsim.def.objects.behaviour.ExpansionDef;
 import gsim.def.objects.behaviour.RLRule;
 import gsim.def.objects.behaviour.RLRuleFrame;
 import gsim.def.objects.behaviour.UserRuleFrame;
@@ -30,7 +30,7 @@ public class JessHandlerUtils {
     private static Logger logger = Logger.getLogger(JessHandler.class);
 
     public static void addUserParams(Rete rete, RuntimeAgent owner) {
-        for (Action r : owner.getBehaviour().getAvailableActions()) {
+        for (ActionDef r : owner.getBehaviour().getAvailableActions()) {
             addUserParams0(rete, owner, r.getObjectClassParams());
         }
     }
@@ -75,9 +75,9 @@ public class JessHandlerUtils {
     public static HashSet<String> buildCurrentState(Rete rete, RuntimeAgent owner) throws JessException {
 
         ArrayList res = new ArrayList();
-        Behaviour b = owner.getBehaviour();
+        BehaviourDef b = owner.getBehaviour();
 
-        for (gsim.def.objects.behaviour.Action a : b.getAvailableActions()) {
+        for (gsim.def.objects.behaviour.ActionDef a : b.getAvailableActions()) {
             if (a.hasObjectParameter()) {
                 for (String param : a.getObjectClassParams()) {
                     if (param != null && param.length() > 0) {
@@ -95,7 +95,7 @@ public class JessHandlerUtils {
 
         for (Instance r : owner.getBehaviour().getChildInstances(BehaviourFrame.RULE_LIST)) {
             for (Instance cc : r.getChildInstances(UserRuleFrame.INST_LIST_COND)) {
-                Condition c = new Condition(cc);
+                ConditionDef c = new ConditionDef(cc);
                 uniqueConditions.add(c.getParameterName());
                 uniqueConditions.add(c.getParameterValue());
             }
@@ -103,12 +103,12 @@ public class JessHandlerUtils {
 
         for (Instance r : owner.getBehaviour().getChildInstances(BehaviourFrame.RL_LIST)) {
             for (Instance cc : r.getChildInstances(UserRuleFrame.INST_LIST_COND)) {
-                Condition c = new Condition(cc);
+                ConditionDef c = new ConditionDef(cc);
                 uniqueConditions.add(c.getParameterName());
                 uniqueConditions.add(c.getParameterValue());
             }
             for (Instance cc : r.getChildInstances(RLRuleFrame.INST_LIST_EXP)) {
-                Expansion c = new Expansion(cc);
+                ExpansionDef c = new ExpansionDef(cc);
                 uniqueConditions.add(c.getParameterName());
                 uniqueConditions.add(String.valueOf(c.getMin()));
                 uniqueConditions.add(c.getParameterName());
@@ -117,7 +117,7 @@ public class JessHandlerUtils {
 
             for (Instance sc : r.getChildInstances(RLRuleFrame.INST_LIST_SHORTCUTS)) {
                 for (Instance cc : sc.getChildInstances(UserRuleFrame.INST_LIST_COND)) {
-                    Condition c = new Condition(cc);
+                    ConditionDef c = new ConditionDef(cc);
                     if (!c.getParameterName().contains("$")) {
                         throw new RuntimeException("Parse error: selectors must reference action-nodes on their LHS");
                     }
@@ -129,7 +129,7 @@ public class JessHandlerUtils {
             for (Instance eval : r.getChildInstances(RLRuleFrame.INST_LIST_LEARNING)) {
                 String s = eval.getName();
                 if (!eval.getName().startsWith("{")) {
-                    Condition c = new Condition(eval);
+                    ConditionDef c = new ConditionDef(eval);
                     s = c.getParameterName();
                     uniqueConditions.add(c.getParameterName());
                     uniqueConditions.add(c.getParameterValue());

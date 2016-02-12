@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import de.s2.gsim.objects.ObjectInstanceIF;
+import de.s2.gsim.objects.ObjectInstance;
 import de.s2.gsim.objects.attribute.Attribute;
 import de.s2.gsim.sim.agent.AgentState;
 import gsim.def.objects.TypedList;
@@ -94,12 +94,12 @@ public class RuntimeAgentState implements Serializable, AgentState {
     }
 
     @Override
-    public List<ObjectInstanceIF> getAgentObjects(String list) {
+    public List<ObjectInstance> getAgentObjects(String list) {
         TypedList tlist = r.getObjectLists().get(list);
-        List<ObjectInstanceIF> ret = new ArrayList<ObjectInstanceIF>();
+        List<ObjectInstance> ret = new ArrayList<ObjectInstance>();
         for (Unit unit : tlist) {
-            if (unit instanceof ObjectInstanceIF) {
-                ret.add((ObjectInstanceIF) unit);
+            if (unit instanceof ObjectInstance) {
+                ret.add((ObjectInstance) unit);
             }
         }
         return ret;

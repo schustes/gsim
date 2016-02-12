@@ -1,9 +1,9 @@
 package gsim.core.impl;
 
-import de.s2.gsim.core.DefinitionEnvironment;
+import de.s2.gsim.core.ModelDefinitionEnvironment;
 import gsim.def.Environment;
 
-public class EnvLocalImpl extends AbstractEnv implements DefinitionEnvironment {
+public class EnvLocalImpl extends AbstractEnv implements ModelDefinitionEnvironment {
 
     /**
      * 

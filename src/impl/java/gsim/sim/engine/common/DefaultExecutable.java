@@ -6,11 +6,11 @@ import java.util.HashMap;
 import org.apache.log4j.Logger;
 //import gsim.tools.setup.ModelInstanceSetupPanel;
 
-import de.s2.gsim.core.DefinitionEnvironment;
+import de.s2.gsim.core.ModelDefinitionEnvironment;
 import de.s2.gsim.core.GSimCore;
 import de.s2.gsim.core.GSimCoreFactory;
-import de.s2.gsim.core.ScenarioListener;
-import de.s2.gsim.core.ScenarioManager;
+import de.s2.gsim.core.SimulationController;
+import de.s2.gsim.core.SimulationListener;
 import de.s2.gsim.sim.engine.Executable;
 
 public class DefaultExecutable implements Executable, Serializable {
@@ -19,9 +19,9 @@ public class DefaultExecutable implements Executable, Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private DefinitionEnvironment env;
+    private ModelDefinitionEnvironment env;
 
-    private transient ScenarioManager m;
+    private transient SimulationController m;
 
     private String mode;
 
@@ -31,7 +31,7 @@ public class DefaultExecutable implements Executable, Serializable {
 
     private int steps = 0;
 
-    public DefaultExecutable(DefinitionEnvironment env, String mode, HashMap<String, Object> props, int steps, int runs) {
+    public DefaultExecutable(ModelDefinitionEnvironment env, String mode, HashMap<String, Object> props, int steps, int runs) {
         this.mode = mode;
         this.props = props;
         this.steps = steps;
@@ -46,7 +46,7 @@ public class DefaultExecutable implements Executable, Serializable {
 
             m = core.createScenarioManager(env, props, steps, runs);
 
-            m.registerSimulationListener(new ScenarioListener() {
+            m.registerSimulationListener(new SimulationListener() {
                 @Override
                 public void instanceCancelled(String uid) {
                 }

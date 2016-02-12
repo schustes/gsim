@@ -16,7 +16,7 @@ import gsim.util.Utils;
  *
  * @see ActionFrame for details.
  */
-public class Action extends Instance {
+public class ActionDef extends Instance {
 
     static final long serialVersionUID = -6035384056999349555L;
 
@@ -26,7 +26,7 @@ public class Action extends Instance {
      * @param f
      *            ActionFrame
      */
-    public Action(ActionFrame f) {
+    public ActionDef(ActionFrame f) {
         super(f.getTypeName(), f);
     }
 
@@ -36,7 +36,7 @@ public class Action extends Instance {
      * @param inst
      *            Instance
      */
-    public Action(Instance inst) {
+    public ActionDef(Instance inst) {
         super(inst);
     }
 
@@ -99,11 +99,11 @@ public class Action extends Instance {
     @Override
     public boolean equals(Object o) {
 
-        if (!(o instanceof Action)) {
+        if (!(o instanceof ActionDef)) {
             return false;
         }
 
-        Action other = (Action) o;
+        ActionDef other = (ActionDef) o;
 
         if (!other.getName().equals(getName())) {
             return false;

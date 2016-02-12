@@ -4,9 +4,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import de.s2.gsim.core.GSimException;
-import de.s2.gsim.core.ScenarioConnector;
-import de.s2.gsim.core.ScenarioListener;
-import de.s2.gsim.core.ScenarioManager;
+import de.s2.gsim.core.SimulationController;
+import de.s2.gsim.core.SimulationListener;
 import de.s2.gsim.sim.engine.GSimEngineException;
 import de.s2.gsim.sim.engine.ModelState;
 import de.s2.gsim.sim.engine.SimulationID;
@@ -16,11 +15,11 @@ import gsim.def.Environment;
 import gsim.sim.engine.local.SimulationInstanceContainerLocal;
 import gsim.sim.engine.local.SimulationManagerConnectorLocal;
 
-public class ScenarioManagerLocal implements ScenarioManager, ScenarioConnector {
+public class ScenarioManagerLocal implements SimulationController {
 
     private SimulationManagerConnector connector = null;
 
-    private ArrayList<ScenarioListener> listeners = new ArrayList<ScenarioListener>();
+    private ArrayList<SimulationListener> listeners = new ArrayList<SimulationListener>();
 
     private SimulationManager manager = null;
 
@@ -53,7 +52,7 @@ public class ScenarioManagerLocal implements ScenarioManager, ScenarioConnector 
     }
 
     @Override
-    public SimulationID[] getInstances() {
+    public SimulationID[] getSimulationInstances() {
         try {
             if (manager != null) {
                 return manager.getInstances();
@@ -106,7 +105,7 @@ public class ScenarioManagerLocal implements ScenarioManager, ScenarioConnector 
     }
 
     @Override
-    public void registerSimulationListener(ScenarioListener l) throws GSimException {
+    public void registerSimulationListener(SimulationListener l) throws GSimException {
         try {
             if (manager instanceof SimulationInstanceContainerLocal) {
                 SimulationInstanceContainerLocal m = (SimulationInstanceContainerLocal) manager;
@@ -164,7 +163,7 @@ public class ScenarioManagerLocal implements ScenarioManager, ScenarioConnector 
     }
 
     @Override
-    public void unregisterSimulationListener(ScenarioListener l) {
+    public void unregisterSimulationListener(SimulationListener l) {
         System.out.println("ScenarioManagerLocal.unregister:I think I can do nothing here");
     }
 

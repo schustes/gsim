@@ -2,7 +2,7 @@ package de.s2.gsim.sim.engine;
 
 import java.util.List;
 
-import de.s2.gsim.core.DefinitionEnvironment;
+import de.s2.gsim.core.ModelDefinitionEnvironment;
 import de.s2.gsim.objects.AppAgent;
 import de.s2.gsim.sim.agent.AgentState;
 
@@ -35,7 +35,7 @@ public interface ModelState {
 
     DataHandler[] getDataHandlers() throws GSimEngineException;
 
-    DefinitionEnvironment getDefinitionEnvironment() throws GSimEngineException;
+    ModelDefinitionEnvironment getDefinitionEnvironment() throws GSimEngineException;
 
     List<AgentState> getGlobalState() throws GSimEngineException;
 

@@ -2,16 +2,15 @@ package gsim.objects.impl;
 
 import java.util.ArrayList;
 
-import de.s2.gsim.objects.ActionIF;
-import de.s2.gsim.objects.ConditionIF;
+import de.s2.gsim.objects.Condition;
 import de.s2.gsim.objects.GSimObjectException;
-import de.s2.gsim.objects.RuleIF;
+import de.s2.gsim.objects.Rule;
 import gsim.def.objects.Unit;
 import gsim.def.objects.behaviour.ActionFrame;
 import gsim.def.objects.behaviour.ConditionFrame;
 import gsim.def.objects.behaviour.UserRuleFrame;
 
-public class RuleClass implements RuleIF, UnitWrapper {
+public class RuleClass implements Rule, UnitWrapper {
 
     /**
      *
@@ -28,7 +27,7 @@ public class RuleClass implements RuleIF, UnitWrapper {
     }
 
     @Override
-    public void addOrSetCondition(ConditionIF cond) throws GSimObjectException {
+    public void addOrSetCondition(Condition cond) throws GSimObjectException {
         ConditionFrame f = (ConditionFrame) ((UnitWrapper) cond).toUnit();
         real.removeCondition(f);
         real.addCondition(f);
@@ -36,21 +35,21 @@ public class RuleClass implements RuleIF, UnitWrapper {
     }
 
     @Override
-    public void addOrSetConsequent(ActionIF cons) throws GSimObjectException {
+    public void addOrSetConsequent(de.s2.gsim.objects.Action cons) throws GSimObjectException {
         real.removeConsequence((ActionFrame) ((UnitWrapper) cons).toUnit());
         real.addConsequence((ActionFrame) ((UnitWrapper) cons).toUnit());
         owner.addOrSetRule(this);
     }
 
     @Override
-    public ConditionIF createCondition(String paramName, String op, String val) throws GSimObjectException {
+    public Condition createCondition(String paramName, String op, String val) throws GSimObjectException {
         ConditionFrame c = real.createCondition(paramName, op, val);
         real.addCondition(c);
         return new ConditionClass(this, c);
     }
 
     @Override
-    public ConditionIF[] getConditions() {
+    public Condition[] getConditions() {
 
         ConditionFrame[] c = real.getConditions();
         ConditionClass[] ret = new ConditionClass[c.length];
@@ -61,7 +60,7 @@ public class RuleClass implements RuleIF, UnitWrapper {
     }
 
     @Override
-    public ActionIF getConsequent(String name) {
+    public de.s2.gsim.objects.Action getConsequent(String name) {
         ActionFrame[] c = real.getConsequences();
         for (int i = 0; i < c.length; i++) {
             if (c[i].getTypeName().equals(name)) {
@@ -72,8 +71,8 @@ public class RuleClass implements RuleIF, UnitWrapper {
     }
 
     @Override
-    public ActionIF[] getConsequents() {
-        ArrayList<ActionIF> list = new ArrayList<ActionIF>();
+    public de.s2.gsim.objects.Action[] getConsequents() {
+        ArrayList<de.s2.gsim.objects.Action> list = new ArrayList<>();
 
         ActionFrame[] c = real.getConsequences();
         for (int i = 0; i < c.length; i++) {
@@ -82,7 +81,7 @@ public class RuleClass implements RuleIF, UnitWrapper {
             }
         }
 
-        ActionIF[] ret = new ActionClass[list.size()];
+        de.s2.gsim.objects.Action[] ret = new ActionClass[list.size()];
         list.toArray(ret);
         return ret;
     }
@@ -98,13 +97,13 @@ public class RuleClass implements RuleIF, UnitWrapper {
     }
 
     @Override
-    public void removeCondition(ConditionIF cond) throws GSimObjectException {
+    public void removeCondition(Condition cond) throws GSimObjectException {
         real.removeCondition((ConditionFrame) ((UnitWrapper) cond).toUnit());
         owner.addOrSetRule(this);
     }
 
     @Override
-    public void removeConsequent(ActionIF cons) throws GSimObjectException {
+    public void removeConsequent(de.s2.gsim.objects.Action cons) throws GSimObjectException {
         real.removeConsequence((ActionFrame) ((UnitWrapper) cons).toUnit());
         owner.addOrSetRule(this);
     }

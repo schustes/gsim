@@ -26,7 +26,7 @@ public class RLRule extends UserRule {
         super(inst);
     }
 
-    public void addExpansion(Expansion cond) {
+    public void addExpansion(ExpansionDef cond) {
         super.addChildInstance(RLRuleFrame.INST_LIST_EXP, cond);
     }
 
@@ -74,18 +74,18 @@ public class RLRule extends UserRule {
         return a.getValue();
     }
 
-    public Condition getEvaluationFunction() {
+    public ConditionDef getEvaluationFunction() {
         Instance[] inst = getChildInstances(RLRuleFrame.INST_LIST_LEARNING);
         ArrayList list = new ArrayList();
         for (int i = 0; i < inst.length; i++) {
             if (!inst[i].getName().startsWith("{")) {
-                list.add(new Condition(inst[i]));
+                list.add(new ConditionDef(inst[i]));
             }
         }
 
-        Condition cond = null;
+        ConditionDef cond = null;
         if (list.size() == 1) {
-            cond = (Condition) list.get(0);
+            cond = (ConditionDef) list.get(0);
         } else if (list.size() > 1) {
             logger.warn("There was more than one learning evaluation function");
             // cond = (Condition) list.get(0);
@@ -94,11 +94,11 @@ public class RLRule extends UserRule {
 
     }
 
-    public Expansion[] getExpansions() {
+    public ExpansionDef[] getExpansions() {
         Instance[] f = super.getChildInstances(RLRuleFrame.INST_LIST_EXP);
-        Expansion[] e = new Expansion[f.length];
+        ExpansionDef[] e = new ExpansionDef[f.length];
         for (int i = 0; i < f.length; i++) {
-            e[i] = new Expansion(f[i]);
+            e[i] = new ExpansionDef(f[i]);
         }
         return e;
     }
@@ -222,7 +222,7 @@ public class RLRule extends UserRule {
         super.setAttribute(UserRuleFrame.ATTR_LIST_ATTRS, a);
     }
 
-    public void setEvaluationFunction(Condition f) {
+    public void setEvaluationFunction(ConditionDef f) {
         for (Instance a : super.getChildInstances(RLRuleFrame.INST_LIST_LEARNING)) {
             super.removeChildInstance(RLRuleFrame.INST_LIST_LEARNING, a.getName());
         }

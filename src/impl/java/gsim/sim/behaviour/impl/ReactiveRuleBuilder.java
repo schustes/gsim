@@ -3,7 +3,7 @@ package gsim.sim.behaviour.impl;
 import cern.jet.random.Uniform;
 import de.s2.gsim.sim.engine.GSimEngineException;
 import gsim.def.objects.Instance;
-import gsim.def.objects.behaviour.Condition;
+import gsim.def.objects.behaviour.ConditionDef;
 import gsim.def.objects.behaviour.UserRule;
 import gsim.sim.agent.RuntimeAgent;
 import jess.JessException;
@@ -52,7 +52,7 @@ public class ReactiveRuleBuilder {
 
     private String buildUserRules_PerActionName(UserRule rule) throws GSimEngineException {
 
-        gsim.def.objects.behaviour.Action[] consequences = rule.getConsequences();
+        gsim.def.objects.behaviour.ActionDef[] consequences = rule.getConsequences();
         String role = ParsingUtils.getDefiningRoleForRule(agent, rule.getName());
 
         String res = "";
@@ -62,7 +62,7 @@ public class ReactiveRuleBuilder {
             if (rule.isActivated()) {
                 for (int i = 0; i < consequences.length; i++) {
 
-                    gsim.def.objects.behaviour.Action c = consequences[i];
+                    gsim.def.objects.behaviour.ActionDef c = consequences[i];
 
                     String x = rule.getName() + "_" + i;
                     x = x.replace(' ', '_');
@@ -78,7 +78,7 @@ public class ReactiveRuleBuilder {
 
                     String ruleIdent = x + val + role;
 
-                    Condition[] conditions = rule.getConditions();
+                    ConditionDef[] conditions = rule.getConditions();
 
                     String salience = "\n ";
                     salience += "(declare (salience " + (int) consequences[i].getSalience() + ")) ";
@@ -104,7 +104,7 @@ public class ReactiveRuleBuilder {
                         p.build(rule);
 
                         for (int k = 0; k < conditions.length; k++) {
-                            Condition cond = conditions[k];
+                            ConditionDef cond = conditions[k];
                             if (isConstant(cond.getParameterValue()) && !isExistQuantified(cond) && cond.getParameterValue().indexOf("{") < 0) {
                                 nRule += " " + utils.createFixedAtomCondition(cond, p, nRule);
                             } else if (isConstant(cond.getParameterValue()) && isExistQuantified(cond)) {
@@ -139,8 +139,8 @@ public class ReactiveRuleBuilder {
         return res;
     }
 
-    private String buildUserRules_PerActionName_P(String ruleIdent, String nRule, String[] objParams, gsim.def.objects.behaviour.Action consequence,
-            Condition[] conditions, String role, UserRule rule) {
+    private String buildUserRules_PerActionName_P(String ruleIdent, String nRule, String[] objParams, gsim.def.objects.behaviour.ActionDef consequence,
+            ConditionDef[] conditions, String role, UserRule rule) {
 
         try {
             String ctxString = "";
@@ -169,7 +169,7 @@ public class ReactiveRuleBuilder {
             }
 
             for (int k = 0; k < conditions.length; k++) {
-                Condition cond = conditions[k];
+                ConditionDef cond = conditions[k];
                 if (isConstant(cond.getParameterValue()) && !isExistQuantified(cond) && cond.getParameterValue().indexOf("{") < 0) {
                     nRule += "" + utils.createFixedAtomCondition(cond, params, nRule);
                 } else if (isExistQuantified(cond)) {
@@ -207,7 +207,7 @@ public class ReactiveRuleBuilder {
         return true;
     }
 
-    private boolean isExistQuantified(Condition c) {
+    private boolean isExistQuantified(ConditionDef c) {
         return c.getOperator().trim().equalsIgnoreCase("EXISTS") || c.getOperator().trim().equalsIgnoreCase("~EXISTS")
                 || c.getOperator().trim().equalsIgnoreCase("NOT EXISTS");
     }

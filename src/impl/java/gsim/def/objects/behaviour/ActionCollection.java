@@ -14,22 +14,22 @@ public class ActionCollection extends Instance {
         super(inst);
     }
 
-    public Action getAction(String name) {
+    public ActionDef getAction(String name) {
         Instance inst = this.getChildInstance(ActionCollectionFrame.INST_ACTION_LIST, name);
         if (inst != null) {
-            return new Action(inst);
+            return new ActionDef(inst);
         }
         return null;
     }
 
-    public Action[] getActions() {
+    public ActionDef[] getActions() {
         Instance[] inst = getChildInstances(ActionCollectionFrame.INST_ACTION_LIST);
         if (inst == null) {
-            return new Action[0];
+            return new ActionDef[0];
         }
-        Action[] a = new Action[inst.length];
+        ActionDef[] a = new ActionDef[inst.length];
         for (int i = 0; i < inst.length; i++) {
-            a[i] = new Action(inst[i]);
+            a[i] = new ActionDef(inst[i]);
         }
         return a;
     }

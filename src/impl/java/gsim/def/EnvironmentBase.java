@@ -12,7 +12,7 @@ import gsim.def.objects.Frame;
 import gsim.def.objects.Instance;
 import gsim.def.objects.Unit;
 import gsim.def.objects.UnitUtils;
-import gsim.def.objects.agent.Behaviour;
+import gsim.def.objects.agent.BehaviourDef;
 import gsim.def.objects.agent.BehaviourFrame;
 import gsim.def.objects.agent.GenericAgent;
 import gsim.def.objects.agent.GenericAgentClass;
@@ -393,7 +393,7 @@ public class EnvironmentBase {
                 while (successorMembers.hasNext()) {
                     GenericAgent a = (GenericAgent) successorMembers.next();
                     a.setDirty(true);
-                    Behaviour np = new Behaviour(sb);
+                    BehaviourDef np = new BehaviourDef(sb);
                     a.setFrame(p);
                     a.setBehaviour(np);
                     successorMembers.set(a);
@@ -419,7 +419,7 @@ public class EnvironmentBase {
         while (successorMembers.hasNext()) {
             GenericAgent a = (GenericAgent) successorMembers.next();
             a.setDirty(true);
-            Behaviour np = new Behaviour(b);
+            BehaviourDef np = new BehaviourDef(b);
             a.setFrame(here);
             a.setBehaviour(np);
             successorMembers.set(a);

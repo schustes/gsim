@@ -3,10 +3,10 @@ package gsim.objects.impl;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import de.s2.gsim.objects.AgentClassIF;
-import de.s2.gsim.objects.BehaviourIF;
+import de.s2.gsim.objects.AgentClass;
+import de.s2.gsim.objects.Behaviour;
 import de.s2.gsim.objects.GSimObjectException;
-import de.s2.gsim.objects.ObjectClassIF;
+import de.s2.gsim.objects.ObjectClass;
 import de.s2.gsim.objects.attribute.Attribute;
 import de.s2.gsim.objects.attribute.DomainAttribute;
 import gsim.def.objects.Frame;
@@ -14,7 +14,7 @@ import gsim.def.objects.TypedList;
 import gsim.def.objects.agent.BehaviourFrame;
 import gsim.def.objects.agent.GenericAgentClass;
 
-public class AgentClassSim implements AgentClassIF, ObjectClassIF {
+public class AgentClassSim implements AgentClass, ObjectClass {
 
     /**
      *
@@ -40,7 +40,7 @@ public class AgentClassSim implements AgentClassIF, ObjectClassIF {
      * @link gsim.objects.AgentClassIF
      */
     @Override
-    public void addOrSetObject(String list, ObjectClassIF object) throws GSimObjectException {
+    public void addOrSetObject(String list, ObjectClass object) throws GSimObjectException {
 
         try {
             real.addChildFrame(list, (Frame) ((UnitWrapper) object).toUnit());
@@ -103,7 +103,7 @@ public class AgentClassSim implements AgentClassIF, ObjectClassIF {
      * @link gsim.objects.AgentClassIF
      */
     @Override
-    public BehaviourIF getBehaviour() throws GSimObjectException {
+    public Behaviour getBehaviour() throws GSimObjectException {
 
         try {
             return new BehaviourClass(this, real.getBehaviour());
@@ -162,7 +162,7 @@ public class AgentClassSim implements AgentClassIF, ObjectClassIF {
      * @link gsim.objects.AgentClassIF
      */
     @Override
-    public ObjectClassIF getObjectListType(String listName) throws GSimObjectException {
+    public ObjectClass getObjectListType(String listName) throws GSimObjectException {
         try {
             return new ChildObjectClass(this, listName, real.getListType(listName));
         } catch (Exception e) {
@@ -175,11 +175,11 @@ public class AgentClassSim implements AgentClassIF, ObjectClassIF {
      * @link gsim.objects.AgentClassIF
      */
     @Override
-    public ObjectClassIF[] getObjects(String list) throws GSimObjectException {
+    public ObjectClass[] getObjects(String list) throws GSimObjectException {
 
         try {
             Frame[] f = real.getChildFrames(list);
-            ObjectClassIF[] ret = new ObjectClassIF[f.length];
+            ObjectClass[] ret = new ObjectClass[f.length];
             for (int i = 0; i < f.length; i++) {
                 ret[i] = new ChildObjectClass(this, list, f[i]);
             }
@@ -205,7 +205,7 @@ public class AgentClassSim implements AgentClassIF, ObjectClassIF {
      * @link gsim.objects.AgentClassIF
      */
     @Override
-    public void removeObject(String list, ObjectClassIF object) throws GSimObjectException {
+    public void removeObject(String list, ObjectClass object) throws GSimObjectException {
 
         try {
             real.removeChildFrame(list, object.getName());
@@ -289,7 +289,7 @@ public class AgentClassSim implements AgentClassIF, ObjectClassIF {
      * @throws GSimObjectException
      */
     @Override
-    public void setBehaviour(BehaviourIF b) throws GSimObjectException {
+    public void setBehaviour(Behaviour b) throws GSimObjectException {
 
         try {
             if (!(b instanceof BehaviourClass)) {

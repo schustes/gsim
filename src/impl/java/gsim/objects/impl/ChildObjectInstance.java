@@ -3,9 +3,9 @@ package gsim.objects.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.s2.gsim.objects.AgentInstanceIF;
+import de.s2.gsim.objects.AgentInstance;
 import de.s2.gsim.objects.GSimObjectException;
-import de.s2.gsim.objects.ObjectInstanceIF;
+import de.s2.gsim.objects.ObjectInstance;
 import de.s2.gsim.objects.attribute.Attribute;
 import de.s2.gsim.objects.attribute.DomainAttribute;
 import de.s2.gsim.objects.attribute.IntervalAttribute;
@@ -16,27 +16,27 @@ import gsim.def.objects.Frame;
 import gsim.def.objects.Instance;
 import gsim.def.objects.Unit;
 
-public class ChildObjectInstance implements ObjectInstanceIF, UnitWrapper {
+public class ChildObjectInstance implements ObjectInstance, UnitWrapper {
 
     private static final long serialVersionUID = 1L;
 
     private boolean destroyed = false;
 
-    private AgentInstanceIF env;
+    private AgentInstance env;
 
     private String list = "";
 
     private Instance real;
 
-    public ChildObjectInstance(AgentInstanceIF env, String list, Instance real) {
+    public ChildObjectInstance(AgentInstance env, String list, Instance real) {
         this.env = env;
         this.real = real;
     }
 
     @Override
-    public ObjectInstanceIF copy() {
+    public ObjectInstance copy() {
         Instance copy = new Instance(real);
-        AgentInstanceIF agent = (AgentInstanceIF) env.copy();
+        AgentInstance agent = (AgentInstance) env.copy();
         return new ChildObjectInstance(agent, list, copy);
     }
 

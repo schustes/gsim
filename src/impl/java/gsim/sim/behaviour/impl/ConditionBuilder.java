@@ -4,17 +4,17 @@ import java.io.FileInputStream;
 import java.util.HashMap;
 
 import cern.jet.random.Uniform;
-import de.s2.gsim.core.DefinitionEnvironment;
+import de.s2.gsim.core.ModelDefinitionEnvironment;
 import de.s2.gsim.core.GSimCore;
 import de.s2.gsim.core.GSimCoreFactory;
-import de.s2.gsim.core.ScenarioManager;
-import de.s2.gsim.objects.AgentClassIF;
+import de.s2.gsim.core.SimulationController;
+import de.s2.gsim.objects.AgentClass;
 import de.s2.gsim.objects.attribute.Attribute;
 import de.s2.gsim.objects.attribute.NumericalAttribute;
 import de.s2.gsim.sim.engine.GSimEngineException;
 import gsim.def.objects.Instance;
-import gsim.def.objects.behaviour.Condition;
-import gsim.def.objects.behaviour.Expansion;
+import gsim.def.objects.behaviour.ConditionDef;
+import gsim.def.objects.behaviour.ExpansionDef;
 import gsim.util.Utils;
 
 /**
@@ -35,7 +35,7 @@ public class ConditionBuilder {
      * @return
      * @throws GSimEngineException
      */
-    public String createAttributeCondition(Condition cond, Object2VariableBindingTable objRefs, String nRule_1) throws GSimEngineException {
+    public String createAttributeCondition(ConditionDef cond, Object2VariableBindingTable objRefs, String nRule_1) throws GSimEngineException {
 
         String nRule = "";
 
@@ -85,7 +85,7 @@ public class ConditionBuilder {
 
         int k = Uniform.staticNextIntFromTo(0, 1000);
 
-        Condition c0 = new Condition(attName, "=", selectedFiller);
+        ConditionDef c0 = new ConditionDef(attName, "=", selectedFiller);
 
         nRule = createLHS(c0.getParameterName(), objRefs, k, nRule_1);
 
@@ -119,7 +119,7 @@ public class ConditionBuilder {
             }
         }
 
-        Condition c0 = new Condition(attName, "=", name.toString());
+        ConditionDef c0 = new ConditionDef(attName, "=", name.toString());
         nRule = createLHS(c0.getParameterName(), objRefs, k, nRule_1);
 
         nRule += " (value ?value" + k + 1251 + "&:(or ";
@@ -144,7 +144,7 @@ public class ConditionBuilder {
 
     }
 
-    public String createCondition(Instance agent, Condition cond, Object2VariableBindingTable objRefs, String ruleSoFar) throws GSimEngineException {
+    public String createCondition(Instance agent, ConditionDef cond, Object2VariableBindingTable objRefs, String ruleSoFar) throws GSimEngineException {
 
         String n = "";
 
@@ -170,18 +170,18 @@ public class ConditionBuilder {
      * @return
      * @throws GSimEngineException
      */
-    public String createDefaultAtomCondition(Expansion cond, Object2VariableBindingTable objRefs, String nRule_1) throws GSimEngineException {
+    public String createDefaultAtomCondition(ExpansionDef cond, Object2VariableBindingTable objRefs, String nRule_1) throws GSimEngineException {
 
         String nRule = "";
 
         int k = cern.jet.random.Uniform.staticNextIntFromTo(0, 1000);
 
-        Condition c0 = null;
-        Condition c1 = null;
+        ConditionDef c0 = null;
+        ConditionDef c1 = null;
 
         if (cond.isNumerical()) {
-            c0 = new Condition(cond.getParameterName(), ">=", String.valueOf(cond.getMin()));
-            c1 = new Condition(cond.getParameterName(), "<", String.valueOf(cond.getMax()));
+            c0 = new ConditionDef(cond.getParameterName(), ">=", String.valueOf(cond.getMin()));
+            c1 = new ConditionDef(cond.getParameterName(), "<", String.valueOf(cond.getMax()));
             nRule = createLHS(c0.getParameterName(), objRefs, k + 9001, nRule_1);
             nRule += "(value ?value" + k + "&:(and (numberp ?value" + k + ") (>= ?value" + k + " " + String.valueOf(cond.getMin()) + " ))))\n";
 
@@ -191,7 +191,7 @@ public class ConditionBuilder {
 
         } else {
             String[] cat = cond.getFillers();
-            c0 = new Condition(cond.getParameterName(), "=", cat[0]);
+            c0 = new ConditionDef(cond.getParameterName(), "=", cat[0]);
             nRule = createLHS(c0.getParameterName(), objRefs, k + 12001, nRule_1);
             if (!gsim.util.Utils.isNumerical(cat[0])) {
                 nRule += "(value ?value" + k + 1251 + "&:(or (eq ?value" + k + 1251 + " \"" + cat[0] + "\" ) ";
@@ -229,7 +229,7 @@ public class ConditionBuilder {
      * @param refs
      * @return
      */
-    public String createExistsQuantifiedCondition(Condition cond, Object2VariableBindingTable refs) {
+    public String createExistsQuantifiedCondition(ConditionDef cond, Object2VariableBindingTable refs) {
 
         String objectPath = resolveObjectClass(cond.getParameterName());
         String attPath = null;
@@ -360,7 +360,7 @@ public class ConditionBuilder {
      * @return
      * @throws GSimEngineException
      */
-    public String createFixedAtomCondition(Condition cond, Object2VariableBindingTable objRefs, String nRule_1) throws GSimEngineException {
+    public String createFixedAtomCondition(ConditionDef cond, Object2VariableBindingTable objRefs, String nRule_1) throws GSimEngineException {
 
         String nRule = "";
 
@@ -394,8 +394,8 @@ public class ConditionBuilder {
 
         int k = cern.jet.random.Uniform.staticNextIntFromTo(0, 1000);
 
-        Condition c0 = new Condition(attributeName, ">=", String.valueOf(min));
-        Condition c1 = new Condition(attributeName, "<", String.valueOf(max));
+        ConditionDef c0 = new ConditionDef(attributeName, ">=", String.valueOf(min));
+        ConditionDef c1 = new ConditionDef(attributeName, "<", String.valueOf(max));
 
         nRule = createLHS(c0.getParameterName(), objRefs, k + 12001, nRule_1);
 
@@ -424,7 +424,7 @@ public class ConditionBuilder {
      * @return the string with the jess expression for that condition
      * @throws GSimEngineException
      */
-    public String createVariableCondition(Instance owner, Condition cond, Object2VariableBindingTable objRefs, String nRule_1)
+    public String createVariableCondition(Instance owner, ConditionDef cond, Object2VariableBindingTable objRefs, String nRule_1)
             throws GSimEngineException {
 
         int k = Uniform.staticNextIntFromTo(0, 1000);
@@ -566,7 +566,7 @@ public class ConditionBuilder {
         return true;
     }
 
-    private boolean isExistQuantified(Condition c) {
+    private boolean isExistQuantified(ConditionDef c) {
         return c.getOperator().trim().equalsIgnoreCase("EXISTS") || c.getOperator().trim().equalsIgnoreCase("~EXISTS")
                 || c.getOperator().trim().equalsIgnoreCase("NOT EXISTS");
     }
@@ -584,24 +584,24 @@ public class ConditionBuilder {
 
         GSimCore core = GSimCoreFactory.defaultFactory().createCore();
 
-        DefinitionEnvironment env = core.create("test", new FileInputStream("/projects/phd/sim/main/dist/gsim/repos/models/nhs.definition"),
+        ModelDefinitionEnvironment env = core.create("test", new FileInputStream("/projects/phd/sim/main/dist/gsim/repos/models/nhs.definition"),
                 new HashMap());
-        AgentClassIF a0 = env.getAgentClass("Traditional");
+        AgentClass a0 = env.getAgentClass("Traditional");
         @SuppressWarnings("unused")
-        AgentClassIF a1 = env.getAgentClass("Forward_looking_trust");
+        AgentClass a1 = env.getAgentClass("Forward_looking_trust");
         @SuppressWarnings("unused")
-        AgentClassIF a2 = env.getAgentClass("Independent-Competitor");
-        AgentClassIF c1 = env.getAgentClass("Type A patient");
+        AgentClass a2 = env.getAgentClass("Independent-Competitor");
+        AgentClass c1 = env.getAgentClass("Type A patient");
         @SuppressWarnings("unused")
-        AgentClassIF c2 = env.getAgentClass("Type C patient");
+        AgentClass c2 = env.getAgentClass("Type C patient");
 
-        env.instanciateAgents(a0, "traditional", 1, 0, DefinitionEnvironment.RAND_ATT_ONLY);
+        env.instanciateAgents(a0, "traditional", 1, 0, ModelDefinitionEnvironment.RAND_ATT_ONLY);
         // env.instanciateAgents(a1, "trust", 1, 0, Env.RAND_ATT_ONLY);
         // env.instanciateAgents(a2, "indie", 1, 0, Env.RAND_ATT_ONLY);
-        env.instanciateAgents(c1, "A", 1, 0, DefinitionEnvironment.RAND_ATT_ONLY);
+        env.instanciateAgents(c1, "A", 1, 0, ModelDefinitionEnvironment.RAND_ATT_ONLY);
         // env.instanciateAgents(c2, "C", 1, 0, Env.RAND_ATT_ONLY);
 
-        ScenarioManager m = core.createScenarioManager(env, new HashMap(), 53, 1);
+        SimulationController m = core.createScenarioManager(env, new HashMap(), 53, 1);
         m.start();
 
     }

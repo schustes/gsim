@@ -6,7 +6,7 @@ package de.s2.gsim.objects;
  * @author Stephan
  *
  */
-public interface AgentInstanceIF extends ObjectInstanceIF {
+public interface AgentInstance extends ObjectInstance {
 
     /**
      * Adds (if not yet existing) or updates object instances in a list.
@@ -15,7 +15,7 @@ public interface AgentInstanceIF extends ObjectInstanceIF {
      * @param object the object
      * @throws GSimObjectException
      */
-    public void addOrSetObject(String list, ObjectInstanceIF object) throws GSimObjectException;
+    public void addOrSetObject(String list, ObjectInstance object) throws GSimObjectException;
 
     /**
      * Creates object of the type of object specified for the list and adds it to the list.
@@ -25,7 +25,7 @@ public interface AgentInstanceIF extends ObjectInstanceIF {
      * @return the newly created object
      * @throws GSimObjectException
      */
-    public ObjectInstanceIF createObjectFromListType(String objectName, String listName) throws GSimObjectException;
+    public ObjectInstance createObjectFromListType(String objectName, String listName) throws GSimObjectException;
 
     /**
      * Gets the behaviour associated with this agent instance.
@@ -33,7 +33,7 @@ public interface AgentInstanceIF extends ObjectInstanceIF {
      * @return the behaviour
      * @throws GSimObjectException
      */
-    public BehaviourIF getBehaviour() throws GSimObjectException;
+    public Behaviour getBehaviour() throws GSimObjectException;
 
     /**
      * Gets an object from a list.
@@ -43,7 +43,7 @@ public interface AgentInstanceIF extends ObjectInstanceIF {
      * @return the object
      * @throws GSimObjectException
      */
-    public ObjectInstanceIF getObject(String list, String objectName) throws GSimObjectException;
+    public ObjectInstance getObject(String list, String objectName) throws GSimObjectException;
 
     /**
      * Gets the object list names defined for this agent.
@@ -60,7 +60,7 @@ public interface AgentInstanceIF extends ObjectInstanceIF {
      * @return list of objects
      * @throws GSimObjectException
      */
-    public ObjectInstanceIF[] getObjects(String list) throws GSimObjectException;
+    public ObjectInstance[] getObjects(String list) throws GSimObjectException;
 
     /**
      * Removes all objects from an object list.
@@ -77,7 +77,7 @@ public interface AgentInstanceIF extends ObjectInstanceIF {
      * @param object the object
      * @throws GSimObjectException
      */
-    public void removeObject(String list, ObjectInstanceIF object) throws GSimObjectException;
+    public void removeObject(String list, ObjectInstance object) throws GSimObjectException;
 
     /**
      * Removes an object, given by its name, from the specified list.
@@ -94,6 +94,6 @@ public interface AgentInstanceIF extends ObjectInstanceIF {
      * @param behaviour the behaviour
      * @throws GSimObjectException
      */
-    public void setBehaviour(BehaviourIF behaviour) throws GSimObjectException;
+    public void setBehaviour(Behaviour behaviour) throws GSimObjectException;
 
 }

@@ -2,7 +2,7 @@ package de.s2.gsim.objects;
 
 import java.io.Serializable;
 
-public interface ExpansionIF extends Serializable {
+public interface Expansion extends Serializable {
 
     public void addFiller(String filler) throws GSimObjectException;
 

@@ -7,9 +7,9 @@ import java.util.List;
 
 import de.s2.gsim.sim.engine.GSimEngineException;
 import gsim.def.objects.Instance;
-import gsim.def.objects.agent.Behaviour;
-import gsim.def.objects.behaviour.Action;
-import gsim.def.objects.behaviour.Expansion;
+import gsim.def.objects.agent.BehaviourDef;
+import gsim.def.objects.behaviour.ActionDef;
+import gsim.def.objects.behaviour.ExpansionDef;
 import gsim.def.objects.behaviour.RLRule;
 import gsim.sim.agent.RuntimeAgent;
 import gsim.util.CombinationGenerator;
@@ -471,11 +471,11 @@ public class FactHandler {
 
         ValueVector v1 = new ValueVector();
 
-        for (Expansion cond : r.getExpansions()) {
+        for (ExpansionDef cond : r.getExpansions()) {
             v1.add(new Value(cond.getParameterName(), RU.STRING));
         }
 
-        for (Expansion cond : r.getExpansions()) {
+        for (ExpansionDef cond : r.getExpansions()) {
 
             // logger.debug(cond.getFillers().length);
 
@@ -514,7 +514,7 @@ public class FactHandler {
 
         // String ruleName = "experimental_rule_"+r.getName() + "@"+sfn+"@";
 
-        for (gsim.def.objects.behaviour.Action action : r.getConsequences()) {
+        for (gsim.def.objects.behaviour.ActionDef action : r.getConsequences()) {
 
             String[] params = action.getObjectClassParams();
 
@@ -641,7 +641,7 @@ public class FactHandler {
         return false;
     }
 
-    private Fact createActionNode(Rete rete, String sfn, String[] args, String evaluator, Action action) throws JessException {
+    private Fact createActionNode(Rete rete, String sfn, String[] args, String evaluator, ActionDef action) throws JessException {
 
         Deftemplate p = rete.findDeftemplate("rl-action-node");
 
@@ -712,10 +712,10 @@ public class FactHandler {
 
     private String[] getEvaluationFunctionNames(RuntimeAgent a) {
         HashSet<String> set = new HashSet<String>();
-        Behaviour b = a.getBehaviour();
+        BehaviourDef b = a.getBehaviour();
         RLRule[] r = b.getRLRules();
         for (int i = 0; i < r.length; i++) {
-            gsim.def.objects.behaviour.Action[] c = r[i].getConsequences();
+            gsim.def.objects.behaviour.ActionDef[] c = r[i].getConsequences();
             for (int j = 0; j < c.length; j++) {
                 set.add(r[i].getEvaluationFunction().getParameterName());
             }

@@ -3,7 +3,7 @@ package gsim.sim.behaviour;
 import java.util.HashMap;
 import java.util.Set;
 
-import gsim.def.objects.agent.Behaviour;
+import gsim.def.objects.agent.BehaviourDef;
 import gsim.sim.agent.RuntimeAgent;
 
 public class SimAction implements java.io.Serializable {
@@ -45,10 +45,10 @@ public class SimAction implements java.io.Serializable {
     public void setContext(Context ctx) {
         this.ctx = ctx;
         RuntimeAgent agent = ctx.getAgent();
-        Behaviour b = agent.getBehaviour();
-        gsim.def.objects.behaviour.Action[] cs = b.getAvailableActions();
+        BehaviourDef b = agent.getBehaviour();
+        gsim.def.objects.behaviour.ActionDef[] cs = b.getAvailableActions();
         for (int i = 0; i < cs.length; i++) {
-            gsim.def.objects.behaviour.Action a = cs[i];
+            gsim.def.objects.behaviour.ActionDef a = cs[i];
             String className = a.getClassName();
             if (className.equals(this.getClass().getName())) {
                 name = a.getName();

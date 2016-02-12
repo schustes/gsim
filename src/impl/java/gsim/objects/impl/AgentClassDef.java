@@ -3,10 +3,10 @@ package gsim.objects.impl;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import de.s2.gsim.objects.AgentClassIF;
-import de.s2.gsim.objects.BehaviourIF;
+import de.s2.gsim.objects.AgentClass;
+import de.s2.gsim.objects.Behaviour;
 import de.s2.gsim.objects.GSimObjectException;
-import de.s2.gsim.objects.ObjectClassIF;
+import de.s2.gsim.objects.ObjectClass;
 import de.s2.gsim.objects.attribute.DomainAttribute;
 import gsim.def.Environment;
 import gsim.def.objects.Frame;
@@ -15,7 +15,7 @@ import gsim.def.objects.Unit;
 import gsim.def.objects.agent.BehaviourFrame;
 import gsim.def.objects.agent.GenericAgentClass;
 
-public class AgentClass extends ObjectClass implements AgentClassIF, UnitWrapper {
+public class AgentClassDef extends ObjectClassDef implements AgentClass, UnitWrapper {
 
     // private Environment env;
     // private GenericAgentClass real;
@@ -33,7 +33,7 @@ public class AgentClass extends ObjectClass implements AgentClassIF, UnitWrapper
      * @param real
      *            GenericAgentClass
      */
-    public AgentClass(Environment env, GenericAgentClass real) {
+    public AgentClassDef(Environment env, GenericAgentClass real) {
         // this.env=env;
         // this.real=real;
         super(env, real);
@@ -57,7 +57,7 @@ public class AgentClass extends ObjectClass implements AgentClassIF, UnitWrapper
      * @link gsim.objects.AgentClassIF
      */
     @Override
-    public void addOrSetObject(String list, ObjectClassIF object) throws GSimObjectException {
+    public void addOrSetObject(String list, ObjectClass object) throws GSimObjectException {
 
         if (destroyed) {
             throw new GSimObjectException("This object was removed from the runtime context.");
@@ -94,7 +94,7 @@ public class AgentClass extends ObjectClass implements AgentClassIF, UnitWrapper
      * @link gsim.objects.AgentClassIF
      */
     @Override
-    public BehaviourIF getBehaviour() throws GSimObjectException {
+    public Behaviour getBehaviour() throws GSimObjectException {
         if (destroyed) {
             throw new GSimObjectException("This object was removed from the runtime context.");
         }
@@ -130,7 +130,7 @@ public class AgentClass extends ObjectClass implements AgentClassIF, UnitWrapper
      * @link gsim.objects.AgentClassIF
      */
     @Override
-    public ObjectClassIF getObjectListType(String listName) throws GSimObjectException {
+    public ObjectClass getObjectListType(String listName) throws GSimObjectException {
         if (destroyed) {
             throw new GSimObjectException("This object was removed from the runtime context.");
         }
@@ -148,14 +148,14 @@ public class AgentClass extends ObjectClass implements AgentClassIF, UnitWrapper
      * @link gsim.objects.AgentClassIF
      */
     @Override
-    public ObjectClassIF[] getObjects(String list) throws GSimObjectException {
+    public ObjectClass[] getObjects(String list) throws GSimObjectException {
         if (destroyed) {
             throw new GSimObjectException("This object was removed from the runtime context.");
         }
 
         try {
             Frame[] f = real.getChildFrames(list);
-            ObjectClassIF[] ret = new ObjectClassIF[f.length];
+            ObjectClass[] ret = new ObjectClass[f.length];
             for (int i = 0; i < f.length; i++) {
                 ret[i] = new ChildObjectClass(this, list, f[i]);
             }
@@ -181,7 +181,7 @@ public class AgentClass extends ObjectClass implements AgentClassIF, UnitWrapper
      * @link gsim.objects.AgentClassIF
      */
     @Override
-    public void removeObject(String list, ObjectClassIF object) throws GSimObjectException {
+    public void removeObject(String list, ObjectClass object) throws GSimObjectException {
 
         if (destroyed) {
             throw new GSimObjectException("This object was removed from the runtime context.");
@@ -231,14 +231,14 @@ public class AgentClass extends ObjectClass implements AgentClassIF, UnitWrapper
             if (o instanceof DomainAttribute) {
                 return o;
             } else if (o instanceof Frame) {
-                return new ObjectClass(env, (Frame) o);
+                return new ObjectClassDef(env, (Frame) o);
             } else if (o instanceof TypedList) {
                 TypedList list = (TypedList) o;
-                ArrayList<ObjectClass> ret = new ArrayList<ObjectClass>();
+                ArrayList<ObjectClassDef> ret = new ArrayList<ObjectClassDef>();
                 Iterator iter = list.iterator();
                 while (iter.hasNext()) {
                     Frame f = (Frame) iter.next();
-                    ObjectClass c = new ObjectClass(env, f);
+                    ObjectClassDef c = new ObjectClassDef(env, f);
                     ret.add(c);
                 }
                 return ret;
@@ -277,7 +277,7 @@ public class AgentClass extends ObjectClass implements AgentClassIF, UnitWrapper
      * @throws GSimObjectException
      */
     @Override
-    public void setBehaviour(BehaviourIF b) throws GSimObjectException {
+    public void setBehaviour(Behaviour b) throws GSimObjectException {
 
         if (destroyed) {
             throw new GSimObjectException("This object was removed from the runtime context..");

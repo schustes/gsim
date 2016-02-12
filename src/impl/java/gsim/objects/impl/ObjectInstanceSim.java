@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.s2.gsim.objects.GSimObjectException;
-import de.s2.gsim.objects.ObjectInstanceIF;
+import de.s2.gsim.objects.ObjectInstance;
 import de.s2.gsim.objects.attribute.Attribute;
 import de.s2.gsim.objects.attribute.DomainAttribute;
 import de.s2.gsim.objects.attribute.IntervalAttribute;
@@ -15,7 +15,7 @@ import gsim.def.objects.Frame;
 import gsim.def.objects.Instance;
 import gsim.def.objects.Unit;
 
-public class ObjectInstanceSim implements ObjectInstanceIF, UnitWrapper {
+public class ObjectInstanceSim implements ObjectInstance, UnitWrapper {
 
     private static final long serialVersionUID = 1L;
 
@@ -28,7 +28,7 @@ public class ObjectInstanceSim implements ObjectInstanceIF, UnitWrapper {
     }
 
     @Override
-    public ObjectInstanceIF copy() {
+    public ObjectInstance copy() {
         Instance copy = new Instance(real);
         return new ObjectInstanceSim(copy);
     }

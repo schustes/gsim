@@ -8,7 +8,7 @@ import java.io.Serializable;
  * @author Stephan
  *
  */
-public interface BehaviourIF extends Serializable {
+public interface Behaviour extends Serializable {
 
     /**
      * Adds or updates an action of this behaviour.
@@ -16,23 +16,23 @@ public interface BehaviourIF extends Serializable {
      * @param action the action
      * @throws GSimObjectException
      */
-    public void addOrSetAction(ActionIF action) throws GSimObjectException;
+    public void addOrSetAction(Action action) throws GSimObjectException;
 
     /**
-     * Adds or updates an {@link de.s2.gsim.objects.RLActionNodeIF} of this behaviour.
+     * Adds or updates an {@link de.s2.gsim.objects.RLActionNode} of this behaviour.
      * 
      * @param node the RLNode
      * @throws GSimObjectException
      */
-    public void addOrSetRLActionNode(RLActionNodeIF node) throws GSimObjectException;
+    public void addOrSetRLActionNode(RLActionNode node) throws GSimObjectException;
 
     /**
-     * Adds or sets a {@link de.s2.gsim.objects.RuleIF} of this behaviour
+     * Adds or sets a {@link de.s2.gsim.objects.Rule} of this behaviour
      * 
      * @param rule the rule
      * @throws GSimObjectException
      */
-    public void addOrSetRule(RuleIF rule) throws GSimObjectException;
+    public void addOrSetRule(Rule rule) throws GSimObjectException;
 
     /**
      * Creates an action.
@@ -42,42 +42,42 @@ public interface BehaviourIF extends Serializable {
      * @return the action
      * @throws GSimObjectException
      */
-    public ActionIF createAction(String name, String cls) throws GSimObjectException;
+    public Action createAction(String name, String cls) throws GSimObjectException;
 
     /**
-     * Creates an {@link de.s2.gsim.objects.RLActionNodeIF}.
+     * Creates an {@link de.s2.gsim.objects.RLActionNode}.
      * 
      * @param name
      * @return the node
      * @throws GSimObjectException
      */
-    public RLActionNodeIF createRLActionNode(String name) throws GSimObjectException;
+    public RLActionNode createRLActionNode(String name) throws GSimObjectException;
 
     /**
-     * Creates a {@link de.s2.gsim.objects.RuleIF}.
+     * Creates a {@link de.s2.gsim.objects.Rule}.
      * 
      * @param name
      * @return the rule
      * @throws GSimObjectException
      */
-    public RuleIF createRule(String name) throws GSimObjectException;
+    public Rule createRule(String name) throws GSimObjectException;
 
     /**
-     * Gets the {@link de.s2.gsim.objects.ActionIF} with the specified name.
+     * Gets the {@link de.s2.gsim.objects.Action} with the specified name.
      * 
      * @param name name of the action
      * @return the action
      * @throws GSimObjectException
      */
-    public ActionIF getAction(String name) throws GSimObjectException;
+    public Action getAction(String name) throws GSimObjectException;
 
     /**
-     * Gets all {@link de.s2.gsim.objects.ActionIF}'s of this behaviour.
+     * Gets all {@link de.s2.gsim.objects.Action}'s of this behaviour.
      * 
      * @return list of actions
      * @throws GSimObjectException
      */
-    public ActionIF[] getAvailableActions() throws GSimObjectException;
+    public Action[] getAvailableActions() throws GSimObjectException;
 
     /**
      * Gets the maximum possible number of nodes that the BRA process can expand.
@@ -105,38 +105,38 @@ public interface BehaviourIF extends Serializable {
     public double getRevisitCostFraction() throws GSimObjectException;
 
     /**
-     * Get an {@link de.s2.gsim.objects.RLActionNodeIF} with the specified name.
+     * Get an {@link de.s2.gsim.objects.RLActionNode} with the specified name.
      * 
      * @param name the name of the node
      * @return the node
      * @throws GSimObjectException
      */
-    public RLActionNodeIF getRLActionNode(String name) throws GSimObjectException;
+    public RLActionNode getRLActionNode(String name) throws GSimObjectException;
 
     /**
-     * Gets all {@link de.s2.gsim.objects.RLActionNodeIF}'s associated with this behaviour.
+     * Gets all {@link de.s2.gsim.objects.RLActionNode}'s associated with this behaviour.
      * 
      * @return list of nodes
      * @throws GSimObjectException
      */
-    public RLActionNodeIF[] getRLActionNodes() throws GSimObjectException;
+    public RLActionNode[] getRLActionNodes() throws GSimObjectException;
 
     /**
-     * Gets the {@link de.s2.gsim.objects.RuleIF} with the specified name.
+     * Gets the {@link de.s2.gsim.objects.Rule} with the specified name.
      * 
      * @param name
      * @return the rule
      * @throws GSimObjectException
      */
-    public RuleIF getRule(String name) throws GSimObjectException;
+    public Rule getRule(String name) throws GSimObjectException;
 
     /**
-     * Gets all {@link de.s2.gsim.objects.RuleIF}'s associated with this behaviour.
+     * Gets all {@link de.s2.gsim.objects.Rule}'s associated with this behaviour.
      * 
      * @return list of rules
      * @throws GSimObjectException
      */
-    public RuleIF[] getRules() throws GSimObjectException;
+    public Rule[] getRules() throws GSimObjectException;
 
     /**
      * Gets the interval m with which nodes in the BRA process are updated. Note: The delete cycle is hardcoded at round(m - 1/4m).
@@ -147,7 +147,7 @@ public interface BehaviourIF extends Serializable {
     public int getUpdateInterval() throws GSimObjectException;
 
     /**
-     * Checks whether the {@link de.s2.gsim.objects.RLActionNodeIF} with the specified name was declared in this level of the inheritance hierarchy.
+     * Checks whether the {@link de.s2.gsim.objects.RLActionNode} with the specified name was declared in this level of the inheritance hierarchy.
      * 
      * @param nodeName the name of the node
      * @return true if declared, false otherwise
@@ -156,7 +156,7 @@ public interface BehaviourIF extends Serializable {
     public boolean isDeclaredRLNode(String nodeName) throws GSimObjectException;
 
     /**
-     * Checks whether the {@link de.s2.gsim.objects.RuleIF} with the specified name was declared in this level of the inheritance hierarchy.
+     * Checks whether the {@link de.s2.gsim.objects.Rule} with the specified name was declared in this level of the inheritance hierarchy.
      * 
      * @param ruleName
      * @return true if declared, false otherwise
@@ -165,7 +165,7 @@ public interface BehaviourIF extends Serializable {
     public boolean isDeclaredRule(String ruleName) throws GSimObjectException;
 
     /**
-     * Removes the {@link de.s2.gsim.objects.RLActionNodeIF} with the specified name from this behaviour.
+     * Removes the {@link de.s2.gsim.objects.RLActionNode} with the specified name from this behaviour.
      * 
      * @param name the name of the node
      * @throws GSimObjectException
@@ -173,7 +173,7 @@ public interface BehaviourIF extends Serializable {
     public void removeRLActionNode(String name) throws GSimObjectException;
 
     /**
-     * Removes the {@link de.s2.gsim.objects.RuleIF} with the specified name from this behaviour.
+     * Removes the {@link de.s2.gsim.objects.Rule} with the specified name from this behaviour.
      * 
      * @param name then name of the rule
      * @throws GSimObjectException

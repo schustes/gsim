@@ -8,7 +8,7 @@ import java.util.concurrent.Semaphore;
 
 import org.apache.log4j.Logger;
 
-import de.s2.gsim.core.ScenarioListener;
+import de.s2.gsim.core.SimulationListener;
 import de.s2.gsim.sim.engine.Controller;
 import de.s2.gsim.sim.engine.GSimEngineException;
 import de.s2.gsim.sim.engine.ModelState;
@@ -36,7 +36,7 @@ public class SimulationInstanceContainerLocal implements SimulationManager {
 
     private ArrayList<SimulationID> finished = new ArrayList<SimulationID>();
 
-    private HashSet<de.s2.gsim.core.ScenarioListener> listeners = new HashSet<de.s2.gsim.core.ScenarioListener>();
+    private HashSet<de.s2.gsim.core.SimulationListener> listeners = new HashSet<de.s2.gsim.core.SimulationListener>();
 
     private ConcurrentHashMap<Listener, ModelState> listening = new ConcurrentHashMap<Listener, ModelState>();
 
@@ -116,7 +116,7 @@ public class SimulationInstanceContainerLocal implements SimulationManager {
 
     }
 
-    public void registerSimulationListener(ScenarioListener l) {
+    public void registerSimulationListener(SimulationListener l) {
         listeners.add(l);
     }
 
@@ -236,19 +236,19 @@ public class SimulationInstanceContainerLocal implements SimulationManager {
     }
 
     private void notifyInstanceFinished(SimulationID uid) {
-        for (de.s2.gsim.core.ScenarioListener l : listeners) {
+        for (de.s2.gsim.core.SimulationListener l : listeners) {
             l.instanceFinished(uid.toString());
         }
     }
 
     private void notifyInstanceStep(SimulationID uid, int step) {
-        for (de.s2.gsim.core.ScenarioListener l : listeners) {
+        for (de.s2.gsim.core.SimulationListener l : listeners) {
             l.instanceStep(uid.toString(), step);
         }
     }
 
     private void notifySimulationFinished() {
-        for (de.s2.gsim.core.ScenarioListener l : listeners) {
+        for (de.s2.gsim.core.SimulationListener l : listeners) {
             l.simulationFinished(ns);
         }
 

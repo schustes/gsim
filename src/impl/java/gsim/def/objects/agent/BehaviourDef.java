@@ -4,16 +4,16 @@ import de.s2.gsim.objects.attribute.NumericalAttribute;
 import gsim.def.objects.Frame;
 import gsim.def.objects.Instance;
 import gsim.def.objects.UnitUtils;
-import gsim.def.objects.behaviour.Action;
+import gsim.def.objects.behaviour.ActionDef;
 import gsim.def.objects.behaviour.ActionCollection;
-import gsim.def.objects.behaviour.Condition;
-import gsim.def.objects.behaviour.Expansion;
+import gsim.def.objects.behaviour.ConditionDef;
+import gsim.def.objects.behaviour.ExpansionDef;
 import gsim.def.objects.behaviour.RLRule;
 import gsim.def.objects.behaviour.RLRuleFrame;
 import gsim.def.objects.behaviour.UserRule;
 import gsim.def.objects.behaviour.UserRuleFrame;
 
-public class Behaviour extends Instance {
+public class BehaviourDef extends Instance {
 
     public static final long serialVersionUID = 47162704396246620L;
 
@@ -26,7 +26,7 @@ public class Behaviour extends Instance {
      * @param id
      *            int
      */
-    public Behaviour(Frame f) {
+    public BehaviourDef(Frame f) {
         super(f.getTypeName(), f);
     }
 
@@ -36,11 +36,11 @@ public class Behaviour extends Instance {
      * @param inst
      *            Instance
      */
-    public Behaviour(Instance inst) {
+    public BehaviourDef(Instance inst) {
         super(inst);
     }
 
-    public void addAction(Action r) {
+    public void addAction(ActionDef r) {
         // ActionCollection c = this.getAvailableActions(listName);
         // if (c==null) {
         // c = new ActionCollection(new ActionCollectionFrame(listName, 123),123);
@@ -82,7 +82,7 @@ public class Behaviour extends Instance {
 
     @Override
     public Object clone() {
-        Behaviour b = new Behaviour(this);
+        BehaviourDef b = new BehaviourDef(this);
         return b;
     }
 
@@ -122,17 +122,17 @@ public class Behaviour extends Instance {
      *            String
      * @return ConditionFrame
      */
-    public Condition createCondition(String var, String op, String val) {
-        Condition f = new Condition(var, op, val);
+    public ConditionDef createCondition(String var, String op, String val) {
+        ConditionDef f = new ConditionDef(var, op, val);
         return f;
     }
 
-    public Expansion createExpansion(String var, double min, double max) {
-        Expansion f = new Expansion(var, min, max);
+    public ExpansionDef createExpansion(String var, double min, double max) {
+        ExpansionDef f = new ExpansionDef(var, min, max);
         return f;
     }
 
-    public RLRule createRLRule(String name, Condition[] conditions, Action[] consequents) {
+    public RLRule createRLRule(String name, ConditionDef[] conditions, ActionDef[] consequents) {
 
         BehaviourFrame f = (BehaviourFrame) getDefinition();
         Frame r = f.getRule(name);
@@ -154,7 +154,7 @@ public class Behaviour extends Instance {
 
     }
 
-    public UserRule createRule(String name, Condition[] conditions, Action[] consequents) {
+    public UserRule createRule(String name, ConditionDef[] conditions, ActionDef[] consequents) {
 
         BehaviourFrame f = (BehaviourFrame) getDefinition();
         Frame r = f.getRule(name);
@@ -173,21 +173,21 @@ public class Behaviour extends Instance {
 
     }
 
-    public Action getAction(String cat) {
+    public ActionDef getAction(String cat) {
         Instance[] str = getChildInstances(BehaviourFrame.ACTION_LIST);
         for (int i = 0; i < str.length; i++) {
             if (str[i].getName().equals(cat)) {
-                return new Action(str[i]);
+                return new ActionDef(str[i]);
             }
         }
         return null;
     }
 
-    public Action[] getAvailableActions() {
+    public ActionDef[] getAvailableActions() {
         Instance[] str = getChildInstances(BehaviourFrame.ACTION_LIST);
-        Action[] ss = new Action[str.length];
+        ActionDef[] ss = new ActionDef[str.length];
         for (int i = 0; i < ss.length; i++) {
-            ss[i] = new Action(str[i]);
+            ss[i] = new ActionDef(str[i]);
         }
         return ss;
     }

@@ -7,7 +7,7 @@ import java.util.Set;
 import cern.jet.random.Uniform;
 import de.s2.gsim.sim.engine.GSimEngineException;
 import gsim.def.objects.Instance;
-import gsim.def.objects.behaviour.Condition;
+import gsim.def.objects.behaviour.ConditionDef;
 import gsim.def.objects.behaviour.DependencyTest;
 import gsim.def.objects.behaviour.RLRule;
 import gsim.def.objects.behaviour.UserRule;
@@ -30,7 +30,7 @@ public class RLRulesBuilder {
         general = new GeneralRLBuilder(a, conditionBuilder);
     }
 
-    String buildAvgRule(RLRule rule, Condition evaluationFunction) {
+    String buildAvgRule(RLRule rule, ConditionDef evaluationFunction) {
 
         String ownerRule = createRuleIdentifier(evaluationFunction);
 
@@ -74,7 +74,7 @@ public class RLRulesBuilder {
         return nRule;
     }
 
-    String buildExperimentationUpdateRule(RLRule rule, Condition evaluationFunction) throws GSimEngineException {
+    String buildExperimentationUpdateRule(RLRule rule, ConditionDef evaluationFunction) throws GSimEngineException {
         String span = rule.getUpdateSpan();
         if (span != null) {
             return buildExperimentationUpdateRule1(rule, evaluationFunction, span);
@@ -185,7 +185,7 @@ public class RLRulesBuilder {
     }
 
     private String buildExperimentationFunctions(String ruleIdentifier, gsim.def.objects.behaviour.DependencyTest[] tests,
-            gsim.def.objects.behaviour.Action[] a, FUNCTION f, Condition funct) {
+            gsim.def.objects.behaviour.ActionDef[] a, FUNCTION f, ConditionDef funct) {
 
         String s1 = createListActionQuery(ruleIdentifier, a, funct);
 
@@ -236,7 +236,7 @@ public class RLRulesBuilder {
         return ss;
     }
 
-    private String buildExperimentationUpdateRule0(RLRule rule, Condition evaluationFunction, String lag) throws GSimEngineException {
+    private String buildExperimentationUpdateRule0(RLRule rule, ConditionDef evaluationFunction, String lag) throws GSimEngineException {
 
         String ownerRule = createRuleIdentifier(evaluationFunction);
 
@@ -300,7 +300,7 @@ public class RLRulesBuilder {
 
     }
 
-    private String buildExperimentationUpdateRule1(RLRule rule, Condition evaluationFunction, String span) {
+    private String buildExperimentationUpdateRule1(RLRule rule, ConditionDef evaluationFunction, String span) {
 
         String ownerRule = createRuleIdentifier(evaluationFunction);
 
@@ -356,7 +356,7 @@ public class RLRulesBuilder {
 
     private String createConditions(RLRule rule, Object2VariableBindingTable objRefs) throws GSimEngineException {
         StringBuffer result = new StringBuffer();
-        for (Condition condition : rule.getConditions()) {
+        for (ConditionDef condition : rule.getConditions()) {
             String sofar = result.toString();
             result.append(conditionBuilder.createCondition(agent, condition, objRefs, sofar));
         }
@@ -389,7 +389,7 @@ public class RLRulesBuilder {
         return s0 + s1;
     }
 
-    private String createListActionQuery(String ruleIdentifier, gsim.def.objects.behaviour.Action[] a, Condition funct) {
+    private String createListActionQuery(String ruleIdentifier, gsim.def.objects.behaviour.ActionDef[] a, ConditionDef funct) {
         String query1 = "(defquery list-actions_" + ruleIdentifier + "\n";
         query1 += " (declare (variables ?ev))\n";
         String ss2 = "	";

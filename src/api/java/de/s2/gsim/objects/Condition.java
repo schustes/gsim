@@ -2,7 +2,7 @@ package de.s2.gsim.objects;
 
 import java.io.Serializable;
 
-public interface ConditionIF extends Serializable {
+public interface Condition extends Serializable {
 
     public String getOperator() throws GSimObjectException;
 

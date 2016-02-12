@@ -1,6 +1,6 @@
 package gsim.sim.engine.local;
 
-import de.s2.gsim.core.ScenarioListener;
+import de.s2.gsim.core.SimulationListener;
 import de.s2.gsim.sim.engine.GSimEngineException;
 import de.s2.gsim.sim.engine.ModelState;
 import de.s2.gsim.sim.engine.SimulationID;
@@ -33,7 +33,7 @@ public class SimulationManagerConnectorLocal implements SimulationManagerConnect
         SimulationInstanceContainerLocal.getInstance(ns).pause();
     }
 
-    public void registerSimulatonListener(String ns, ScenarioListener l) throws GSimEngineException {
+    public void registerSimulatonListener(String ns, SimulationListener l) throws GSimEngineException {
         SimulationInstanceContainerLocal.getInstance(ns).registerSimulationListener(l);
     }
 

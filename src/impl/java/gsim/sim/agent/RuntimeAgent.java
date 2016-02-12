@@ -4,7 +4,7 @@ import java.util.HashMap;
 
 import org.apache.log4j.Logger;
 
-import de.s2.gsim.objects.AgentInstanceIF;
+import de.s2.gsim.objects.AgentInstance;
 import de.s2.gsim.sim.agent.ApplicationAgent;
 import de.s2.gsim.sim.communication.AgentType;
 import de.s2.gsim.sim.communication.Communication;
@@ -262,7 +262,7 @@ public class RuntimeAgent extends GenericAgent implements AgentType {
     }
 
     @Override
-    public AgentInstanceIF toAgent() throws ClassCastException {
+    public AgentInstance toAgent() throws ClassCastException {
         return new AgentInstanceSim(this);
     }
 

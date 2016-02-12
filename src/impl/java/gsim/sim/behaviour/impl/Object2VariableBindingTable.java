@@ -4,9 +4,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 import cern.jet.random.Uniform;
-import gsim.def.objects.behaviour.Action;
-import gsim.def.objects.behaviour.Condition;
-import gsim.def.objects.behaviour.Expansion;
+import gsim.def.objects.behaviour.ActionDef;
+import gsim.def.objects.behaviour.ConditionDef;
+import gsim.def.objects.behaviour.ExpansionDef;
 import gsim.def.objects.behaviour.RLRule;
 import gsim.def.objects.behaviour.UserRule;
 
@@ -34,7 +34,7 @@ public class Object2VariableBindingTable {
         if (rule instanceof RLRule) {
             addExpansionRefs(((RLRule) rule).getExpansions());
         }
-        for (Action a : rule.getConsequences()) {
+        for (ActionDef a : rule.getConsequences()) {
             addParamRefs(a);
         }
     }
@@ -67,8 +67,8 @@ public class Object2VariableBindingTable {
      * 
      * @param conditions
      */
-    private void addConditionsRefs(Condition[] conditions) {
-        for (Condition c : conditions) {
+    private void addConditionsRefs(ConditionDef[] conditions) {
+        for (ConditionDef c : conditions) {
             if (c.getParameterName().contains("::")) {
                 String object = resolveObjectClass(c.getParameterName());
                 addObjectClass(object);
@@ -87,8 +87,8 @@ public class Object2VariableBindingTable {
      * 
      * @param expansions
      */
-    private void addExpansionRefs(Expansion[] expansions) {
-        for (Expansion c : expansions) {
+    private void addExpansionRefs(ExpansionDef[] expansions) {
+        for (ExpansionDef c : expansions) {
             if (c.getParameterName().contains("::")) {
                 String pn = c.getParameterName();
                 String object = resolveObjectClass(pn);
@@ -104,7 +104,7 @@ public class Object2VariableBindingTable {
         }
     }
 
-    private void addParamRefs(Action a) {
+    private void addParamRefs(ActionDef a) {
         if (a.getObjectClassParams() == null || a.getObjectClassParams() != null && a.getObjectClassParams().length == 0) {
             return;
         }

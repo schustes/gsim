@@ -14,7 +14,7 @@ import de.s2.gsim.objects.attribute.Attribute;
 import gsim.def.objects.Frame;
 import gsim.def.objects.Instance;
 import gsim.def.objects.UnitUtils;
-import gsim.def.objects.agent.Behaviour;
+import gsim.def.objects.agent.BehaviourDef;
 import gsim.def.objects.agent.BehaviourFrame;
 import gsim.def.objects.agent.GenericAgent;
 import gsim.def.objects.agent.GenericAgentClass;
@@ -247,7 +247,7 @@ public class Environment extends EnvironmentBase implements java.io.Serializable
 
     }
 
-    public GenericAgent changeAgentBehaviour(GenericAgent c, Behaviour b) {
+    public GenericAgent changeAgentBehaviour(GenericAgent c, BehaviourDef b) {
         GenericAgent here = findGenericAgent(c.getName());
         here.setBehaviour(b);
         here.setDirty(true);
@@ -734,7 +734,7 @@ public class Environment extends EnvironmentBase implements java.io.Serializable
         while (iter.hasNext()) {
             GenericAgent p = (GenericAgent) iter.next();
             p.setDirty(true);
-            Behaviour pb = p.getBehaviour();
+            BehaviourDef pb = p.getBehaviour();
             UserRule ur = pb.getRule(ruleName);
             if (ur == null) {
                 ur = pb.getRLRule(ruleName);
@@ -770,7 +770,7 @@ public class Environment extends EnvironmentBase implements java.io.Serializable
                 while (successorMembers.hasNext()) {
                     GenericAgent a = (GenericAgent) iter.next();
                     p.setDirty(true);
-                    Behaviour beh = a.getBehaviour();
+                    BehaviourDef beh = a.getBehaviour();
                     UserRule ur2 = beh.getRule(ruleName);
                     if (ur2 == null) {
                         ur2 = beh.getRLRule(ruleName);

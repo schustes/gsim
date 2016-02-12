@@ -6,9 +6,9 @@ import java.util.HashMap;
 import de.s2.gsim.objects.attribute.StringAttribute;
 import de.s2.gsim.sim.engine.GSimEngineException;
 import gsim.def.objects.Instance;
-import gsim.def.objects.behaviour.Condition;
+import gsim.def.objects.behaviour.ConditionDef;
 import gsim.def.objects.behaviour.DependencyTest;
-import gsim.def.objects.behaviour.Expansion;
+import gsim.def.objects.behaviour.ExpansionDef;
 import gsim.def.objects.behaviour.RLRule;
 import gsim.def.objects.behaviour.UserRule;
 import gsim.def.objects.behaviour.UserRuleFrame;
@@ -127,14 +127,14 @@ public class GeneralRLBuilder {
             n += " (" + owner.getName() + ")\n";
         }
 
-        HashMap<Integer, gsim.def.objects.behaviour.Action> actionRefs = new HashMap<Integer, gsim.def.objects.behaviour.Action>();
-        HashMap<gsim.def.objects.behaviour.Action, ArrayList<String>> objectRefs = new HashMap<gsim.def.objects.behaviour.Action, ArrayList<String>>();
+        HashMap<Integer, gsim.def.objects.behaviour.ActionDef> actionRefs = new HashMap<Integer, gsim.def.objects.behaviour.ActionDef>();
+        HashMap<gsim.def.objects.behaviour.ActionDef, ArrayList<String>> objectRefs = new HashMap<gsim.def.objects.behaviour.ActionDef, ArrayList<String>>();
 
-        HashMap<Integer, gsim.def.objects.behaviour.Action> actions = new HashMap<Integer, gsim.def.objects.behaviour.Action>();
-        HashMap<gsim.def.objects.behaviour.Action, ArrayList<String>> objects = new HashMap<gsim.def.objects.behaviour.Action, ArrayList<String>>();
+        HashMap<Integer, gsim.def.objects.behaviour.ActionDef> actions = new HashMap<Integer, gsim.def.objects.behaviour.ActionDef>();
+        HashMap<gsim.def.objects.behaviour.ActionDef, ArrayList<String>> objects = new HashMap<gsim.def.objects.behaviour.ActionDef, ArrayList<String>>();
 
         for (int i = 0; i < agent.getBehaviour().getAvailableActions().length; i++) {
-            gsim.def.objects.behaviour.Action action = agent.getBehaviour().getAvailableActions()[i];
+            gsim.def.objects.behaviour.ActionDef action = agent.getBehaviour().getAvailableActions()[i];
             int refPos = i;
             actions.put(refPos, action);
             if (action.hasObjectParameter()) {
@@ -150,7 +150,7 @@ public class GeneralRLBuilder {
         }
 
         for (int i = 0; i < rule.getConditions().length; i++) {
-            Condition cond = rule.getConditions()[i];
+            ConditionDef cond = rule.getConditions()[i];
 
             String[] a = cond.getParameterName().split("::")[0].split("\\$");
             if (a.length > 1) {
@@ -158,7 +158,7 @@ public class GeneralRLBuilder {
 
                 String objRef = a.length > 2 ? a[2].trim() : null;
 
-                gsim.def.objects.behaviour.Action action = agent.getBehaviour().getAction(actionRef);
+                gsim.def.objects.behaviour.ActionDef action = agent.getBehaviour().getAction(actionRef);
                 actionRefs.put(i, action);
 
                 if (objRef != null) {
@@ -182,7 +182,7 @@ public class GeneralRLBuilder {
 
         HashMap<String, Integer> paramIndices = new HashMap<String, Integer>();
         for (int actionCtxNumber : actionRefs.keySet()) {
-            gsim.def.objects.behaviour.Action action = actionRefs.get(actionCtxNumber);
+            gsim.def.objects.behaviour.ActionDef action = actionRefs.get(actionCtxNumber);
             ArrayList<String> list = objectRefs.get(action);
             if (list != null) {
                 int number = 0;
@@ -204,13 +204,13 @@ public class GeneralRLBuilder {
 
         String prefix = "";
         String postFix = "";
-        HashMap<gsim.def.objects.behaviour.Action, ArrayList<String>> resolvedObjRefs = new HashMap<gsim.def.objects.behaviour.Action, ArrayList<String>>();
+        HashMap<gsim.def.objects.behaviour.ActionDef, ArrayList<String>> resolvedObjRefs = new HashMap<gsim.def.objects.behaviour.ActionDef, ArrayList<String>>();
 
         Object2VariableBindingTable scCond = new Object2VariableBindingTable();
 
         for (int i = 0; i < rule.getConditions().length; i++) {
 
-            Condition cond = rule.getConditions()[i];
+            ConditionDef cond = rule.getConditions()[i];
 
             String path = cond.getParameterName();
 
@@ -220,7 +220,7 @@ public class GeneralRLBuilder {
 
                 String objRef = p1.length > 1 ? p1[0].split("\\$")[2] : null;
 
-                gsim.def.objects.behaviour.Action a = actionRefs.get(i);
+                gsim.def.objects.behaviour.ActionDef a = actionRefs.get(i);
 
                 prefix = objRef;
                 String[] pp = prefix.split("/");
@@ -267,7 +267,7 @@ public class GeneralRLBuilder {
 
         int actionFactRefs = 0;
         HashMap<Integer, String> map = new HashMap<Integer, String>();
-        for (gsim.def.objects.behaviour.Action a : actionRefs.values()) {
+        for (gsim.def.objects.behaviour.ActionDef a : actionRefs.values()) {
 
             ArrayList<String> objParams = resolvedObjRefs.get(a);
 
@@ -351,7 +351,7 @@ public class GeneralRLBuilder {
     }
 
     private boolean hasCatExpansion(RLRule rule) {
-        for (Expansion e : rule.getExpansions()) {
+        for (ExpansionDef e : rule.getExpansions()) {
             if (Double.isNaN(e.getMin()) && Double.isNaN(e.getMax())) {
                 return true;
             }
@@ -360,7 +360,7 @@ public class GeneralRLBuilder {
     }
 
     private boolean hasNumericalExpansion(RLRule rule) {
-        for (Expansion e : rule.getExpansions()) {
+        for (ExpansionDef e : rule.getExpansions()) {
             if (!Double.isNaN(e.getMin()) && !Double.isNaN(e.getMax())) {
                 return true;
             }
@@ -375,7 +375,7 @@ public class GeneralRLBuilder {
         return true;
     }
 
-    private boolean isExistQuantified(Condition c) {
+    private boolean isExistQuantified(ConditionDef c) {
         return c.getOperator().trim().equalsIgnoreCase("EXISTS") || c.getOperator().trim().equalsIgnoreCase("~EXISTS")
                 || c.getOperator().trim().equalsIgnoreCase("NOT EXISTS");
     }

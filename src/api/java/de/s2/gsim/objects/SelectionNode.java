@@ -1,6 +1,6 @@
 package de.s2.gsim.objects;
 
-public interface SelectionNodeIF extends RuleIF {
+public interface SelectionNode extends Rule {
 
     public void addNodeRef(String formattedString, String op, String val) throws GSimObjectException;
 
@@ -8,11 +8,11 @@ public interface SelectionNodeIF extends RuleIF {
 
     public String[] getNodeRefs() throws GSimObjectException;
 
-    public ActionIF getReferencedAction(String actionName) throws GSimObjectException;
+    public Action getReferencedAction(String actionName) throws GSimObjectException;
 
     // public String[] getReferencedParameters() throws GSimObjectException;
 
-    public ActionIF[] getReferencedActions() throws GSimObjectException;
+    public Action[] getReferencedActions() throws GSimObjectException;
 
     public String[] getReferencedParameters(String actionRef) throws GSimObjectException;
 

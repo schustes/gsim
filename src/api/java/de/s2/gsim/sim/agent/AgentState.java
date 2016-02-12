@@ -2,7 +2,7 @@ package de.s2.gsim.sim.agent;
 
 import java.util.List;
 
-import de.s2.gsim.objects.ObjectInstanceIF;
+import de.s2.gsim.objects.ObjectInstance;
 import de.s2.gsim.objects.attribute.Attribute;
 
 public interface AgentState {
@@ -21,7 +21,7 @@ public interface AgentState {
 
     String[] getAgentObjectListNames();
 
-    List<ObjectInstanceIF> getAgentObjects(String list);
+    List<ObjectInstance> getAgentObjects(String list);
 
     String[] getAgentAttributesListNames();
 

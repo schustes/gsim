@@ -1,11 +1,11 @@
 package gsim.objects.impl;
 
-import de.s2.gsim.objects.ExpansionIF;
+import de.s2.gsim.objects.Expansion;
 import de.s2.gsim.objects.GSimObjectException;
 import gsim.def.objects.Unit;
-import gsim.def.objects.behaviour.Expansion;
+import gsim.def.objects.behaviour.ExpansionDef;
 
-public class ExpansionInstance implements ExpansionIF, UnitWrapper {
+public class ExpansionInstance implements Expansion, UnitWrapper {
 
     /**
      *
@@ -14,9 +14,9 @@ public class ExpansionInstance implements ExpansionIF, UnitWrapper {
 
     private RuleInstance owner;
 
-    private Expansion real;
+    private ExpansionDef real;
 
-    public ExpansionInstance(RuleInstance owner, Expansion real) {
+    public ExpansionInstance(RuleInstance owner, ExpansionDef real) {
         this.real = real;
         this.owner = owner;
     }

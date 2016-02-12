@@ -2,16 +2,15 @@ package gsim.objects.impl;
 
 import java.util.ArrayList;
 
-import de.s2.gsim.objects.ActionIF;
-import de.s2.gsim.objects.ConditionIF;
+import de.s2.gsim.objects.Condition;
 import de.s2.gsim.objects.GSimObjectException;
-import de.s2.gsim.objects.SelectionNodeIF;
+import de.s2.gsim.objects.SelectionNode;
 import gsim.def.objects.Unit;
 import gsim.def.objects.behaviour.ActionFrame;
 import gsim.def.objects.behaviour.ConditionFrame;
 import gsim.def.objects.behaviour.UserRuleFrame;
 
-public class SelectionNodeClass extends RuleClass implements SelectionNodeIF {
+public class SelectionNodeClass extends RuleClass implements SelectionNode {
 
     /**
      *
@@ -36,7 +35,7 @@ public class SelectionNodeClass extends RuleClass implements SelectionNodeIF {
             String objectRef = s0[2].substring(0, s0[2].indexOf("::"));
             String attPath = s0[2].substring(s0[2].indexOf("::") + 2);
 
-            ActionIF action = owner.getConsequent(actionRef);
+            de.s2.gsim.objects.Action action = owner.getConsequent(actionRef);
             if (action == null) {
                 throw new GSimObjectException(
                         "Action-node reference " + actionRef + " references an action not defined in" + " parent-node " + owner.getName());
@@ -44,7 +43,7 @@ public class SelectionNodeClass extends RuleClass implements SelectionNodeIF {
 
             addOrSetConsequent(action);
 
-            ConditionIF condition = createCondition(objectRef + "::" + attPath, op, val);
+            Condition condition = createCondition(objectRef + "::" + attPath, op, val);
             addOrSetCondition(condition);
 
         } catch (Exception e) {
@@ -55,7 +54,7 @@ public class SelectionNodeClass extends RuleClass implements SelectionNodeIF {
 
     @Override
     public void addNodeRef(String actionRef, String objectRef, String relativeAttPath, String op, String val) throws GSimObjectException {
-        ActionIF action = owner.getConsequent(actionRef);
+        de.s2.gsim.objects.Action action = owner.getConsequent(actionRef);
         if (action == null) {
             throw new GSimObjectException(
                     "Action-node reference " + actionRef + " references an action not defined in" + " parent-node " + owner.getName());
@@ -63,27 +62,27 @@ public class SelectionNodeClass extends RuleClass implements SelectionNodeIF {
 
         addOrSetConsequent(action);
         String s = "$" + actionRef + "$" + objectRef + "::" + relativeAttPath;
-        ConditionIF condition = createCondition(s, op, val);
+        Condition condition = createCondition(s, op, val);
         addOrSetCondition(condition);
 
     }
 
     @Override
-    public void addOrSetCondition(ConditionIF cond) {
+    public void addOrSetCondition(Condition cond) {
         ConditionFrame f = (ConditionFrame) ((UnitWrapper) cond).toUnit();
         real.removeCondition(f);
         real.addCondition(f);
     }
 
     @Override
-    public void addOrSetConsequent(ActionIF cons) throws GSimObjectException {
+    public void addOrSetConsequent(de.s2.gsim.objects.Action cons) throws GSimObjectException {
         real.removeConsequence((ActionFrame) ((UnitWrapper) cons).toUnit());
         real.addConsequence((ActionFrame) ((UnitWrapper) cons).toUnit());
         owner.addOrSetSelectionNode(this);
     }
 
     @Override
-    public ConditionIF[] getConditions() {
+    public Condition[] getConditions() {
         ConditionFrame[] c = real.getConditions();
         ConditionClass[] ret = new ConditionClass[c.length];
         for (int i = 0; i < c.length; i++) {
@@ -93,7 +92,7 @@ public class SelectionNodeClass extends RuleClass implements SelectionNodeIF {
     }
 
     @Override
-    public ActionIF getConsequent(String name) {
+    public de.s2.gsim.objects.Action getConsequent(String name) {
         ActionFrame[] c = real.getConsequences();
         for (int i = 0; i < c.length; i++) {
             if (c[i].getTypeName().equals(name)) {
@@ -104,7 +103,7 @@ public class SelectionNodeClass extends RuleClass implements SelectionNodeIF {
     }
 
     @Override
-    public ActionIF[] getConsequents() {
+    public de.s2.gsim.objects.Action[] getConsequents() {
         ArrayList<ActionClass> list = new ArrayList<ActionClass>();
 
         ActionFrame[] c = real.getConsequences();
@@ -129,7 +128,7 @@ public class SelectionNodeClass extends RuleClass implements SelectionNodeIF {
     public String[] getNodeRefs() throws GSimObjectException {
         String[] ret = new String[getConditions().length];
         int i = 0;
-        for (ConditionIF c : getConditions()) {
+        for (Condition c : getConditions()) {
             String refString = c.getParameterName();
             ret[i] = refString;
             i++;
@@ -138,19 +137,19 @@ public class SelectionNodeClass extends RuleClass implements SelectionNodeIF {
     }
 
     @Override
-    public ActionIF getReferencedAction(String name) throws GSimObjectException {
+    public de.s2.gsim.objects.Action getReferencedAction(String name) throws GSimObjectException {
         return getConsequent(name);
     }
 
     @Override
-    public ActionIF[] getReferencedActions() throws GSimObjectException {
+    public de.s2.gsim.objects.Action[] getReferencedActions() throws GSimObjectException {
         return getConsequents();
     }
 
     @Override
     public String[] getReferencedParameters(String actionRef) throws GSimObjectException {
         ArrayList<String> list = new ArrayList<String>();
-        ActionIF a = getConsequent(actionRef);
+        de.s2.gsim.objects.Action a = getConsequent(actionRef);
         if (a.hasObjectParameter()) {
             String[] s = a.getObjectClassParams();
             for (String u : s) {
@@ -169,13 +168,13 @@ public class SelectionNodeClass extends RuleClass implements SelectionNodeIF {
     }
 
     @Override
-    public void removeCondition(ConditionIF cond) throws GSimObjectException {
+    public void removeCondition(Condition cond) throws GSimObjectException {
         real.removeCondition((ConditionFrame) ((UnitWrapper) cond).toUnit());
         owner.addOrSetSelectionNode(this);
     }
 
     @Override
-    public void removeConsequent(ActionIF cons) throws GSimObjectException {
+    public void removeConsequent(de.s2.gsim.objects.Action cons) throws GSimObjectException {
         real.removeConsequence((ActionFrame) ((UnitWrapper) cons).toUnit());
         owner.addOrSetSelectionNode(this);
     }
@@ -188,9 +187,9 @@ public class SelectionNodeClass extends RuleClass implements SelectionNodeIF {
             String objectRef = s0[2].substring(0, s0[2].indexOf("::"));
             String attPath = s0[2].substring(s0[2].indexOf("::") + 1);
 
-            ActionIF action = getConsequent(actionRef);
+            de.s2.gsim.objects.Action action = getConsequent(actionRef);
             removeConsequent(action);
-            ConditionIF condition = createCondition(objectRef + "::" + attPath, op, val);
+            Condition condition = createCondition(objectRef + "::" + attPath, op, val);
             removeCondition(condition);
 
         } catch (Exception e) {

@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 import de.s2.gsim.objects.attribute.DomainAttribute;
 
-public interface ObjectClassIF extends Serializable {
+public interface ObjectClass extends Serializable {
 
     public void addAttribute(String list, DomainAttribute a) throws GSimObjectException;
 

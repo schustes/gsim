@@ -1,11 +1,11 @@
 package gsim.objects.impl;
 
-import de.s2.gsim.objects.ExpansionIF;
+import de.s2.gsim.objects.Expansion;
 import de.s2.gsim.objects.GSimObjectException;
 import gsim.def.objects.Unit;
 import gsim.def.objects.behaviour.ExpansionFrame;
 
-public class ExpansionClass implements ExpansionIF, UnitWrapper {
+public class ExpansionClass implements Expansion, UnitWrapper {
 
     /**
      *

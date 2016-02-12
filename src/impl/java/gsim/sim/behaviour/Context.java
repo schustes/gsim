@@ -2,7 +2,7 @@ package gsim.sim.behaviour;
 
 import java.util.HashMap;
 
-import de.s2.gsim.objects.AgentInstanceIF;
+import de.s2.gsim.objects.AgentInstance;
 import de.s2.gsim.sim.communication.CommunicationProtocol;
 import de.s2.gsim.sim.engine.GSimEngineException;
 import gsim.objects.impl.AgentInstanceSim;
@@ -31,7 +31,7 @@ public class Context implements java.io.Serializable {
         return exCtx.getOwner();
     }
 
-    public AgentInstanceIF getAgentIF() {
+    public AgentInstance getAgentIF() {
         return new AgentInstanceSim(exCtx.getOwner());
     }
 

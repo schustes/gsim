@@ -2,7 +2,7 @@ package de.s2.gsim.core;
 
 import java.util.HashMap;
 
-import de.s2.gsim.objects.AgentClassIF;
+import de.s2.gsim.objects.AgentClass;
 
 public class Test {
 
@@ -13,13 +13,12 @@ public class Test {
         System.out.println("core: 1" + core);
 
         core = GSimCoreFactory.customFactory("Standalone").createCore();
-
         System.out.println("core: 2" + core);
 
-        DefinitionEnvironment env = core.create("test", new HashMap<>());
+        ModelDefinitionEnvironment env = core.create("test", new HashMap<>());
 
         env.createAgentClass("Test", null);
-        AgentClassIF agentClass = env.getAgentClass("Test");
+        AgentClass agentClass = env.getAgentClass("Test");
         System.out.println(agentClass + ":" + agentClass.getName());
 
         // AgentClassIF a0 = env.getAgentClass("Traditional");

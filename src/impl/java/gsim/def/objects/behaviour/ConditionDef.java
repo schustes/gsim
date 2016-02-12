@@ -3,11 +3,11 @@ package gsim.def.objects.behaviour;
 import de.s2.gsim.objects.attribute.StringAttribute;
 import gsim.def.objects.Instance;
 
-public class Condition extends Instance {
+public class ConditionDef extends Instance {
 
     static final long serialVersionUID = 437787152226881019L;
 
-    public Condition(ConditionFrame template) {
+    public ConditionDef(ConditionFrame template) {
         super("Condition for variable " + template.getParameterName(), template);
     }
 
@@ -17,11 +17,11 @@ public class Condition extends Instance {
      * @param inst
      *            Instance
      */
-    public Condition(Instance inst) {
+    public ConditionDef(Instance inst) {
         super(inst);
     }
 
-    public Condition(String parameterName, String operator, String parameterValue) {
+    public ConditionDef(String parameterName, String operator, String parameterValue) {
         super(parameterName, new ConditionFrame(parameterName));
         super.setAttribute(new StringAttribute("parameter-name", parameterName));
         super.setAttribute(new StringAttribute("operator", operator));
@@ -29,11 +29,11 @@ public class Condition extends Instance {
     }
 
     public boolean equals1(Object o) {
-        if (!(o instanceof Condition)) {
+        if (!(o instanceof ConditionDef)) {
             return false;
         }
 
-        Condition other = (Condition) o;
+        ConditionDef other = (ConditionDef) o;
 
         String var1 = getParameterName();
         String op1 = getOperator();

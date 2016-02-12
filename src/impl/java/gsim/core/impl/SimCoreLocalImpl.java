@@ -11,11 +11,10 @@ import java.util.Properties;
 import org.apache.log4j.Logger;
 
 import de.s2.gsim.core.BatchManager;
+import de.s2.gsim.core.ModelDefinitionEnvironment;
 import de.s2.gsim.core.GSimCore;
-import de.s2.gsim.core.DefinitionEnvironment;
 import de.s2.gsim.core.GSimException;
-import de.s2.gsim.core.ScenarioConnector;
-import de.s2.gsim.core.ScenarioManager;
+import de.s2.gsim.core.SimulationController;
 import gsim.def.Environment;
 import gsim.sim.engine.local.SimulationInstanceContainerLocal;
 
@@ -43,9 +42,9 @@ public class SimCoreLocalImpl implements GSimCore {
     }
 
     @Override
-    public ScenarioConnector connectScenarioManager(String ns, HashMap props) throws GSimException {
+    public SimulationController connectScenarioManager(String ns, HashMap props) throws GSimException {
         try {
-            ScenarioConnector m = new ScenarioManagerLocal(ns);
+            SimulationController m = new ScenarioManagerLocal(ns);
             return m;
         } catch (Exception e) {
             e.printStackTrace();
@@ -54,7 +53,7 @@ public class SimCoreLocalImpl implements GSimCore {
     }
 
     @Override
-    public DefinitionEnvironment create(String ns, HashMap props) {
+    public ModelDefinitionEnvironment create(String ns, HashMap props) {
         try {
             Environment env = Environment.newInstance(ns);
             EnvLocalImpl impl = new EnvLocalImpl(env);
@@ -67,7 +66,7 @@ public class SimCoreLocalImpl implements GSimCore {
     }
 
     @Override
-    public DefinitionEnvironment create(String ns, InputStream setup, HashMap props) {
+    public ModelDefinitionEnvironment create(String ns, InputStream setup, HashMap props) {
         try {
 
             Environment env = Environment.newInstance(ns, setup);
@@ -82,7 +81,7 @@ public class SimCoreLocalImpl implements GSimCore {
         return null;
     }
 
-    public DefinitionEnvironment create(String ns, java.io.File setup, HashMap props) throws GSimException {
+    public ModelDefinitionEnvironment create(String ns, java.io.File setup, HashMap props) throws GSimException {
         try {
             InputStream setupStream = setup == null ? null : new java.io.FileInputStream(setup);
             return this.create(ns, setupStream, props);
@@ -92,7 +91,7 @@ public class SimCoreLocalImpl implements GSimCore {
         return null;
     }
 
-    public DefinitionEnvironment create(String ns, String setup, HashMap props) {
+    public ModelDefinitionEnvironment create(String ns, String setup, HashMap props) {
         try {
             InputStream setupStream = new java.io.ByteArrayInputStream(setup.getBytes());
             return this.create(ns, setupStream, props);
@@ -109,10 +108,10 @@ public class SimCoreLocalImpl implements GSimCore {
     }
 
     @Override
-    public ScenarioManager createScenarioManager(DefinitionEnvironment env, HashMap props, int steps, int runs) throws GSimException {
+    public SimulationController createScenarioManager(ModelDefinitionEnvironment env, HashMap props, int steps, int runs) throws GSimException {
 
         if (env instanceof EnvLocalImpl) {
-            ScenarioManager m = new ScenarioManagerLocal(((EnvLocalImpl) env).getComplicatedInterface(), props, steps, runs);
+            SimulationController m = new ScenarioManagerLocal(((EnvLocalImpl) env).getComplicatedInterface(), props, steps, runs);
             return m;
         } else {
             throw new GSimException(
@@ -191,7 +190,7 @@ public class SimCoreLocalImpl implements GSimCore {
         return null;
     }
 
-    public DefinitionEnvironment open(String ns, InputStream setup, HashMap props) {
+    public ModelDefinitionEnvironment open(String ns, InputStream setup, HashMap props) {
         try {
             Environment env = Environment.openInstance(ns, setup);
             EnvLocalImpl impl = new EnvLocalImpl(env);
@@ -202,7 +201,7 @@ public class SimCoreLocalImpl implements GSimCore {
         return null;
     }
 
-    public DefinitionEnvironment open(String ns, java.io.File setup, HashMap props) throws GSimException {
+    public ModelDefinitionEnvironment open(String ns, java.io.File setup, HashMap props) throws GSimException {
         try {
             return this.open(ns, new java.io.FileInputStream(setup), props);
         } catch (Exception e) {
@@ -211,7 +210,7 @@ public class SimCoreLocalImpl implements GSimCore {
         return null;
     }
 
-    public DefinitionEnvironment open(String ns, String setup, HashMap props) {
+    public ModelDefinitionEnvironment open(String ns, String setup, HashMap props) {
         try {
             InputStream setupStream = new java.io.ByteArrayInputStream(setup.getBytes());
             return this.open(ns, setupStream, props);

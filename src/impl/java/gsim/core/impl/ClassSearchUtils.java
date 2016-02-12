@@ -1,4 +1,4 @@
-package de.s2.gsim.core;
+package gsim.core.impl;
 
 import java.io.File;
 import java.io.IOException;

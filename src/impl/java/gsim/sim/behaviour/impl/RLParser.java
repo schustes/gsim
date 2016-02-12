@@ -10,10 +10,10 @@ import de.s2.gsim.sim.engine.GSimEngineException;
 import gsim.def.objects.Frame;
 import gsim.def.objects.Instance;
 import gsim.def.objects.Unit;
-import gsim.def.objects.agent.Behaviour;
+import gsim.def.objects.agent.BehaviourDef;
 import gsim.def.objects.agent.BehaviourFrame;
 import gsim.def.objects.agent.GenericAgentClass;
-import gsim.def.objects.behaviour.Expansion;
+import gsim.def.objects.behaviour.ExpansionDef;
 import gsim.def.objects.behaviour.RLRule;
 import gsim.sim.agent.RuntimeAgent;
 import jess.Fact;
@@ -78,7 +78,7 @@ public class RLParser {
         try {
             String res = "";
 
-            Behaviour b = agent.getBehaviour();
+            BehaviourDef b = agent.getBehaviour();
             RLRule[] r = b.getRLRules();
 
             if (r.length == 0) {
@@ -151,7 +151,7 @@ public class RLParser {
             for (String n : expansionMap.keySet()) {
                 Unit u = expansionMap.get(n);
                 if (u instanceof Instance) {
-                    Behaviour beh = (Behaviour) u;
+                    BehaviourDef beh = (BehaviourDef) u;
                     int expandInterval = beh.getStateUpdateInterval();
                     double revisitCostFraction = beh.getRevisitCost();
                     double revaluationProbability = beh.getRevalProb();
@@ -195,7 +195,7 @@ public class RLParser {
     }
 
     private void extractConditionRefs(RLRule r, Attribute2ValuesMap exp) {
-        for (Expansion e : r.getExpansions()) {
+        for (ExpansionDef e : r.getExpansions()) {
             String path = e.getParameterName();
             DomainAttribute a = null;
             if (path.contains("::")) {
