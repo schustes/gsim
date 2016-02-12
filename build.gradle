@@ -81,7 +81,7 @@ uploadArchives {
                 ["compile", "runtime"].each { scope ->
                     configuration = configurations[type + scope.capitalize()]
                     ["main", type].each { pomName ->
-                        pom(pomName).scopeMappings.addMapping i, configuration, scope
+                        pom(pomName).scopeMappings.addMapping priority, configuration, scope
 	                    priority++
                     }
                 }
