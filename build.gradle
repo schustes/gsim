@@ -66,7 +66,7 @@ repositories {
 uploadArchives {
     repositories {
         mavenDeployer {
-			repository(url: "http://ems-server:7002/nexus/content/repositories/snapshots") {
+			repository(url: "http://2s-server:7002/nexus/content/repositories/snapshots") {
 				authentication(userName: "ems", password: "18e1042ms")
 			}
 
