@@ -53,13 +53,13 @@ jar {
 repositories {
 	mavenCentral()
     maven {
-		url 'http://ems-server:7002/nexus/content/repositories/snapshots/'
+		url 'http://2s-server:7002/nexus/content/repositories/snapshots/'
 	}    
     maven {
-		url 'http://ems-server:7002/nexus/content/repositories/releases/'
+		url 'http://2s-server:7002/nexus/content/repositories/releases/'
 	}    
     maven {
-		url 'http://ems-server:7002/nexus/content/repositories/thirdparty/'
+		url 'http://2s-server:7002/nexus/content/repositories/thirdparty/'
 	}    
 }
 
