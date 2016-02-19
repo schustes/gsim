@@ -1,5 +1,7 @@
 package de.s2.gsim.objects;
 
+import de.s2.gsim.core.GSimException;
+
 /**
  * The <code>AgentClassIF</code> is an interface to the frame representing an agent.
  *
@@ -13,43 +15,43 @@ public interface AgentClass extends ObjectClass {
      * 
      * @param list the list where to add the object class.
      * @param object the object class to add/set
-     * @throws GSimObjectException
+     * @throws GSimException
      */
-    public void addOrSetObject(String list, ObjectClass object) throws GSimObjectException;
+    void addOrSetObject(String list, ObjectClass object) throws GSimException;
 
     /**
      * Gets the behaviour associated with this agent.
      * 
      * @return the behaviour
-     * @throws GSimObjectException
+     * @throws GSimException
      */
-    public Behaviour getBehaviour() throws GSimObjectException;
+    Behaviour getBehaviour() throws GSimException;
 
     /**
      * Gets the names of all object lists that are defined for this agent.
      * 
      * @return object list names
-     * @throws GSimObjectException
+     * @throws GSimException
      */
-    public String[] getObjectListNames() throws GSimObjectException;
+    String[] getObjectListNames() throws GSimException;
 
     /**
      * Gets the type of object for a particular list.
      * 
      * @param listName
      * @return object class
-     * @throws GSimObjectException
+     * @throws GSimException
      */
-    public ObjectClass getObjectListType(String listName) throws GSimObjectException;
+    ObjectClass getObjectListType(String listName) throws GSimException;
 
     /**
      * Gets the default objects in a list. This object classes would be used as a template during the instanciation process.
      * 
      * @param list the name of the object list
      * @return a list of object classes
-     * @throws GSimObjectException
+     * @throws GSimException
      */
-    public ObjectClass[] getObjects(String list) throws GSimObjectException;
+    ObjectClass[] getObjects(String list) throws GSimException;
 
     /**
      * Tests whether an object class was defined in this agent, or whether it was defined somewhere up in the inheritance hierarchy.
@@ -57,27 +59,27 @@ public interface AgentClass extends ObjectClass {
      * @param list the list name
      * @param objectName the object class name
      * @return true if the object was declared in the frame representing this agent, false otherwise
-     * @throws GSimObjectException
+     * @throws GSimException
      */
-    public boolean isDeclaredObject(String list, String objectName) throws GSimObjectException;
+    boolean isDeclaredObject(String list, String objectName) throws GSimException;
 
     /**
      * Removes an object class from a list.
      * 
      * @param list the name of the list
      * @param object the object class
-     * @throws GSimObjectException
+     * @throws GSimException
      */
-    public void removeObject(String list, ObjectClass object) throws GSimObjectException;
+    void removeObject(String list, ObjectClass object) throws GSimException;
 
     /**
      * Removes an object class, identified by name only, from a list.
      * 
      * @param list the name of the list
      * @param objectName the name of the object class
-     * @throws GSimObjectException
+     * @throws GSimException
      */
-    public void removeObject(String list, String objectName) throws GSimObjectException;
+    void removeObject(String list, String objectName) throws GSimException;
 
     /**
      * Resolves a path into the object it references. Each object can be described by a name that represents its position within the object hierachy.
@@ -87,17 +89,17 @@ public interface AgentClass extends ObjectClass {
      * @return Object an Attribute if the name specified an attribute; an ObjectClass if it specified an ObjectClass; a {@link java.util.List} of
      * attributes if an attribute list was specified; a {@link java.util.List} of ObjectClasses if an object-list was specified; or null if the path
      * did not specify a valid object/attribute/list.
-     * @throws GSimObjectException
+     * @throws GSimException
      */
     @Override
-    public Object resolveName(String path) throws GSimObjectException;
+    Object resolveName(String path) throws GSimException;
 
     /**
      * Sets the behaviour of this agent.
      * 
      * @param behaviour the behaviour
-     * @throws GSimObjectException
+     * @throws GSimException
      */
-    public void setBehaviour(Behaviour behaviour) throws GSimObjectException;
+    void setBehaviour(Behaviour behaviour) throws GSimException;
 
 }

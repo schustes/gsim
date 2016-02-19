@@ -6,9 +6,9 @@ import java.util.HashMap;
 import org.apache.log4j.Logger;
 //import gsim.tools.setup.ModelInstanceSetupPanel;
 
-import de.s2.gsim.core.ModelDefinitionEnvironment;
 import de.s2.gsim.core.GSimCore;
 import de.s2.gsim.core.GSimCoreFactory;
+import de.s2.gsim.core.ModelDefinitionEnvironment;
 import de.s2.gsim.core.SimulationController;
 import de.s2.gsim.core.SimulationListener;
 import de.s2.gsim.sim.engine.Executable;

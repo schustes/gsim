@@ -1,6 +1,6 @@
 package de.s2.gsim.objects;
 
-import java.io.Serializable;
+import de.s2.gsim.core.GSimException;
 
 /**
  * The <code>ActionIF</code> specifies actions of an agent. It abstracts from the fact whether the action is defined on the frame or instance level.
@@ -8,69 +8,69 @@ import java.io.Serializable;
  * @author Stephan
  *
  */
-public interface Action extends Serializable {
+public interface Action {
 
     /**
      * Adds a parameter to this action.
      * 
      * @param objectClassName the type of object
-     * @throws GSimObjectException
+     * @throws GSimException
      */
-    public void addObjectClassParam(String objectClassName) throws GSimObjectException;
+    void addObjectClassParam(String objectClassName) throws GSimException;
 
     /**
      * Removes all parameters.
      * 
-     * @throws GSimObjectException
+     * @throws GSimException
      */
-    public void clearObjectClassParams() throws GSimObjectException;
+    void clearObjectClassParams() throws GSimException;
 
     /**
      * Gets the actual java class that is called when this action becomes activated.
      * 
      * @return fully qualified name of the class
-     * @throws GSimObjectException
+     * @throws GSimException
      */
-    public String getActionClassName() throws GSimObjectException;
+    String getActionClassName() throws GSimException;
 
     /**
      * Gets the name of this action.
      * 
      * @return the name
-     * @throws GSimObjectException
+     * @throws GSimException
      */
-    public String getName() throws GSimObjectException;
+    String getName() throws GSimException;
 
     /**
      * Gets the parameters of this action.
      * 
      * @return a list of paths to the respective object of the agent.
-     * @throws GSimObjectException
+     * @throws GSimException
      */
-    public String[] getObjectClassParams() throws GSimObjectException;
+    String[] getObjectClassParams() throws GSimException;
 
     /**
      * Tests whether this action has parameters.
      * 
      * @return true if at least one parameter is defined, false otherwise
-     * @throws GSimObjectException
+     * @throws GSimException
      */
-    public boolean hasObjectParameter() throws GSimObjectException;
+    boolean hasObjectParameter() throws GSimException;
 
     /**
      * Remove a single parameter.
      * 
      * @param path path to the parameter
-     * @throws GSimObjectException
+     * @throws GSimException
      */
-    public void removeObjectClassParam(String path) throws GSimObjectException;
+    void removeObjectClassParam(String path) throws GSimException;
 
     /**
      * Sets the actual java class that is called when this action becomes activated.
      * 
      * @param className
-     * @throws GSimObjectException
+     * @throws GSimException
      */
-    public void setActionClassName(String className) throws GSimObjectException;
+    void setActionClassName(String className) throws GSimException;
 
 }

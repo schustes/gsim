@@ -4,9 +4,9 @@ import java.io.FileInputStream;
 import java.util.HashMap;
 
 import cern.jet.random.Uniform;
-import de.s2.gsim.core.ModelDefinitionEnvironment;
 import de.s2.gsim.core.GSimCore;
 import de.s2.gsim.core.GSimCoreFactory;
+import de.s2.gsim.core.ModelDefinitionEnvironment;
 import de.s2.gsim.core.SimulationController;
 import de.s2.gsim.objects.AgentClass;
 import de.s2.gsim.objects.attribute.Attribute;

@@ -1,25 +1,88 @@
 package de.s2.gsim.objects;
 
-import java.io.Serializable;
+import de.s2.gsim.core.GSimException;
 
-public interface Expansion extends Serializable {
+/**
+ * An Expansion is a special kind of condition that can be split up into more conditions during runtime. This requires that the original expansion
+ * object can be defined in terms of value lists or ranges. The BRA extension will then split these ranges into smaller ones.
+ * 
+ * A rule with expansion condition looks like. say, if (value> min and value < max) then do ...
+ * 
+ * @author Stephan
+ *
+ */
+public interface Expansion {
 
-    public void addFiller(String filler) throws GSimObjectException;
+    /**
+     * Add a filler (component) to a value list.
+     * 
+     * @param filler the filler
+     * @throws GSimException if a problem occurs
+     */
+    void addFiller(String filler) throws GSimException;
 
-    public String[] getFillers() throws GSimObjectException;
+    /**
+     * Gets all fillers (components of a value list) if this expension i defined in terms of a value list.
+     * 
+     * @return the fillers
+     * @throws GSimException if a problem occurs
+     */
+    String[] getFillers() throws GSimException;
 
-    public String getMax() throws GSimObjectException;
+    /**
+     * Gets the maximum value if this expansion if defined in terms of a numeric range.
+     * 
+     * @return the max value
+     * @throws GSimException if a problem occurs
+     */
+    String getMax() throws GSimException;
 
-    public String getMin() throws GSimObjectException;
+    /**
+     * Gets the minimum value if this expansion if defined in terms of a numeric range.
+     * 
+     * @return the min value
+     * @throws GSimException if a problem occurs
+     */
+    String getMin() throws GSimException;
 
-    public String getParameterName() throws GSimObjectException;
+    /**
+     * Gets the parameter name.
+     * 
+     * @return the parameter name
+     * @throws GSimException if a problem occurs
+     */
+    String getParameterName() throws GSimException;
 
-    public boolean isNumerical() throws GSimObjectException;
+    /**
+     * Tests whether this expansion if defined as numeric interval.
+     * 
+     * @return true if the expansion describes a numeric interval
+     * @throws GSimException if a problem occurs
+     */
+    boolean isNumerical() throws GSimException;
 
-    public void setMax(String parameterValue) throws GSimObjectException;
+    /**
+     * Set the max value if the expansion is numeric.
+     * 
+     * @param parameterValue the max value
+     * @throws GSimException if a problem occurs
+     */
+    void setMax(String parameterValue) throws GSimException;
 
-    public void setMin(String parameterValue) throws GSimObjectException;
+    /**
+     * Set the min value if the expansion is numeric.
+     * 
+     * @param parameterValue the max value
+     * @throws GSimException if a problem occurs
+     */
+    void setMin(String parameterValue) throws GSimException;
 
-    public void setParameterName(String parameterName) throws GSimObjectException;
+    /**
+     * Set the parameter name.
+     * 
+     * @param parameterName the parameter name
+     * @throws GSimException if a problem occurs
+     */
+    void setParameterName(String parameterName) throws GSimException;
 
 }

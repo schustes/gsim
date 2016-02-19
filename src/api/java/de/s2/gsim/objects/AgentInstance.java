@@ -1,5 +1,7 @@
 package de.s2.gsim.objects;
 
+import de.s2.gsim.core.GSimException;
+
 /**
  * The <code>AgentInstanceIF</code> class represents an agent instance.
  *
@@ -13,9 +15,9 @@ public interface AgentInstance extends ObjectInstance {
      * 
      * @param list the name of the list
      * @param object the object
-     * @throws GSimObjectException
+     * @throws GSimException
      */
-    public void addOrSetObject(String list, ObjectInstance object) throws GSimObjectException;
+    void addOrSetObject(String list, ObjectInstance object) throws GSimException;
 
     /**
      * Creates object of the type of object specified for the list and adds it to the list.
@@ -23,17 +25,17 @@ public interface AgentInstance extends ObjectInstance {
      * @param objectName the name of the object to instanciate
      * @param listName the name of the list
      * @return the newly created object
-     * @throws GSimObjectException
+     * @throws GSimException
      */
-    public ObjectInstance createObjectFromListType(String objectName, String listName) throws GSimObjectException;
+    ObjectInstance createObjectFromListType(String objectName, String listName) throws GSimException;
 
     /**
      * Gets the behaviour associated with this agent instance.
      * 
      * @return the behaviour
-     * @throws GSimObjectException
+     * @throws GSimException
      */
-    public Behaviour getBehaviour() throws GSimObjectException;
+    Behaviour getBehaviour() throws GSimException;
 
     /**
      * Gets an object from a list.
@@ -41,59 +43,59 @@ public interface AgentInstance extends ObjectInstance {
      * @param list the list name
      * @param objectName the object name
      * @return the object
-     * @throws GSimObjectException
+     * @throws GSimException
      */
-    public ObjectInstance getObject(String list, String objectName) throws GSimObjectException;
+    ObjectInstance getObject(String list, String objectName) throws GSimException;
 
     /**
      * Gets the object list names defined for this agent.
      * 
      * @return the names of the lists
-     * @throws GSimObjectException
+     * @throws GSimException
      */
-    public String[] getObjectListNames() throws GSimObjectException;
+    String[] getObjectListNames() throws GSimException;
 
     /**
      * Gets all objects in a particular list.
      * 
      * @param list the name of the list
      * @return list of objects
-     * @throws GSimObjectException
+     * @throws GSimException
      */
-    public ObjectInstance[] getObjects(String list) throws GSimObjectException;
+    ObjectInstance[] getObjects(String list) throws GSimException;
 
     /**
      * Removes all objects from an object list.
      * 
      * @param list
-     * @throws GSimObjectException
+     * @throws GSimException
      */
-    public void removeAllObjects(String list) throws GSimObjectException;
+    void removeAllObjects(String list) throws GSimException;
 
     /**
      * Removes an object from the specified list.
      * 
      * @param list the name of the list
      * @param object the object
-     * @throws GSimObjectException
+     * @throws GSimException
      */
-    public void removeObject(String list, ObjectInstance object) throws GSimObjectException;
+    void removeObject(String list, ObjectInstance object) throws GSimException;
 
     /**
      * Removes an object, given by its name, from the specified list.
      * 
      * @param list the name of the list
      * @param objectName the name of the object
-     * @throws GSimObjectException
+     * @throws GSimException
      */
-    public void removeObject(String list, String objectName) throws GSimObjectException;
+    void removeObject(String list, String objectName) throws GSimException;
 
     /**
      * Sets the behaviour of this agent.
      * 
      * @param behaviour the behaviour
-     * @throws GSimObjectException
+     * @throws GSimException
      */
-    public void setBehaviour(Behaviour behaviour) throws GSimObjectException;
+    void setBehaviour(Behaviour behaviour) throws GSimException;
 
 }

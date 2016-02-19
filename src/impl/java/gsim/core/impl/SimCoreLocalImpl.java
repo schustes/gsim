@@ -11,9 +11,9 @@ import java.util.Properties;
 import org.apache.log4j.Logger;
 
 import de.s2.gsim.core.BatchManager;
-import de.s2.gsim.core.ModelDefinitionEnvironment;
 import de.s2.gsim.core.GSimCore;
 import de.s2.gsim.core.GSimException;
+import de.s2.gsim.core.ModelDefinitionEnvironment;
 import de.s2.gsim.core.SimulationController;
 import gsim.def.Environment;
 import gsim.sim.engine.local.SimulationInstanceContainerLocal;

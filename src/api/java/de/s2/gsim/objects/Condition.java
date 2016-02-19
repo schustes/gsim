@@ -1,19 +1,61 @@
 package de.s2.gsim.objects;
 
-import java.io.Serializable;
+import de.s2.gsim.core.GSimException;
 
-public interface Condition extends Serializable {
+/**
+ * Describes a condition of a rule.
+ * 
+ * @author Stephan
+ *
+ */
+public interface Condition {
 
-    public String getOperator() throws GSimObjectException;
+    /**
+     * Get the Operator.
+     * 
+     * @return the operator
+     * @throws GSimException if a problem occurs
+     */
+    String getOperator() throws GSimException;
 
-    public String getParameterName() throws GSimObjectException;
+    /**
+     * Get the parameter of the condition.
+     * 
+     * @return the parameter name
+     * @throws GSimException if a problem occurs
+     */
+    String getParameterName() throws GSimException;
 
-    public String getParameterValue() throws GSimObjectException;
+    /**
+     * Get the parameter value of the condition.
+     * 
+     * @return the value
+     * @throws GSimException if a problem occurs
+     */
+    String getParameterValue() throws GSimException;
 
-    public void setOperator(String str) throws GSimObjectException;
+    /**
+     * Sets the operator.
+     * 
+     * @param str the operator
+     * @throws GSimException if a problem occurs
+     */
+    void setOperator(String str) throws GSimException;
 
-    public void setParameterName(String str) throws GSimObjectException;
+    /**
+     * Sets the parameter name.
+     * 
+     * @param paramName the parameter name
+     * @throws GSimException if a problem occurs
+     */
+    void setParameterName(String paramName) throws GSimException;
 
-    public void setParameterValue(String str) throws GSimObjectException;
+    /**
+     * Sets the parameter value.
+     * 
+     * @param paramVal the parameter value
+     * @throws GSimException if a problem occurs
+     */
+    void setParameterValue(String paramVal) throws GSimException;
 
 }

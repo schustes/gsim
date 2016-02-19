@@ -1,6 +1,6 @@
 package gsim.objects.impl;
 
-import de.s2.gsim.objects.GSimObjectException;
+import de.s2.gsim.core.GSimException;
 import gsim.def.objects.Unit;
 import gsim.def.objects.behaviour.ActionFrame;
 
@@ -18,13 +18,13 @@ public class ActionClass implements de.s2.gsim.objects.Action, UnitWrapper {
     }
 
     @Override
-    public void addObjectClassParam(String objectClassName) throws GSimObjectException {
+    public void addObjectClassParam(String objectClassName) throws GSimException {
         real.addObjectClassParam(objectClassName, null);
         owner.addOrSetConsequent(this);
     }
 
     @Override
-    public void clearObjectClassParams() throws GSimObjectException {
+    public void clearObjectClassParams() throws GSimException {
         real.clearObjectClassParams();
         owner.addOrSetConsequent(this);
     }
@@ -58,18 +58,18 @@ public class ActionClass implements de.s2.gsim.objects.Action, UnitWrapper {
     }
 
     @Override
-    public void removeObjectClassParam(String name) throws GSimObjectException {
+    public void removeObjectClassParam(String name) throws GSimException {
         real.removeObjectClassParam(name);
         owner.addOrSetConsequent(this);
     }
 
     @Override
-    public void setActionClassName(String className) throws GSimObjectException {
+    public void setActionClassName(String className) throws GSimException {
         real.setClassName(className);
         owner.addOrSetConsequent(this);
     }
 
-    public void setSalience(int s) throws GSimObjectException {
+    public void setSalience(int s) throws GSimException {
         real.setSalience(s);
         owner.addOrSetConsequent(this);
     }

@@ -1,7 +1,7 @@
 package gsim.objects.impl;
 
+import de.s2.gsim.core.GSimException;
 import de.s2.gsim.objects.Expansion;
-import de.s2.gsim.objects.GSimObjectException;
 import gsim.def.objects.Unit;
 import gsim.def.objects.behaviour.ExpansionFrame;
 
@@ -22,7 +22,7 @@ public class ExpansionClass implements Expansion, UnitWrapper {
     }
 
     @Override
-    public void addFiller(String filler) throws GSimObjectException {
+    public void addFiller(String filler) throws GSimException {
         real.addFiller(filler);
         owner.addOrSetExpansion(this);
     }
@@ -53,19 +53,19 @@ public class ExpansionClass implements Expansion, UnitWrapper {
     }
 
     @Override
-    public void setMax(String parameterValue) throws GSimObjectException {
+    public void setMax(String parameterValue) throws GSimException {
         real.setMax(parameterValue);
         owner.addOrSetExpansion(this);
     }
 
     @Override
-    public void setMin(String parameterValue) throws GSimObjectException {
+    public void setMin(String parameterValue) throws GSimException {
         real.setMin(parameterValue);
         owner.addOrSetExpansion(this);
     }
 
     @Override
-    public void setParameterName(String parameterName) throws GSimObjectException {
+    public void setParameterName(String parameterName) throws GSimException {
         real.setParameterName(parameterName);
         owner.addOrSetExpansion(this);
     }

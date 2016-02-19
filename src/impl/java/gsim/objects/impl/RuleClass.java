@@ -2,8 +2,8 @@ package gsim.objects.impl;
 
 import java.util.ArrayList;
 
+import de.s2.gsim.core.GSimException;
 import de.s2.gsim.objects.Condition;
-import de.s2.gsim.objects.GSimObjectException;
 import de.s2.gsim.objects.Rule;
 import gsim.def.objects.Unit;
 import gsim.def.objects.behaviour.ActionFrame;
@@ -27,7 +27,7 @@ public class RuleClass implements Rule, UnitWrapper {
     }
 
     @Override
-    public void addOrSetCondition(Condition cond) throws GSimObjectException {
+    public void addOrSetCondition(Condition cond) throws GSimException {
         ConditionFrame f = (ConditionFrame) ((UnitWrapper) cond).toUnit();
         real.removeCondition(f);
         real.addCondition(f);
@@ -35,14 +35,14 @@ public class RuleClass implements Rule, UnitWrapper {
     }
 
     @Override
-    public void addOrSetConsequent(de.s2.gsim.objects.Action cons) throws GSimObjectException {
+    public void addOrSetConsequent(de.s2.gsim.objects.Action cons) throws GSimException {
         real.removeConsequence((ActionFrame) ((UnitWrapper) cons).toUnit());
         real.addConsequence((ActionFrame) ((UnitWrapper) cons).toUnit());
         owner.addOrSetRule(this);
     }
 
     @Override
-    public Condition createCondition(String paramName, String op, String val) throws GSimObjectException {
+    public Condition createCondition(String paramName, String op, String val) throws GSimException {
         ConditionFrame c = real.createCondition(paramName, op, val);
         real.addCondition(c);
         return new ConditionClass(this, c);
@@ -87,7 +87,7 @@ public class RuleClass implements Rule, UnitWrapper {
     }
 
     @Override
-    public String getName() throws GSimObjectException {
+    public String getName() throws GSimException {
         return real.getTypeName();
     }
 
@@ -97,19 +97,19 @@ public class RuleClass implements Rule, UnitWrapper {
     }
 
     @Override
-    public void removeCondition(Condition cond) throws GSimObjectException {
+    public void removeCondition(Condition cond) throws GSimException {
         real.removeCondition((ConditionFrame) ((UnitWrapper) cond).toUnit());
         owner.addOrSetRule(this);
     }
 
     @Override
-    public void removeConsequent(de.s2.gsim.objects.Action cons) throws GSimObjectException {
+    public void removeConsequent(de.s2.gsim.objects.Action cons) throws GSimException {
         real.removeConsequence((ActionFrame) ((UnitWrapper) cons).toUnit());
         owner.addOrSetRule(this);
     }
 
     @Override
-    public void setActivated(boolean b) throws GSimObjectException {
+    public void setActivated(boolean b) throws GSimException {
         real.setActivated(b);
         owner.addOrSetRule(this);
     }

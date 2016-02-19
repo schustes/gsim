@@ -2,9 +2,9 @@ package gsim.objects.impl;
 
 import java.util.ArrayList;
 
+import de.s2.gsim.core.GSimException;
 import de.s2.gsim.objects.AgentClass;
 import de.s2.gsim.objects.Behaviour;
-import de.s2.gsim.objects.GSimObjectException;
 import de.s2.gsim.objects.RLActionNode;
 import de.s2.gsim.objects.Rule;
 import gsim.def.objects.Unit;
@@ -36,7 +36,7 @@ public class BehaviourClass implements Behaviour, UnitWrapper {
     }
 
     @Override
-    public void addOrSetRLActionNode(RLActionNode node) throws GSimObjectException {
+    public void addOrSetRLActionNode(RLActionNode node) throws GSimException {
         // try {
         // real.removeRLRule(node.getName());
         // } catch (gsim.def.GSimDefException e) {
@@ -48,7 +48,7 @@ public class BehaviourClass implements Behaviour, UnitWrapper {
     }
 
     @Override
-    public void addOrSetRule(Rule rule) throws GSimObjectException {
+    public void addOrSetRule(Rule rule) throws GSimException {
 
         if (rule instanceof RLActionNode) {
             addOrSetRLActionNode((RLActionNode) rule);
@@ -66,14 +66,14 @@ public class BehaviourClass implements Behaviour, UnitWrapper {
     }
 
     @Override
-    public de.s2.gsim.objects.Action createAction(String name, String cls) throws GSimObjectException {
+    public de.s2.gsim.objects.Action createAction(String name, String cls) throws GSimException {
         ActionFrame a = new ActionFrame(name, cls);
         real.addAction(a);
         return new ActionClass2(this, a);
     }
 
     @Override
-    public RLActionNode createRLActionNode(String name) throws GSimObjectException {
+    public RLActionNode createRLActionNode(String name) throws GSimException {
         RLRuleFrame r = real.createRLRule(name);
         real.addRLRule(r);
         RLActionNodeClass c = new RLActionNodeClass(this, r);
@@ -82,7 +82,7 @@ public class BehaviourClass implements Behaviour, UnitWrapper {
     }
 
     @Override
-    public Rule createRule(String name) throws GSimObjectException {
+    public Rule createRule(String name) throws GSimException {
         UserRuleFrame r = real.createRule(name);
         real.addRule(r);
         RuleClass c = new RuleClass(this, r);
@@ -91,10 +91,10 @@ public class BehaviourClass implements Behaviour, UnitWrapper {
     }
 
     @Override
-    public de.s2.gsim.objects.Action getAction(String name) throws GSimObjectException {
+    public de.s2.gsim.objects.Action getAction(String name) throws GSimException {
         ActionFrame a = real.getAction(name);
         if (a == null) {
-            throw new GSimObjectException("Action " + name + " does not exist!");
+            throw new GSimException("Action " + name + " does not exist!");
         }
         return new ActionClass2(this, a);
     }
@@ -117,17 +117,17 @@ public class BehaviourClass implements Behaviour, UnitWrapper {
     }
 
     @Override
-    public int getMaxNodes() throws GSimObjectException {
+    public int getMaxNodes() throws GSimException {
         return real.getMaxNodes();
     }
 
     @Override
-    public double getRevaluationProb() throws GSimObjectException {
+    public double getRevaluationProb() throws GSimException {
         return real.getRevalProb();
     }
 
     @Override
-    public double getRevisitCostFraction() throws GSimObjectException {
+    public double getRevisitCostFraction() throws GSimException {
         return real.getRevisitCost();
     }
 
@@ -179,21 +179,21 @@ public class BehaviourClass implements Behaviour, UnitWrapper {
     }
 
     @Override
-    public int getUpdateInterval() throws GSimObjectException {
+    public int getUpdateInterval() throws GSimException {
         return real.getStateUpdateInterval();
     }
 
     @Override
-    public boolean isDeclaredRLNode(String nodeName) throws GSimObjectException {
+    public boolean isDeclaredRLNode(String nodeName) throws GSimException {
         return real.getDeclaredFrame(BehaviourFrame.RL_LIST, nodeName) != null;
     }
 
     @Override
-    public boolean isDeclaredRule(String ruleName) throws GSimObjectException {
+    public boolean isDeclaredRule(String ruleName) throws GSimException {
         return real.getDeclaredFrame(BehaviourFrame.RULE_LIST, ruleName) != null;
     }
 
-    public void removeAvailableAction(String name) throws GSimObjectException {
+    public void removeAvailableAction(String name) throws GSimException {
 
         ActionFrame[] x = real.getDeclaredAvailableActions();
         boolean check = false;
@@ -203,7 +203,7 @@ public class BehaviourClass implements Behaviour, UnitWrapper {
             }
         }
         if (!check) {
-            throw new GSimObjectException("Action " + name + " cannot be removed in this object-class, because it is defined in a parent");
+            throw new GSimException("Action " + name + " cannot be removed in this object-class, because it is defined in a parent");
         }
 
         ActionFrame a = real.getAction(name);
@@ -215,48 +215,48 @@ public class BehaviourClass implements Behaviour, UnitWrapper {
     }
 
     @Override
-    public void removeRLActionNode(String name) throws GSimObjectException {
+    public void removeRLActionNode(String name) throws GSimException {
         try {
             real.removeRLRule(name);
             owner.setBehaviour(this);
         } catch (gsim.def.GSimDefException e) {
-            throw new GSimObjectException(e.getMessage());
+            throw new GSimException(e.getMessage());
         }
     }
 
     @Override
-    public void removeRule(String name) throws GSimObjectException {
+    public void removeRule(String name) throws GSimException {
         try {
             real.removeRule(name);
             owner.setBehaviour(this);
         } catch (gsim.def.GSimDefException e) {
-            throw new GSimObjectException(e.getMessage());
+            throw new GSimException(e.getMessage());
         }
     }
 
     @Override
-    public void setMaxNodes(int n) throws GSimObjectException {
+    public void setMaxNodes(int n) throws GSimException {
         real.setMaxNodes(n);
         real.setDirty(true);
         owner.setBehaviour(this);
     }
 
     @Override
-    public void setRevaluationProb(double d) throws GSimObjectException {
+    public void setRevaluationProb(double d) throws GSimException {
         real.setRevalProb(d);
         real.setDirty(true);
         owner.setBehaviour(this);
     }
 
     @Override
-    public void setRevisitCostFraction(double d) throws GSimObjectException {
+    public void setRevisitCostFraction(double d) throws GSimException {
         real.setRevisitCost(d);
         real.setDirty(true);
         owner.setBehaviour(this);
     }
 
     @Override
-    public void setUpdateInterval(int n) throws GSimObjectException {
+    public void setUpdateInterval(int n) throws GSimException {
         real.setStateUpdateInterval(n);
         real.setDirty(true);
         owner.setBehaviour(this);

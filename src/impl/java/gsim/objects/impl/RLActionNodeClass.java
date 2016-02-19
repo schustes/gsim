@@ -1,8 +1,8 @@
 package gsim.objects.impl;
 
+import de.s2.gsim.core.GSimException;
 import de.s2.gsim.objects.Condition;
 import de.s2.gsim.objects.Expansion;
-import de.s2.gsim.objects.GSimObjectException;
 import de.s2.gsim.objects.RLActionNode;
 import de.s2.gsim.objects.SelectionNode;
 import gsim.def.objects.Frame;
@@ -24,7 +24,7 @@ public class RLActionNodeClass extends RuleClass implements RLActionNode, UnitWr
     }
 
     @Override
-    public void addOrSetCondition(Condition cond) throws GSimObjectException {
+    public void addOrSetCondition(Condition cond) throws GSimException {
         ConditionFrame f = (ConditionFrame) ((UnitWrapper) cond).toUnit();
         real.removeCondition(f);
         real.addCondition(f);
@@ -32,35 +32,35 @@ public class RLActionNodeClass extends RuleClass implements RLActionNode, UnitWr
     }
 
     @Override
-    public void addOrSetConsequent(de.s2.gsim.objects.Action cons) throws GSimObjectException {
+    public void addOrSetConsequent(de.s2.gsim.objects.Action cons) throws GSimException {
         real.removeConsequence((ActionFrame) ((UnitWrapper) cons).toUnit());
         real.addConsequence((ActionFrame) ((UnitWrapper) cons).toUnit());
         owner.addOrSetRLActionNode(this);
     }
 
     @Override
-    public void addOrSetExpansion(Expansion cond) throws GSimObjectException {
+    public void addOrSetExpansion(Expansion cond) throws GSimException {
         Frame inst = (Frame) ((UnitWrapper) cond).toUnit();
         real.addChildFrame(RLRuleFrame.INST_LIST_EXP, inst);
         owner.addOrSetRule(this);
     }
 
     @Override
-    public void addOrSetSelectionNode(SelectionNode sc) throws GSimObjectException {
+    public void addOrSetSelectionNode(SelectionNode sc) throws GSimException {
         ((RLRuleFrame) real).removeSelectionRule(((UserRuleFrame) ((UnitWrapper) sc).toUnit()));
         ((RLRuleFrame) real).addSelectionRule((UserRuleFrame) ((UnitWrapper) sc).toUnit());
         owner.addOrSetRLActionNode(this);
     }
 
     @Override
-    public Condition createEvaluator(String paramName, String op, String val) throws GSimObjectException {
+    public Condition createEvaluator(String paramName, String op, String val) throws GSimException {
         ConditionFrame c = real.createCondition(paramName, op, val);
         ((RLRuleFrame) real).setEvaluationFunction(c);
         return new ConditionClass(this, c);
     }
 
     @Override
-    public Expansion createExpansion(String param, String min, String max) throws GSimObjectException {
+    public Expansion createExpansion(String param, String min, String max) throws GSimException {
 
         ExpansionFrame f = null;
         // f = real.getChildFrame(RLRuleFrame.INST_LIST_EXP, param);
@@ -73,7 +73,7 @@ public class RLActionNodeClass extends RuleClass implements RLActionNode, UnitWr
     }
 
     @Override
-    public Expansion createExpansion(String param, String[] fillers) throws GSimObjectException {
+    public Expansion createExpansion(String param, String[] fillers) throws GSimException {
         ExpansionFrame f = new ExpansionFrame(param);
         f.setFillers(fillers);
         real.addChildFrame(RLRuleFrame.INST_LIST_EXP, f);
@@ -82,7 +82,7 @@ public class RLActionNodeClass extends RuleClass implements RLActionNode, UnitWr
     }
 
     @Override
-    public SelectionNode createSelectionNode(String name) throws GSimObjectException {
+    public SelectionNode createSelectionNode(String name) throws GSimException {
         UserRuleFrame f = new UserRuleFrame(name);
         return new SelectionNodeClass(this, f);
     }
@@ -97,7 +97,7 @@ public class RLActionNodeClass extends RuleClass implements RLActionNode, UnitWr
     }
 
     @Override
-    public Condition getEvaluator() throws GSimObjectException {
+    public Condition getEvaluator() throws GSimException {
         ConditionFrame f = ((RLRuleFrame) real).getEvaluationFunction();
         if (f != null) {
             return new EvaluatorClass(this, f);
@@ -109,7 +109,7 @@ public class RLActionNodeClass extends RuleClass implements RLActionNode, UnitWr
     }
 
     @Override
-    public String getExecutionRestrictionInterval() throws GSimObjectException {
+    public String getExecutionRestrictionInterval() throws GSimException {
         return ((RLRuleFrame) real).getExecutionIntervalTest();
     }
 
@@ -129,13 +129,13 @@ public class RLActionNodeClass extends RuleClass implements RLActionNode, UnitWr
     }
 
     @Override
-    public Method getMethod() throws GSimObjectException {
+    public Method getMethod() throws GSimException {
         Method m = Method.valueOf(((RLRuleFrame) real).getMethod());
         return m;
     }
 
     @Override
-    public String getName() throws GSimObjectException {
+    public String getName() throws GSimException {
         return real.getTypeName();
     }
 
@@ -150,7 +150,7 @@ public class RLActionNodeClass extends RuleClass implements RLActionNode, UnitWr
     }
 
     @Override
-    public SelectionNode getSelectionNode(String name) throws GSimObjectException {
+    public SelectionNode getSelectionNode(String name) throws GSimException {
         for (SelectionNode c : getSelectionNodes()) {
             if (c.getName().equals(name)) {
                 return c;
@@ -174,50 +174,50 @@ public class RLActionNodeClass extends RuleClass implements RLActionNode, UnitWr
     }
 
     @Override
-    public void removeExpansion(Expansion cond) throws GSimObjectException {
+    public void removeExpansion(Expansion cond) throws GSimException {
         Frame inst = (Frame) ((UnitWrapper) cond).toUnit();
         real.removeChildFrame(RLRuleFrame.INST_LIST_EXP, inst.getTypeName());
         owner.addOrSetRule(this);
     }
 
     @Override
-    public void removeSelectionNode(SelectionNode sc) throws GSimObjectException {
+    public void removeSelectionNode(SelectionNode sc) throws GSimException {
         ((RLRuleFrame) real).removeSelectionRule(((UserRuleFrame) ((UnitWrapper) sc).toUnit()));
         owner.addOrSetRLActionNode(this);
     }
 
-    public void setComparisonDiscount(double d) throws GSimObjectException {
+    public void setComparisonDiscount(double d) throws GSimException {
         ((RLRuleFrame) real).setAvgBeta(d);
         owner.addOrSetRLActionNode(this);
     }
 
     @Override
-    public void setDiscount(double d) throws GSimObjectException {
+    public void setDiscount(double d) throws GSimException {
         ((RLRuleFrame) real).setDiscount(d);
         owner.addOrSetRLActionNode(this);
     }
 
     @Override
-    public void setEvaluator(Condition f) throws GSimObjectException {
+    public void setEvaluator(Condition f) throws GSimException {
         ConditionFrame c = (ConditionFrame) ((UnitWrapper) f).toUnit();
         ((RLRuleFrame) real).setEvaluationFunction(c);
         owner.addOrSetRLActionNode(this);
     }
 
     @Override
-    public void setExecutionRestrictionInterval(String t) throws GSimObjectException {
+    public void setExecutionRestrictionInterval(String t) throws GSimException {
         ((RLRuleFrame) real).setRepeatedExecutionTest(t);
         owner.addOrSetRLActionNode(this);
     }
 
     @Override
-    public void setGlobalAverageStepSize(double d) throws GSimObjectException {
+    public void setGlobalAverageStepSize(double d) throws GSimException {
         ((RLRuleFrame) real).setAvgStepSize(d);
         owner.addOrSetRLActionNode(this);
     }
 
     @Override
-    public void setMethod(Method p) throws GSimObjectException {
+    public void setMethod(Method p) throws GSimException {
         if (p.equals(Method.NULL)) {
             ((RLRuleFrame) real).setMethod("Null");
             owner.addOrSetRLActionNode(this);
@@ -230,7 +230,7 @@ public class RLActionNodeClass extends RuleClass implements RLActionNode, UnitWr
     }
 
     @Override
-    public void setPolicy(POLICY p) throws GSimObjectException {
+    public void setPolicy(POLICY p) throws GSimException {
         if (p.equals(POLICY.COMPARISON)) {
             ((RLRuleFrame) real).setComparison(true);
         } else if (p.equals(POLICY.SOFTMAX)) {
@@ -239,7 +239,7 @@ public class RLActionNodeClass extends RuleClass implements RLActionNode, UnitWr
         owner.addOrSetRLActionNode(this);
     }
 
-    public void setUpdateLag(String s) throws GSimObjectException {
+    public void setUpdateLag(String s) throws GSimException {
         ((RLRuleFrame) real).setUpdateLag(s);
         owner.addOrSetRLActionNode(this);
     }

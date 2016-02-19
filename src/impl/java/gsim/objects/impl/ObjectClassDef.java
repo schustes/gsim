@@ -2,7 +2,7 @@ package gsim.objects.impl;
 
 import java.util.ArrayList;
 
-import de.s2.gsim.objects.GSimObjectException;
+import de.s2.gsim.core.GSimException;
 import de.s2.gsim.objects.ObjectClass;
 import de.s2.gsim.objects.attribute.Attribute;
 import de.s2.gsim.objects.attribute.DomainAttribute;
@@ -29,15 +29,15 @@ public class ObjectClassDef implements ObjectClass, UnitWrapper {
     }
 
     @Override
-    public void addAttribute(String list, DomainAttribute a) throws GSimObjectException {
+    public void addAttribute(String list, DomainAttribute a) throws GSimException {
         if (destroyed) {
-            throw new GSimObjectException("This object was removed from the runtime context.");
+            throw new GSimException("This object was removed from the runtime context.");
         }
 
         try {
             real = env.addObjectClassAttribute(real, new String[] { list }, a);
         } catch (Exception e) {
-            throw new GSimObjectException(e);
+            throw new GSimException(e);
         }
     }
 
@@ -46,16 +46,16 @@ public class ObjectClassDef implements ObjectClass, UnitWrapper {
      * @link gsim.objects.ObjectClassIF
      */
     @Override
-    public void destroy() throws GSimObjectException {
+    public void destroy() throws GSimException {
         if (destroyed) {
-            throw new GSimObjectException("This object was removed from the runtime context.");
+            throw new GSimException("This object was removed from the runtime context.");
         }
 
         try {
             env.removeObjectClass(real);
             real = null;
         } catch (Exception e) {
-            throw new GSimObjectException(e);
+            throw new GSimException(e);
         }
 
         destroyed = true;
@@ -66,15 +66,15 @@ public class ObjectClassDef implements ObjectClass, UnitWrapper {
      * @link gsim.objects.ObjectClassIF
      */
     @Override
-    public DomainAttribute getAttribute(String list, String attName) throws GSimObjectException {
+    public DomainAttribute getAttribute(String list, String attName) throws GSimException {
         if (destroyed) {
-            throw new GSimObjectException("This object was removed from the runtime context.");
+            throw new GSimException("This object was removed from the runtime context.");
         }
 
         try {
             return real.getAttribute(list, attName);
         } catch (Exception e) {
-            throw new GSimObjectException(e);
+            throw new GSimException(e);
         }
 
     }
@@ -84,15 +84,15 @@ public class ObjectClassDef implements ObjectClass, UnitWrapper {
      * @link gsim.objects.ObjectClassIF
      */
     @Override
-    public String[] getAttributeListNames() throws GSimObjectException {
+    public String[] getAttributeListNames() throws GSimException {
         if (destroyed) {
-            throw new GSimObjectException("This object was removed from the runtime context.");
+            throw new GSimException("This object was removed from the runtime context.");
         }
 
         try {
             return real.getAttributesListNames();
         } catch (Exception e) {
-            throw new GSimObjectException(e);
+            throw new GSimException(e);
         }
     }
 
@@ -101,16 +101,16 @@ public class ObjectClassDef implements ObjectClass, UnitWrapper {
      * @link gsim.objects.ObjectClassIF
      */
     @Override
-    public DomainAttribute[] getAttributes(String list) throws GSimObjectException {
+    public DomainAttribute[] getAttributes(String list) throws GSimException {
 
         if (destroyed) {
-            throw new GSimObjectException("This object was removed from the runtime context.");
+            throw new GSimException("This object was removed from the runtime context.");
         }
 
         try {
             return real.getAttributes(list);
         } catch (Exception e) {
-            throw new GSimObjectException(e);
+            throw new GSimException(e);
         }
     }
 
@@ -119,17 +119,17 @@ public class ObjectClassDef implements ObjectClass, UnitWrapper {
      * @link gsim.objects.ObjectClassIF
      */
     @Override
-    public String getDefaultValue(String list, String attName) throws GSimObjectException {
+    public String getDefaultValue(String list, String attName) throws GSimException {
 
         if (destroyed) {
-            throw new GSimObjectException("This object was removed from the runtime context.");
+            throw new GSimException("This object was removed from the runtime context.");
         }
 
         try {
             DomainAttribute a = real.getAttribute(list, attName);
             return a.getDefaultValue();
         } catch (Exception e) {
-            throw new GSimObjectException(e);
+            throw new GSimException(e);
         }
     }
 
@@ -138,21 +138,21 @@ public class ObjectClassDef implements ObjectClass, UnitWrapper {
      * @link gsim.objects.ObjectClassIF
      */
     @Override
-    public String getName() throws GSimObjectException {
+    public String getName() throws GSimException {
 
         if (destroyed) {
-            throw new GSimObjectException("This object was removed from the runtime context.");
+            throw new GSimException("This object was removed from the runtime context.");
         }
 
         try {
             return real.getTypeName();
         } catch (Exception e) {
-            throw new GSimObjectException(e);
+            throw new GSimException(e);
         }
     }
 
     @Override
-    public boolean isDeclaredAttribute(String list, String attName) throws GSimObjectException {
+    public boolean isDeclaredAttribute(String list, String attName) throws GSimException {
         return real.isDeclaredAttribute(list, attName);
     }
 
@@ -161,10 +161,10 @@ public class ObjectClassDef implements ObjectClass, UnitWrapper {
      * @link gsim.objects.ObjectClassIF
      */
     @Override
-    public Object resolveName(String path) throws GSimObjectException {
+    public Object resolveName(String path) throws GSimException {
 
         if (destroyed) {
-            throw new GSimObjectException("This object was removed from the runtime context.");
+            throw new GSimException("This object was removed from the runtime context.");
         }
 
         try {
@@ -177,11 +177,11 @@ public class ObjectClassDef implements ObjectClass, UnitWrapper {
             if (o instanceof Attribute || o instanceof ArrayList) {
                 return o;
             } else {
-                throw new GSimObjectException("Can't handle return value " + o);
+                throw new GSimException("Can't handle return value " + o);
             }
 
         } catch (Exception e) {
-            throw new GSimObjectException(e);
+            throw new GSimException(e);
         }
 
     }
@@ -191,16 +191,16 @@ public class ObjectClassDef implements ObjectClass, UnitWrapper {
      * @link gsim.objects.ObjectClassIF
      */
     @Override
-    public void setAttribute(String list, DomainAttribute a) throws GSimObjectException {
+    public void setAttribute(String list, DomainAttribute a) throws GSimException {
 
         if (destroyed) {
-            throw new GSimObjectException("This object was removed from the runtime context.");
+            throw new GSimException("This object was removed from the runtime context.");
         }
 
         try {
             real = env.modifyObjectClassAttribute(real, new String[] { list }, a);
         } catch (Exception e) {
-            throw new GSimObjectException(e);
+            throw new GSimException(e);
         }
 
     }
@@ -210,10 +210,10 @@ public class ObjectClassDef implements ObjectClass, UnitWrapper {
      * @link gsim.objects.ObjectClassIF
      */
     @Override
-    public void setDefaultAttributeValue(String list, String attName, String value) throws GSimObjectException {
+    public void setDefaultAttributeValue(String list, String attName, String value) throws GSimException {
 
         if (destroyed) {
-            throw new GSimObjectException("This object was removed from the runtime context.");
+            throw new GSimException("This object was removed from the runtime context.");
         }
 
         try {
@@ -221,7 +221,7 @@ public class ObjectClassDef implements ObjectClass, UnitWrapper {
             a.setDefault(value);
             real = env.modifyObjectClassAttribute(real, new String[] { list }, a);
         } catch (Exception e) {
-            throw new GSimObjectException(e);
+            throw new GSimException(e);
         }
 
     }

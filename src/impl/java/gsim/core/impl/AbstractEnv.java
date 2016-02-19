@@ -2,8 +2,8 @@ package gsim.core.impl;
 
 import java.util.ArrayList;
 
-import de.s2.gsim.core.ModelDefinitionEnvironment;
 import de.s2.gsim.core.GSimException;
+import de.s2.gsim.core.ModelDefinitionEnvironment;
 import de.s2.gsim.objects.AgentClass;
 import de.s2.gsim.objects.AgentInstance;
 import de.s2.gsim.objects.ObjectClass;

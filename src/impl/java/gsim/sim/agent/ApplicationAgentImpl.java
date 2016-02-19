@@ -1,7 +1,6 @@
 package gsim.sim.agent;
 
 import java.sql.Connection;
-import java.util.HashMap;
 
 import de.s2.gsim.objects.AppAgent;
 import de.s2.gsim.sim.agent.ApplicationAgent;
@@ -60,12 +59,6 @@ public abstract class ApplicationAgentImpl implements AgentType, AppAgent, Appli
     public boolean isAgent() {
         return false;
     }
-
-    @Override
-    public abstract void post();
-
-    @Override
-    public abstract void pre(HashMap<String, Object> simProps);
 
     public abstract void save(Connection con);
 
