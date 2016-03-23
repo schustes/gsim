@@ -6,13 +6,13 @@ import de.s2.gsim.objects.AppAgent;
 import de.s2.gsim.sim.agent.ApplicationAgent;
 import de.s2.gsim.sim.communication.AgentType;
 import de.s2.gsim.sim.communication.Messenger;
-import de.s2.gsim.sim.engine.ModelState;
+import de.s2.gsim.sim.engine.Simulation;
 
 public abstract class ApplicationAgentImpl implements AgentType, AppAgent, ApplicationAgent {
 
     private transient Messenger messenger = null;
 
-    private transient ModelState model = null;
+    private transient Simulation model = null;
 
     private String name;
 
@@ -26,7 +26,7 @@ public abstract class ApplicationAgentImpl implements AgentType, AppAgent, Appli
     }
 
     @Override
-    public final ModelState getCoordinatorRef() {
+    public final Simulation getSimulation() {
         return model;
     }
 
@@ -62,7 +62,7 @@ public abstract class ApplicationAgentImpl implements AgentType, AppAgent, Appli
 
     public abstract void save(Connection con);
 
-    public void setCoordinatorRef(ModelState m) {
+    public void setCoordinatorRef(Simulation m) {
         model = m;
     }
 

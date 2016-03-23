@@ -15,14 +15,15 @@ import java.util.Random;
 import org.apache.log4j.Logger;
 
 import de.s2.gsim.core.ModelDefinitionEnvironment;
+import de.s2.gsim.objects.AgentInstance;
 import de.s2.gsim.objects.AppAgent;
 import de.s2.gsim.objects.ObjectInstance;
 import de.s2.gsim.objects.attribute.Attribute;
-import de.s2.gsim.sim.agent.AgentState;
+import de.s2.gsim.sim.agent.RtAgent;
 import de.s2.gsim.sim.communication.AgentType;
 import de.s2.gsim.sim.engine.DataHandler;
 import de.s2.gsim.sim.engine.GSimEngineException;
-import de.s2.gsim.sim.engine.ModelState;
+import de.s2.gsim.sim.engine.Simulation;
 import de.s2.gsim.sim.engine.Saveable;
 import de.s2.gsim.sim.engine.SimulationID;
 import de.s2.gsim.sim.engine.Steppable;
@@ -32,7 +33,6 @@ import gsim.def.objects.Instance;
 import gsim.def.objects.agent.GenericAgent;
 import gsim.sim.agent.ApplicationAgentImpl;
 import gsim.sim.agent.RuntimeAgent;
-import gsim.sim.agent.RuntimeAgentState;
 import gsim.sim.behaviour.SimAction;
 import gsim.sim.engine.common.RuntimeAgentFactory;
 import gsim.sim.engine.common.ScenarioEvent;
@@ -42,7 +42,7 @@ import gsim.sim.engine.common.SimpleClassLoader;
  * Local implementation, and runs for the most part as one would expect from a standalone simulation.
  *
  */
-public class ModelCoordinatorLocal implements ModelState, Steppable, Saveable {
+public class ModelCoordinatorLocal implements Simulation, Steppable, Saveable {
 
     private static Logger logger = Logger.getLogger(ModelCoordinatorLocal.class);
 
@@ -269,13 +269,8 @@ public class ModelCoordinatorLocal implements ModelState, Steppable, Saveable {
     }
 
     @Override
-    public AgentState getAgentState(String agentName) {
-        RuntimeAgent a = agents.get(agentName);
-        if (a != null) {
-            return new RuntimeAgentState(a);
-        } else {
-            return null;
-        }
+    public RtAgent getAgentState(String agentName) {
+        return agents.get(agentName);
     }
 
     @Override
@@ -325,22 +320,22 @@ public class ModelCoordinatorLocal implements ModelState, Steppable, Saveable {
     }
 
     @Override
-    public List<AgentState> getGlobalState() throws GSimEngineException {
+    public List<RtAgent> getGlobalState() throws GSimEngineException {
         Iterator iter = agents.values().iterator();
-        ArrayList<AgentState> list = new ArrayList<AgentState>();
+        ArrayList<RtAgent> list = new ArrayList<RtAgent>();
         while (iter.hasNext()) {
             RuntimeAgent a = (RuntimeAgent) iter.next();
-            list.add(new RuntimeAgentState(a));
+            list.add(a);
         }
         return list;
     }
 
     @Override
-    public List<AgentState> getGlobalState(int count, int offset) throws GSimEngineException {
+    public List<RtAgent> getGlobalState(int count, int offset) throws GSimEngineException {
 
         ArrayList<RuntimeAgent> allList = new ArrayList<RuntimeAgent>();
 
-        ArrayList<AgentState> list = new ArrayList<AgentState>();
+        ArrayList<RtAgent> list = new ArrayList<RtAgent>();
 
         if (offset > agents.size()) {
 
@@ -356,7 +351,7 @@ public class ModelCoordinatorLocal implements ModelState, Steppable, Saveable {
 
         while (iter.hasNext() && list.size() < count) {
             RuntimeAgent a = (RuntimeAgent) iter.next();
-            list.add(new RuntimeAgentState(a));
+            list.add(a);
         }
         return list;
 
@@ -393,16 +388,18 @@ public class ModelCoordinatorLocal implements ModelState, Steppable, Saveable {
         return true;
     }
 
+    // TODO pass better an AgentInstance
     @Override
-    public void modifyAgentState(AgentState agentState) throws GSimEngineException {
-        RuntimeAgent agent = agents.get(agentState.getAgentName());
-        for (String list : agentState.getAgentObjectListNames()) {
-            for (ObjectInstance inst : agentState.getAgentObjects(list)) {
+    public void modifyAgentState(RtAgent agentState) throws GSimEngineException {
+        AgentInstance agentInstance = agentState.getAgent();
+        RuntimeAgent agent = agents.get(agentInstance.getName());
+        for (String list : agentInstance.getObjectListNames()) {
+            for (ObjectInstance inst : agentInstance.getObjects(list)) {
                 agent.setChildInstance(list, (Instance) inst);
             }
         }
-        for (String list : agentState.getAgentAttributesListNames()) {
-            for (Attribute a : agentState.getAgentAttributes(list)) {
+        for (String list : agentInstance.getAttributeListNames()) {
+            for (Attribute a : agentInstance.getAttributes(list)) {
                 agent.setAttribute(list, a);
             }
         }

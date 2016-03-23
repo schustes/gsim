@@ -5,6 +5,12 @@ import java.io.Serializable;
 import de.s2.gsim.core.GSimException;
 import de.s2.gsim.objects.attribute.Attribute;
 
+/**
+ * ObjectInstance represents an instanciation of an {@link ObjectClass}.
+ * 
+ * @author stephan
+ *
+ */
 public interface ObjectInstance extends Serializable {
 
     public ObjectInstance copy();

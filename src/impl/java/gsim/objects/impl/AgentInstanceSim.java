@@ -25,9 +25,6 @@ import gsim.def.objects.agent.GenericAgent;
 
 public class AgentInstanceSim implements AgentInstance, ObjectInstance, UnitWrapper, Serializable {
 
-    /**
-     *
-     */
     private static final long serialVersionUID = 1L;
 
     private boolean destroyed = false;

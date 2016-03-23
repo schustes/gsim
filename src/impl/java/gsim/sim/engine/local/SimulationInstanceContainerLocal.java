@@ -11,7 +11,7 @@ import org.apache.log4j.Logger;
 import de.s2.gsim.core.SimulationListener;
 import de.s2.gsim.sim.engine.Controller;
 import de.s2.gsim.sim.engine.GSimEngineException;
-import de.s2.gsim.sim.engine.ModelState;
+import de.s2.gsim.sim.engine.Simulation;
 import de.s2.gsim.sim.engine.SimulationID;
 import de.s2.gsim.sim.engine.SimulationManager;
 import de.s2.gsim.sim.engine.Steppable;
@@ -38,7 +38,7 @@ public class SimulationInstanceContainerLocal implements SimulationManager {
 
     private HashSet<de.s2.gsim.core.SimulationListener> listeners = new HashSet<de.s2.gsim.core.SimulationListener>();
 
-    private ConcurrentHashMap<Listener, ModelState> listening = new ConcurrentHashMap<Listener, ModelState>();
+    private ConcurrentHashMap<Listener, Simulation> listening = new ConcurrentHashMap<Listener, Simulation>();
 
     private String ns;
 
@@ -48,7 +48,7 @@ public class SimulationInstanceContainerLocal implements SimulationManager {
 
     private ConcurrentHashMap<SimulationID, Controller> schedulers = new ConcurrentHashMap<SimulationID, Controller>();
 
-    private ConcurrentHashMap<SimulationID, ModelState> sims = new ConcurrentHashMap<SimulationID, ModelState>();
+    private ConcurrentHashMap<SimulationID, Simulation> sims = new ConcurrentHashMap<SimulationID, Simulation>();
 
     private int steps = 0;
 
@@ -72,7 +72,7 @@ public class SimulationInstanceContainerLocal implements SimulationManager {
     }
 
     @Override
-    public ModelState getModelState(SimulationID uid) {
+    public Simulation getModelState(SimulationID uid) {
         return sims.get(uid);
     }
 
@@ -190,9 +190,9 @@ public class SimulationInstanceContainerLocal implements SimulationManager {
 
     private void finishInstance(Listener listener, SimulationID uid) {
 
-        ModelState instance = listening.remove(listener);
+        Simulation instance = listening.remove(listener);
 
-        ModelState svm = sims.get(uid);
+        Simulation svm = sims.get(uid);
         if (svm == instance) {
 
             // notify before destruction.
@@ -268,9 +268,9 @@ public class SimulationInstanceContainerLocal implements SimulationManager {
 
         @Override
         public void onStep(long step) {
-            ModelState instance = listening.get(this);
+            Simulation instance = listening.get(this);
             for (SimulationID uid : sims.keySet()) {
-                ModelState svm = sims.get(uid);
+                Simulation svm = sims.get(uid);
                 if (svm == instance) {
                     if (steps == step) {
                         finishInstance(this, uid);

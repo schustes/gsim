@@ -7,7 +7,7 @@ import de.s2.gsim.core.GSimException;
 import de.s2.gsim.core.SimulationController;
 import de.s2.gsim.core.SimulationListener;
 import de.s2.gsim.sim.engine.GSimEngineException;
-import de.s2.gsim.sim.engine.ModelState;
+import de.s2.gsim.sim.engine.Simulation;
 import de.s2.gsim.sim.engine.SimulationID;
 import de.s2.gsim.sim.engine.SimulationManager;
 import de.s2.gsim.sim.engine.SimulationManagerConnector;
@@ -66,7 +66,7 @@ public class ScenarioManagerLocal implements SimulationController {
     }
 
     @Override
-    public ModelState getModelState(SimulationID uid) {
+    public Simulation getModelState(SimulationID uid) {
         try {
             if (manager != null) {
                 return manager.getModelState(uid);

@@ -2,7 +2,7 @@ package gsim.sim.engine.common;
 
 import java.io.Serializable;
 
-import de.s2.gsim.sim.engine.ModelState;
+import de.s2.gsim.sim.engine.Simulation;
 
 /**
  * Instances of the ScenarioEvent class get loaded by the Scheduler object during runtime, where its execute-method is called. Sub-classes have to
@@ -28,7 +28,7 @@ public abstract class ScenarioEvent implements Serializable, Cloneable {
 
     protected String target;
 
-    private transient ModelState coordinator = null;
+    private transient Simulation coordinator = null;
 
     private boolean isInterval = false;
 
@@ -77,7 +77,7 @@ public abstract class ScenarioEvent implements Serializable, Cloneable {
     }
 
     // Coordinator is responsible for setting right context
-    public void setCoordinatorRef(ModelState state) {
+    public void setCoordinatorRef(Simulation state) {
         coordinator = state;
     }
 
@@ -107,7 +107,7 @@ public abstract class ScenarioEvent implements Serializable, Cloneable {
     }
 
     // subclasses must use this method to get access to agents
-    protected ModelState getCoordinatorRef() {
+    protected Simulation getCoordinatorRef() {
         return coordinator;
     }
 

@@ -1,6 +1,6 @@
 package de.s2.gsim.core;
 
-import de.s2.gsim.sim.engine.ModelState;
+import de.s2.gsim.sim.engine.Simulation;
 import de.s2.gsim.sim.engine.SimulationID;
 
 /**
@@ -33,7 +33,7 @@ public interface SimulationController {
      * @return ModelState an object containing information about the current state of the model
      * @throws GSimException
      */
-    ModelState getModelState(SimulationID uid) throws GSimException;
+    Simulation getModelState(SimulationID uid) throws GSimException;
 
     /**
      * Starts a model run by starting all simulation instances.

@@ -6,6 +6,7 @@ import org.apache.log4j.Logger;
 
 import de.s2.gsim.objects.AgentInstance;
 import de.s2.gsim.sim.agent.ApplicationAgent;
+import de.s2.gsim.sim.agent.RtAgent;
 import de.s2.gsim.sim.communication.AgentType;
 import de.s2.gsim.sim.communication.Communication;
 import gsim.def.objects.Instance;
@@ -14,7 +15,7 @@ import gsim.def.objects.agent.GenericAgentClass;
 import gsim.objects.impl.AgentInstanceSim;
 import gsim.sim.behaviour.impl.JessHandler;
 
-public class RuntimeAgent extends GenericAgent implements AgentType {
+public class RuntimeAgent extends GenericAgent implements AgentType, RtAgent {
 
     private static Logger logger = Logger.getLogger(RuntimeAgent.class);
 
@@ -33,6 +34,8 @@ public class RuntimeAgent extends GenericAgent implements AgentType {
     private transient JessHandler ruleBase = null;
 
     private int time = 0;
+
+    private AgentInstanceSim simInstance;
 
     public RuntimeAgent() {
     }
@@ -273,6 +276,29 @@ public class RuntimeAgent extends GenericAgent implements AgentType {
 
     public void updateRewards() {
         ruleBase.updateRewards();
+    }
+
+    @Override
+    public String[] getExecutionContextNames() {
+        String[] r = new String[roles.size()];
+        roles.keySet().toArray(r);
+        return r;
+    }
+
+    @Override
+    public String getLastAction() {
+        if (getCurrentStrategy() != null && getCurrentStrategy().length > 0) {
+            return getCurrentStrategy()[0];
+        }
+        return null;
+    }
+
+    @Override
+    public AgentInstance getAgent() {
+        if (this.simInstance == null) {
+            this.simInstance = new AgentInstanceSim(this);
+        }
+        return simInstance;
     }
 
 }

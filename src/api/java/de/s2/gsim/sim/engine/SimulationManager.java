@@ -4,7 +4,7 @@ public interface SimulationManager {
 
     public SimulationID[] getInstances() throws GSimEngineException, Exception;
 
-    public ModelState getModelState(SimulationID uid) throws GSimEngineException, Exception;
+    public Simulation getModelState(SimulationID uid) throws GSimEngineException, Exception;
 
     public long getTime(SimulationID uid) throws GSimEngineException, Exception;
 

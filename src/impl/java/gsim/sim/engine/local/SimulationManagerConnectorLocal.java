@@ -2,7 +2,7 @@ package gsim.sim.engine.local;
 
 import de.s2.gsim.core.SimulationListener;
 import de.s2.gsim.sim.engine.GSimEngineException;
-import de.s2.gsim.sim.engine.ModelState;
+import de.s2.gsim.sim.engine.Simulation;
 import de.s2.gsim.sim.engine.SimulationID;
 import de.s2.gsim.sim.engine.SimulationManagerConnector;
 
@@ -14,7 +14,7 @@ public class SimulationManagerConnectorLocal implements SimulationManagerConnect
     }
 
     @Override
-    public ModelState getSVM(String ns, SimulationID id) throws GSimEngineException {
+    public Simulation getSVM(String ns, SimulationID id) throws GSimEngineException {
         return SimulationInstanceContainerLocal.getInstance(ns).getModelState(id);
     }
 

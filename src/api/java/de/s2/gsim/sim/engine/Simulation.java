@@ -4,7 +4,7 @@ import java.util.List;
 
 import de.s2.gsim.core.ModelDefinitionEnvironment;
 import de.s2.gsim.objects.AppAgent;
-import de.s2.gsim.sim.agent.AgentState;
+import de.s2.gsim.sim.agent.RtAgent;
 
 /**
  * Interface for the minimal requirements for interaction between state and ScenarioManager. In the EJB implementation for example, there exists
@@ -13,7 +13,7 @@ import de.s2.gsim.sim.agent.AgentState;
  * other hand, a local implementation could store agents in a certain object, and can simply call them by their references.
  *
  */
-public interface ModelState {
+public interface Simulation {
 
     // void addAgent(RuntimeAgent agent) throws GSimEngineException;
 
@@ -25,7 +25,7 @@ public interface ModelState {
 
     String[] getAgentNames() throws GSimEngineException;
 
-    AgentState getAgentState(String agentName) throws GSimEngineException;
+    RtAgent getAgentState(String agentName) throws GSimEngineException;
 
     AppAgent[] getAppAgentState() throws GSimEngineException;
 
@@ -37,13 +37,13 @@ public interface ModelState {
 
     ModelDefinitionEnvironment getDefinitionEnvironment() throws GSimEngineException;
 
-    List<AgentState> getGlobalState() throws GSimEngineException;
+    List<RtAgent> getGlobalState() throws GSimEngineException;
 
-    List<AgentState> getGlobalState(int count, int offset) throws GSimEngineException;
+    List<RtAgent> getGlobalState(int count, int offset) throws GSimEngineException;
 
     String getNameSpace() throws GSimEngineException;
 
-    void modifyAgentState(AgentState state) throws GSimEngineException;
+    void modifyAgentState(RtAgent state) throws GSimEngineException;
 
     void removeAgent(String agentName) throws GSimEngineException;
 
