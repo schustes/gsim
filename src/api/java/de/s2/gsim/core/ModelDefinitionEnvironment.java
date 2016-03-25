@@ -2,10 +2,11 @@ package de.s2.gsim.core;
 
 import java.io.Serializable;
 
+import javax.management.ObjectInstance;
+
 import de.s2.gsim.objects.AgentClass;
 import de.s2.gsim.objects.AgentInstance;
 import de.s2.gsim.objects.ObjectClass;
-import de.s2.gsim.objects.ObjectInstance;
 
 /**
  * The <code>ModelDefinitionEnvironment</code> is a wrapper for the actual gsim environment managing agents and objects. Agents are instanciated by
