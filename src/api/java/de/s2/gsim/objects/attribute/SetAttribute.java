@@ -4,23 +4,63 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+/**
+ * A SetAttribute can hold several values.
+ * 
+ * @author stephan
+ *
+ */
 public class SetAttribute extends Attribute {
-
-    public static final long serialVersionUID = -4982728557786529264L;
 
     protected String[] fillers;
 
     private List<String> entries = new ArrayList<>();
 
+    /**
+     * Constructor. The SetAttribute is initialised with an empty set.
+     * 
+     * @param name the attribute name
+     * @param fillers the possible values the set can hold
+     */
     public SetAttribute(String name, String[] fillers) {
         super(name);
         this.fillers = fillers;
     }
 
+    /**
+     * Adds an entry.
+     * 
+     * @param value the value to add
+     */
     public void addEntry(String value) {
         if (value.length() > 0 && !entries.contains(value)) {
             entries.add(value);
         }
+    }
+
+    /**
+     * Gets all entries of the attribute.
+     * 
+     * @return the entries
+     */
+    public List<String> getEntries() {
+        return entries;
+    }
+
+    /**
+     * Gets all fillers of the attribute, i.e. the possible values that can be in the entry list.
+     * 
+     * @return the fillers
+     */
+    public String[] getFillers() {
+        return fillers;
+    }
+
+    /**
+     * Clears the set.
+     */
+    public void removeAllEntries() {
+        entries.clear();
     }
 
     @Override
@@ -56,30 +96,6 @@ public class SetAttribute extends Attribute {
         }
         return true;
     }
-
-    public List<String> getEntries() {
-        return entries;
-    }
-
-    public String[] getFillers() {
-        return fillers;
-    }
-
-    public String[] getFillersAndEntries() {
-        List<String> set = new ArrayList<>();
-        set.addAll(entries);
-        for (String s : fillers) {
-            set.add(s);
-        }
-        String[] ret = new String[set.size()];
-        set.toArray(ret);
-        return ret;
-    }
-
-    public void removeAllEntries() {
-        entries.clear();
-    }
-
     @Override
     public String toValueString() {
         Iterator<String> iter = entries.iterator();

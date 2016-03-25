@@ -4,18 +4,20 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class DomainAttribute implements java.io.Serializable {
+/**
+ * A DomainAttribute serves as the template or frame for concrete {@link Attribute}s. A DomainAttribute defines the type and the possible values or
+ * value range and a default value of the concrete attribute that can be generated from it.
+ * 
+ * @author stephan
+ *
+ */
+public class DomainAttribute {
 
-    /**
-     * 
-     */
-    private static final long serialVersionUID = 1L;
+    private final String name;
 
-    private String attType = "";
+    private final AttributeType attType;
 
     private String defaultValue = "";
-
-    private double defaultWeight = -1;
 
     private List<String> fillers = new ArrayList<>();
 
@@ -23,36 +25,31 @@ public class DomainAttribute implements java.io.Serializable {
 
     private boolean isSystem = false;
 
-    private String name; // "price"
 
-    private List<String> slopes = new ArrayList<>();
-
-    public DomainAttribute(String attrName, String attType) {
+    /**
+     * Constructor.
+     * 
+     * @param attrName the attribute name
+     * @param attType the attribute type (one of {@link AttributeConstants}
+     */
+    public DomainAttribute(String attrName, AttributeType attType) {
         name = attrName;
         this.attType = attType;
     }
 
+    /**
+     * Adds a filler to the possible value range if the attribute is a categorical one.
+     * 
+     * @param fillerValue filler value
+     */
     public void addFiller(String fillerValue) {
         fillers.add(fillerValue);
     }
 
-    public void addSlope(String slope) {
-        if (attType.equals(AttributeConstants.SET) || attType.equals(AttributeConstants.ORDERED_SET) || attType.equals(AttributeConstants.INTERVAL)) {
-            slopes.add(slope);
-        } else {
-            throw new RuntimeException("This attribute has no slope");
-        }
-    }
 
     @Override
     public Object clone() {
         DomainAttribute a = new DomainAttribute(getName(), getType());
-        String[] slopes = getSlopes();
-        if (slopes != null) {
-            for (int i = 0; i < slopes.length; i++) {
-                a.addSlope(slopes[i]);
-            }
-        }
         String[] fillers = getFillers();
         if (fillers != null) {
             for (int i = 0; i < fillers.length; i++) {
@@ -60,7 +57,6 @@ public class DomainAttribute implements java.io.Serializable {
             }
         }
         a.setDefault(getDefaultValue());
-        a.setWeight(defaultWeight);
         a.setMutable(isMutable());
         a.setSystem(isSystem());
 
@@ -68,60 +64,60 @@ public class DomainAttribute implements java.io.Serializable {
 
     }
 
-    /**
-     * Two attributes are equal if they have the same name (!)
-     */
     @Override
     public boolean equals(Object o) {
         if (o instanceof DomainAttribute) {
             DomainAttribute a = (DomainAttribute) o;
             if (a.getName().equalsIgnoreCase(name)) {
                 return true;
-            } else {
-                return false;
             }
         } else if (o instanceof Attribute) {
             return name.equalsIgnoreCase(((Attribute) o).getName());
-        } else {
-            return false;
         }
+            return false;
     }
 
+    /**
+     * Gets the default value defined for this domain attribute.
+     * 
+     * @return the default value
+     */
     public String getDefaultValue() {
         return defaultValue;
     }
 
-    public double getDefaultWeight() {
-        return defaultWeight;
-    }
-
+    /**
+     * Gets the possible values of this domain attribute.
+     * 
+     * @return the fillers
+     */
     public String[] getFillers() {
         String[] ss = new String[fillers.size()];
         fillers.toArray(ss);
         return ss;
     }
 
+    /**
+     * Gets the name of this domain attribute.
+     * 
+     * @return the name
+     */
     public String getName() {
         return name;
     }
 
-    public String[] getSlopes() {
-        if (!(attType.equals(AttributeConstants.SET) || attType.equals(AttributeConstants.ORDERED_SET)
-                || attType.equals(AttributeConstants.INTERVAL))) {
-            return null;
-        }
-        String[] ss = new String[slopes.size()];
-        slopes.toArray(ss);
-        return AttributeConstants.SLOPES_REP;
-    }
-
-    public String getType() {
+    /**
+     * Gets the type of this domain attribute.
+     * 
+     * @return the type
+     */
+    public AttributeType getType() {
         return attType;
     }
 
     @Override
     public int hashCode() {
-        return 21;
+        return name.hashCode() * 2;
     }
 
     /**
@@ -169,10 +165,6 @@ public class DomainAttribute implements java.io.Serializable {
         return isSystem;
     }
 
-    public boolean isWeighted() {
-        return defaultWeight >= 0;
-    }
-
     public void setDefault(String val) {
         defaultValue = val;
     }
@@ -190,10 +182,6 @@ public class DomainAttribute implements java.io.Serializable {
 
     public void setSystem(boolean b) {
         isSystem = b;
-    }
-
-    public void setWeight(double w) {
-        defaultWeight = w;
     }
 
     @Override

@@ -1,6 +1,12 @@
 package de.s2.gsim.objects.attribute;
 
-public class AttributeConstants {
+/**
+ * Contants class for attributes.
+ * 
+ * @author stephan
+ *
+ */
+public abstract class AttributeConstants {
 
     public static String INDIFFERENT = "FLAT";
 
@@ -37,5 +43,12 @@ public class AttributeConstants {
             return STRINGSINGLETON;
         }
         return null;
+    }
+
+    /**
+     * Private constructor to prevent instantiation.
+     */
+    private AttributeConstants() {
+        // to prevent instantiation.
     }
 }

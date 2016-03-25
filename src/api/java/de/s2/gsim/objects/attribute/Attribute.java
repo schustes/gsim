@@ -1,11 +1,12 @@
 package de.s2.gsim.objects.attribute;
 
-public abstract class Attribute implements java.io.Serializable, Cloneable {
-
-    /**
-     *
-     */
-    private static final long serialVersionUID = 1L;
+/**
+ * Base class for all attributes.
+ * 
+ * @author stephan
+ *
+ */
+public abstract class Attribute implements Cloneable {
 
     private boolean isMutable = true;
 
@@ -13,8 +14,11 @@ public abstract class Attribute implements java.io.Serializable, Cloneable {
 
     private String name;
 
-    private double weight = -1;
-
+    /***
+     * Constructor.
+     * 
+     * @param name the attribute name
+     */
     protected Attribute(String name) {
         this.name = name;
     }
@@ -23,72 +27,94 @@ public abstract class Attribute implements java.io.Serializable, Cloneable {
     public abstract Object clone();
 
     /**
-     * Two attributes are equal if they have the same name (!)
+     * Checks whether two attributes have the same value.
+     * 
+     * @param attribute
+     * @return true if both attributes have the same value, false otherwise
+     */
+    public abstract boolean equalsValue(Attribute attribute);
+
+    /**
+     * Creates a readable String representation of the attribute value.
+     * 
+     * @return the value string
+     */
+    public abstract String toValueString();
+
+    /**
+     * Two attributes are equal if they have the same name
      */
     @Override
     public boolean equals(Object o) {
+
         if (o instanceof Attribute) {
             Attribute a = (Attribute) o;
             if (a.getName().equalsIgnoreCase(name)) {
                 return true;
-            } else {
-                return false;
             }
         } else if (o instanceof DomainAttribute) {
             DomainAttribute a = (DomainAttribute) o;
             if (a.getName().equalsIgnoreCase(name)) {
                 return true;
-            } else {
-                return false;
             }
-
-        } else {
             return false;
         }
+        return false;
     }
 
-    public abstract boolean equalsValue(Attribute a);
-
+    /**
+     * Gets the name of the attribute.
+     * 
+     * @return the attribute name
+     */
     public String getName() {
         return name;
     }
 
-    public double getWeight() {
-        return weight;
-    }
-
     @Override
     public int hashCode() {
-        return (int) (name.hashCode() * weight);
+        return (int) (name.hashCode());
     }
 
+    /**
+     * Checks whether this attribute may be modified or not (important for generators).
+     * 
+     * @return true if mutable, false otherwise
+     */
     public boolean isMutable() {
         return isMutable;
     }
 
+    /**
+     * Checks whether this attribute is a system attribute.
+     * 
+     * @return true if system attribute, false otherwise
+     */
     public boolean isSystem() {
         return isSystem;
     }
 
-    public void setMutable(boolean b) {
-        isMutable = b;
+    /**
+     * Set mutable.
+     * 
+     * @param isMutable true if the attribute can be modified, false otherwise
+     */
+    public void setMutable(boolean isMutable) {
+        this.isMutable = isMutable;
     }
 
-    public void setSystem(boolean b) {
-        isSystem = b;
+    /**
+     * Set system.
+     * 
+     * @param isSystem true if system attribute, false otherwise
+     */
+    public void setSystem(boolean isSystem) {
+        this.isSystem = isSystem;
     }
 
     @Override
     public String toString() {
-        String val = toValueString();
-        String s = "(value=" + val;
-        if (getWeight() > -1) {
-            s = s + ", weight=" + getWeight();
-        }
-        s += ")";
-        return s;
+        return new StringBuilder().append("(value=").append(toValueString()).append(")").toString();
     }
-
-    public abstract String toValueString();
 
 }

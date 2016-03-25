@@ -2,22 +2,27 @@ package de.s2.gsim.objects.attribute;
 
 import java.util.Iterator;
 
+/**
+ * An OrderedSetAttribute is a SetAttribute that defines an order on its components.
+ * 
+ * @author stephan
+ *
+ */
 public class OrderedSetAttribute extends SetAttribute {
 
-    public final static long serialVersionUID = -7414629019203902476L;
-
-    private String slope = "FLAT"; // default
-
-    public OrderedSetAttribute(String name, String slope, String[] fillers) {
+    /**
+     * Constructor.
+     * 
+     * @param name the name of the attribute
+     * @param fillers the values of the attribute
+     */
+    public OrderedSetAttribute(String name, String[] fillers) {
         super(name, fillers);
-        if (slope != null) {
-            this.slope = slope;
-        }
     }
 
     @Override
     public Object clone() {
-        OrderedSetAttribute a = new OrderedSetAttribute(getName(), getSlope(), fillers);
+        OrderedSetAttribute a = new OrderedSetAttribute(getName(), fillers);
         Iterator<String> iter = getEntries().iterator();
         while (iter.hasNext()) {
             a.addEntry((String) iter.next());
@@ -27,6 +32,12 @@ public class OrderedSetAttribute extends SetAttribute {
         return a;
     }
 
+    /**
+     * Gets the value at the specified position in the order.
+     * 
+     * @param forOrder order position
+     * @return the value
+     */
     public String getFiller(double forOrder) {
 
         if (forOrder == 0) {
@@ -40,6 +51,12 @@ public class OrderedSetAttribute extends SetAttribute {
 
     }
 
+    /**
+     * Get the order of the specified entry.
+     * 
+     * @param entry the entry
+     * @return the order
+     */
     public double getOrder(String entry) {
 
         double size = super.getFillers().length;
@@ -52,10 +69,12 @@ public class OrderedSetAttribute extends SetAttribute {
         return 0;
     }
 
-    public String getSlope() {
-        return slope;
-    }
-
+    /**
+     * Gets the position in the filler array for the given entry.
+     * 
+     * @param entry the entry
+     * @return the position
+     */
     private int getPos(String entry) {
         String[] f = getFillers();
         for (int i = 0; i < f.length; i++) {

@@ -1,14 +1,47 @@
 package de.s2.gsim.objects.attribute;
 
+/**
+ * A StringAttribute holds a simple string value.
+ * 
+ * @author stephan
+ *
+ */
 public class StringAttribute extends Attribute {
-
-    public static final long serialVersionUID = -4982728557786529261L;
 
     private String value = null;
 
+    /**
+     * Constructor.
+     * 
+     * @param name the attribute name
+     * @param value the attribute value
+     */
     public StringAttribute(String name, String value) {
         super(name);
         this.value = value;
+    }
+
+    /**
+     * Gets the attribute value.
+     * 
+     * @return the value
+     */
+    public String getValue() {
+        return value;
+    }
+
+    /**
+     * Sets the value
+     * 
+     * @param value the value
+     */
+    public void setValue(String value) {
+        this.value = value;
+    }
+
+    @Override
+    public String toValueString() {
+        return value;
     }
 
     @Override
@@ -28,17 +61,5 @@ public class StringAttribute extends Attribute {
         }
     }
 
-    public String getValue() {
-        return value;
-    }
-
-    public void setValue(String s) {
-        value = s;
-    }
-
-    @Override
-    public String toValueString() {
-        return value;
-    }
 
 }

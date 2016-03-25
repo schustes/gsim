@@ -1,22 +1,22 @@
 package gsim.def;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
+import javax.management.ObjectInstance;
 
-import de.s2.gsim.objects.ObjectInstance;
 import de.s2.gsim.objects.attribute.Attribute;
 import de.s2.gsim.objects.attribute.DomainAttribute;
 import de.s2.gsim.objects.attribute.IntervalAttribute;
 import de.s2.gsim.objects.attribute.NumericalAttribute;
 import de.s2.gsim.objects.attribute.OrderedSetAttribute;
 import de.s2.gsim.objects.attribute.SetAttribute;
-import de.s2.gsim.objects.attribute.WeightedAttribute;
 import gsim.def.objects.Instance;
 import gsim.def.objects.agent.GenericAgent;
 import gsim.objects.impl.UnitWrapper;
 
 public class Generator {
+
+    public enum Method {
+        Normal, Uniform
+    }
 
     private Method method = Method.Normal;
 
@@ -72,81 +72,6 @@ public class Generator {
         }
     }
 
-    /**
-     * Randomises attribute values and weights of agent itself and all contained objects, for attributes that are declared as 'mutable'; if attribute
-     * is weighted, then also the weights.
-     * 
-     * @param a
-     *            GenericAgent
-     * @param svar
-     *            double
-     * @return GenericAgent
-     */
-    public GenericAgent randomiseAttributeValuesAndWeights(GenericAgent a, double svar, Method method) {
-        if (method.equals(Method.Normal)) {
-            GenericAgent agent = (GenericAgent) this.randomiseAttributeValues(a, svar);
-            agent = (GenericAgent) this.randomiseAttributeWeights(a, svar);
-            String[] lists = a.getChildInstanceListNames();
-            for (int i = 0; i < lists.length; i++) {
-                Instance[] inst = agent.getChildInstances(lists[i]);
-                for (int j = 0; j < inst.length; j++) {
-                    Instance obj = this.randomiseAttributeValues(inst[j], svar);
-                    obj = this.randomiseAttributeWeights(inst[j], svar);
-                    agent.setChildInstance(lists[i], obj);
-                }
-            }
-            return agent;
-        } else {
-            GenericAgent agent = (GenericAgent) this.randomiseAttributeValues(a);
-            agent = (GenericAgent) this.randomiseAttributeWeights(a);
-            String[] lists = a.getChildInstanceListNames();
-            for (int i = 0; i < lists.length; i++) {
-                Instance[] inst = agent.getChildInstances(lists[i]);
-                for (int j = 0; j < inst.length; j++) {
-                    Instance obj = this.randomiseAttributeValues(inst[j]);
-                    obj = this.randomiseAttributeWeights(inst[j]);
-                    agent.setChildInstance(lists[i], obj);
-                }
-            }
-            return agent;
-
-        }
-    }
-
-    /**
-     * Randomises attribute weights of agent itself and all contained objects, for attributes that are declared as 'mutable' and having weights.
-     * 
-     * @param a
-     *            GenericAgent
-     * @param svar
-     *            double
-     * @return GenericAgent
-     */
-    public GenericAgent randomiseAttributeWeights(GenericAgent a, double svar, Method method) {
-        GenericAgent agent = null;
-        if (method == Method.Normal) {
-            agent = (GenericAgent) this.randomiseAttributeWeights(a, svar);
-            String[] lists = a.getChildInstanceListNames();
-            for (int i = 0; i < lists.length; i++) {
-                Instance[] inst = agent.getChildInstances(lists[i]);
-                for (int j = 0; j < inst.length; j++) {
-                    Instance obj = this.randomiseAttributeWeights(inst[j], svar);
-                    agent.setChildInstance(lists[i], obj);
-                }
-            }
-        } else {
-            agent = (GenericAgent) this.randomiseAttributeWeights(a);
-            String[] lists = a.getChildInstanceListNames();
-            for (int i = 0; i < lists.length; i++) {
-                Instance[] inst = agent.getChildInstances(lists[i]);
-                for (int j = 0; j < inst.length; j++) {
-                    Instance obj = this.randomiseAttributeWeights(inst[j]);
-                    agent.setChildInstance(lists[i], obj);
-                }
-            }
-        }
-        return agent;
-    }
 
     private Instance randomiseAttributeValues(Instance obj) {
 
@@ -288,123 +213,6 @@ public class Generator {
             }
         }
         return obj;
-    }
-
-    private Instance randomiseAttributeWeights(Instance obj) {
-
-        String[] lists = obj.getAttributesListNames();
-        double weightSum = 0;
-        double modifiedAtts = 0;
-        HashMap modified = new HashMap();
-        for (int j = 0; j < lists.length; j++) {
-            Attribute[] atts = obj.getAttributes(lists[j]);
-            for (int k = 0; k < atts.length; k++) {
-                DomainAttribute da = obj.getDefinition().getAttribute(lists[j], atts[k].getName());
-                if (da.isMutable() && da.isWeighted()) {
-                    double mean = da.getDefaultWeight();
-                    double v = cern.jet.random.Uniform.staticNextDoubleFromTo(0, 1);
-                    if (mean > 0 && v < 0) {
-                        v = 0;
-                    }
-                    weightSum = weightSum + v;
-                    WeightedAttribute att = (WeightedAttribute) atts[k];
-                    att.setWeight(v);
-                    ArrayList list = (ArrayList) modified.get(lists[j]);
-                    if (list == null) {
-                        list = new ArrayList();
-                    }
-                    list.add(atts[k]);
-                    modified.put(lists[j], list);
-                    modifiedAtts++;
-                }
-            }
-        }
-
-        Iterator iter = modified.keySet().iterator();
-        while (iter.hasNext()) {
-            String list = (String) iter.next();
-            ArrayList l = (ArrayList) modified.get(list);
-            Iterator it = l.iterator();
-            while (it.hasNext()) {
-                WeightedAttribute a = (WeightedAttribute) it.next();
-                if (weightSum > 1) {
-                    double diffRatio = (weightSum - 1) / 1;
-                    double p = diffRatio / modifiedAtts;
-                    a.setWeight(a.getWeight() - p);
-                } else if (weightSum < 1) {
-                    double diffRatio = (1 - weightSum) / 1;
-                    double p = diffRatio / modifiedAtts;
-                    a.setWeight(a.getWeight() + p);
-                }
-                obj.setAttribute(list, (Attribute) a);
-            }
-        }
-        return obj;
-    }
-
-    /**
-     * Randomises all weighted attributes with the given s. All weihts are adapted to a sum of 1. Furhtermore, the s is expected to <=1.
-     * 
-     * @param obj
-     *            Instance
-     * @param standardVariation
-     *            double
-     * @return Instance
-     */
-    private Instance randomiseAttributeWeights(Instance obj, double standardVariation) {
-
-        String[] lists = obj.getAttributesListNames();
-        double weightSum = 0;
-        double modifiedAtts = 0;
-        HashMap modified = new HashMap();
-        for (int j = 0; j < lists.length; j++) {
-            Attribute[] atts = obj.getAttributes(lists[j]);
-            for (int k = 0; k < atts.length; k++) {
-                DomainAttribute da = obj.getDefinition().getAttribute(lists[j], atts[k].getName());
-                if (da.isMutable() && da.isWeighted()) {
-                    double mean = da.getDefaultWeight();
-                    double v = cern.jet.random.Normal.staticNextDouble(mean, standardVariation);
-                    if (mean > 0 && v < 0) {
-                        v = 0;
-                    }
-                    weightSum = weightSum + v;
-                    WeightedAttribute att = (WeightedAttribute) atts[k];
-                    att.setWeight(v);
-                    ArrayList list = (ArrayList) modified.get(lists[j]);
-                    if (list == null) {
-                        list = new ArrayList();
-                    }
-                    list.add(atts[k]);
-                    modified.put(lists[j], list);
-                    modifiedAtts++;
-                }
-            }
-        }
-
-        Iterator iter = modified.keySet().iterator();
-        while (iter.hasNext()) {
-            String list = (String) iter.next();
-            ArrayList l = (ArrayList) modified.get(list);
-            Iterator it = l.iterator();
-            while (it.hasNext()) {
-                WeightedAttribute a = (WeightedAttribute) it.next();
-                if (weightSum > 1) {
-                    double diffRatio = (weightSum - 1) / 1;
-                    double p = diffRatio / modifiedAtts;
-                    a.setWeight(a.getWeight() - p);
-                } else if (weightSum < 1) {
-                    double diffRatio = (1 - weightSum) / 1;
-                    double p = diffRatio / modifiedAtts;
-                    a.setWeight(a.getWeight() + p);
-                }
-                obj.setAttribute(list, (Attribute) a);
-            }
-        }
-        return obj;
-    }
-
-    public enum Method {
-        Normal, Uniform
     }
 
 }
