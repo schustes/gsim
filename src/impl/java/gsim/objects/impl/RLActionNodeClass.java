@@ -140,11 +140,11 @@ public class RLActionNodeClass extends RuleClass implements RLActionNode, UnitWr
     }
 
     @Override
-    public POLICY getPolicy() {
+    public Policy getPolicy() {
         if (((RLRuleFrame) real).isComparison()) {
-            return POLICY.COMPARISON;
+            return Policy.COMPARISON;
         } else if (!((RLRuleFrame) real).isComparison()) {
-            return POLICY.SOFTMAX;
+            return Policy.SOFTMAX;
         }
         return null;
     }
@@ -230,10 +230,10 @@ public class RLActionNodeClass extends RuleClass implements RLActionNode, UnitWr
     }
 
     @Override
-    public void setPolicy(POLICY p) throws GSimException {
-        if (p.equals(POLICY.COMPARISON)) {
+    public void setPolicy(Policy p) throws GSimException {
+        if (p.equals(Policy.COMPARISON)) {
             ((RLRuleFrame) real).setComparison(true);
-        } else if (p.equals(POLICY.SOFTMAX)) {
+        } else if (p.equals(Policy.SOFTMAX)) {
             ((RLRuleFrame) real).setComparison(false);
         }
         owner.addOrSetRLActionNode(this);

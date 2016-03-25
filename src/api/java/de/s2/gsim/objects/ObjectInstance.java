@@ -2,7 +2,6 @@ package de.s2.gsim.objects;
 
 import java.io.Serializable;
 
-import de.s2.gsim.core.GSimException;
 import de.s2.gsim.objects.attribute.Attribute;
 
 /**
@@ -11,44 +10,164 @@ import de.s2.gsim.objects.attribute.Attribute;
  * @author stephan
  *
  */
-public interface ObjectInstance extends Serializable {
+interface ObjectInstance extends Serializable {
 
-    public ObjectInstance copy();
+    /**
+     * Creates a copy of the instance.
+     * 
+     * @return the copy
+     */
+    ObjectInstance copy();
 
-    public void destroy() throws GSimException;
+    /**
+     * Destroys the instance and removes it from the environment.
+     */
+    void destroy();
 
-    public Attribute getAttribute(String attName) throws GSimException;
+    /**
+     * Gets the first matching attribute from one of the attribute lists.
+     * 
+     * @param attName the name of the attribute
+     * @return the attribute or null if not found
+     */
+    Attribute getAttribute(String attName);
 
-    public Attribute getAttribute(String list, String attName) throws GSimException;
+    /**
+     * Gets the specified attribute from the given list.
+     * 
+     * @param list the attribute list name
+     * @param attName the attribute name
+     * @return the attribute or null if nothing was found
+     */
+    Attribute getAttribute(String list, String attName);
 
-    public String[] getAttributeListNames() throws GSimException;
+    /**
+     * Gets all attribute list names.
+     * 
+     * @return the list names
+     */
+    String[] getAttributeListNames();
 
-    public Attribute[] getAttributes(String list) throws GSimException;
+    /**
+     * Gets all attributes from the given list.
+     * 
+     * @param list the list name
+     * @return the attributes
+     */
+    Attribute[] getAttributes(String list);
 
-    public double getIntervalAttributeFrom(String list, String attName) throws GSimException;
+    /**
+     * Tries to cast the given attribute to an interval attribute and retrieves its lower bound.
+     * 
+     * @param list the attribute list name
+     * @param attName the attribute name
+     * @return the lower bound
+     */
+    double getIntervalAttributeFrom(String list, String attName);
 
-    public double getIntervalAttributeTo(String list, String attName) throws GSimException;
+    /**
+     * Tries to cast the given attribute to an interval attribute and retrieves its upper bound.
+     * 
+     * @param list the attribute list name
+     * @param attName the attribute name
+     * @return the upper bound
+     */
+    double getIntervalAttributeTo(String list, String attName);
 
-    public String getName() throws GSimException;
+    /**
+     * Gets the name of this object instance.
+     * 
+     * @return the name
+     */
+    String getName();
 
-    public double getNumericalAttribute(String list, String attName) throws GSimException;
+    /**
+     * Tries to cast the given attribute to a numerical attribute and retrieves its value.
+     * 
+     * @param list the attribute list name.
+     * @param attName the attribute name
+     * @return the value of the attribute
+     */
+    double getNumericalAttribute(String list, String attName);
 
-    public String[] getSetAttributeValues(String list, String attName) throws GSimException;
+    /**
+     * Tries to cast the given attribute to a set attribute and retrieves its values.
+     * 
+     * @param list the attribute list name.
+     * @param attName the attribute name
+     * @return the values of the attribute set
+     */
+    String[] getSetAttributeValues(String list, String attName);
 
-    public String getStringAttribute(String list, String attName) throws GSimException;
+    /**
+     * Tries to cast the given attribute to a string attribute and retrieves its value.
+     * 
+     * @param list the attribute list name.
+     * @param attName the attribute name
+     * @return the value of the attribute
+     */
+    String getStringAttribute(String list, String attName);
 
-    public boolean inheritsFrom(String agentclassName);
+    /**
+     * Checks whether the object is a subclass of the given agent class.
+     * 
+     * @param agentclassName the agent class name to check
+     * @return true if the object inherits from the class, false otherwise
+     */
+    boolean inheritsFrom(String agentclassName);
 
-    public Object resolveName(String path) throws GSimException;
+    /**
+     * Resolves a FQN in the form list-name/attribute|instance/name and returns the matching object. The object can be an ObjectInstance of an
+     * Attribute.
+     * 
+     * @param path the path
+     * @return the entity or null of there was no match
+     */
+    Object resolveName(String path);
 
-    public void setAttribute(String list, Attribute a) throws GSimException;
+    /**
+     * Adds or sets the attribute into the given list.
+     * 
+     * @param list the list name
+     * @param attribute the attribute to set
+     */
+    void setAttribute(String list, Attribute attribute);
 
-    public void setIntervalAttributeValue(String list, String name, double from, double to) throws GSimException;
+    /**
+     * Creates or sets an interval attribute into the given list.
+     * 
+     * @param list the list name
+     * @param name the name of the attribute
+     * @param from the lower bound of the attribute
+     * @param to the upper bound of the attribute
+     */
+    void setIntervalAttributeValue(String list, String name, double from, double to);
 
-    public void setNumericalAttributeValue(String list, String name, double value) throws GSimException;
+    /**
+     * Creates or sets a numerical attribute into the given list.
+     * 
+     * @param list the list name
+     * @param name the name of the attribute
+     * @param value the value of the attribute
+     */
+    void setNumericalAttributeValue(String list, String name, double value);
 
-    public void setSetAttributeValues(String list, String name, String... values) throws GSimException;
+    /**
+     * Creates or sets a Set attribute into the given list.
+     * 
+     * @param list the list name
+     * @param name the name of the attribute
+     * @param values the values of the attribute
+     */
+    void setSetAttributeValues(String list, String name, String... values);
 
-    public void setStringAttributeValue(String list, String name, String value) throws GSimException;
+    /**
+     * Creates or sets a String attribute into the given list.
+     * 
+     * @param list the list name
+     * @param name the name of the attribute
+     * @param value the value of the attribute
+     */
+    void setStringAttributeValue(String list, String name, String value);
 
 }

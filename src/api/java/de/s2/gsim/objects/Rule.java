@@ -1,31 +1,91 @@
 package de.s2.gsim.objects;
 
-import java.io.Serializable;
+/**
+ * Represents a simple if-then rule.
+ * 
+ * @author stephan
+ */
+interface Rule {
 
-import de.s2.gsim.core.GSimException;
+    /**
+     * Adds or sets a condition.
+     * 
+     * @param condition the condition
+     */
+    void addOrSetCondition(Condition condition);
 
-public interface Rule extends Serializable {
+    /**
+     * Adds or sets an {@link Action} as consequent .
+     * 
+     * @param consequent the action
+     */
+    void addOrSetConsequent(Action consequent);
 
-    public void addOrSetCondition(Condition cond) throws GSimException;
+    /**
+     * Creates a {@link Condition}.
+     * 
+     * @param paramName the condition parameter name
+     * @param op operator
+     * @param val value
+     * @return the condition
+     */
+    Condition createCondition(String paramName, String op, String val);
 
-    public void addOrSetConsequent(Action cons) throws GSimException;
+    /**
+     * Gets a all {@link Condition}s of the rule.
+     * 
+     * @return the conditions
+     */
+    Condition[] getConditions();
 
-    public Condition createCondition(String paramName, String op, String val) throws GSimException;
+    /**
+     * Gets a consequent of the rule.
+     * 
+     * @param actionName the action name
+     * @return the {@link Action} object
+     */
+    Action getConsequent(String actionName);
 
-    public Condition[] getConditions() throws GSimException;
+    /**
+     * Gets all consequents of the rule.
+     * 
+     * @return the actions
+     */
+    Action[] getConsequents();
 
-    public Action getConsequent(String actionName) throws GSimException;
+    /**
+     * Gets the name of this rule.
+     * 
+     * @return the name
+     */
+    String getName();
 
-    public Action[] getConsequents() throws GSimException;
+    /**
+     * Checks whether this rule is active or not. Inactive rules never fire.
+     * 
+     * @return true if active, false otherwise
+     */
+    boolean isActivated();
 
-    public String getName() throws GSimException;
+    /**
+     * Removes a condition from the rule.
+     * 
+     * @param condition the condition to remove
+     */
+    void removeCondition(Condition condition);
 
-    public boolean isActivated() throws GSimException;
+    /**
+     * Removes a consequent from the rule.
+     * 
+     * @param consequent the consequent
+     */
+    void removeConsequent(Action consequent);
 
-    public void removeCondition(Condition cond) throws GSimException;
-
-    public void removeConsequent(Action cons) throws GSimException;
-
-    public void setActivated(boolean b) throws GSimException;
+    /**
+     * Activates or deactivates the rule.
+     * 
+     * @param activated if true, the rule is active, false otherwise
+     */
+    void setActivated(boolean activated);
 
 }
