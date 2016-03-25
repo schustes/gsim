@@ -10,7 +10,7 @@ import de.s2.gsim.objects.attribute.Attribute;
  * @author stephan
  *
  */
-interface ObjectInstance extends Serializable {
+public interface ObjectInstance extends Serializable {
 
     /**
      * Creates a copy of the instance.

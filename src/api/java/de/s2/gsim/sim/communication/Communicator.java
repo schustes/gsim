@@ -2,7 +2,7 @@ package de.s2.gsim.sim.communication;
 
 import de.s2.gsim.sim.engine.GSimEngineException;
 
-public interface Communication {
+public interface Communicator {
 
     public void broadcast(BroadcastProtocol protocol) throws GSimEngineException;
 

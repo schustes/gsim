@@ -12,7 +12,7 @@ public interface Messenger {
 
     public void endSession() throws GSimEngineException;
 
-    public Communication getCommunicationInterface();
+    public Communicator getCommunicationInterface();
 
     public String getNamespace();
 

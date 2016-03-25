@@ -8,7 +8,7 @@ import de.s2.gsim.objects.AgentInstance;
 import de.s2.gsim.sim.agent.ApplicationAgent;
 import de.s2.gsim.sim.agent.RtAgent;
 import de.s2.gsim.sim.communication.AgentType;
-import de.s2.gsim.sim.communication.Communication;
+import de.s2.gsim.sim.communication.Communicator;
 import gsim.def.objects.Instance;
 import gsim.def.objects.agent.GenericAgent;
 import gsim.def.objects.agent.GenericAgentClass;
@@ -21,7 +21,7 @@ public class RuntimeAgent extends GenericAgent implements AgentType, RtAgent {
 
     private static final long serialVersionUID = 1L;
 
-    protected transient Communication commInterface = null;
+    protected transient Communicator commInterface = null;
 
     private String[] currentStrategy = new String[0];
 
@@ -182,7 +182,7 @@ public class RuntimeAgent extends GenericAgent implements AgentType, RtAgent {
         return roles.values().toArray(new RtExecutionContextImpl[0]);
     }
 
-    public Communication getMessagingComponent() {
+    public Communicator getMessagingComponent() {
         return commInterface;
     }
 
@@ -240,7 +240,7 @@ public class RuntimeAgent extends GenericAgent implements AgentType, RtAgent {
         currentStrategy = actions;
     }
 
-    public void setMessagingComponent(Communication a) {
+    public void setMessagingComponent(Communicator a) {
         commInterface = a;
     }
 

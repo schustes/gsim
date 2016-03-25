@@ -6,7 +6,7 @@ package de.s2.gsim.objects;
  * @author stephan
  *
  */
-interface RLActionNode extends Rule {
+public interface RLActionNode extends Rule {
 
     /**
      * Enum for the accumulation of experience

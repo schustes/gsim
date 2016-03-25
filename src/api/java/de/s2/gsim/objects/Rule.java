@@ -5,7 +5,7 @@ package de.s2.gsim.objects;
  * 
  * @author stephan
  */
-interface Rule {
+public interface Rule {
 
     /**
      * Adds or sets a condition.
