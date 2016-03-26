@@ -1,4 +1,4 @@
-package de.s2.gsim.api.core.impl;
+package de.s2.gsim.api.impl;
 
 import de.s2.gsim.def.ModelDefinitionEnvironment;
 import gsim.def.Environment;
