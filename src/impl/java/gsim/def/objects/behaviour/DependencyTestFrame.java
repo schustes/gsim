@@ -1,6 +1,6 @@
 package gsim.def.objects.behaviour;
 
-import de.s2.gsim.objects.attribute.AttributeConstants;
+import de.s2.gsim.objects.attribute.AttributeType;
 import de.s2.gsim.objects.attribute.DomainAttribute;
 import gsim.def.objects.Frame;
 
@@ -25,35 +25,35 @@ public class DependencyTestFrame extends Frame {
 
         this(testName);
 
-        DomainAttribute a1 = new DomainAttribute("action-type", AttributeConstants.STRING);
+        DomainAttribute a1 = new DomainAttribute("action-type", AttributeType.STRING);
         a1.setDefault(actionType);
         addOrSetAttribute("list", a1);
 
-        DomainAttribute a2 = new DomainAttribute("object-type", AttributeConstants.STRING);
+        DomainAttribute a2 = new DomainAttribute("object-type", AttributeType.STRING);
         a2.setDefault(objType);
         addOrSetAttribute("list", a2);
 
-        DomainAttribute a3 = new DomainAttribute("time", AttributeConstants.STRING);
+        DomainAttribute a3 = new DomainAttribute("time", AttributeType.STRING);
         a3.setDefault(time);
         addOrSetAttribute("list", a3);
 
-        DomainAttribute a4 = new DomainAttribute("for-action-type", AttributeConstants.STRING);
+        DomainAttribute a4 = new DomainAttribute("for-action-type", AttributeType.STRING);
         a4.setDefault(forA);
         addOrSetAttribute("list", a4);
 
-        DomainAttribute a5 = new DomainAttribute("for-object-type", AttributeConstants.STRING);
+        DomainAttribute a5 = new DomainAttribute("for-object-type", AttributeType.STRING);
         a5.setDefault(forO);
         addOrSetAttribute("list", a5);
 
-        DomainAttribute a6 = new DomainAttribute("for-time", AttributeConstants.STRING);
+        DomainAttribute a6 = new DomainAttribute("for-time", AttributeType.STRING);
         a6.setDefault(forT);
         addOrSetAttribute("list", a6);
 
-        DomainAttribute a7 = new DomainAttribute("expression", AttributeConstants.STRING);
+        DomainAttribute a7 = new DomainAttribute("expression", AttributeType.STRING);
         a7.setDefault(testExpression);
         addOrSetAttribute("list", a7);
 
-        DomainAttribute a8 = new DomainAttribute("wait", AttributeConstants.STRING);
+        DomainAttribute a8 = new DomainAttribute("wait", AttributeType.STRING);
         a8.setDefault("0");
         addOrSetAttribute("list", a8);
 

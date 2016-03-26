@@ -2,7 +2,7 @@ package gsim.def.objects.behaviour;
 
 import java.util.ArrayList;
 
-import de.s2.gsim.objects.attribute.AttributeConstants;
+import de.s2.gsim.objects.attribute.AttributeType;
 import de.s2.gsim.objects.attribute.DomainAttribute;
 import gsim.def.objects.Frame;
 
@@ -32,7 +32,7 @@ public class UserRuleFrame extends Frame {
         addChildFrame("consequences", f2);
 
         if (this.getAttribute(ATTR_LIST_ATTRS, "activated") == null) {
-            DomainAttribute a = new DomainAttribute("activated", AttributeConstants.STRING);
+            DomainAttribute a = new DomainAttribute("activated", AttributeType.STRING);
             a.setDefault("true");
             addOrSetAttribute(ATTR_LIST_ATTRS, a);
         }
@@ -55,11 +55,11 @@ public class UserRuleFrame extends Frame {
         f2.setMutable(false);
         addChildFrame("consequences", f2);
 
-        DomainAttribute a = new DomainAttribute("activated", AttributeConstants.STRING);
+        DomainAttribute a = new DomainAttribute("activated", AttributeType.STRING);
         a.setDefault("true");
         addOrSetAttribute(ATTR_LIST_ATTRS, a);
 
-        DomainAttribute c = new DomainAttribute("update-lag", AttributeConstants.STRING);
+        DomainAttribute c = new DomainAttribute("update-lag", AttributeType.STRING);
         c.setDefault("0");
         addOrSetAttribute(ATTR_LIST_ATTRS, c);
 
@@ -133,7 +133,7 @@ public class UserRuleFrame extends Frame {
     }
 
     public void setActivated(boolean b) {
-        DomainAttribute a = new DomainAttribute("activated", AttributeConstants.STRING);
+        DomainAttribute a = new DomainAttribute("activated", AttributeType.STRING);
         a.setDefault(String.valueOf(b));
         addOrSetAttribute(ATTR_LIST_ATTRS, a);
     }
@@ -147,13 +147,13 @@ public class UserRuleFrame extends Frame {
     }
 
     public void setUpdateLag(String s) {
-        DomainAttribute a = new DomainAttribute("update-lag", AttributeConstants.STRING);
+        DomainAttribute a = new DomainAttribute("update-lag", AttributeType.STRING);
         a.setDefault(String.valueOf(s));
         addOrSetAttribute(ATTR_LIST_ATTRS, a);
     }
 
     public void setUpdateSpan(String s) {
-        DomainAttribute a = new DomainAttribute("update-span", AttributeConstants.STRING);
+        DomainAttribute a = new DomainAttribute("update-span", AttributeType.STRING);
         a.setDefault(String.valueOf(s));
         addOrSetAttribute(ATTR_LIST_ATTRS, a);
     }

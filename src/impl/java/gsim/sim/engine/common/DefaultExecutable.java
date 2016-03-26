@@ -6,12 +6,12 @@ import java.util.HashMap;
 import org.apache.log4j.Logger;
 //import gsim.tools.setup.ModelInstanceSetupPanel;
 
-import de.s2.gsim.core.GSimCore;
-import de.s2.gsim.core.GSimCoreFactory;
-import de.s2.gsim.core.ModelDefinitionEnvironment;
-import de.s2.gsim.core.SimulationController;
-import de.s2.gsim.core.SimulationListener;
-import de.s2.gsim.sim.engine.Executable;
+import de.s2.gsim.GSimCore;
+import de.s2.gsim.GSimCoreFactory;
+import de.s2.gsim.def.ModelDefinitionEnvironment;
+import de.s2.gsim.sim.Executable;
+import de.s2.gsim.sim.SimulationController;
+import de.s2.gsim.sim.SimulationListener;
 
 public class DefaultExecutable implements Executable, Serializable {
 

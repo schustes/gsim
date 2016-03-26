@@ -2,7 +2,7 @@ package de.s2.gsim.sim.communication;
 
 import java.util.List;
 
-import de.s2.gsim.sim.engine.GSimEngineException;
+import de.s2.gsim.sim.GSimEngineException;
 
 public interface Messenger {
 

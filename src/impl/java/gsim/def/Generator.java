@@ -2,6 +2,7 @@ package gsim.def;
 
 import javax.management.ObjectInstance;
 
+import de.s2.gsim.api.objects.impl.UnitWrapper;
 import de.s2.gsim.objects.attribute.Attribute;
 import de.s2.gsim.objects.attribute.DomainAttribute;
 import de.s2.gsim.objects.attribute.IntervalAttribute;
@@ -10,7 +11,6 @@ import de.s2.gsim.objects.attribute.OrderedSetAttribute;
 import de.s2.gsim.objects.attribute.SetAttribute;
 import gsim.def.objects.Instance;
 import gsim.def.objects.agent.GenericAgent;
-import gsim.objects.impl.UnitWrapper;
 
 public class Generator {
 

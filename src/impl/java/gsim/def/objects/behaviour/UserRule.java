@@ -1,7 +1,7 @@
 package gsim.def.objects.behaviour;
 
 import de.s2.gsim.objects.attribute.Attribute;
-import de.s2.gsim.objects.attribute.AttributeConstants;
+import de.s2.gsim.objects.attribute.AttributeType;
 import de.s2.gsim.objects.attribute.DomainAttribute;
 import de.s2.gsim.objects.attribute.SetAttribute;
 import de.s2.gsim.objects.attribute.StringAttribute;
@@ -31,7 +31,7 @@ public class UserRule extends Instance {
     public UserRule(Instance inst) {
         super(inst);
         if (this.getAttribute(UserRuleFrame.ATTR_LIST_ATTRS, "activated") == null) {
-            DomainAttribute a = new DomainAttribute("activated", AttributeConstants.STRING);
+            DomainAttribute a = new DomainAttribute("activated", AttributeType.STRING);
             a.setDefault("true");
             getDefinition().addOrSetAttribute(UserRuleFrame.ATTR_LIST_ATTRS, a);
 

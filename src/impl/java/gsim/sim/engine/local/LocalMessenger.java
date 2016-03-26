@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
+import de.s2.gsim.sim.GSimEngineException;
 import de.s2.gsim.sim.communication.AgentType;
 import de.s2.gsim.sim.communication.BroadcastProtocol;
 import de.s2.gsim.sim.communication.BroadcastProtocolRespond;
@@ -14,7 +15,6 @@ import de.s2.gsim.sim.communication.CommunicationProtocolRespond;
 import de.s2.gsim.sim.communication.Conversation;
 import de.s2.gsim.sim.communication.Message;
 import de.s2.gsim.sim.communication.Messenger;
-import de.s2.gsim.sim.engine.GSimEngineException;
 
 public class LocalMessenger implements Messenger, java.io.Serializable, Communicator {
 

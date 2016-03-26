@@ -1,15 +1,15 @@
 package gsim.sim.behaviour.impl;
 
+import de.s2.gsim.api.sim.agent.impl.RuntimeAgent;
 import de.s2.gsim.objects.attribute.Attribute;
 import de.s2.gsim.objects.attribute.AttributeConstants;
 import de.s2.gsim.objects.attribute.DomainAttribute;
 import de.s2.gsim.objects.attribute.IntervalAttribute;
 import de.s2.gsim.objects.attribute.NumericalAttribute;
-import de.s2.gsim.sim.engine.GSimEngineException;
+import de.s2.gsim.sim.GSimEngineException;
 import gsim.def.objects.Frame;
 import gsim.def.objects.Instance;
 import gsim.def.objects.agent.GenericAgentClass;
-import gsim.sim.agent.RuntimeAgent;
 
 public class ParsingUtils {
 

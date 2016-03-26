@@ -5,13 +5,13 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
-import de.s2.gsim.sim.engine.GSimEngineException;
+import de.s2.gsim.api.sim.agent.impl.RuntimeAgent;
+import de.s2.gsim.sim.GSimEngineException;
 import gsim.def.objects.Instance;
 import gsim.def.objects.agent.BehaviourDef;
 import gsim.def.objects.behaviour.ActionDef;
 import gsim.def.objects.behaviour.ExpansionDef;
 import gsim.def.objects.behaviour.RLRule;
-import gsim.sim.agent.RuntimeAgent;
 import gsim.util.CombinationGenerator;
 import gsim.util.Utils;
 import jess.Context;

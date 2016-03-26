@@ -3,8 +3,8 @@ package gsim.sim.behaviour;
 import java.util.HashMap;
 import java.util.Set;
 
+import de.s2.gsim.api.sim.agent.impl.RuntimeAgent;
 import gsim.def.objects.agent.BehaviourDef;
-import gsim.sim.agent.RuntimeAgent;
 
 public class SimAction implements java.io.Serializable {
 

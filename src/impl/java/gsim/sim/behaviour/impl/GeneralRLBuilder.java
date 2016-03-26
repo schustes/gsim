@@ -3,8 +3,9 @@ package gsim.sim.behaviour.impl;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import de.s2.gsim.api.sim.agent.impl.RuntimeAgent;
 import de.s2.gsim.objects.attribute.StringAttribute;
-import de.s2.gsim.sim.engine.GSimEngineException;
+import de.s2.gsim.sim.GSimEngineException;
 import gsim.def.objects.Instance;
 import gsim.def.objects.behaviour.ConditionDef;
 import gsim.def.objects.behaviour.DependencyTest;
@@ -12,7 +13,6 @@ import gsim.def.objects.behaviour.ExpansionDef;
 import gsim.def.objects.behaviour.RLRule;
 import gsim.def.objects.behaviour.UserRule;
 import gsim.def.objects.behaviour.UserRuleFrame;
-import gsim.sim.agent.RuntimeAgent;
 
 public class GeneralRLBuilder {
 

@@ -2,12 +2,12 @@ package gsim.sim.behaviour;
 
 import java.util.HashMap;
 
+import de.s2.gsim.api.objects.impl.AgentInstanceSim;
+import de.s2.gsim.api.sim.agent.impl.RtExecutionContextImpl;
+import de.s2.gsim.api.sim.agent.impl.RuntimeAgent;
 import de.s2.gsim.objects.AgentInstance;
+import de.s2.gsim.sim.GSimEngineException;
 import de.s2.gsim.sim.communication.CommunicationProtocol;
-import de.s2.gsim.sim.engine.GSimEngineException;
-import gsim.objects.impl.AgentInstanceSim;
-import gsim.sim.agent.RtExecutionContextImpl;
-import gsim.sim.agent.RuntimeAgent;
 
 public class Context implements java.io.Serializable {
 

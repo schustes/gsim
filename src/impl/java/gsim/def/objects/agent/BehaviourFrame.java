@@ -2,7 +2,7 @@ package gsim.def.objects.agent;
 
 import java.util.ArrayList;
 
-import de.s2.gsim.objects.attribute.AttributeConstants;
+import de.s2.gsim.objects.attribute.AttributeType;
 import de.s2.gsim.objects.attribute.DomainAttribute;
 import gsim.def.objects.Frame;
 import gsim.def.objects.behaviour.ActionCollectionFrame;
@@ -480,28 +480,28 @@ public class BehaviourFrame extends Frame {
 
         super.defineAttributeList(ATTR_LIST);
 
-        DomainAttribute dattr = new DomainAttribute("max-depth", AttributeConstants.NUMERICAL);
+        DomainAttribute dattr = new DomainAttribute("max-depth", AttributeType.NUMERICAL);
         dattr.setDefault("10");
-        DomainAttribute nattr = new DomainAttribute("max-nodes", AttributeConstants.NUMERICAL);
+        DomainAttribute nattr = new DomainAttribute("max-nodes", AttributeType.NUMERICAL);
         nattr.setDefault("100");
         super.addOrSetAttribute(ATTR_LIST, dattr);
         super.addOrSetAttribute(ATTR_LIST, nattr);
-        DomainAttribute uattr = new DomainAttribute("update-interval", AttributeConstants.NUMERICAL);
+        DomainAttribute uattr = new DomainAttribute("update-interval", AttributeType.NUMERICAL);
         uattr.setDefault("10");
-        DomainAttribute delattr = new DomainAttribute("delete-unused-after", AttributeConstants.NUMERICAL);
+        DomainAttribute delattr = new DomainAttribute("delete-unused-after", AttributeType.NUMERICAL);
         delattr.setDefault("100");
         super.addOrSetAttribute(ATTR_LIST, uattr);
         super.addOrSetAttribute(ATTR_LIST, delattr);
 
-        DomainAttribute tattr = new DomainAttribute("depth-first", AttributeConstants.NUMERICAL);
+        DomainAttribute tattr = new DomainAttribute("depth-first", AttributeType.NUMERICAL);
         tattr.setDefault("0");
         super.addOrSetAttribute(ATTR_LIST, tattr);
 
-        DomainAttribute rattr = new DomainAttribute("reval-prob", AttributeConstants.NUMERICAL);
+        DomainAttribute rattr = new DomainAttribute("reval-prob", AttributeType.NUMERICAL);
         rattr.setDefault("0.5");
         super.addOrSetAttribute(ATTR_LIST, rattr);
 
-        DomainAttribute cattr = new DomainAttribute("revisit-costfraction", AttributeConstants.NUMERICAL);
+        DomainAttribute cattr = new DomainAttribute("revisit-costfraction", AttributeType.NUMERICAL);
         cattr.setDefault("0");
         super.addOrSetAttribute(ATTR_LIST, cattr);
 

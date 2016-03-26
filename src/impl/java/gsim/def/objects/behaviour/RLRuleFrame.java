@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
 
-import de.s2.gsim.objects.attribute.AttributeConstants;
+import de.s2.gsim.objects.attribute.AttributeType;
 import de.s2.gsim.objects.attribute.DomainAttribute;
 import gsim.def.objects.Frame;
 
@@ -65,7 +65,7 @@ public class RLRuleFrame extends UserRuleFrame {
         DomainAttribute s = this.getAttribute("state-var");
 
         if (s == null) {
-            s = new DomainAttribute("state-var", AttributeConstants.SET);
+            s = new DomainAttribute("state-var", AttributeType.SET);
         }
         s.setDefault(path);
         s.addFiller(path);
@@ -289,7 +289,7 @@ public class RLRuleFrame extends UserRuleFrame {
                 "(and (eq $?y1 $?y2) (or(>= ?z1 (- $current-time$ (mod $current-time$ " + timeToWait + "))) "
                         + "(>= ?z2 (- $current-time$ (mod $current-time$ " + timeToWait + ")))) )",
                 "?x2", "$?y2", "?z2");
-        DomainAttribute a = new DomainAttribute("wait", AttributeConstants.STRING);
+        DomainAttribute a = new DomainAttribute("wait", AttributeType.STRING);
         a.setDefault(timeToWait);
         t.addOrSetAttribute("list", a);
         addTest(t);
@@ -299,7 +299,7 @@ public class RLRuleFrame extends UserRuleFrame {
     public void setRetractObsolete(boolean b) {
         DomainAttribute a = super.getAttribute(ATTR_LIST_ATTRS, "retract-osbolete-actions");
         if (a == null) {
-            a = new DomainAttribute("retract-osbolete-actions", AttributeConstants.STRING);
+            a = new DomainAttribute("retract-osbolete-actions", AttributeType.STRING);
         }
         a.setDefault(Boolean.toString(b));
         super.addOrSetAttribute(ATTR_LIST_ATTRS, a);
@@ -308,7 +308,7 @@ public class RLRuleFrame extends UserRuleFrame {
     public void setStateVarMax(double d) {
         DomainAttribute s = this.getAttribute("state-var-max");
         if (s == null) {
-            s = new DomainAttribute("state-var-max", AttributeConstants.SET);
+            s = new DomainAttribute("state-var-max", AttributeType.SET);
             s.setDefault(String.valueOf(d));
         }
         s.addFiller(String.valueOf(d));
@@ -326,51 +326,51 @@ public class RLRuleFrame extends UserRuleFrame {
 
         DomainAttribute s = this.getAttribute("state-var");
         if (s == null) {
-            s = new DomainAttribute("state-var", AttributeConstants.SET);
+            s = new DomainAttribute("state-var", AttributeType.SET);
             s.setDefault("");
             addOrSetAttribute(ATTR_LIST_ATTRS, s);
         }
 
         DomainAttribute averaging = this.getAttribute("averaging");
         if (averaging == null) {
-            averaging = new DomainAttribute("averaging", AttributeConstants.STRING);
+            averaging = new DomainAttribute("averaging", AttributeType.STRING);
             averaging.setDefault("false");
             addOrSetAttribute(ATTR_LIST_ATTRS, averaging);
         }
         DomainAttribute comparison = this.getAttribute("comparison");
         if (comparison == null) {
-            comparison = new DomainAttribute("comparison", AttributeConstants.STRING);
+            comparison = new DomainAttribute("comparison", AttributeType.STRING);
             comparison.setDefault("false");
             addOrSetAttribute(ATTR_LIST_ATTRS, comparison);
         }
 
         DomainAttribute discount = this.getAttribute("discount");
         if (discount == null) {
-            discount = new DomainAttribute("discount", AttributeConstants.NUMERICAL);
+            discount = new DomainAttribute("discount", AttributeType.NUMERICAL);
             discount.setDefault("1");
             addOrSetAttribute(ATTR_LIST_ATTRS, discount);
         }
         DomainAttribute avgStep = this.getAttribute("avg-step-size");
         if (avgStep == null) {
-            avgStep = new DomainAttribute("avg-step-size", AttributeConstants.NUMERICAL);
+            avgStep = new DomainAttribute("avg-step-size", AttributeType.NUMERICAL);
             avgStep.setDefault("0.5");
             addOrSetAttribute(ATTR_LIST_ATTRS, avgStep);
         }
         DomainAttribute beta = this.getAttribute("avg-beta");
         if (beta == null) {
-            beta = new DomainAttribute("avg-beta", AttributeConstants.NUMERICAL);
+            beta = new DomainAttribute("avg-beta", AttributeType.NUMERICAL);
             beta.setDefault("0.5");
             addOrSetAttribute(ATTR_LIST_ATTRS, beta);
         }
         DomainAttribute method = this.getAttribute("method");
         if (method == null) {
-            method = new DomainAttribute("method", AttributeConstants.STRING);
+            method = new DomainAttribute("method", AttributeType.STRING);
             method.setDefault("Null");
             addOrSetAttribute(ATTR_LIST_ATTRS, method);
         }
         DomainAttribute defaultReward = this.getAttribute("defaultReward");
         if (defaultReward == null) {
-            defaultReward = new DomainAttribute("defaultReward", AttributeConstants.NUMERICAL);
+            defaultReward = new DomainAttribute("defaultReward", AttributeType.NUMERICAL);
             defaultReward.setDefault("0.5");
             addOrSetAttribute(ATTR_LIST_ATTRS, defaultReward);
         }

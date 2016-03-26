@@ -2,11 +2,14 @@ package de.s2.gsim.objects;
 
 import java.io.Serializable;
 
-import de.s2.gsim.core.GSimException;
+import de.s2.gsim.GSimException;
 
 /**
- * The <code>BehaviourIF</code> class is the interface representing both behaviour frames and instances.
- *
+ * The <code>Behaviour</code> class is the interface representing both behaviour frames and instances. It contains the whole behaviour of the agent,
+ * that is, it can have - Normal, reactive rules - RL nodes that implement the BRA algorithm. Furthermore, the Behaviour must refer to all actions the
+ * agent is able to see. Only those actions can be referenced in the rules. This is a convention to clearly separate (and implicitly type) the action
+ * spaces of different agent roles (agent classes that define possibly exclusive behaviour).
+ * 
  * @author Stephan
  *
  */

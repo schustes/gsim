@@ -1,6 +1,6 @@
 package gsim.def.objects.behaviour;
 
-import de.s2.gsim.objects.attribute.AttributeConstants;
+import de.s2.gsim.objects.attribute.AttributeType;
 import de.s2.gsim.objects.attribute.DomainAttribute;
 import gsim.def.objects.Frame;
 
@@ -26,15 +26,15 @@ public class ConditionFrame extends Frame {
 
     public ConditionFrame(String forParameter) {
         super(forParameter + "-condition-" + cern.jet.random.Uniform.staticNextDouble(), "condition");
-        DomainAttribute a0 = new DomainAttribute("parameter-name", AttributeConstants.STRING);
-        DomainAttribute a = new DomainAttribute("parameter-class", AttributeConstants.STRING);
-        DomainAttribute b = new DomainAttribute("operator", AttributeConstants.STRING);
+        DomainAttribute a0 = new DomainAttribute("parameter-name", AttributeType.STRING);
+        DomainAttribute a = new DomainAttribute("parameter-class", AttributeType.STRING);
+        DomainAttribute b = new DomainAttribute("operator", AttributeType.STRING);
         b.addFiller(">");
         b.addFiller("<");
         b.addFiller(">=");
         b.addFiller("<=");
         b.addFiller("=");
-        DomainAttribute c = new DomainAttribute("parameter-value", AttributeConstants.STRING);
+        DomainAttribute c = new DomainAttribute("parameter-value", AttributeType.STRING);
         a0.setDefault(forParameter);
         a.setDefault("");
         b.setDefault("=");

@@ -1,9 +1,9 @@
 package de.s2.gsim.sim.agent;
 
-import java.util.HashMap;
+import java.util.Map;
 
+import de.s2.gsim.sim.Simulation;
 import de.s2.gsim.sim.communication.Messenger;
-import de.s2.gsim.sim.engine.Simulation;
 
 /**
  * An application agent is a special kind of agent that can access the simulation as a whole. It can be called at certain times of a simulation,
@@ -50,6 +50,6 @@ public interface ApplicationAgent {
     /**
      * Called by the simulation before all agents in the simulation act in the current time step.
      */
-    void pre(HashMap<String, Object> simProps);
+    void pre(Map<String, Object> simProps);
 
 }

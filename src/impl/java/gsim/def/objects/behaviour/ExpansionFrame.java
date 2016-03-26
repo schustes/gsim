@@ -1,6 +1,6 @@
 package gsim.def.objects.behaviour;
 
-import de.s2.gsim.objects.attribute.AttributeConstants;
+import de.s2.gsim.objects.attribute.AttributeType;
 import de.s2.gsim.objects.attribute.DomainAttribute;
 import gsim.def.objects.Frame;
 
@@ -23,10 +23,10 @@ public class ExpansionFrame extends Frame {
 
     public ExpansionFrame(String forParameter) {
         super(forParameter, "expansion");
-        DomainAttribute a = new DomainAttribute("parameter-name", AttributeConstants.STRING);
-        DomainAttribute b = new DomainAttribute("min", AttributeConstants.NUMERICAL);
-        DomainAttribute c = new DomainAttribute("max", AttributeConstants.NUMERICAL);
-        DomainAttribute d = new DomainAttribute("fillers", AttributeConstants.SET);
+        DomainAttribute a = new DomainAttribute("parameter-name", AttributeType.STRING);
+        DomainAttribute b = new DomainAttribute("min", AttributeType.NUMERICAL);
+        DomainAttribute c = new DomainAttribute("max", AttributeType.NUMERICAL);
+        DomainAttribute d = new DomainAttribute("fillers", AttributeType.SET);
 
         a.setDefault(forParameter);
         b.setDefault(String.valueOf(Double.NaN));

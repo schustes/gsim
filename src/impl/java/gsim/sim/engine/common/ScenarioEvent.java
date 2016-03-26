@@ -2,7 +2,7 @@ package gsim.sim.engine.common;
 
 import java.io.Serializable;
 
-import de.s2.gsim.sim.engine.Simulation;
+import de.s2.gsim.sim.Simulation;
 
 /**
  * Instances of the ScenarioEvent class get loaded by the Scheduler object during runtime, where its execute-method is called. Sub-classes have to

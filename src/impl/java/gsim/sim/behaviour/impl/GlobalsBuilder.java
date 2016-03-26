@@ -1,6 +1,6 @@
 package gsim.sim.behaviour.impl;
 
-import java.util.HashMap;
+import java.util.Map;
 
 import jess.JessException;
 import jess.Rete;
@@ -25,7 +25,7 @@ public class GlobalsBuilder {
         super();
     }
 
-    public String build(Rete rete, HashMap props) {
+    public String build(Rete rete, Map props) {
 
         String s = begin + "\n" + createRules() + "\n" + functions + "\n" + createGlobalVariables(props) + "\n" + endPart;
         try {
@@ -36,7 +36,7 @@ public class GlobalsBuilder {
         return s;
     }
 
-    private String createGlobalVariables(HashMap props) {
+    private String createGlobalVariables(Map props) {
         String s = "";
         if (props.containsKey("AGENT_COUNT")) {
             s += "(defglobal ?*agent-count* = " + (String) props.get("AGENT_COUNT") + ")\n";

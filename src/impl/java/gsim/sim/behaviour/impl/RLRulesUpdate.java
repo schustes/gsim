@@ -5,11 +5,11 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
+import de.s2.gsim.api.sim.agent.impl.RuntimeAgent;
 import de.s2.gsim.objects.attribute.Attribute;
 import de.s2.gsim.objects.attribute.DomainAttribute;
 import gsim.def.objects.behaviour.ExpansionDef;
 import gsim.def.objects.behaviour.RLRule;
-import gsim.sim.agent.RuntimeAgent;
 import gsim.sim.behaviour.impl.jessfunction.DynamicRuleBuilder;
 import gsim.sim.behaviour.impl.jessfunction.Expand0;
 import gsim.sim.behaviour.util.CollectiveTreeDBWriter;

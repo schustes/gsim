@@ -8,15 +8,15 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 
-import de.s2.gsim.sim.engine.DataHandler;
-import de.s2.gsim.sim.engine.GSimEngineException;
+import de.s2.gsim.api.sim.agent.impl.ApplicationAgentImpl;
+import de.s2.gsim.api.sim.agent.impl.RtExecutionContextImpl;
+import de.s2.gsim.api.sim.agent.impl.RuntimeAgent;
+import de.s2.gsim.sim.DataHandler;
+import de.s2.gsim.sim.GSimEngineException;
 import gsim.def.Environment;
 import gsim.def.GSimDefException;
 import gsim.def.objects.Frame;
 import gsim.def.objects.agent.GenericAgent;
-import gsim.sim.agent.ApplicationAgentImpl;
-import gsim.sim.agent.RtExecutionContextImpl;
-import gsim.sim.agent.RuntimeAgent;
 import gsim.sim.behaviour.impl.JessHandler;
 
 public class RuntimeAgentFactory {
@@ -108,7 +108,7 @@ public class RuntimeAgentFactory {
     // }
 
     @SuppressWarnings("unchecked")
-    public RuntimeAgent[] createAgentsWithRulebase(Environment env, String id, HashMap props) throws GSimEngineException {
+    public RuntimeAgent[] createAgentsWithRulebase(Environment env, String id, Map props) throws GSimEngineException {
 
         try {
             ArrayList agentList = new ArrayList();
@@ -178,8 +178,7 @@ public class RuntimeAgentFactory {
         }
     }
 
-    public RuntimeAgent createAgentWithRulebase(GenericAgent a, /* HashMap agentRtMappings, HashMap agentMappings, */ int agentCount, String simId,
-            HashMap<String, Object> props) throws GSimEngineException {
+    public RuntimeAgent createAgentWithRulebase(GenericAgent a, int agentCount, String simId, Map<String, Object> props) throws GSimEngineException {
 
         try {
 
@@ -190,14 +189,6 @@ public class RuntimeAgentFactory {
             Frame[] anc = def.getAncestors();
             RuntimeAgent owner = new RuntimeAgent(a, simId);
 
-            /*
-             * Iterator iter = agentMappings.keySet().iterator(); while (iter.hasNext()) { String agentClassName = (String) iter.next(); if
-             * (def.isSuccessor(agentClassName)) { for (Frame element : anc) { if (element.getTypeName().equals(agentClassName)) { //String role =
-             * (String) agentMappings.get(agentClassName); //String cls = (String) agentRtMappings.get(role.trim()) + "@"+ new Random().nextInt();
-             * //map.put(cls, role + ":" + agentClassName); } } } else if (def.getTypeName().equals(agentClassName)) { //String role = (String)
-             * agentMappings.get(agentClassName); //String roleName = role.trim(); //String cls = (String) agentRtMappings.get(roleName) + "@" + new
-             * Random().nextInt(); //map.put(cls, roleName + ":" + agentClassName); } }
-             */
             if (map.size() > 0) {
                 Iterator it = map.keySet().iterator();
                 while (it.hasNext()) {
@@ -206,8 +197,6 @@ public class RuntimeAgentFactory {
                     String[] rr = roleAndClass.split(":");
                     try {
                         cls = cls.split("@")[0];
-                        // RtExecutionContext rc = (RtExecutionContext) Class.forName(cls,
-                        // false, cl).newInstance();
                         RtExecutionContextImpl rc = null;
                         try {
                             rc = (RtExecutionContextImpl) Class.forName(cls, false, cl).newInstance();

@@ -1,6 +1,6 @@
 package de.s2.gsim.objects;
 
-import de.s2.gsim.core.GSimException;
+import de.s2.gsim.GSimException;
 
 /**
  * An Expansion is a special kind of condition that can be split up into more conditions during runtime. This requires that the original expansion

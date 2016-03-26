@@ -1,8 +1,10 @@
 package de.s2.gsim.objects.attribute;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 /**
  * A SetAttribute can hold several values.
@@ -107,6 +109,14 @@ public class SetAttribute extends Attribute {
             }
         }
         return s;
+    }
+
+    public String[] getFillersAndEntries() {
+        Set<String> all = new HashSet<>(this.entries);
+        for (String filler : this.fillers) {
+            all.add(filler);
+        }
+        return all.toArray(new String[0]);
     }
 
 }

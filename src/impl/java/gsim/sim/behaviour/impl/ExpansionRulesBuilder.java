@@ -1,6 +1,6 @@
 package gsim.sim.behaviour.impl;
 
-import de.s2.gsim.sim.engine.GSimEngineException;
+import de.s2.gsim.sim.GSimEngineException;
 
 public class ExpansionRulesBuilder {
 

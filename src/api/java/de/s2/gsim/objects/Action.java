@@ -1,6 +1,6 @@
 package de.s2.gsim.objects;
 
-import de.s2.gsim.core.GSimException;
+import de.s2.gsim.GSimException;
 
 /**
  * The <code>ActionIF</code> specifies actions of an agent. It abstracts from the fact whether the action is defined on the frame or instance level.

@@ -1,6 +1,6 @@
 package gsim.sim.engine.local;
 
-import de.s2.gsim.sim.engine.Executable;
+import de.s2.gsim.sim.Executable;
 
 public class BatchExecutor {
 

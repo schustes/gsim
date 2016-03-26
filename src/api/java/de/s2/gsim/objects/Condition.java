@@ -1,6 +1,6 @@
 package de.s2.gsim.objects;
 
-import de.s2.gsim.core.GSimException;
+import de.s2.gsim.GSimException;
 
 /**
  * Describes a condition of a rule.

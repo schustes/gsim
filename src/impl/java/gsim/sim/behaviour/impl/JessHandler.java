@@ -7,14 +7,16 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 
+import de.s2.gsim.api.sim.agent.impl.RuntimeAgent;
 import de.s2.gsim.objects.attribute.Attribute;
 import de.s2.gsim.objects.attribute.AttributeConstants;
 import de.s2.gsim.objects.attribute.DomainAttribute;
 import de.s2.gsim.objects.attribute.IntervalAttribute;
-import de.s2.gsim.sim.engine.GSimEngineException;
+import de.s2.gsim.sim.GSimEngineException;
 import gsim.def.objects.Frame;
 import gsim.def.objects.Instance;
 import gsim.def.objects.agent.BehaviourFrame;
@@ -25,7 +27,6 @@ import gsim.def.objects.behaviour.ExpansionDef;
 import gsim.def.objects.behaviour.RLRule;
 import gsim.def.objects.behaviour.UserRule;
 import gsim.def.objects.behaviour.UserRuleFrame;
-import gsim.sim.agent.RuntimeAgent;
 import gsim.sim.behaviour.GSimBehaviourException;
 import gsim.sim.behaviour.impl.jessfunction.Expand;
 import gsim.sim.behaviour.impl.jessfunction.RandomStrategy;
@@ -81,7 +82,7 @@ public class JessHandler implements java.io.Serializable {
         clean();
     }
 
-    public JessHandler(RuntimeAgent ownerAgent, HashMap props) throws GSimEngineException {
+    public JessHandler(RuntimeAgent ownerAgent, Map props) throws GSimEngineException {
         String s = System.getProperty("debugJess");
         String treeDB = System.getProperty("writeTreeDBInterval");
         String treeFile = System.getProperty("writeTreeFile");
@@ -548,7 +549,7 @@ public class JessHandler implements java.io.Serializable {
     }
 
     @SuppressWarnings("unchecked")
-    private void createEngine(RuntimeAgent a, HashMap props) throws GSimEngineException {
+    private void createEngine(RuntimeAgent a, Map props) throws GSimEngineException {
 
         owner = a;
 

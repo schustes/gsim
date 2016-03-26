@@ -2,7 +2,7 @@ package gsim.sim.behaviour.impl.jessfunction;
 
 import java.util.ArrayList;
 
-import gsim.sim.agent.RuntimeAgent;
+import de.s2.gsim.api.sim.agent.impl.RuntimeAgent;
 import gsim.sim.behaviour.impl.FactHandler;
 import gsim.sim.behaviour.impl.ParsingUtils;
 import jess.Context;

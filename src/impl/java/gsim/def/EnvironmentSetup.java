@@ -14,6 +14,7 @@ import org.jdom.Element;
 import org.jdom.input.SAXBuilder;
 
 import de.s2.gsim.objects.attribute.AttributeConstants;
+import de.s2.gsim.objects.attribute.AttributeType;
 import de.s2.gsim.objects.attribute.DomainAttribute;
 import gsim.def.objects.Frame;
 import gsim.def.objects.agent.GenericAgentClass;
@@ -505,7 +506,7 @@ public class EnvironmentSetup extends EnvironmentBase {
                         }
                     }
                     it.remove();
-                    DomainAttribute da = new DomainAttribute("equivalent-actionset", AttributeConstants.STRING);
+                    DomainAttribute da = new DomainAttribute("equivalent-actionset", AttributeType.STRING);
                     da.setDefault(refName);
                     rf.addOrSetAttribute(UserRuleFrame.ATTR_LIST_ATTRS, da);
                     agent.getBehaviour().addRLRule(rf);
@@ -577,7 +578,7 @@ public class EnvironmentSetup extends EnvironmentBase {
                         }
                     }
                     it.remove();
-                    DomainAttribute da = new DomainAttribute("equivalent-state", AttributeConstants.STRING);
+                    DomainAttribute da = new DomainAttribute("equivalent-state", AttributeType.STRING);
                     da.setDefault(refName);
                     rf.addOrSetAttribute(UserRuleFrame.ATTR_LIST_ATTRS, da);
                     agent.getBehaviour().addRLRule(rf);
@@ -750,7 +751,7 @@ public class EnvironmentSetup extends EnvironmentBase {
             throw new GSimDefException("The attribute 'default' for attribute " + name + " does not exist.");
         }
         String def = e.getAttribute("default").getValue();
-        DomainAttribute da = new DomainAttribute(name, type);
+        DomainAttribute da = new DomainAttribute(name, AttributeType.valueOf(type));
 
         da.setDefault(def);
         da.setMutable(true);
@@ -774,13 +775,6 @@ public class EnvironmentSetup extends EnvironmentBase {
             da.addFiller(max);
         }
 
-        if (e.getAttribute("weight") != null) {
-            try {
-                da.setWeight(e.getAttribute("weight").getDoubleValue());
-            } catch (DataConversionException ex) {
-                System.out.println("Couldn't set attribute weight because it didn't seem to be a number");
-            }
-        }
         if (e.getAttribute("mutable") != null) {
             da.setMutable(Boolean.parseBoolean(e.getAttributeValue("mutable")));
         }

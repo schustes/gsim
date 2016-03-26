@@ -3,10 +3,12 @@ package de.s2.gsim.objects;
 /**
  * An RLActionNode manages the reinforcement learning and state space partitioning part according to the BRA algorithm of the agent.
  * 
+ * It has a set of {@link SelectionNode}s, as described in the BRA paper.
+ * 
  * @author stephan
  *
  */
-public interface RLActionNode extends Rule {
+public interface RLActionNode {
 
     /**
      * Enum for the accumulation of experience

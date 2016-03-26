@@ -137,7 +137,7 @@ public class SimpleSoftmaxSelector implements Userfunction, java.io.Serializable
             String stats = v.actionName + "," + v.reward + "," + v.pref + "," + p;
 
             try {
-                gsim.sim.agent.RuntimeAgent a = (gsim.sim.agent.RuntimeAgent) ctx.getEngine().fetch("AGENT").externalAddressValue(ctx);
+                de.s2.gsim.api.sim.agent.impl.RuntimeAgent a = (de.s2.gsim.api.sim.agent.impl.RuntimeAgent) ctx.getEngine().fetch("AGENT").externalAddressValue(ctx);
                 String[] statVector0 = a.getCurrentStrategy();
                 String[] statVector = new String[statVector0.length + 1];
                 for (int i = 0; i < statVector0.length; i++) {

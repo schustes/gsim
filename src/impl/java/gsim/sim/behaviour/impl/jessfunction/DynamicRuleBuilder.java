@@ -5,9 +5,9 @@ import java.util.Iterator;
 
 import org.apache.log4j.Logger;
 
+import de.s2.gsim.api.sim.agent.impl.RuntimeAgent;
 import de.s2.gsim.objects.attribute.DomainAttribute;
 import gsim.def.objects.behaviour.RLRule;
-import gsim.sim.agent.RuntimeAgent;
 import gsim.sim.behaviour.impl.Attribute2ValuesMap;
 import gsim.sim.behaviour.impl.FactHandler;
 import gsim.sim.behaviour.impl.TreeExpansionBuilder;

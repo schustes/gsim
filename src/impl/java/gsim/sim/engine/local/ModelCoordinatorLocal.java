@@ -2,38 +2,36 @@ package gsim.sim.engine.local;
 
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
 
-import javax.management.ObjectInstance;
-
 import org.apache.log4j.Logger;
 
-import de.s2.gsim.core.ModelDefinitionEnvironment;
+import de.s2.gsim.api.core.impl.EnvLocalImpl;
+import de.s2.gsim.api.sim.agent.impl.ApplicationAgentImpl;
+import de.s2.gsim.api.sim.agent.impl.RuntimeAgent;
+import de.s2.gsim.def.ModelDefinitionEnvironment;
 import de.s2.gsim.objects.AgentInstance;
 import de.s2.gsim.objects.AppAgent;
+import de.s2.gsim.objects.ObjectInstance;
 import de.s2.gsim.objects.attribute.Attribute;
+import de.s2.gsim.sim.DataHandler;
+import de.s2.gsim.sim.GSimEngineException;
+import de.s2.gsim.sim.Simulation;
+import de.s2.gsim.sim.SimulationId;
+import de.s2.gsim.sim.Steppable;
 import de.s2.gsim.sim.agent.RtAgent;
 import de.s2.gsim.sim.communication.AgentType;
-import de.s2.gsim.sim.engine.DataHandler;
-import de.s2.gsim.sim.engine.GSimEngineException;
-import de.s2.gsim.sim.engine.Saveable;
-import de.s2.gsim.sim.engine.Simulation;
-import de.s2.gsim.sim.engine.SimulationID;
-import de.s2.gsim.sim.engine.Steppable;
-import gsim.core.impl.EnvLocalImpl;
 import gsim.def.Environment;
 import gsim.def.objects.Instance;
 import gsim.def.objects.agent.GenericAgent;
-import gsim.sim.agent.ApplicationAgentImpl;
-import gsim.sim.agent.RuntimeAgent;
 import gsim.sim.behaviour.SimAction;
 import gsim.sim.engine.common.RuntimeAgentFactory;
 import gsim.sim.engine.common.ScenarioEvent;
@@ -43,7 +41,7 @@ import gsim.sim.engine.common.SimpleClassLoader;
  * Local implementation, and runs for the most part as one would expect from a standalone simulation.
  *
  */
-public class ModelCoordinatorLocal implements Simulation, Steppable, Saveable {
+public class ModelCoordinatorLocal implements Simulation, Steppable {
 
     private static Logger logger = Logger.getLogger(ModelCoordinatorLocal.class);
 
@@ -59,11 +57,9 @@ public class ModelCoordinatorLocal implements Simulation, Steppable, Saveable {
 
     private HashMap events = new HashMap();
 
-    // private HashMap agentOrder = new HashMap();
-
     private String host = "localhost";
 
-    private SimulationID id = null;
+    private SimulationId id = null;
 
     private LocalMessenger messenger;
 
@@ -71,11 +67,11 @@ public class ModelCoordinatorLocal implements Simulation, Steppable, Saveable {
 
     private String pass = null;
 
-    private HashMap pauseIntervals = null;
+    private Map pauseIntervals = null;
 
-    private HashMap<String, Object> props = new HashMap<String, Object>();
+    private Map<String, Object> props = new HashMap<String, Object>();
 
-    private ArrayList<String> removeList = new ArrayList<String>();
+    private List<String> removeList = new ArrayList<String>();
 
     private long time = 0;
 
@@ -83,14 +79,14 @@ public class ModelCoordinatorLocal implements Simulation, Steppable, Saveable {
 
     private String user = null;
 
-    public ModelCoordinatorLocal(Environment env, HashMap<String, Object> props) {
+    public ModelCoordinatorLocal(Environment env, Map<String, Object> props) {
 
         this.props = props;
         this.env = env;
 
         try {
             pauseIntervals = env.getAgentIntervals();
-            id = new SimulationID(env.getNamespace());
+            id = new SimulationId(env.getNamespace());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -247,10 +243,6 @@ public class ModelCoordinatorLocal implements Simulation, Steppable, Saveable {
     }
 
     @Override
-    public void disconnect() throws GSimEngineException {
-    }
-
-    @Override
     public int getAgentCount() throws GSimEngineException {
         return agents.size();
         // throw new UnsupportedOperationException("not implemented");
@@ -270,12 +262,12 @@ public class ModelCoordinatorLocal implements Simulation, Steppable, Saveable {
     }
 
     @Override
-    public RtAgent getAgentState(String agentName) {
+    public RtAgent getAgent(String agentName) {
         return agents.get(agentName);
     }
 
     @Override
-    public AppAgent[] getAppAgentState() {
+    public AppAgent[] getAppAgents() {
         Iterator iter = appAgents.values().iterator();
         ArrayList<ApplicationAgentImpl> list = new ArrayList<ApplicationAgentImpl>();
         while (iter.hasNext()) {
@@ -288,7 +280,7 @@ public class ModelCoordinatorLocal implements Simulation, Steppable, Saveable {
     }
 
     @Override
-    public AppAgent getAppAgentState(String name) {
+    public AppAgent getAppAgent(String name) {
         AppAgent a = appAgents.get(name);
         return a;
     }
@@ -321,7 +313,7 @@ public class ModelCoordinatorLocal implements Simulation, Steppable, Saveable {
     }
 
     @Override
-    public List<RtAgent> getGlobalState() throws GSimEngineException {
+    public List<RtAgent> getAllAgents() throws GSimEngineException {
         Iterator iter = agents.values().iterator();
         ArrayList<RtAgent> list = new ArrayList<RtAgent>();
         while (iter.hasNext()) {
@@ -332,7 +324,7 @@ public class ModelCoordinatorLocal implements Simulation, Steppable, Saveable {
     }
 
     @Override
-    public List<RtAgent> getGlobalState(int count, int offset) throws GSimEngineException {
+    public List<RtAgent> getAllAgents(int count, int offset) throws GSimEngineException {
 
         ArrayList<RuntimeAgent> allList = new ArrayList<RuntimeAgent>();
 
@@ -359,7 +351,7 @@ public class ModelCoordinatorLocal implements Simulation, Steppable, Saveable {
     }
 
     @Override
-    public SimulationID getId() {
+    public SimulationId getId() {
         return id;
     }
 
@@ -372,16 +364,6 @@ public class ModelCoordinatorLocal implements Simulation, Steppable, Saveable {
         return ns;
     }
 
-    @Override
-    public SimulationID getSimulationID() throws GSimEngineException {
-        return id;
-    }
-
-    @Override
-    public int getTimeStep() throws GSimEngineException {
-        return (int) time;
-    }
-
     public void init(Environment env) {
     }
 
@@ -391,7 +373,7 @@ public class ModelCoordinatorLocal implements Simulation, Steppable, Saveable {
 
     // TODO pass better an AgentInstance
     @Override
-    public void modifyAgentState(RtAgent agentState) throws GSimEngineException {
+    public void replaceAgent(RtAgent agentState) throws GSimEngineException {
         AgentInstance agentInstance = agentState.getAgent();
         RuntimeAgent agent = agents.get(agentInstance.getName());
         for (String list : agentInstance.getObjectListNames()) {
@@ -518,32 +500,11 @@ public class ModelCoordinatorLocal implements Simulation, Steppable, Saveable {
         while (iter.hasNext()) {
             DataHandler e = (DataHandler) iter.next();
 
-            String managerClass = (String) props.get("DB_MANAGER");
-            if (managerClass == null) {
-                managerClass = "Postgres";
-            }
-
-            gsim.sim.engine.common.DatabaseManager m = null;
-            if (managerClass.equalsIgnoreCase("Postgres")) {
-                m = gsim.sim.engine.common.DatabaseManagerPostgres.getInstance();
-            } else if (managerClass.equalsIgnoreCase("HSQL")) {
-                m = gsim.sim.engine.common.DatabaseManagerHSQL.getInstance();
-            }
             if (host != null && dbName != null && user != null && pass != null) {
-                java.sql.Connection con = null;
                 try {
-                    con = m.getConnection(host, dbName, user, pass);
-                    e.save(this, con);
+                    e.save(this);
                 } catch (Exception ex) {
                     logger.error("Error during getting database connection", ex);
-                } finally {
-                    try {
-                        if (con != null && !con.isClosed()) {
-                            m.releaseConnection(host, dbName, con);
-                        }
-                    } catch (SQLException e1) {
-                        e1.printStackTrace();
-                    }
                 }
             }
         }
@@ -617,6 +578,12 @@ public class ModelCoordinatorLocal implements Simulation, Steppable, Saveable {
             logger.error("Error", e);
         }
         return ordered;
+    }
+
+    @Override
+    public int getCurrentTimeStep() {
+        // TODO Auto-generated method stub
+        return 0;
     }
 
 }

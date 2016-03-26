@@ -1,6 +1,6 @@
 package gsim.def.objects.behaviour;
 
-import de.s2.gsim.objects.attribute.AttributeConstants;
+import de.s2.gsim.objects.attribute.AttributeType;
 import de.s2.gsim.objects.attribute.DomainAttribute;
 import gsim.def.objects.Frame;
 
@@ -46,26 +46,21 @@ public class ActionFrame extends Frame {
      */
     public ActionFrame(String name, String defaultClass) {
         super(name, CATEGORY);
-        DomainAttribute a = new DomainAttribute("class-name", AttributeConstants.STRING);
+        DomainAttribute a = new DomainAttribute("class-name", AttributeType.STRING);
         a.setDefault(defaultClass);
         addOrSetAttribute(ATTR_LIST_ATTRS, a);
 
-        DomainAttribute c = new DomainAttribute("cost", AttributeConstants.NUMERICAL);
+        DomainAttribute c = new DomainAttribute("cost", AttributeType.NUMERICAL);
         c.setDefault("0");
         addOrSetAttribute(ATTR_LIST_PROPS, c);
 
-        DomainAttribute d = new DomainAttribute("salience", AttributeConstants.NUMERICAL);
+        DomainAttribute d = new DomainAttribute("salience", AttributeType.NUMERICAL);
         d.setDefault("0");
         addOrSetAttribute(ATTR_LIST_PROPS, d);
 
-        DomainAttribute e = new DomainAttribute("object-types", AttributeConstants.SET);
+        DomainAttribute e = new DomainAttribute("object-types", AttributeType.SET);
         d.setDefault("");
         addOrSetAttribute(ATTR_LIST_PARAMS, e);
-
-        // DomainAttribute f = new
-        // DomainAttribute("has-product-parameter",AttributeConstants.STRING);
-        // d.setDefault("false");
-        // addOrSetAttribute(ATTR_LIST_ATTRS, f);
 
     }
 
@@ -84,7 +79,7 @@ public class ActionFrame extends Frame {
             a.addFiller(cls);
             addOrSetAttribute(ATTR_LIST_PARAMS, a);
         } else {
-            DomainAttribute b = new DomainAttribute(forParameter, AttributeConstants.STRING);
+            DomainAttribute b = new DomainAttribute(forParameter, AttributeType.STRING);
             b.addFiller(cls);
             b.setDefault(cls);
             addOrSetAttribute(ATTR_LIST_PARAMS, b);
@@ -123,7 +118,7 @@ public class ActionFrame extends Frame {
      *            String
      */
     public void addUserParameter(String name) {
-        DomainAttribute a = new DomainAttribute(name.trim(), AttributeConstants.SET);
+        DomainAttribute a = new DomainAttribute(name.trim(), AttributeType.SET);
         a.addFiller("{}");
         a.setDefault("{}");
         addOrSetAttribute(ATTR_LIST_PARAMS, a);
@@ -320,7 +315,7 @@ public class ActionFrame extends Frame {
      *            double
      */
     public void setCost(double d) {
-        DomainAttribute att = new DomainAttribute("cost", AttributeConstants.NUMERICAL);
+        DomainAttribute att = new DomainAttribute("cost", AttributeType.NUMERICAL);
         att.setDefault(String.valueOf(d));
         addOrSetAttribute(ATTR_LIST_PROPS, att);
     }
@@ -332,7 +327,7 @@ public class ActionFrame extends Frame {
      *            double
      */
     public void setSalience(double d) {
-        DomainAttribute att = new DomainAttribute("salience", AttributeConstants.NUMERICAL);
+        DomainAttribute att = new DomainAttribute("salience", AttributeType.NUMERICAL);
         att.setDefault(String.valueOf(d));
         addOrSetAttribute(ATTR_LIST_PROPS, att);
     }

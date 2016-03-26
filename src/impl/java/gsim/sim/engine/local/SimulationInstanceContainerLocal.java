@@ -1,26 +1,30 @@
 package gsim.sim.engine.local;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Semaphore;
 
 import org.apache.log4j.Logger;
 
-import de.s2.gsim.core.SimulationListener;
-import de.s2.gsim.sim.engine.Controller;
-import de.s2.gsim.sim.engine.GSimEngineException;
-import de.s2.gsim.sim.engine.Simulation;
-import de.s2.gsim.sim.engine.SimulationID;
-import de.s2.gsim.sim.engine.SimulationManager;
-import de.s2.gsim.sim.engine.Steppable;
+import de.s2.gsim.sim.GSimEngineException;
+import de.s2.gsim.sim.Simulation;
+import de.s2.gsim.sim.SimulationController;
+import de.s2.gsim.sim.SimulationId;
+import de.s2.gsim.sim.SimulationListener;
+import de.s2.gsim.sim.SimulationScheduler;
+import de.s2.gsim.sim.Steppable;
 import gsim.def.Environment;
 
 /**
  * Executes one model instance at a time, i.e. all repetitions are processed in sequence.
  */
-public class SimulationInstanceContainerLocal implements SimulationManager {
+public class SimulationInstanceContainerLocal implements SimulationController {
 
     private static Semaphore blockingSema = new Semaphore(1);
 
@@ -34,51 +38,51 @@ public class SimulationInstanceContainerLocal implements SimulationManager {
 
     private Environment env = null;
 
-    private ArrayList<SimulationID> finished = new ArrayList<SimulationID>();
+    private List<SimulationId> finished = new ArrayList<SimulationId>();
 
-    private HashSet<de.s2.gsim.core.SimulationListener> listeners = new HashSet<de.s2.gsim.core.SimulationListener>();
+    private Set<SimulationListener> listeners = new HashSet<SimulationListener>();
 
-    private ConcurrentHashMap<Listener, Simulation> listening = new ConcurrentHashMap<Listener, Simulation>();
+    private Map<Listener, Simulation> listening = new ConcurrentHashMap<Listener, Simulation>();
 
     private String ns;
 
-    private HashMap<String, Object> props = new HashMap<String, Object>();
+    private Map<String, Object> props = new HashMap<String, Object>();
 
     private int runs = 0;
 
-    private ConcurrentHashMap<SimulationID, Controller> schedulers = new ConcurrentHashMap<SimulationID, Controller>();
+    private Map<SimulationId, SimulationScheduler> schedulers = new ConcurrentHashMap<SimulationId, SimulationScheduler>();
 
-    private ConcurrentHashMap<SimulationID, Simulation> sims = new ConcurrentHashMap<SimulationID, Simulation>();
+    private Map<SimulationId, Simulation> sims = new ConcurrentHashMap<SimulationId, Simulation>();
 
     private int steps = 0;
 
-    public SimulationInstanceContainerLocal(String ns, HashMap<String, Object> props, int steps, int runs) {
+    public SimulationInstanceContainerLocal(Environment env, String ns, Map<String, Object> props, int steps, int runs) {
         try {
             this.steps = steps;
             this.runs = runs;
             this.props = props;
             this.ns = ns;
+            this.env = (Environment) env.cloneEnvironment();
             instances.put(this.ns, this);
         } catch (Exception e) {
             logger.error("Error", e);
         }
     }
 
-    @Override
-    public SimulationID[] getInstances() {
-        SimulationID[] ids = new SimulationID[sims.size()];
+    public SimulationId[] getInstances() {
+        SimulationId[] ids = new SimulationId[sims.size()];
         sims.keySet().toArray(ids);
         return ids;
     }
 
     @Override
-    public Simulation getModelState(SimulationID uid) {
+    public Simulation getModelState(SimulationId uid) {
         return sims.get(uid);
     }
 
     @Override
-    public long getTime(SimulationID uid) throws GSimEngineException {
-        Controller c = schedulers.get(uid);
+    public long getTime(SimulationId uid) throws GSimEngineException {
+        SimulationScheduler c = schedulers.get(uid);
 
         if (c != null) {
             try {
@@ -91,15 +95,6 @@ public class SimulationInstanceContainerLocal implements SimulationManager {
         return -999;
     }
 
-    public void init(Environment env) {
-        try {
-            this.env = (Environment) env.cloneEnvironment();
-        } catch (Exception e) {
-            logger.error("Error", e);
-        }
-    }
-
-    @Override
     public boolean isFinished() {
         return (counter == steps) && (listening.size() == 0);
     }
@@ -107,7 +102,7 @@ public class SimulationInstanceContainerLocal implements SimulationManager {
     @Override
     public void pause() throws GSimEngineException {
         try {
-            for (Controller c : schedulers.values()) {
+            for (SimulationScheduler c : schedulers.values()) {
                 c.pause();
             }
         } catch (Exception e) {
@@ -123,7 +118,7 @@ public class SimulationInstanceContainerLocal implements SimulationManager {
     @Override
     public void resume() throws GSimEngineException {
         try {
-            for (Controller c : schedulers.values()) {
+            for (SimulationScheduler c : schedulers.values()) {
                 c.resume();
             }
         } catch (Exception e) {
@@ -134,7 +129,7 @@ public class SimulationInstanceContainerLocal implements SimulationManager {
     @Override
     public void shutdown() throws GSimEngineException {
 
-        for (Controller c : schedulers.values()) {
+        for (SimulationScheduler c : schedulers.values()) {
             try {
                 c.shutdown();
             } catch (Exception e) {
@@ -166,15 +161,11 @@ public class SimulationInstanceContainerLocal implements SimulationManager {
                 blockingSema.acquire();
             }
 
-            /*
-             * if (SimulationInstanceContainerLocal.instances.size() > SimulationInstanceContainerLocal.instanceCountLimit) { throw new
-             * GSimEngineException( "The limit of simultaneous running models is reached (limit=" + instanceCountLimit + ")"); }
-             */
             ModelCoordinatorLocal mc = new ModelCoordinatorLocal(env, props);
-            StandaloneController c = new StandaloneController(mc);
+            StandaloneScheduler c = new StandaloneScheduler(mc);
 
             Listener l = new Listener();
-            SimulationID uid = mc.getId();
+            SimulationId uid = mc.getId();
             schedulers.put(uid, c);
             listening.put(l, mc);
             c.registerSimulationInstanceListener(l);
@@ -188,7 +179,7 @@ public class SimulationInstanceContainerLocal implements SimulationManager {
         }
     }
 
-    private void finishInstance(Listener listener, SimulationID uid) {
+    private void finishInstance(Listener listener, SimulationId uid) {
 
         Simulation instance = listening.remove(listener);
 
@@ -201,7 +192,7 @@ public class SimulationInstanceContainerLocal implements SimulationManager {
 
             try {
                 ((Steppable) svm).destroy();
-                Controller c = schedulers.remove(uid);
+                SimulationScheduler c = schedulers.remove(uid);
                 c.shutdown();
                 c = null;
             } catch (Exception e) {
@@ -235,20 +226,20 @@ public class SimulationInstanceContainerLocal implements SimulationManager {
         }
     }
 
-    private void notifyInstanceFinished(SimulationID uid) {
-        for (de.s2.gsim.core.SimulationListener l : listeners) {
+    private void notifyInstanceFinished(SimulationId uid) {
+        for (de.s2.gsim.sim.SimulationListener l : listeners) {
             l.instanceFinished(uid.toString());
         }
     }
 
-    private void notifyInstanceStep(SimulationID uid, int step) {
-        for (de.s2.gsim.core.SimulationListener l : listeners) {
+    private void notifyInstanceStep(SimulationId uid, int step) {
+        for (de.s2.gsim.sim.SimulationListener l : listeners) {
             l.instanceStep(uid.toString(), step);
         }
     }
 
     private void notifySimulationFinished() {
-        for (de.s2.gsim.core.SimulationListener l : listeners) {
+        for (de.s2.gsim.sim.SimulationListener l : listeners) {
             l.simulationFinished(ns);
         }
 
@@ -264,12 +255,12 @@ public class SimulationInstanceContainerLocal implements SimulationManager {
         return res;
     }
 
-    private class Listener implements de.s2.gsim.sim.engine.SimulationInstanceListener {
+    private class Listener implements SimulationInstanceListener {
 
         @Override
         public void onStep(long step) {
             Simulation instance = listening.get(this);
-            for (SimulationID uid : sims.keySet()) {
+            for (SimulationId uid : sims.keySet()) {
                 Simulation svm = sims.get(uid);
                 if (svm == instance) {
                     if (steps == step) {
@@ -280,6 +271,28 @@ public class SimulationInstanceContainerLocal implements SimulationManager {
                 }
             }
         }
+    }
+
+    @Override
+    public void clearListeners() {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public SimulationId[] getSimulationInstances() {
+        Collection<SimulationId> ids = this.sims.keySet();
+        return ids.toArray(new SimulationId[0]);
+    }
+
+    @Override
+    public Steppable getSimulationScheduler(SimulationId id) {
+        return this.schedulers.get(id).getSteppable();
+    }
+
+    @Override
+    public void unregisterSimulationListener(SimulationListener listener) {
+        this.listeners.remove(listener);
     }
 
 }

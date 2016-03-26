@@ -5,6 +5,7 @@ import java.util.HashSet;
 
 import org.apache.log4j.Logger;
 
+import de.s2.gsim.api.sim.agent.impl.RuntimeAgent;
 import de.s2.gsim.objects.attribute.Attribute;
 import de.s2.gsim.objects.attribute.IntervalAttribute;
 import gsim.def.objects.Instance;
@@ -16,7 +17,6 @@ import gsim.def.objects.behaviour.ExpansionDef;
 import gsim.def.objects.behaviour.RLRule;
 import gsim.def.objects.behaviour.RLRuleFrame;
 import gsim.def.objects.behaviour.UserRuleFrame;
-import gsim.sim.agent.RuntimeAgent;
 import gsim.util.Utils;
 import jess.Deftemplate;
 import jess.Fact;

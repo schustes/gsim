@@ -25,19 +25,11 @@ import gsim.def.objects.behaviour.UserRuleFrame;
 
 public class Environment extends EnvironmentBase implements java.io.Serializable {
 
-    public static final int RAND_ATT_AND_WEIGHT = 1;
-
-    public static final int RAND_ATT_AND_WEIGHT_UNIFORM = 5;
-
     public static final int RAND_ATT_ONLY = 2;
 
     public static final int RAND_ATT_ONLY_UNIFORM = 6;
 
     public static final int RAND_NONE = 4;
-
-    public static final int RAND_WEIGHT_ONLY = 3;
-
-    public static final int RAND_WEIGHT_ONLY_UNIFORM = 7;
 
     protected static Logger logger = Logger.getLogger(Environment.class);
 
@@ -495,20 +487,11 @@ public class Environment extends EnvironmentBase implements java.io.Serializable
 
         if (method != Environment.RAND_NONE) {
             Generator gen = new Generator();
-            if (method == Environment.RAND_ATT_AND_WEIGHT) {
-                a = gen.randomiseAttributeValuesAndWeights(a, svar, Generator.Method.Normal);
-            } else if (method == Environment.RAND_ATT_ONLY) {
+            if (method == Environment.RAND_ATT_ONLY) {
                 a = gen.randomiseAttributeValues(a, svar, Generator.Method.Normal);
-            } else if (method == Environment.RAND_WEIGHT_ONLY) {
-                a = gen.randomiseAttributeWeights(a, svar, Generator.Method.Normal);
-            } else if (method == Environment.RAND_ATT_AND_WEIGHT_UNIFORM) {
-                a = gen.randomiseAttributeValuesAndWeights(a, svar, Generator.Method.Uniform);
-            } else if (method == Environment.RAND_WEIGHT_ONLY_UNIFORM) {
-                a = gen.randomiseAttributeWeights(a, svar, Generator.Method.Uniform);
             } else if (method == Environment.RAND_ATT_ONLY_UNIFORM) {
                 a = gen.randomiseAttributeValues(a, svar, Generator.Method.Uniform);
             }
-
         }
         agents.add(a);
         return (GenericAgent) a.clone();
