@@ -1,7 +1,5 @@
 package de.s2.gsim.def;
 
-import java.io.Serializable;
-
 import de.s2.gsim.GSimException;
 import de.s2.gsim.objects.AgentClass;
 import de.s2.gsim.objects.AgentInstance;
@@ -19,7 +17,7 @@ import de.s2.gsim.objects.ObjectInstance;
  * @author Stephan
  *
  */
-public interface ModelDefinitionEnvironment extends Serializable {
+public interface ModelDefinitionEnvironment {
 
     /**
      * Constant for creating random attributes and weights (weights are only for fuzzy matching utility) during instanciation using a normal

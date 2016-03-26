@@ -14,7 +14,7 @@ import java.util.Random;
 
 import org.apache.log4j.Logger;
 
-import de.s2.gsim.api.impl.EnvLocalImpl;
+import de.s2.gsim.api.impl.EnvironmentWrapper;
 import de.s2.gsim.api.sim.agent.impl.ApplicationAgentImpl;
 import de.s2.gsim.api.sim.agent.impl.RuntimeAgent;
 import de.s2.gsim.def.ModelDefinitionEnvironment;
@@ -304,7 +304,7 @@ public class ModelCoordinatorLocal implements Simulation, Steppable {
 
     @Override
     public ModelDefinitionEnvironment getDefinitionEnvironment() throws GSimEngineException {
-        EnvLocalImpl impl = new EnvLocalImpl(env);
+        EnvironmentWrapper impl = new EnvironmentWrapper(env);
         return impl;
     }
 

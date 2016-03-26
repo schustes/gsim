@@ -20,15 +20,17 @@ import gsim.def.objects.Instance;
 import gsim.def.objects.agent.GenericAgent;
 import gsim.def.objects.agent.GenericAgentClass;
 
-public abstract class AbstractEnv implements ModelDefinitionEnvironment {
+/**
+ * This class hides the interna of the gsim frame and instance approach and exports only more comprehensible objects that the api publishes.
+ * 
+ * @author stephan
+ *
+ */
+public class EnvironmentWrapper implements ModelDefinitionEnvironment {
 
-    /**
-     *
-     */
-    private static final long serialVersionUID = 1L;
     protected Environment env;
 
-    public AbstractEnv(Environment env) {
+    public EnvironmentWrapper(Environment env) {
         this.env = env;
     }
 
@@ -72,10 +74,6 @@ public abstract class AbstractEnv implements ModelDefinitionEnvironment {
                 }
             }
 
-            if (g == null) {
-                throw new GSimException("No parent with name " + parent + " found.");
-            }
-
             Frame newObjectClass = env.createObjectSubClass(name, g);
             return new ObjectClassDef(env, newObjectClass);
 
@@ -93,9 +91,6 @@ public abstract class AbstractEnv implements ModelDefinitionEnvironment {
             throw new GSimException("Exception", e);
         }
     }
-
-    @Override
-    public abstract void destroy();
 
     public InheritanceHierarchy[] exportAgentHierarchy() throws GSimException {
         try {
@@ -432,6 +427,12 @@ public abstract class AbstractEnv implements ModelDefinitionEnvironment {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public void destroy() {
+        // TODO Auto-generated method stub
+
     }
 
 }

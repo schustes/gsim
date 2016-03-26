@@ -48,9 +48,7 @@ public class SimCoreLocalImpl implements GSimCore {
     public ModelDefinitionEnvironment create(String ns, Map<?, ?> props) {
         try {
             this.ns = ns;
-            Environment env = Environment.newInstance(ns);
-            EnvLocalImpl impl = new EnvLocalImpl(env);
-            return impl;
+            return new EnvironmentWrapper(Environment.newInstance(ns));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -66,7 +64,7 @@ public class SimCoreLocalImpl implements GSimCore {
 
             Logger.getLogger(SimCoreLocalImpl.class).debug(env);
 
-            EnvLocalImpl impl = new EnvLocalImpl(env);
+            EnvironmentWrapper impl = new EnvironmentWrapper(env);
             return impl;
         } catch (Exception e) {
             e.printStackTrace();
@@ -103,9 +101,10 @@ public class SimCoreLocalImpl implements GSimCore {
     @Override
     public SimulationController createScenarioManager(ModelDefinitionEnvironment env, Map props, int steps, int runs) throws GSimException {
 
-        if (env instanceof EnvLocalImpl) {
-            // SimulationController m = new SimulationInstanceContainerLocal(((EnvLocalImpl) env).getComplicatedInterface(), props, steps, runs);
-            SimulationController m = new SimulationInstanceContainerLocal(((EnvLocalImpl) env).getComplicatedInterface(), this.ns, props, steps,
+        if (env instanceof EnvironmentWrapper) {
+            // SimulationController m = new SimulationInstanceContainerLocal(((EnvironmentWrapper) env).getComplicatedInterface(), props, steps,
+            // runs);
+            SimulationController m = new SimulationInstanceContainerLocal(((EnvironmentWrapper) env).getComplicatedInterface(), this.ns, props, steps,
                     runs);
             return m;
         } else {
@@ -188,7 +187,7 @@ public class SimCoreLocalImpl implements GSimCore {
     public ModelDefinitionEnvironment open(String ns, InputStream setup, HashMap props) {
         try {
             Environment env = Environment.openInstance(ns, setup);
-            EnvLocalImpl impl = new EnvLocalImpl(env);
+            EnvironmentWrapper impl = new EnvironmentWrapper(env);
             return impl;
         } catch (Exception e) {
             e.printStackTrace();
