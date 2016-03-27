@@ -1,6 +1,14 @@
 package de.s2.gsim.api.impl;
 
+import gsim.def.Environment;
+import gsim.def.InheritanceHierarchy;
+import gsim.def.objects.Frame;
+import gsim.def.objects.Instance;
+import gsim.def.objects.agent.GenericAgent;
+import gsim.def.objects.agent.GenericAgentClass;
+
 import java.util.ArrayList;
+import java.util.List;
 
 import de.s2.gsim.GSimException;
 import de.s2.gsim.api.objects.impl.AgentClassDef;
@@ -13,12 +21,6 @@ import de.s2.gsim.objects.AgentClass;
 import de.s2.gsim.objects.AgentInstance;
 import de.s2.gsim.objects.ObjectClass;
 import de.s2.gsim.objects.ObjectInstance;
-import gsim.def.Environment;
-import gsim.def.InheritanceHierarchy;
-import gsim.def.objects.Frame;
-import gsim.def.objects.Instance;
-import gsim.def.objects.agent.GenericAgent;
-import gsim.def.objects.agent.GenericAgentClass;
 
 /**
  * This class hides the interna of the gsim frame and instance approach and exports only more comprehensible objects that the api publishes.
@@ -115,7 +117,7 @@ public class EnvironmentWrapper implements ModelDefinitionEnvironment {
             GenericAgent a = env.getAgent(name);
 
             if (a == null) {
-                return null;
+            	throw new GSimException("No agent with name " + name + " found!");
             }
 
             AgentInstanceDef agent = new AgentInstanceDef(env, a);
@@ -134,8 +136,7 @@ public class EnvironmentWrapper implements ModelDefinitionEnvironment {
             GenericAgentClass a = env.getAgentSubClass(name);
 
             if (a == null) {
-                return null; // if proxy mode to prevent too massive
-                             // serialisation!
+            	throw new GSimException("No agent with name " + name + " found!");
             }
 
             return new AgentClassDef(env, a);
@@ -150,12 +151,11 @@ public class EnvironmentWrapper implements ModelDefinitionEnvironment {
             if (parent == null) {
                 GenericAgentClass[] gc = env.getAgentSubClasses();
                 AgentClassDef[] res = new AgentClassDef[gc.length];
-
-                if (res == null) {
-                    return null; // if proxy mode to prevent too massive
-                                 // serialisation!
-                }
-
+                
+//                List<GenericAgentClass> list = new ArrayList<>();
+//                List<AgentClassDef> defList = new ArrayList<>();
+//                list.stream().parallel().forEach(real -> defList.add(new AgentClassDef(env, real)));
+                
                 for (int i = 0; i < gc.length; i++) {
                     AgentClassDef ac = new AgentClassDef(env, gc[i]);
                     res[i] = ac;
