@@ -4,8 +4,8 @@ import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
 
-import de.s2.gsim.def.objects.Frame;
-import de.s2.gsim.def.objects.Instance;
+import de.s2.gsim.def.objects.FrameOLD;
+import de.s2.gsim.def.objects.InstanceOLD;
 import de.s2.gsim.def.objects.UnitUtils;
 import de.s2.gsim.objects.attribute.Attribute;
 import de.s2.gsim.objects.attribute.NumericalAttribute;
@@ -18,11 +18,11 @@ public class RLRule extends UserRule {
 
     private static final long serialVersionUID = 1L;
 
-    public RLRule(Frame parent, String name) {
+    public RLRule(FrameOLD parent, String name) {
         super(parent, name);
     }
 
-    public RLRule(Instance inst) {
+    public RLRule(InstanceOLD inst) {
         super(inst);
     }
 
@@ -41,7 +41,7 @@ public class RLRule extends UserRule {
     }
 
     public void addTest(DependencyTest test) {
-        Instance in = this.getChildInstance(RLRuleFrame.INST_LIST_TESTS, "TestCollection");
+        InstanceOLD in = this.getChildInstance(RLRuleFrame.INST_LIST_TESTS, "TestCollection");
         DependencyTestDefinition fr = null;
         if (in != null) {
             fr = new DependencyTestDefinition(in);
@@ -75,7 +75,7 @@ public class RLRule extends UserRule {
     }
 
     public ConditionDef getEvaluationFunction() {
-        Instance[] inst = getChildInstances(RLRuleFrame.INST_LIST_LEARNING);
+        InstanceOLD[] inst = getChildInstances(RLRuleFrame.INST_LIST_LEARNING);
         ArrayList list = new ArrayList();
         for (int i = 0; i < inst.length; i++) {
             if (!inst[i].getName().startsWith("{")) {
@@ -95,7 +95,7 @@ public class RLRule extends UserRule {
     }
 
     public ExpansionDef[] getExpansions() {
-        Instance[] f = super.getChildInstances(RLRuleFrame.INST_LIST_EXP);
+        InstanceOLD[] f = super.getChildInstances(RLRuleFrame.INST_LIST_EXP);
         ExpansionDef[] e = new ExpansionDef[f.length];
         for (int i = 0; i < f.length; i++) {
             e[i] = new ExpansionDef(f[i]);
@@ -114,7 +114,7 @@ public class RLRule extends UserRule {
     }
 
     public UserRule[] getShortSelectionRules() {
-        Instance[] f = super.getChildInstances(RLRuleFrame.INST_LIST_SHORTCUTS);
+        InstanceOLD[] f = super.getChildInstances(RLRuleFrame.INST_LIST_SHORTCUTS);
         UserRule[] res = new UserRule[f.length];
         for (int i = 0; i < f.length; i++) {
             res[i] = new UserRule(f[i]);
@@ -144,7 +144,7 @@ public class RLRule extends UserRule {
     }
 
     public DependencyTest[] getTests() {
-        Instance x = this.getChildInstance(RLRuleFrame.INST_LIST_TESTS, "TestCollection");
+        InstanceOLD x = this.getChildInstance(RLRuleFrame.INST_LIST_TESTS, "TestCollection");
         if (x != null) {
             DependencyTestDefinition fr = new DependencyTestDefinition(x);
             if (fr != null) {
@@ -223,7 +223,7 @@ public class RLRule extends UserRule {
     }
 
     public void setEvaluationFunction(ConditionDef f) {
-        for (Instance a : super.getChildInstances(RLRuleFrame.INST_LIST_LEARNING)) {
+        for (InstanceOLD a : super.getChildInstances(RLRuleFrame.INST_LIST_LEARNING)) {
             super.removeChildInstance(RLRuleFrame.INST_LIST_LEARNING, a.getName());
         }
         super.addChildInstance(RLRuleFrame.INST_LIST_LEARNING, f);

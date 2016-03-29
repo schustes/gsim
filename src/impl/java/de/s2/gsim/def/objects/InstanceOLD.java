@@ -17,11 +17,11 @@ import de.s2.gsim.objects.attribute.DomainAttribute;
  * until it is found.
  *
  */
-public class Instance extends Unit {
+public class InstanceOLD extends UnitOLD {
 
     static final long serialVersionUID = 28914532862520612L;
 
-    protected Frame frame = null;
+    protected FrameOLD frame = null;
 
     /**
      * Copy constructor.
@@ -29,7 +29,7 @@ public class Instance extends Unit {
      * @param inst
      *            Instance
      */
-    public Instance(Instance inst) {
+    public InstanceOLD(InstanceOLD inst) {
 
         name = inst.getName();
         frame = inst.getDefinition();
@@ -47,12 +47,12 @@ public class Instance extends Unit {
         String[] allchildren = inst.getChildInstanceListNames();
 
         for (int i = 0; i < allchildren.length; i++) {
-            TypedList list = inst.getDefinition().getList(allchildren[i]);// (TypedList)inst.getDefinition().objectLists.get(allchildren[i]);
-            Frame fr = list.getType();
-            objectLists.put(allchildren[i], new TypedList(fr));
-            Instance[] instances = inst.getChildInstances(allchildren[i]);
+            TypedListOLD list = inst.getDefinition().getList(allchildren[i]);// (TypedList)inst.getDefinition().objectLists.get(allchildren[i]);
+            FrameOLD fr = list.getType();
+            objectLists.put(allchildren[i], new TypedListOLD(fr));
+            InstanceOLD[] instances = inst.getChildInstances(allchildren[i]);
             for (int j = 0; j < instances.length; j++) {
-                addChildInstance(allchildren[i], new Instance(instances[j]));
+                addChildInstance(allchildren[i], new InstanceOLD(instances[j]));
             }
         }
 
@@ -61,7 +61,7 @@ public class Instance extends Unit {
         isDirty = false;
     }
 
-    public Instance(Instance inst, String newName) {
+    public InstanceOLD(InstanceOLD inst, String newName) {
         name = newName;
         frame = inst.getDefinition();
 
@@ -80,14 +80,14 @@ public class Instance extends Unit {
         String[] allchildren = inst.getChildInstanceListNames();
 
         for (int i = 0; i < allchildren.length; i++) {
-            TypedList list = (TypedList) inst.getDefinition().getObjectLists().get(allchildren[i]);
-            Frame fr = list.getType();
-            objectLists.put(allchildren[i], new TypedList(fr));
+            TypedListOLD list = (TypedListOLD) inst.getDefinition().getObjectLists().get(allchildren[i]);
+            FrameOLD fr = list.getType();
+            objectLists.put(allchildren[i], new TypedListOLD(fr));
 
-            Instance[] instances = inst.getChildInstances(allchildren[i]);
+            InstanceOLD[] instances = inst.getChildInstances(allchildren[i]);
             if (instances != null) {
                 for (int j = 0; j < instances.length; j++) {
-                    addChildInstance(allchildren[i], new Instance(instances[j]));
+                    addChildInstance(allchildren[i], new InstanceOLD(instances[j]));
                 }
             }
         }
@@ -109,14 +109,14 @@ public class Instance extends Unit {
      * @param id
      *            int
      */
-    public Instance(@NotNull String name, @NotNull Frame frame) {
+    public InstanceOLD(@NotNull String name, @NotNull FrameOLD frame) {
         this.name = name;
         this.frame = frame;
         instanciate(frame);
         setDirty(true);
     }
 
-    protected Instance() {
+    protected InstanceOLD() {
         super();
     }
 
@@ -129,9 +129,9 @@ public class Instance extends Unit {
      *            Instance
      */
 
-    public void addChildInstance(String listname, Instance instance) {
+    public void addChildInstance(String listname, InstanceOLD instance) {
 
-        Instance n = (Instance) instance.clone(); // new Instance(instance);
+        InstanceOLD n = (InstanceOLD) instance.clone(); // new Instance(instance);
 
         if (frame.containsChildFrame(listname, instance.getDefinition())) {
             ArrayList list = (ArrayList) objectLists.get(listname);
@@ -156,8 +156,8 @@ public class Instance extends Unit {
     }
 
     @Override
-    public Object clone() {
-        Instance in = new Instance(this);
+    public InstanceOLD clone() {
+        InstanceOLD in = new InstanceOLD(this);
 
         String[] attrListNames = getAttributesListNames();
 
@@ -171,9 +171,9 @@ public class Instance extends Unit {
         String[] allchildren = getChildInstanceListNames();
 
         for (int i = 0; i < allchildren.length; i++) {
-            Instance[] instances = getChildInstances(allchildren[i]);
+            InstanceOLD[] instances = getChildInstances(allchildren[i]);
             for (int j = 0; j < instances.length; j++) {
-                in.addChildInstance(allchildren[i], new Instance(instances[j]));
+                in.addChildInstance(allchildren[i], new InstanceOLD(instances[j]));
             }
         }
 
@@ -185,10 +185,10 @@ public class Instance extends Unit {
 
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof Instance)) {
+        if (!(o instanceof InstanceOLD)) {
             return false;
         }
-        return (((Instance) o).getName().equals(getName()));
+        return (((InstanceOLD) o).getName().equals(getName()));
     }
 
     /**
@@ -272,9 +272,9 @@ public class Instance extends Unit {
      * @return Instance
      */
 
-    public  Instance getChildInstance(String name) {
+    public  InstanceOLD getChildInstance(String name) {
         String[] listNames = getChildInstanceListNames();
-        Instance result = null;
+        InstanceOLD result = null;
         for (int i = 0; i < listNames.length; i++) {
             result = this.getChildInstance(listNames[i], name);
             if (result != null) {
@@ -294,12 +294,12 @@ public class Instance extends Unit {
      * @return Instance
      */
 
-    public  Instance getChildInstance(String listname, String name) {
+    public  InstanceOLD getChildInstance(String listname, String name) {
         ArrayList list = (ArrayList) objectLists.get(listname);
         if (list != null) {
             Iterator iter = list.iterator();
             while (iter.hasNext()) {
-                Instance instance = (Instance) iter.next();
+                InstanceOLD instance = (InstanceOLD) iter.next();
                 if (instance.getName().equals(name)) {
                     return instance;
                 }
@@ -310,8 +310,8 @@ public class Instance extends Unit {
                 ArrayList l = (ArrayList) iter.next();
                 Iterator it = l.iterator();
                 while (it.hasNext()) {
-                    Instance inst = (Instance) it.next();
-                    Instance pass = inst.getChildInstance(listname, name);
+                    InstanceOLD inst = (InstanceOLD) it.next();
+                    InstanceOLD pass = inst.getChildInstance(listname, name);
                     if (pass != null) {
                         return pass;
                     }
@@ -339,11 +339,11 @@ public class Instance extends Unit {
      * @return Instance[]
      */
 
-    public  Instance[] getChildInstances(String listname) {
+    public  InstanceOLD[] getChildInstances(String listname) {
         listname = listname.trim();
         ArrayList list = (ArrayList) objectLists.get(listname.trim());
         if (list != null) {
-            Instance[] in = new Instance[list.size()];
+            InstanceOLD[] in = new InstanceOLD[list.size()];
             list.toArray(in);
             return in;
         }
@@ -352,15 +352,15 @@ public class Instance extends Unit {
             Object o = iter.next();
             ArrayList l = (ArrayList) o;
             for (int i = 0; i < l.size(); i++) {
-                Instance inst = (Instance) l.get(i);
-                Instance[] pass = inst.getChildInstances(listname);
+                InstanceOLD inst = (InstanceOLD) l.get(i);
+                InstanceOLD[] pass = inst.getChildInstances(listname);
                 if (pass != null) {
                     return pass;
                 }
             }
         }
 
-        return new Instance[0];
+        return new InstanceOLD[0];
     }
 
     /**
@@ -369,7 +369,7 @@ public class Instance extends Unit {
      * @return Frame
      */
 
-    public  Frame getDefinition() {
+    public  FrameOLD getDefinition() {
         return frame;
     }
 
@@ -381,7 +381,7 @@ public class Instance extends Unit {
      * @return boolean
      */
 
-    public  boolean inheritsFrom(Frame f) {
+    public  boolean inheritsFrom(FrameOLD f) {
         return this.inheritsFrom(f.getTypeName());
     }
 
@@ -398,7 +398,7 @@ public class Instance extends Unit {
         if (frame.getTypeName().equals(f)) {
             return true;
         } else {
-            Frame anyOther = frame.getAncestor(f);
+            FrameOLD anyOther = frame.getAncestor(f);
             if (anyOther != null) {
                 return true;
             }
@@ -439,13 +439,13 @@ public class Instance extends Unit {
      */
 
     public  void removeChildInstance(String listname, String instanceName) {
-        Instance instance = this.getChildInstance(listname, instanceName);
+        InstanceOLD instance = this.getChildInstance(listname, instanceName);
         if (frame.containsChildFrame(listname, instance.getDefinition())) {
             ArrayList list = (ArrayList) objectLists.get(listname);
             if (list != null) {
                 ListIterator iter = list.listIterator();
                 while (iter.hasNext()) {
-                    Instance inst = (Instance) iter.next();
+                    InstanceOLD inst = (InstanceOLD) iter.next();
                     if (inst.getName().equals(instance.getName())) {
                         iter.remove();
                         setDirty(true);
@@ -454,7 +454,7 @@ public class Instance extends Unit {
             } else {
                 Iterator iter = objectLists.values().iterator();
                 while (iter.hasNext()) {
-                    Instance inst = (Instance) iter.next();
+                    InstanceOLD inst = (InstanceOLD) iter.next();
                     inst.removeChildInstance(listname, instanceName);
                 }
             }
@@ -486,7 +486,7 @@ public class Instance extends Unit {
             if (path.length == 2) {
                 return this.getChildInstance(path[0], path[1]);
             } else if (path.length > 2) {
-                Instance inst = this.getChildInstance(path[0], path[1]);
+                InstanceOLD inst = this.getChildInstance(path[0], path[1]);
                 if (inst != null) {
                     String[] nPath = new String[path.length - 2];
                     for (int i = 2; i < path.length; i++) {
@@ -576,11 +576,11 @@ public class Instance extends Unit {
      *            Instance
      */
 
-    public  void setChildInstance(Instance instance) {
+    public  void setChildInstance(InstanceOLD instance) {
         String[] names = getChildInstanceListNames();
         for (int i = 0; i < names.length; i++) {
             this.setChildInstance(names[i], instance);
-            Instance[] children = getChildInstances(names[i]);
+            InstanceOLD[] children = getChildInstances(names[i]);
             for (int j = 0; j < children.length; j++) {
                 children[j].setChildInstance(instance);
             }
@@ -596,14 +596,14 @@ public class Instance extends Unit {
      *            Instance
      */
 
-    public  void setChildInstance(String listname, Instance instance) {
+    public  void setChildInstance(String listname, InstanceOLD instance) {
 
         if (frame.definesChildList(listname)) {
             ArrayList list = (ArrayList) objectLists.get(listname);
             if (list != null) {
                 ListIterator iter = list.listIterator();
                 while (iter.hasNext()) {
-                    Instance inst = (Instance) iter.next();
+                    InstanceOLD inst = (InstanceOLD) iter.next();
                     if (inst.getName().equals(instance.getName())) {
                         iter.set(instance);
                         setDirty(true);
@@ -614,7 +614,7 @@ public class Instance extends Unit {
                 while (iter.hasNext()) {
                     ArrayList list2 = (ArrayList) iter.next();
                     for (int i = 0; i < list2.size(); i++) {
-                        Instance inst = (Instance) list2.get(i);
+                        InstanceOLD inst = (InstanceOLD) list2.get(i);
                         inst.setChildInstance(listname, instance);
                     }
                 }
@@ -625,13 +625,13 @@ public class Instance extends Unit {
     /**
      * Set a parent somewhere in the definition frame hierarchy. By ref!
      */
-    public  void setFrame(Frame parent) {
+    public  void setFrame(FrameOLD parent) {
         if (parent == null) {
             return;
         }
 
-        Frame n = parent;
-        Frame f = getDefinition();
+        FrameOLD n = parent;
+        FrameOLD f = getDefinition();
         if (f.getTypeName().equals(parent.getTypeName())) {
             frame = n;
         } else {
@@ -647,7 +647,7 @@ public class Instance extends Unit {
      * @param frame
      *            Frame
      */
-    protected  void instanciate(Frame frame) {
+    protected  void instanciate(FrameOLD frame) {
         this.frame = frame; // by ref???
         String[] listnames = frame.getAttributesListNames();
         for (int i = 0; i < listnames.length; i++) {
@@ -664,19 +664,19 @@ public class Instance extends Unit {
         String[] allchildren = frame.getChildFrameListNames();
         for (int i = 0; i < allchildren.length; i++) {
             String listname = allchildren[i];
-            TypedList l = frame.getList(allchildren[i]);
-            Frame def = l.getType();
-            Frame[] dep = frame.getChildFrames(allchildren[i]);
-            TypedList list = new TypedList(def);
+            TypedListOLD l = frame.getList(allchildren[i]);
+            FrameOLD def = l.getType();
+            FrameOLD[] dep = frame.getChildFrames(allchildren[i]);
+            TypedListOLD list = new TypedListOLD(def);
 
             for (int j = 0; j < dep.length; j++) {
-                Instance ii = null;
+                InstanceOLD ii = null;
                 if (dep[j] != null && !dep[j].getTypeName().startsWith("{")) {
-                    ii = new Instance(dep[j].getTypeName(), dep[j]);
+                    ii = new InstanceOLD(dep[j].getTypeName(), dep[j]);
                 }
 
                 if (objectLists.containsKey(listname)) {
-                    list = (TypedList) objectLists.get(listname);
+                    list = (TypedListOLD) objectLists.get(listname);
                 }
                 if (ii != null) {
                     list.add(ii);
@@ -709,7 +709,7 @@ public class Instance extends Unit {
      * @param frame
      *            Frame
      */
-    private void modifyInheritanceByNewFrame(Frame frame) {
+    private void modifyInheritanceByNewFrame(FrameOLD frame) {
         this.frame = frame; // by ref???
         String[] listnames = frame.getAttributesListNames();
         for (int i = 0; i < listnames.length; i++) {
@@ -744,18 +744,18 @@ public class Instance extends Unit {
         for (int i = 0; i < allchildren.length; i++) {
             if (!objectLists.containsKey(allchildren[i])) {
                 String listname = allchildren[i];
-                Frame[] dep = frame.getChildFrames(allchildren[i]);
+                FrameOLD[] dep = frame.getChildFrames(allchildren[i]);
                 for (int j = 0; j < dep.length; j++) {
-                    Instance ii = null;
+                    InstanceOLD ii = null;
                     if (dep[j] != null && !dep[j].getTypeName().startsWith("{")) {
-                        ii = new Instance(dep[j].getTypeName(), dep[j]);
+                        ii = new InstanceOLD(dep[j].getTypeName(), dep[j]);
                     }
-                    TypedList list = (TypedList) objectLists.get(listname);
+                    TypedListOLD list = (TypedListOLD) objectLists.get(listname);
 
                     if (list == null) {
-                        TypedList l = frame.getList(listname);
-                        Frame fr = l.getType();
-                        list = new TypedList(fr);
+                        TypedListOLD l = frame.getList(listname);
+                        FrameOLD fr = l.getType();
+                        list = new TypedListOLD(fr);
                     }
 
                     if (ii != null) {

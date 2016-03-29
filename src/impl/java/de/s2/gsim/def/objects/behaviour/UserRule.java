@@ -1,7 +1,7 @@
 package de.s2.gsim.def.objects.behaviour;
 
-import de.s2.gsim.def.objects.Frame;
-import de.s2.gsim.def.objects.Instance;
+import de.s2.gsim.def.objects.FrameOLD;
+import de.s2.gsim.def.objects.InstanceOLD;
 import de.s2.gsim.objects.attribute.Attribute;
 import de.s2.gsim.objects.attribute.AttributeType;
 import de.s2.gsim.objects.attribute.DomainAttribute;
@@ -12,11 +12,11 @@ import de.s2.gsim.objects.attribute.StringAttribute;
  * A userrule is a OR-connected rule with AND connected conditions. For example, the user specifies if a and b then c or d: This gets translated into
  * two rules if a and b then c and if a and b then d. WHich rule is used is solved either by conflict resolution or success (preferred).
  */
-public class UserRule extends Instance {
+public class UserRule extends InstanceOLD {
 
     static final long serialVersionUID = 3338801064775642635L;
 
-    public UserRule(Frame parent, String name) {
+    public UserRule(FrameOLD parent, String name) {
         super(name, parent);
         DomainAttribute a = parent.getAttribute("state-var");
         SetAttribute set = (SetAttribute) this.getAttribute("state-var");
@@ -28,7 +28,7 @@ public class UserRule extends Instance {
         }
     }
 
-    public UserRule(Instance inst) {
+    public UserRule(InstanceOLD inst) {
         super(inst);
         if (this.getAttribute(UserRuleFrame.ATTR_LIST_ATTRS, "activated") == null) {
             DomainAttribute a = new DomainAttribute("activated", AttributeType.STRING);
@@ -110,7 +110,7 @@ public class UserRule extends Instance {
     }
 
     public ConditionDef[] getConditions() {
-        Instance[] inst = getChildInstances(UserRuleFrame.INST_LIST_COND);
+        InstanceOLD[] inst = getChildInstances(UserRuleFrame.INST_LIST_COND);
 
         if (inst == null) {
             return new ConditionDef[0];
@@ -125,7 +125,7 @@ public class UserRule extends Instance {
     }
 
     public ActionDef[] getConsequences() {
-        Instance[] inst = getChildInstances(UserRuleFrame.INST_LIST_CONS);
+        InstanceOLD[] inst = getChildInstances(UserRuleFrame.INST_LIST_CONS);
         ActionDef[] cons = new ActionDef[inst.length];
         for (int i = 0; i < cons.length; i++) {
             cons[i] = new ActionDef(inst[i]);
@@ -134,7 +134,7 @@ public class UserRule extends Instance {
     }
 
     public ActionDef getConsequent(String name) {
-        Instance[] inst = getChildInstances(UserRuleFrame.INST_LIST_CONS);
+        InstanceOLD[] inst = getChildInstances(UserRuleFrame.INST_LIST_CONS);
         for (int i = 0; i < inst.length; i++) {
             if (inst[i].getName().equals(name)) {
                 return new ActionDef(inst[i]);

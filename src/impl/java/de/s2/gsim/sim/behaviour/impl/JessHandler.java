@@ -12,8 +12,8 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 
 import de.s2.gsim.api.sim.agent.impl.RuntimeAgent;
-import de.s2.gsim.def.objects.Frame;
-import de.s2.gsim.def.objects.Instance;
+import de.s2.gsim.def.objects.FrameOLD;
+import de.s2.gsim.def.objects.InstanceOLD;
 import de.s2.gsim.def.objects.agent.BehaviourFrame;
 import de.s2.gsim.def.objects.agent.GenericAgentClass;
 import de.s2.gsim.def.objects.behaviour.ActionDef;
@@ -497,7 +497,7 @@ public class JessHandler implements java.io.Serializable {
     }
 
     private void addNewActions() throws JessException {
-        for (Instance r : owner.getBehaviour().getChildInstances(BehaviourFrame.RL_LIST)) {
+        for (InstanceOLD r : owner.getBehaviour().getChildInstances(BehaviourFrame.RL_LIST)) {
             String sfn = r.getName() + "_0" + 0;
             FactHandler.getInstance().insertNonExistentExecutedFinalFacts(rete, owner, new RLRule(r), sfn);
         }
@@ -607,7 +607,7 @@ public class JessHandler implements java.io.Serializable {
         if (path.contains("::")) {
             ConditionBuilder cb = new ConditionBuilder();
             String obj = cb.resolveObjectClass(path);
-            Frame f = (Frame) owner.getDefinition().resolveName(obj.split("/"));
+            FrameOLD f = (FrameOLD) owner.getDefinition().resolveName(obj.split("/"));
             if (f == null) {
                 String list = cb.resolveList(path);
                 f = owner.getDefinition().getListType(list);
@@ -689,8 +689,8 @@ public class JessHandler implements java.io.Serializable {
         if (def.getTypeName().equals(role)) {
 
         } else {
-            Frame[] ancestors = def.getAncestors();
-            for (Frame f : ancestors) {
+            FrameOLD[] ancestors = def.getAncestors();
+            for (FrameOLD f : ancestors) {
                 GenericAgentClass agentClass = (GenericAgentClass) f;
                 if (agentClass.getTypeName().equals(role)) {
 
@@ -753,10 +753,10 @@ public class JessHandler implements java.io.Serializable {
 
     private void retractObsoleteActions() throws JessException {
 
-        for (Instance rule : owner.getBehaviour().getChildInstances(BehaviourFrame.RL_LIST)) {
+        for (InstanceOLD rule : owner.getBehaviour().getChildInstances(BehaviourFrame.RL_LIST)) {
             if (rule.getAttribute("retract-osbolete-actions") != null
                     && rule.getAttribute("retract-osbolete-actions").toValueString().equalsIgnoreCase("true")) {
-                for (Instance a : rule.getChildInstances(UserRuleFrame.INST_LIST_CONS)) {
+                for (InstanceOLD a : rule.getChildInstances(UserRuleFrame.INST_LIST_CONS)) {
                     ActionDef action = new ActionDef(a);
                     String[] params = action.getObjectClassParams();
 
@@ -764,9 +764,9 @@ public class JessHandler implements java.io.Serializable {
                     for (String s : params) {
                         String[] path = s.split("/");
                         String list = path[0];
-                        Instance[] children = owner.getChildInstances(list);
+                        InstanceOLD[] children = owner.getChildInstances(list);
                         for (int i = 0; i < children.length; i++) {
-                            Instance object = children[i];
+                            InstanceOLD object = children[i];
                             String name = list + "/" + object.getName();
 
                             if (arg == null) {

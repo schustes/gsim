@@ -3,7 +3,7 @@ package de.s2.gsim.def;
 import javax.management.ObjectInstance;
 
 import de.s2.gsim.api.objects.impl.UnitWrapper;
-import de.s2.gsim.def.objects.Instance;
+import de.s2.gsim.def.objects.InstanceOLD;
 import de.s2.gsim.def.objects.agent.GenericAgent;
 import de.s2.gsim.objects.attribute.Attribute;
 import de.s2.gsim.objects.attribute.DomainAttribute;
@@ -39,9 +39,9 @@ public class Generator {
             agent = (GenericAgent) this.randomiseAttributeValues(a, svar);
             String[] lists = a.getChildInstanceListNames();
             for (int i = 0; i < lists.length; i++) {
-                Instance[] inst = agent.getChildInstances(lists[i]);
+                InstanceOLD[] inst = agent.getChildInstances(lists[i]);
                 for (int j = 0; j < inst.length; j++) {
-                    Instance obj = this.randomiseAttributeValues(inst[j], svar);
+                    InstanceOLD obj = this.randomiseAttributeValues(inst[j], svar);
                     agent.setChildInstance(lists[i], obj);
                 }
             }
@@ -49,9 +49,9 @@ public class Generator {
             agent = (GenericAgent) this.randomiseAttributeValues(a);
             String[] lists = a.getChildInstanceListNames();
             for (int i = 0; i < lists.length; i++) {
-                Instance[] inst = agent.getChildInstances(lists[i]);
+                InstanceOLD[] inst = agent.getChildInstances(lists[i]);
                 for (int j = 0; j < inst.length; j++) {
-                    Instance obj = this.randomiseAttributeValues(inst[j]);
+                    InstanceOLD obj = this.randomiseAttributeValues(inst[j]);
                     agent.setChildInstance(lists[i], obj);
                 }
             }
@@ -62,18 +62,18 @@ public class Generator {
 
     public ObjectInstance randomiseAttributeValues(ObjectInstance a, double svar, Method method) {
         if (method.equals(Method.Normal)) {
-            Instance b = (Instance) ((UnitWrapper) a).toUnit();
+            InstanceOLD b = (InstanceOLD) ((UnitWrapper) a).toUnit();
             b = this.randomiseAttributeValues(b, svar);
             return a;
         } else {
-            Instance b = (Instance) ((UnitWrapper) a).toUnit();
+            InstanceOLD b = (InstanceOLD) ((UnitWrapper) a).toUnit();
             b = this.randomiseAttributeValues(b);
             return a;
         }
     }
 
 
-    private Instance randomiseAttributeValues(Instance obj) {
+    private InstanceOLD randomiseAttributeValues(InstanceOLD obj) {
 
         String[] lists = obj.getAttributesListNames();
 
@@ -133,7 +133,7 @@ public class Generator {
      *            double
      * @return Instance
      */
-    private Instance randomiseAttributeValues(Instance obj, double svar) {
+    private InstanceOLD randomiseAttributeValues(InstanceOLD obj, double svar) {
 
         String[] lists = obj.getAttributesListNames();
 

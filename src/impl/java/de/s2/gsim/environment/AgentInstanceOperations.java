@@ -16,8 +16,8 @@ import de.s2.gsim.def.Generator;
 import de.s2.gsim.def.InheritanceHierarchy;
 import de.s2.gsim.def.InstancePersistenceManager;
 import de.s2.gsim.def.TimeOrderedSet;
-import de.s2.gsim.def.objects.Frame;
-import de.s2.gsim.def.objects.Instance;
+import de.s2.gsim.def.objects.FrameOLD;
+import de.s2.gsim.def.objects.InstanceOLD;
 import de.s2.gsim.def.objects.UnitUtils;
 import de.s2.gsim.def.objects.agent.BehaviourDef;
 import de.s2.gsim.def.objects.agent.BehaviourFrame;
@@ -32,7 +32,7 @@ import de.s2.gsim.objects.attribute.Attribute;
 public class AgentInstanceOperations {
 
     public BehaviourFrame activateBehaviourRule(BehaviourFrame fr, UserRuleFrame ur, boolean activated) {
-        ListIterator<Frame> iter = behaviourClasses.listIterator();
+        ListIterator<FrameOLD> iter = behaviourClasses.listIterator();
         BehaviourFrame here = null;
         while (iter.hasNext()) {
             BehaviourFrame f = (BehaviourFrame) iter.next();
@@ -106,7 +106,7 @@ public class AgentInstanceOperations {
 
     }
 
-    public GenericAgent addChildInstance(GenericAgent a, String[] path, Instance child) {
+    public GenericAgent addChildInstance(GenericAgent a, String[] path, InstanceOLD child) {
         GenericAgent here = findGenericAgent(a.getName());
         UnitUtils.getInstance().setChildInstance(here, path, child);
         UserRule[] rules = here.getBehaviour().getRules();
@@ -118,7 +118,7 @@ public class AgentInstanceOperations {
         return (GenericAgent) here.clone();
     }
 
-    public GenericAgentClass addChildObjectList(GenericAgentClass owner, String listName, Frame type) throws GSimDefException {
+    public GenericAgentClass addChildObjectList(GenericAgentClass owner, String listName, FrameOLD type) throws GSimDefException {
         GenericAgentClass here = this.findGenericAgentClass(owner);
 
         here.defineObjectList(listName, type);
@@ -175,8 +175,8 @@ public class AgentInstanceOperations {
     public GenericAgent changeChildInstanceName(GenericAgentClass owner, String[] pathToChild, String newName) {
         GenericAgent old = findGenericAgent(owner.getName());
         Object o = old.resolveName(pathToChild);
-        if (o instanceof Instance) {
-            Instance in = (Instance) o;
+        if (o instanceof InstanceOLD) {
+            InstanceOLD in = (InstanceOLD) o;
             in.changeName(newName);
             UnitUtils.getInstance().setChildInstance(old, pathToChild, in);
         }
@@ -192,13 +192,13 @@ public class AgentInstanceOperations {
         HashMap<String, InheritanceHierarchy> nodes = new HashMap<String, InheritanceHierarchy>();
         ListIterator iter = agentSubClasses.listIterator();
 
-        Frame root = agentClass;
-        InheritanceHierarchy node = new InheritanceHierarchy((Frame) root.clone());
+        FrameOLD root = agentClass;
+        InheritanceHierarchy node = new InheritanceHierarchy((FrameOLD) root.clone());
         nodes.put(node.getFrame().getTypeName(), node);
 
         while (iter.hasNext()) {
-            Frame c = (Frame) iter.next();
-            Frame cc = (Frame) c.clone();
+            FrameOLD c = (FrameOLD) iter.next();
+            FrameOLD cc = (FrameOLD) c.clone();
             node.insert(cc);
             nodes.put(node.getFrame().getTypeName(), node);
         }
@@ -214,13 +214,13 @@ public class AgentInstanceOperations {
 
         HashMap<String, InheritanceHierarchy> nodes = new HashMap<String, InheritanceHierarchy>();
         ListIterator iter = behaviourClasses.listIterator();
-        Frame root = behaviourClass;
-        InheritanceHierarchy node = new InheritanceHierarchy((Frame) root.clone());
-        node.insert((Frame) root.clone());
+        FrameOLD root = behaviourClass;
+        InheritanceHierarchy node = new InheritanceHierarchy((FrameOLD) root.clone());
+        node.insert((FrameOLD) root.clone());
 
         while (iter.hasNext()) {
             BehaviourFrame c = (BehaviourFrame) iter.next();
-            node.insert((Frame) c.clone());
+            node.insert((FrameOLD) c.clone());
             nodes.put(node.getFrame().getTypeName(), node);
         }
 
@@ -278,12 +278,12 @@ public class AgentInstanceOperations {
         return ns;
     }
 
-    public Instance getObject(String name) {
-        Instance here = findObject(name);
+    public InstanceOLD getObject(String name) {
+        InstanceOLD here = findObject(name);
         if (here == null) {
             return null;
         }
-        return (Instance) here.clone();
+        return (InstanceOLD) here.clone();
     }
 
     public int getTotalAgentCount() {
@@ -352,10 +352,10 @@ public class AgentInstanceOperations {
 
     }
 
-    public Instance instanciateFrame(Frame cls, String name) {
-        Instance inst = new Instance(name, cls);
+    public InstanceOLD instanciateFrame(FrameOLD cls, String name) {
+        InstanceOLD inst = new InstanceOLD(name, cls);
         objects.add(inst);
-        return (Instance) inst.clone();
+        return (InstanceOLD) inst.clone();
     }
 
     public GenericAgent modifyAgentAttribute(GenericAgent inst, String[] path, Attribute att) {
@@ -447,7 +447,7 @@ public class AgentInstanceOperations {
 
         agentSubClasses.add(here);
 
-        ListIterator<Instance> iter = getInstancesOfClass(here).listIterator();
+        ListIterator<InstanceOLD> iter = getInstancesOfClass(here).listIterator();
         while (iter.hasNext()) {
             GenericAgent p = (GenericAgent) iter.next();
             p.setDirty(true);
@@ -483,7 +483,7 @@ public class AgentInstanceOperations {
                 }
                 p.setBehaviour(pb);
                 iter2.set(p);
-                ListIterator<Instance> successorMembers = getInstancesOfClass(p).listIterator();
+                ListIterator<InstanceOLD> successorMembers = getInstancesOfClass(p).listIterator();
                 while (successorMembers.hasNext()) {
                     GenericAgent a = (GenericAgent) iter.next();
                     p.setDirty(true);

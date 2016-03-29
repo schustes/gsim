@@ -2,7 +2,7 @@ package de.s2.gsim.def.objects.agent;
 
 import java.util.ArrayList;
 
-import de.s2.gsim.def.objects.Frame;
+import de.s2.gsim.def.objects.FrameOLD;
 import de.s2.gsim.def.objects.behaviour.ActionCollectionFrame;
 import de.s2.gsim.def.objects.behaviour.ActionFrame;
 import de.s2.gsim.def.objects.behaviour.ConditionFrame;
@@ -12,7 +12,7 @@ import de.s2.gsim.def.objects.behaviour.UserRuleFrame;
 import de.s2.gsim.objects.attribute.AttributeType;
 import de.s2.gsim.objects.attribute.DomainAttribute;
 
-public class BehaviourFrame extends Frame {
+public class BehaviourFrame extends FrameOLD {
 
     public final static String ACTION_LIST = "available actions";
 
@@ -50,7 +50,7 @@ public class BehaviourFrame extends Frame {
     /**
      * Copy constructor
      */
-    public BehaviourFrame(Frame f) {
+    public BehaviourFrame(FrameOLD f) {
         super(f);
     }
 
@@ -112,7 +112,7 @@ public class BehaviourFrame extends Frame {
      */
     @Override
     public Object clone() {
-        Frame a = (Frame) super.clone();
+        FrameOLD a = (FrameOLD) super.clone();
         BehaviourFrame f = new BehaviourFrame(a);
         return f;
     }
@@ -182,7 +182,7 @@ public class BehaviourFrame extends Frame {
     }
 
     public ActionFrame getAction(String name) {
-        Frame[] f = getChildFrames(ACTION_LIST);
+        FrameOLD[] f = getChildFrames(ACTION_LIST);
         for (int i = 0; i < f.length; i++) {
             if (f[i].getTypeName().equals(name)) {
                 return new ActionFrame(f[i]);
@@ -192,7 +192,7 @@ public class BehaviourFrame extends Frame {
     }
 
     public ActionFrame[] getAvailableActions() {
-        Frame[] f = getChildFrames(ACTION_LIST);
+        FrameOLD[] f = getChildFrames(ACTION_LIST);
         ActionFrame[] uf = new ActionFrame[f.length];
         for (int i = 0; i < f.length; i++) {
             uf[i] = new ActionFrame(f[i]);
@@ -201,7 +201,7 @@ public class BehaviourFrame extends Frame {
     }
 
     public ActionFrame[] getDeclaredAvailableActions() {
-        Frame[] f = super.getDeclaredChildFrames(ACTION_LIST);
+        FrameOLD[] f = super.getDeclaredChildFrames(ACTION_LIST);
         if (f == null) {
             return new ActionFrame[0];
         }
@@ -223,7 +223,7 @@ public class BehaviourFrame extends Frame {
     }
 
     public RLRuleFrame[] getDeclaredRLRules() {
-        Frame[] f = getDeclaredChildFrames(RL_LIST);
+        FrameOLD[] f = getDeclaredChildFrames(RL_LIST);
         if (f == null) {
             return new RLRuleFrame[0];
         }
@@ -259,7 +259,7 @@ public class BehaviourFrame extends Frame {
      * @return UserRuleFrame[]
      */
     public UserRuleFrame[] getDeclaredRules() {
-        Frame[] f = getDeclaredChildFrames(RULE_LIST);
+        FrameOLD[] f = getDeclaredChildFrames(RULE_LIST);
 
         if (f == null) {
             return new UserRuleFrame[0];
@@ -293,7 +293,7 @@ public class BehaviourFrame extends Frame {
     }
 
     public RLRuleFrame[] getRLRule() {
-        Frame[] f = getChildFrames(RL_LIST);
+        FrameOLD[] f = getChildFrames(RL_LIST);
         RLRuleFrame[] uf = new RLRuleFrame[f.length];
         for (int i = 0; i < f.length; i++) {
             uf[i] = new RLRuleFrame(f[i]);
@@ -363,7 +363,7 @@ public class BehaviourFrame extends Frame {
      * @return UserRuleFrame[]
      */
     public UserRuleFrame[] getRules() {
-        Frame[] f = getChildFrames(RULE_LIST);
+        FrameOLD[] f = getChildFrames(RULE_LIST);
         UserRuleFrame[] uf = new UserRuleFrame[f.length];
         for (int i = 0; i < f.length; i++) {
             uf[i] = new UserRuleFrame(f[i]);

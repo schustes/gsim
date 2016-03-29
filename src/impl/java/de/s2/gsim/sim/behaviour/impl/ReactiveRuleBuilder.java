@@ -4,7 +4,7 @@ import jess.JessException;
 import jess.Rete;
 import cern.jet.random.Uniform;
 import de.s2.gsim.api.sim.agent.impl.RuntimeAgent;
-import de.s2.gsim.def.objects.Instance;
+import de.s2.gsim.def.objects.InstanceOLD;
 import de.s2.gsim.def.objects.behaviour.ConditionDef;
 import de.s2.gsim.def.objects.behaviour.UserRule;
 import de.s2.gsim.sim.GSimEngineException;
@@ -27,7 +27,7 @@ public class ReactiveRuleBuilder {
 
         try {
 
-            Instance[] ruleInstances = agent.getBehaviour().getRules();
+            InstanceOLD[] ruleInstances = agent.getBehaviour().getRules();
 
             res = "";
 

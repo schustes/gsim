@@ -1,10 +1,10 @@
 package de.s2.gsim.def.objects.behaviour;
 
-import de.s2.gsim.def.objects.Frame;
+import de.s2.gsim.def.objects.FrameOLD;
 import de.s2.gsim.objects.attribute.AttributeType;
 import de.s2.gsim.objects.attribute.DomainAttribute;
 
-public class DependencyTestFrame extends Frame {
+public class DependencyTestFrame extends FrameOLD {
 
     public static DependencyTestFrame DEFINITION = new DependencyTestFrame("test-definition");
     /**
@@ -12,7 +12,7 @@ public class DependencyTestFrame extends Frame {
      */
     private static final long serialVersionUID = 1L;
 
-    public DependencyTestFrame(Frame f) {
+    public DependencyTestFrame(FrameOLD f) {
         super(f);
     }
 

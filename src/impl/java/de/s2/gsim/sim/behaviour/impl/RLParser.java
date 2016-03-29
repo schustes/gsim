@@ -5,9 +5,9 @@ import java.util.Iterator;
 import java.util.Map;
 
 import de.s2.gsim.api.sim.agent.impl.RuntimeAgent;
-import de.s2.gsim.def.objects.Frame;
-import de.s2.gsim.def.objects.Instance;
-import de.s2.gsim.def.objects.Unit;
+import de.s2.gsim.def.objects.FrameOLD;
+import de.s2.gsim.def.objects.InstanceOLD;
+import de.s2.gsim.def.objects.UnitOLD;
 import de.s2.gsim.def.objects.agent.BehaviourDef;
 import de.s2.gsim.def.objects.agent.BehaviourFrame;
 import de.s2.gsim.def.objects.agent.GenericAgentClass;
@@ -115,7 +115,7 @@ public class RLParser {
 
             }
 
-            Map<String, Unit> expansionMap = new HashMap<String, Unit>();
+            Map<String, UnitOLD> expansionMap = new HashMap<String, UnitOLD>();
 
             for (int i = 0; i < r.length; i++) {
 
@@ -135,9 +135,9 @@ public class RLParser {
                     // s += new ExpansionRulesBuilder().build(expandInterval,revisitCostFraction, revaluationProbability, roleName);
                     expansionMap.put(roleName, agent.getBehaviour());
 
-                    Instance inst = agent;
-                    Frame[] frames = inst.getDefinition().getAncestors();
-                    for (Frame f : frames) {
+                    InstanceOLD inst = agent;
+                    FrameOLD[] frames = inst.getDefinition().getAncestors();
+                    for (FrameOLD f : frames) {
                         if (f.getTypeName().equals(roleName)) {
                             GenericAgentClass a = (GenericAgentClass) f;
                             expansionMap.put(roleName, a.getBehaviour());
@@ -149,8 +149,8 @@ public class RLParser {
 
             ExpansionRulesBuilder erb = new ExpansionRulesBuilder();
             for (String n : expansionMap.keySet()) {
-                Unit u = expansionMap.get(n);
-                if (u instanceof Instance) {
+                UnitOLD u = expansionMap.get(n);
+                if (u instanceof InstanceOLD) {
                     BehaviourDef beh = (BehaviourDef) u;
                     int expandInterval = beh.getStateUpdateInterval();
                     double revisitCostFraction = beh.getRevisitCost();
@@ -201,7 +201,7 @@ public class RLParser {
             if (path.contains("::")) {
                 ConditionBuilder cb = new ConditionBuilder();
                 String obj = cb.resolveObjectClass(path);
-                Frame f = (Frame) agent.getDefinition().resolveName(obj.split("/"));
+                FrameOLD f = (FrameOLD) agent.getDefinition().resolveName(obj.split("/"));
                 if (f == null) {
                     String list = cb.resolveList(path);
                     f = agent.getDefinition().getListType(list);

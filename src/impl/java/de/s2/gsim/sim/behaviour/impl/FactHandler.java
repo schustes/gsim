@@ -6,7 +6,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import de.s2.gsim.api.sim.agent.impl.RuntimeAgent;
-import de.s2.gsim.def.objects.Instance;
+import de.s2.gsim.def.objects.InstanceOLD;
 import de.s2.gsim.def.objects.agent.BehaviourDef;
 import de.s2.gsim.def.objects.behaviour.ActionDef;
 import de.s2.gsim.def.objects.behaviour.ExpansionDef;
@@ -527,7 +527,7 @@ public class FactHandler {
                 int k = 0;
                 for (String param : params) {
                     starts[n] = k;
-                    for (Instance inst : Utils.getChildInstancesOfType(agent, param)) {
+                    for (InstanceOLD inst : Utils.getChildInstancesOfType(agent, param)) {
                         String filter = action.getFilterExpression(param);
                         if (inst.getName().matches(".*" + filter + ".*")) {
                             k++;
@@ -680,7 +680,7 @@ public class FactHandler {
      * return list; }
      */
 
-    private String createRuleIdentifier(Instance inst) {
+    private String createRuleIdentifier(InstanceOLD inst) {
         String x = inst.getName();
         x = x.replace(' ', '_');
         x = x.replace('/', '_');

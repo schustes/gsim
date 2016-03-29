@@ -2,11 +2,11 @@ package de.s2.gsim.def.objects.behaviour;
 
 import java.util.ArrayList;
 
-import de.s2.gsim.def.objects.Frame;
+import de.s2.gsim.def.objects.FrameOLD;
 import de.s2.gsim.objects.attribute.AttributeType;
 import de.s2.gsim.objects.attribute.DomainAttribute;
 
-public class UserRuleFrame extends Frame {
+public class UserRuleFrame extends FrameOLD {
 
     public static final String ATTR_LIST_ATTRS = "attributes";
 
@@ -20,12 +20,12 @@ public class UserRuleFrame extends Frame {
 
     static final long serialVersionUID = 4875468082081888178L;
 
-    public UserRuleFrame(Frame f) {
+    public UserRuleFrame(FrameOLD f) {
         super(f);
-        Frame f1 = new ConditionFrame("{all-conditions}", "=", "don't care");
+        FrameOLD f1 = new ConditionFrame("{all-conditions}", "=", "don't care");
         f1.setSystem(true);
         f1.setMutable(false);
-        Frame f2 = new ActionFrame("{all-actions}", "action");
+        FrameOLD f2 = new ActionFrame("{all-actions}", "action");
         f2.setSystem(false);
         f2.setMutable(false);
         addChildFrame("conditions", f1);
@@ -42,7 +42,7 @@ public class UserRuleFrame extends Frame {
     /**
      * Inheritance constructor
      */
-    public UserRuleFrame(Frame[] parents, String name, String category) {
+    public UserRuleFrame(FrameOLD[] parents, String name, String category) {
         super(parents, name, category);
     }
 
@@ -50,7 +50,7 @@ public class UserRuleFrame extends Frame {
 
         super(name, CATEGORY);
 
-        Frame f2 = new Frame("{all-actions}", "action");
+        FrameOLD f2 = new FrameOLD("{all-actions}", "action");
         f2.setSystem(false);
         f2.setMutable(false);
         addChildFrame("consequences", f2);
@@ -83,7 +83,7 @@ public class UserRuleFrame extends Frame {
     }
 
     public ConditionFrame[] getConditions() {
-        Frame[] inst = getChildFrames(UserRuleFrame.INST_LIST_COND);
+        FrameOLD[] inst = getChildFrames(UserRuleFrame.INST_LIST_COND);
         ArrayList list = new ArrayList();
         for (int i = 0; i < inst.length; i++) {
             if (!inst[i].getTypeName().startsWith("{")) {
@@ -96,7 +96,7 @@ public class UserRuleFrame extends Frame {
     }
 
     public ActionFrame[] getConsequences() {
-        Frame[] inst = getChildFrames(UserRuleFrame.INST_LIST_CONS);
+        FrameOLD[] inst = getChildFrames(UserRuleFrame.INST_LIST_CONS);
         java.util.ArrayList list = new java.util.ArrayList();
         for (int i = 0; i < inst.length; i++) {
             list.add(new ActionFrame(inst[i]));

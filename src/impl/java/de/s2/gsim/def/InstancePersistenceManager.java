@@ -9,7 +9,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 
-import de.s2.gsim.def.objects.Instance;
+import de.s2.gsim.def.objects.InstanceOLD;
 import de.s2.gsim.util.Logging;
 
 public class InstancePersistenceManager {
@@ -23,11 +23,11 @@ public class InstancePersistenceManager {
         loadAll();
     }
 
-    public void deleteInstance(Instance c) {
+    public void deleteInstance(InstanceOLD c) {
         deletePersistently(c);
     }
 
-    public Instance[] loadAll() {
+    public InstanceOLD[] loadAll() {
 
         long a = 0, b = 0;
         a = System.currentTimeMillis();
@@ -43,7 +43,7 @@ public class InstancePersistenceManager {
             for (int i = 0; i < instances.length; i++) {
                 FileInputStream fi = new FileInputStream(instances[i].getCanonicalPath());
                 ObjectInputStream si = new ObjectInputStream(fi);
-                Instance inst = (Instance) si.readObject();
+                InstanceOLD inst = (InstanceOLD) si.readObject();
                 si.close();
 
                 list.add(inst);
@@ -55,12 +55,12 @@ public class InstancePersistenceManager {
         b = System.currentTimeMillis() - a;
         Logging.ModelLogger.info("Loaded " + list.size() + " instances in " + (double) b / 1000 + " seconds.");
 
-        Instance[] res = new Instance[list.size()];
+        InstanceOLD[] res = new InstanceOLD[list.size()];
         list.toArray(res);
         return res;
     }
 
-    public Instance reload(String name) {
+    public InstanceOLD reload(String name) {
         try {
             name = name.replace('\\', '_');
             name = name.replace('/', '_');
@@ -68,7 +68,7 @@ public class InstancePersistenceManager {
             File file = new File(persistDir + "/" + namespace + "/" + name).getCanonicalFile();
             FileInputStream fi = new FileInputStream(file.getCanonicalPath());
             ObjectInputStream si = new ObjectInputStream(fi);
-            Instance inst = (Instance) si.readObject();
+            InstanceOLD inst = (InstanceOLD) si.readObject();
             si.close();
             return inst;
         } catch (FileNotFoundException e) {
@@ -79,11 +79,11 @@ public class InstancePersistenceManager {
         }
     }
 
-    public void saveInstance(Instance c) {
+    public void saveInstance(InstanceOLD c) {
         savePersistently(c);
     }
 
-    private void deletePersistently(Instance c) {
+    private void deletePersistently(InstanceOLD c) {
         File dir = new File(persistDir + "/" + namespace);
 
         if (dir.exists()) {
@@ -102,7 +102,7 @@ public class InstancePersistenceManager {
         }
     }
 
-    private void savePersistently(Instance inst) {
+    private void savePersistently(InstanceOLD inst) {
         try {
             File dir = new File(persistDir + "/" + namespace);
             if (!dir.exists()) {

@@ -1,7 +1,7 @@
 package de.s2.gsim.def.objects.agent;
 
-import de.s2.gsim.def.objects.Frame;
-import de.s2.gsim.def.objects.Instance;
+import de.s2.gsim.def.objects.FrameOLD;
+import de.s2.gsim.def.objects.InstanceOLD;
 import de.s2.gsim.def.objects.UnitUtils;
 import de.s2.gsim.def.objects.behaviour.ActionCollection;
 import de.s2.gsim.def.objects.behaviour.ActionDef;
@@ -13,7 +13,7 @@ import de.s2.gsim.def.objects.behaviour.UserRule;
 import de.s2.gsim.def.objects.behaviour.UserRuleFrame;
 import de.s2.gsim.objects.attribute.NumericalAttribute;
 
-public class BehaviourDef extends Instance {
+public class BehaviourDef extends InstanceOLD {
 
     public static final long serialVersionUID = 47162704396246620L;
 
@@ -26,7 +26,7 @@ public class BehaviourDef extends Instance {
      * @param id
      *            int
      */
-    public BehaviourDef(Frame f) {
+    public BehaviourDef(FrameOLD f) {
         super(f.getTypeName(), f);
     }
 
@@ -36,7 +36,7 @@ public class BehaviourDef extends Instance {
      * @param inst
      *            Instance
      */
-    public BehaviourDef(Instance inst) {
+    public BehaviourDef(InstanceOLD inst) {
         super(inst);
     }
 
@@ -135,10 +135,10 @@ public class BehaviourDef extends Instance {
     public RLRule createRLRule(String name, ConditionDef[] conditions, ActionDef[] consequents) {
 
         BehaviourFrame f = (BehaviourFrame) getDefinition();
-        Frame r = f.getRule(name);
+        FrameOLD r = f.getRule(name);
         r = new RLRuleFrame(name);
 
-        Instance rule = new Instance(name, r);
+        InstanceOLD rule = new InstanceOLD(name, r);
 
         for (int i = 0; i < conditions.length; i++) {
             conditions[i].changeName(conditions[i].getName() + cern.jet.random.Uniform.staticNextDoubleFromTo(Double.MIN_VALUE, Double.MAX_VALUE));
@@ -157,10 +157,10 @@ public class BehaviourDef extends Instance {
     public UserRule createRule(String name, ConditionDef[] conditions, ActionDef[] consequents) {
 
         BehaviourFrame f = (BehaviourFrame) getDefinition();
-        Frame r = f.getRule(name);
+        FrameOLD r = f.getRule(name);
         r = new UserRuleFrame(name);
 
-        Instance rule = new Instance(name, r);
+        InstanceOLD rule = new InstanceOLD(name, r);
 
         for (int i = 0; i < conditions.length; i++) {
             rule.addChildInstance(UserRuleFrame.INST_LIST_COND, conditions[i]);
@@ -174,7 +174,7 @@ public class BehaviourDef extends Instance {
     }
 
     public ActionDef getAction(String cat) {
-        Instance[] str = getChildInstances(BehaviourFrame.ACTION_LIST);
+        InstanceOLD[] str = getChildInstances(BehaviourFrame.ACTION_LIST);
         for (int i = 0; i < str.length; i++) {
             if (str[i].getName().equals(cat)) {
                 return new ActionDef(str[i]);
@@ -184,7 +184,7 @@ public class BehaviourDef extends Instance {
     }
 
     public ActionDef[] getAvailableActions() {
-        Instance[] str = getChildInstances(BehaviourFrame.ACTION_LIST);
+        InstanceOLD[] str = getChildInstances(BehaviourFrame.ACTION_LIST);
         ActionDef[] ss = new ActionDef[str.length];
         for (int i = 0; i < ss.length; i++) {
             ss[i] = new ActionDef(str[i]);
@@ -223,7 +223,7 @@ public class BehaviourDef extends Instance {
     }
 
     public RLRule[] getRLRules() {
-        Instance[] rules = getChildInstances(BehaviourFrame.RL_LIST);
+        InstanceOLD[] rules = getChildInstances(BehaviourFrame.RL_LIST);
         RLRule[] userRules = new RLRule[rules.length];
         for (int i = 0; i < rules.length; i++) {
             userRules[i] = new RLRule(rules[i]);
@@ -254,7 +254,7 @@ public class BehaviourDef extends Instance {
      * @return UserRule[]
      */
     public UserRule[] getRules() {
-        Instance[] rules = getChildInstances(BehaviourFrame.RULE_LIST);
+        InstanceOLD[] rules = getChildInstances(BehaviourFrame.RULE_LIST);
         UserRule[] userRules = new UserRule[rules.length];
         for (int i = 0; i < rules.length; i++) {
             userRules[i] = new UserRule(rules[i]);
@@ -277,7 +277,7 @@ public class BehaviourDef extends Instance {
     }
 
     public void removeAllRLRules() {
-        Instance[] classifiers = getChildInstances(BehaviourFrame.RL_LIST);
+        InstanceOLD[] classifiers = getChildInstances(BehaviourFrame.RL_LIST);
         for (int i = 0; i < classifiers.length; i++) {
             removeChildInstance(BehaviourFrame.RL_LIST, classifiers[i].getName());
         }

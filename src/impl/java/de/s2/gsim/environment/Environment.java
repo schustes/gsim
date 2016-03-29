@@ -1,96 +1,209 @@
 package de.s2.gsim.environment;
 
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.ListIterator;
 import java.util.Map;
-
-import de.s2.gsim.def.EnvironmentBase;
-import de.s2.gsim.def.FramePersistenceManager;
-import de.s2.gsim.def.GSimDefException;
-import de.s2.gsim.def.InheritanceHierarchy;
-import de.s2.gsim.def.InstancePersistenceManager;
-import de.s2.gsim.def.TimeOrderedSet;
-import de.s2.gsim.def.objects.Frame;
-import de.s2.gsim.def.objects.Instance;
-import de.s2.gsim.def.objects.agent.BehaviourFrame;
-import de.s2.gsim.def.objects.agent.GenericAgent;
-import de.s2.gsim.def.objects.agent.GenericAgentClass;
+import java.util.stream.Stream;
 
 /**
  * @author Stephan
  *
  */
 public class Environment {
-	
-	private EntitiesContainer container;
 
-	private Map<String, String> actionMappings = new HashMap<String, String>();
+    /**
+     * Reference to all entities.
+     */
+    private EntitiesContainer container;
 
-    private Map<String, String[]> agentMappings = new HashMap<String, String[]>();
+    /**
+     * Caches mappings from action names to executable class names.
+     */
+    private final Map<String, String> actionMappings = new HashMap<String, String>();
 
-    private Map<String, String> agentPauses = new HashMap<String, String>();
+    /**
+     * Caches agent names to roles.
+     */
+    private final Map<String, String[]> agentMappings = new HashMap<String, String[]>();
 
-    private Map<String, Integer> agentOrder = new HashMap<String, Integer>();
-    
-    private Map<String, String> agentRtClassMappings = new HashMap<String, String>();
-	
-    private Map<String, String> systemAgents = new HashMap<String, String>();
+    /**
+     * Caches the executions cycles of agent classes.
+     */
+    private final Map<String, String> agentPauses = new HashMap<String, String>();
 
+    /**
+     * Caches the ordering of agent roles for determining in which orders they are excuted within a cycle.
+     */
+    private final Map<String, Integer> agentOrder = new HashMap<String, Integer>();
+
+    /**
+     * Caches the agent class names to their runtime equivalents.
+     */
+    private final Map<String, String> agentRtClassMappings = new HashMap<String, String>();
+
+    /**
+     * Caches the system agents active during a simulation.
+     */
+    private final Map<String, String> systemAgents = new HashMap<String, String>();
+
+
+    /**
+     * Name space of the model.
+     */
+    private final String ns;
+
+    /**
+     * Constructor.
+     * 
+     * @param ns name space of the model
+     */
+    public Environment(String ns) {
+        this.ns = ns;
+        this.container = new EntitiesContainer(ns);
+    }
+
+    /**
+     * Removes all entities in this instance and all entities from the other Environment.
+     * 
+     * @param env the other Environment
+     * @throws GSimDefException if a problem during the remove-add cycle occurs
+     */
+    public void copyFromEnvironment(Environment env) throws GSimDefException {
+        try {
+            this.container.copyFromEnvironment(env.getContainer());
+            this.agentPauses.clear();
+            this.agentMappings.clear();
+            this.agentOrder.clear();
+            this.agentRtClassMappings.clear();
+            this.systemAgents.clear();
+            this.agentPauses.putAll(env.getAgentPauses());
+            this.agentMappings.putAll(env.getAgentMappings());
+            this.agentOrder.putAll(env.getAgentOrder());
+            this.agentRtClassMappings.putAll(env.getAgentRtClassMappings());
+            this.systemAgents.putAll(env.getSystemAgents());
+        } catch (Exception e) {
+            throw new GSimDefException("Error in copy env", e);
+        }
+    }
+
+    /**
+     * Exports a tree representation of the object classes in this Environment.
+     * 
+     * @return the tree representation of object classes in this Environment
+     */
+    public HierarchyTree exportObjectHierarchy() {
+        return exportType(container.getObjectClass(), container.getObjectSubClasses().stream());
+    }
+
+    /**
+     * Exports a tree representation of the agent classes in this Environment.
+     * 
+     * @return the tree representation of agent classes in this Environment
+     */
+    public HierarchyTree exportAgentHierarchy() {
+        return exportType(container.getAgentClass(), container.getAgentSubClasses().stream());
+    }
+
+    /**
+     * Exports a tree representation of the behaviour classes in this Environment.
+     * 
+     * @return the tree representation of behaviour classes in this Environment
+     */
+    public HierarchyTree exportBehaviourHierarchy() {
+        return exportType(container.getBehaviourClass(), container.getBehaviourClasses().stream());
+    }
+
+    private HierarchyTree exportType(Frame root, Stream<? extends Frame> stream) {
+
+        HashMap<String, HierarchyNode> nodes = new HashMap<String, HierarchyNode>();
+        HierarchyNode node = new HierarchyNode(root.clone());
+        nodes.put(node.getFrame().getTypeName(), node);
+
+        stream.forEach(frame -> {
+            node.insert(frame.clone());
+            nodes.put(node.getFrame().getTypeName(), node);
+        });
+
+        HierarchyNode[] top = new HierarchyNode[nodes.values().size()];
+        nodes.values().toArray(top);
+
+        return new HierarchyTree(node);
+
+    }
+
+    /**
+     * Gets the container where all frame and instances are stored.
+     * 
+     * @return
+     */
     public EntitiesContainer getContainer() {
-		return container;
-	}
-	public void setContainer(EntitiesContainer container) {
-		this.container = container;
-	}
-	public Map<String, String> getActionMappings() {
-		return actionMappings;
-	}
-	public void setActionMappings(Map<String, String> actionMappings) {
-		this.actionMappings = actionMappings;
-	}
-	public Map<String, String[]> getAgentMappings() {
-		return agentMappings;
-	}
-	public void setAgentMappings(Map<String, String[]> agentMappings) {
-		this.agentMappings = agentMappings;
-	}
-	public Map<String, String> getAgentPauses() {
-		return agentPauses;
-	}
-	public void setAgentPauses(Map<String, String> agentPauses) {
-		this.agentPauses = agentPauses;
-	}
-	public Map<String, Integer> getAgentOrder() {
-		return agentOrder;
-	}
-	public void setAgentOrder(Map<String, Integer> agentOrder) {
-		this.agentOrder = agentOrder;
-	}
-	public Map<String, String> getAgentRtClassMappings() {
-		return agentRtClassMappings;
-	}
-	public void setAgentRtClassMappings(Map<String, String> agentRtClassMappings) {
-		this.agentRtClassMappings = agentRtClassMappings;
-	}
-	public Map<String, String> getSystemAgents() {
-		return systemAgents;
-	}
-	public void setSystemAgents(Map<String, String> systemAgents) {
-		this.systemAgents = systemAgents;
-	}
+        return container;
+    }
 
-	public Environment(EntitiesContainer container) {
-		this.container = container;
-	}
-	public EntitiesContainer getEntities() {
-		return null;
-	}
-	
-	public AgentClassOperations getAgentClassOperations() {
-		return new AgentClassOperations(this.container);
-	}
-	
+    public String getNamespace() {
+        return this.ns;
+    }
+
+    public void setContainer(EntitiesContainer container) {
+        this.container = container;
+    }
+
+    public Map<String, String> getActionMappings() {
+        return actionMappings;
+    }
+
+    public void addActionMapping(String name, String action) {
+        this.actionMappings.put(name, action);
+    }
+
+    public Map<String, String[]> getAgentMappings() {
+        return agentMappings;
+    }
+
+    public void addAgentMappings(String agentName, String[] roles) {
+        this.agentMappings.put(agentName, roles);
+    }
+
+    public Map<String, String> getAgentPauses() {
+        return agentPauses;
+    }
+
+    public void addAgentPause(String agentClassName, String interval) {
+        this.agentPauses.put(agentClassName, interval);
+    }
+
+    public Map<String, Integer> getAgentOrder() {
+        return agentOrder;
+    }
+
+    public void addAgentOrder(String agentClassName, int order) {
+        this.agentOrder.put(agentClassName, order);
+    }
+
+    public Map<String, String> getAgentRtClassMappings() {
+        return agentRtClassMappings;
+    }
+
+    public void addAgentRtClassMapping(String agentClassName, String rtName) {
+        this.agentRtClassMappings.put(agentClassName, rtName);
+    }
+
+    public Map<String, String> getSystemAgents() {
+        return systemAgents;
+    }
+
+    public void addSystemAgents(String name, String cls) {
+        this.systemAgents.put(name, cls);
+    }
+
+
+    public EntitiesContainer getEntities() {
+        return null;
+    }
+
+    public AgentClassOperations getAgentClassOperations() {
+        return new AgentClassOperations(this.container);
+    }
+
     public void addOrSetAgentMapping(String agentName, String[] roleNames) {
         agentMappings.put(agentName, roleNames);
     }
@@ -107,206 +220,4 @@ public class Environment {
         systemAgents.put(name, cls);
     }
 
-    protected void copyEnvironment(EnvironmentBase env) throws GSimDefException {
-        try {
-            behaviourClasses = new TimeOrderedSet<Frame>(this.clone(env.behaviourClasses));
-            objects = new TimeOrderedSet<Instance>(this.clone(env.objects));
-            objectSubClasses = new TimeOrderedSet<Frame>(this.clone(env.objectSubClasses));
-            agentClass = (GenericAgentClass) env.agentClass.clone();
-
-            agentSubClasses = new TimeOrderedSet<GenericAgentClass>(this.clone(env.agentSubClasses));
-            agents = new TimeOrderedSet<GenericAgent>(this.clone(env.agents));
-
-            if (env.behaviourClass != null) {
-                behaviourClass = (Frame) env.behaviourClass.clone();
-            }
-            agentClass = (GenericAgentClass) env.agentClass.clone();
-            objectClass = (Frame) env.objectClass.clone();
-
-            agentPauses = new HashMap<String, String>(env.agentPauses);
-            dataHandlers = new HashMap<String, String>(env.dataHandlers);
-            agentMappings = new HashMap<String, String[]>(env.agentMappings);
-            agentOrder = new HashMap<String, Integer>(env.agentOrder);
-            agentRtClassMappings = new HashMap<String, String>(env.agentRtClassMappings);
-            systemAgents = new HashMap<String, String>(env.systemAgents);
-        } catch (Exception e) {
-            throw new GSimDefException("Error in copy env", e);
-        }
-    }
-
-    public void dismissChanges() {
-
-        removed.clear();
-
-        FramePersistenceManager frameControl = new FramePersistenceManager(ns);
-        InstancePersistenceManager instanceControl = new InstancePersistenceManager(ns);
-
-        ListIterator<GenericAgent> iter = agents.listIterator();
-        while (iter.hasNext()) {
-            Instance in = iter.next();
-            if (in.isDirty()) {
-                GenericAgent f = (GenericAgent) instanceControl.reload(in.getName());
-                if (f != null) {
-                    iter.set(f);
-                } else {
-                    iter.remove();
-                }
-            }
-        }
-
-        ListIterator<GenericAgentClass> iter2 = agentSubClasses.listIterator();
-        while (iter2.hasNext()) {
-            Frame in = iter2.next();
-            if (in.isDirty()) {
-                GenericAgentClass f = (GenericAgentClass) frameControl.reload(in.getTypeName());
-                if (f != null) {
-                    iter2.set(f);
-                } else {
-                    iter2.remove();
-                }
-            }
-        }
-
-        ListIterator<Frame> iter3 = objectSubClasses.listIterator();
-        while (iter3.hasNext()) {
-            Frame in = iter3.next();
-            if (in.isDirty()) {
-                Frame f = frameControl.reload(in.getTypeName());
-                if (f != null) {
-                    iter3.set(f);
-                } else {
-                    iter3.remove();
-                }
-            }
-        }
-
-        ListIterator<Instance> iter4 = objects.listIterator();
-        while (iter4.hasNext()) {
-            Instance in = iter.next();
-            if (in.isDirty()) {
-                Instance f = instanceControl.reload(in.getName());
-                if (f != null) {
-                    iter4.set(f);
-                } else {
-                    iter4.remove();
-                }
-            }
-        }
-
-    }
-	
-    public InheritanceHierarchy[] exportObjectHierarchy() {
-
-        HashMap<String, InheritanceHierarchy> nodes = new HashMap<String, InheritanceHierarchy>();
-        ListIterator iter = objectSubClasses.listIterator();
-
-        Frame root = objectClass;
-        InheritanceHierarchy node = new InheritanceHierarchy((Frame) root.clone());
-        nodes.put(node.getFrame().getTypeName(), node);
-
-        while (iter.hasNext()) {
-            Frame c = (Frame) iter.next();
-            node.insert((Frame) c.clone());
-            nodes.put(node.getFrame().getTypeName(), node);
-        }
-
-        InheritanceHierarchy[] top = new InheritanceHierarchy[nodes.values().size()];
-        nodes.values().toArray(top);
-
-        return top;
-
-    }
-    public void saveEnvironment() {
-        FramePersistenceManager frameControl = new FramePersistenceManager(ns);
-        InstancePersistenceManager instanceControl = new InstancePersistenceManager(ns);
-
-        Iterator iter = removed.iterator();
-
-        while (iter.hasNext()) {
-            Object o = iter.next();
-            if (o instanceof Frame) {
-                frameControl.deleteFrame((Frame) o);
-            } else if (o instanceof Instance) {
-                instanceControl.deleteInstance((Instance) o);
-            }
-        }
-        removed.clear();
-
-        iter = agentSubClasses.listIterator();
-        while (iter.hasNext()) {
-            Frame f = (Frame) iter.next();
-            if (f.isDirty()) {
-                frameControl.saveFrame(f);
-            }
-        }
-        iter = objectSubClasses.listIterator();
-        while (iter.hasNext()) {
-            Frame f = (Frame) iter.next();
-            if (f.isDirty()) {
-                frameControl.saveFrame(f);
-            }
-        }
-        iter = behaviourClasses.listIterator();
-        while (iter.hasNext()) {
-            Frame f = (Frame) iter.next();
-            if (f.isDirty()) {
-                frameControl.saveFrame(f);
-            }
-        }
-
-        iter = agents.iterator();
-        while (iter.hasNext()) {
-            Instance inst = (Instance) iter.next();
-            if (inst.isDirty()) {
-                inst.setDirty(false);
-                instanceControl.saveInstance(inst);
-            }
-        }
-        iter = objects.iterator();
-        while (iter.hasNext()) {
-            Instance inst = (Instance) iter.next();
-            if (inst.isDirty()) {
-                inst.setDirty(false);
-                instanceControl.saveInstance(inst);
-            }
-        }
-
-    }
-    
-    /**
-     * @TODO load here frames and instances. !!!!Make sure that the top-level classes are at the top of the loaded classes!!!!
-     * 
-     */
-    protected void init() {
-        FramePersistenceManager frameControl = new FramePersistenceManager(ns);
-        InstancePersistenceManager instanceControl = new InstancePersistenceManager(ns);
-
-        Frame[] all = frameControl.getAllFrames();
-        Instance[] in = instanceControl.loadAll();
-
-        for (int i = 0; i < all.length; i++) {
-            if (all[i] instanceof GenericAgentClass) {
-                agentSubClasses.add((GenericAgentClass) all[i]);
-                all[i].setAncestor(agentClass);
-
-                for (int j = 0; j < in.length; j++) {
-                    if (in[j].inheritsFrom(all[i])) {
-                        in[j].getDefinition().setAncestor(all[i]);
-                        agents.add((GenericAgent) in[j]);
-                    }
-                }
-            } else if (all[i] instanceof BehaviourFrame) {
-                behaviourClasses.add(all[i]);
-            } else {
-                all[i].setAncestor(objectClass);
-                objectSubClasses.add(all[i]);
-                for (int j = 0; j < in.length; j++) {
-                    if (in[j].inheritsFrom(all[i])) {
-                        in[j].getDefinition().setAncestor(all[i]);
-                        objects.add(in[j]);
-                    }
-                }
-            }
-        }
-    }
 }

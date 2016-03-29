@@ -15,7 +15,7 @@ public class UnitUtils {
         super();
     }
 
-    public void copyProperties(Instance self, Instance in) {
+    public void copyProperties(InstanceOLD self, InstanceOLD in) {
 
         String[] attrListNames = self.getAttributesListNames();
 
@@ -29,9 +29,9 @@ public class UnitUtils {
         String[] allchildren = self.getChildInstanceListNames();
 
         for (int i = 0; i < allchildren.length; i++) {
-            Instance[] instances = self.getChildInstances(allchildren[i]);
+            InstanceOLD[] instances = self.getChildInstances(allchildren[i]);
             for (int j = 0; j < instances.length; j++) {
-                in.addChildInstance(allchildren[i], new Instance(instances[j]));
+                in.addChildInstance(allchildren[i], new InstanceOLD(instances[j]));
             }
         }
 
@@ -43,7 +43,7 @@ public class UnitUtils {
      * @param listName
      *            String
      */
-    public void removeAllAttributes(Instance inst, String listName) {
+    public void removeAllAttributes(InstanceOLD inst, String listName) {
         ArrayList list = (ArrayList) inst.attributeLists.get(listName);
         if (list != null) {
             list.clear();
@@ -59,7 +59,7 @@ public class UnitUtils {
      * @param a
      *            String
      */
-    public void removeAttribute(Frame f, String[] pathToChild, String a) {
+    public void removeAttribute(FrameOLD f, String[] pathToChild, String a) {
         // the last part of the path must be the list to delete from
         if (pathToChild.length == 1) {
             ArrayList list = (ArrayList) f.attributeLists.get(pathToChild[0]);
@@ -78,7 +78,7 @@ public class UnitUtils {
             String[] childrenNames = f.getChildFrameListNames();
             for (int i = 0; i < childrenNames.length; i++) {
                 if (childrenNames[i].equals(list)) {
-                    Frame[] children = f.getChildFrames(childrenNames[i]);
+                    FrameOLD[] children = f.getChildFrames(childrenNames[i]);
                     for (int j = 0; j < children.length; j++) {
                         this.removeAttribute(children[j], Utils.removeFromArray(newPath, children[j].getTypeName()), a);
                     }
@@ -91,7 +91,7 @@ public class UnitUtils {
         f.setDirty(true);
     }
 
-    public void removeAttribute(Instance inst, String[] pathToChild, String a) {
+    public void removeAttribute(InstanceOLD inst, String[] pathToChild, String a) {
         if (pathToChild.length == 1) {
             ArrayList list = (ArrayList) inst.attributeLists.get(pathToChild[0]);
             if (a != null) {
@@ -106,7 +106,7 @@ public class UnitUtils {
             String[] childrenNames = inst.getChildInstanceListNames();
             for (int i = 0; i < childrenNames.length; i++) {
                 if (childrenNames[i].equals(list)) {
-                    Instance[] children = inst.getChildInstances(childrenNames[i]);
+                    InstanceOLD[] children = inst.getChildInstances(childrenNames[i]);
                     for (int j = 0; j < children.length; j++) {
                         this.removeAttribute(children[j], Utils.removeFromArray(newPath, children[j].getName()), a);
                     }
@@ -126,13 +126,13 @@ public class UnitUtils {
      * @param childName
      *            String
      */
-    public void removeChildFrame(Frame x, String[] pathToChild, String childName) {
+    public void removeChildFrame(FrameOLD x, String[] pathToChild, String childName) {
 
         if (pathToChild.length == 1) {
             ArrayList list = (ArrayList) x.objectLists.get(pathToChild[0]);
             Iterator iter = list.iterator();
             while (iter.hasNext()) {
-                Frame f = (Frame) iter.next();
+                FrameOLD f = (FrameOLD) iter.next();
                 if (f.getTypeName().equals(childName)) {
                     iter.remove();
                     x.setDirty(true);
@@ -145,7 +145,7 @@ public class UnitUtils {
             String[] childrenNames = x.getChildFrameListNames();
             for (int i = 0; i < childrenNames.length; i++) {
                 if (childrenNames[i].equals(list)) {
-                    Frame[] children = x.getChildFrames(childrenNames[i]);
+                    FrameOLD[] children = x.getChildFrames(childrenNames[i]);
                     for (int j = 0; j < children.length; j++) {
                         removeChildFrame(children[j], Utils.removeFromArray(newPath, children[j].getTypeName()), childName);
                     }
@@ -164,14 +164,14 @@ public class UnitUtils {
      * @param childName
      *            String
      */
-    public void removeChildInstance(Instance inst, String[] pathToChild, String childName) {
+    public void removeChildInstance(InstanceOLD inst, String[] pathToChild, String childName) {
         // the last part of the path must be the list to append to
         if (pathToChild.length == 1) {
             ArrayList list = (ArrayList) inst.objectLists.get(pathToChild[0]);
             if (list != null) {
                 Iterator iter = list.iterator();
                 while (iter.hasNext()) {
-                    Instance in = (Instance) iter.next();
+                    InstanceOLD in = (InstanceOLD) iter.next();
                     if (in.getName().equals(childName)) {
                         iter.remove();
                         inst.setDirty(true);
@@ -185,7 +185,7 @@ public class UnitUtils {
             String[] childrenNames = inst.getChildInstanceListNames();
             for (int i = 0; i < childrenNames.length; i++) {
                 if (childrenNames[i].equals(list)) {
-                    Instance[] children = inst.getChildInstances(childrenNames[i]);
+                    InstanceOLD[] children = inst.getChildInstances(childrenNames[i]);
                     for (int j = 0; j < children.length; j++) {
                         removeChildInstance(children[j], Utils.removeFromArray(newPath, children[j].getName()), childName);
                     }
@@ -206,7 +206,7 @@ public class UnitUtils {
      * @param a
      *            DomainAttribute
      */
-    public void setChildAttribute(Frame f, String[] pathToChild, DomainAttribute a) {
+    public void setChildAttribute(FrameOLD f, String[] pathToChild, DomainAttribute a) {
         if (pathToChild.length == 1) {
             ArrayList list = (ArrayList) f.getAttributeLists().get(pathToChild[0]);
             if (a != null) {
@@ -224,7 +224,7 @@ public class UnitUtils {
             String[] childrenNames = f.getChildFrameListNames();
             for (int i = 0; i < childrenNames.length; i++) {
                 if (childrenNames[i].equals(list)) {
-                    Frame[] children = f.getChildFrames(childrenNames[i]);
+                    FrameOLD[] children = f.getChildFrames(childrenNames[i]);
                     for (int j = 0; j < children.length; j++) {
                         this.setChildAttribute(children[j], Utils.removeFromArray(newPath, children[j].getTypeName()), a);
                     }
@@ -246,7 +246,7 @@ public class UnitUtils {
      * @param a
      *            Attribute
      */
-    public void setChildAttribute(Instance inst, String[] pathToChild, Attribute a) {
+    public void setChildAttribute(InstanceOLD inst, String[] pathToChild, Attribute a) {
         // the last part of the path must be the list to append to
         if (pathToChild.length == 1) {
             ArrayList list = (ArrayList) inst.attributeLists.get(pathToChild[0]);
@@ -268,7 +268,7 @@ public class UnitUtils {
             String[] childrenNames = inst.getChildInstanceListNames();
             for (int i = 0; i < childrenNames.length; i++) {
                 if (childrenNames[i].equals(list)) {
-                    Instance[] children = inst.getChildInstances(childrenNames[i]);
+                    InstanceOLD[] children = inst.getChildInstances(childrenNames[i]);
                     for (int j = 0; j < children.length; j++) {
                         this.setChildAttribute(children[j], Utils.removeFromArray(newPath, children[j].getName()), a);
                     }
@@ -290,15 +290,15 @@ public class UnitUtils {
      * @param a
      *            Frame
      */
-    public void setChildFrame(Frame x, String[] pathToChild, Frame a) {
+    public void setChildFrame(FrameOLD x, String[] pathToChild, FrameOLD a) {
         // the last part of the path must be the list to append to
         if (pathToChild.length == 1) {
             ArrayList list = (ArrayList) x.objectLists.get(pathToChild[0]);
             if (list != null) {
-                a = (Frame) a.clone();
+                a = (FrameOLD) a.clone();
                 Iterator iter = list.iterator();
                 while (iter.hasNext()) {
-                    Frame f = (Frame) iter.next();
+                    FrameOLD f = (FrameOLD) iter.next();
                     if (f.getTypeName().equals(a.getTypeName())) {
                         iter.remove();
                     }
@@ -315,7 +315,7 @@ public class UnitUtils {
             String[] childrenNames = x.getChildFrameListNames();
             for (int i = 0; i < childrenNames.length; i++) {
                 if (childrenNames[i].equals(list)) {
-                    Frame[] children = x.getChildFrames(childrenNames[i]);
+                    FrameOLD[] children = x.getChildFrames(childrenNames[i]);
                     for (int j = 0; j < children.length; j++) {
                         setChildFrame(children[j], Utils.removeFromArray(newPath, children[j].getTypeName()), a);
                     }
@@ -334,13 +334,13 @@ public class UnitUtils {
      * @param a
      *            Instance
      */
-    public void setChildInstance(Instance inst, String[] pathToChild, Instance a) {
+    public void setChildInstance(InstanceOLD inst, String[] pathToChild, InstanceOLD a) {
         // the last part of the path must be the list to append to
         if (pathToChild.length == 1) {
             ArrayList list = (ArrayList) inst.objectLists.get(pathToChild[0]);
             if (list != null) {
                 list.remove(a);
-                a = new Instance(a);
+                a = new InstanceOLD(a);
                 list.add(a);
             } else {
                 inst.addChildInstance(pathToChild[0], a);
@@ -352,7 +352,7 @@ public class UnitUtils {
             String[] childrenNames = inst.getChildInstanceListNames();
             for (int i = 0; i < childrenNames.length; i++) {
                 if (childrenNames[i].equals(list)) {
-                    Instance[] children = inst.getChildInstances(childrenNames[i]);
+                    InstanceOLD[] children = inst.getChildInstances(childrenNames[i]);
                     for (int j = 0; j < children.length; j++) {
                         setChildInstance(children[j], Utils.removeFromArray(newPath, children[j].getName()), a);
                     }

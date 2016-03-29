@@ -1,8 +1,8 @@
 package de.s2.gsim.def.objects.behaviour;
 
-import de.s2.gsim.def.objects.Frame;
+import de.s2.gsim.def.objects.FrameOLD;
 
-public class DependencyTestDefinitionFrame extends Frame {
+public class DependencyTestDefinitionFrame extends FrameOLD {
 
     public final static DependencyTestDefinitionFrame DEFINITION = new DependencyTestDefinitionFrame("test-definition-definition");
     /**
@@ -10,7 +10,7 @@ public class DependencyTestDefinitionFrame extends Frame {
      */
     private static final long serialVersionUID = 1L;
 
-    public DependencyTestDefinitionFrame(Frame f) {
+    public DependencyTestDefinitionFrame(FrameOLD f) {
         super(f);
     }
 
@@ -26,7 +26,7 @@ public class DependencyTestDefinitionFrame extends Frame {
     public DependencyTestFrame[] getDependencyTestFrames() {
         DependencyTestFrame[] res = new DependencyTestFrame[getChildFrames("list").length];
         int i = 0;
-        for (Frame f : getChildFrames("list")) {
+        for (FrameOLD f : getChildFrames("list")) {
             DependencyTestFrame frame = new DependencyTestFrame(f);
             res[i] = frame;
             i++;

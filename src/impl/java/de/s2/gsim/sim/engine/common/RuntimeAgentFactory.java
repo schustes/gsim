@@ -13,7 +13,7 @@ import de.s2.gsim.api.sim.agent.impl.RtExecutionContextImpl;
 import de.s2.gsim.api.sim.agent.impl.RuntimeAgent;
 import de.s2.gsim.def.Environment;
 import de.s2.gsim.def.GSimDefException;
-import de.s2.gsim.def.objects.Frame;
+import de.s2.gsim.def.objects.FrameOLD;
 import de.s2.gsim.def.objects.agent.GenericAgent;
 import de.s2.gsim.sim.DataHandler;
 import de.s2.gsim.sim.GSimEngineException;
@@ -43,8 +43,8 @@ public class RuntimeAgentFactory {
 
             for (GenericAgent element : a) {
                 HashMap<String, String> map = new HashMap<String, String>();
-                Frame def = element.getDefinition();
-                Frame[] anc = def.getAncestors();
+                FrameOLD def = element.getDefinition();
+                FrameOLD[] anc = def.getAncestors();
                 RuntimeAgent owner = new RuntimeAgent(element, ns + "/" + id);
 
                 /*
@@ -125,8 +125,8 @@ public class RuntimeAgentFactory {
 
             for (GenericAgent element : a) {
                 HashMap map = new HashMap();
-                Frame def = element.getDefinition();
-                Frame[] anc = def.getAncestors();
+                FrameOLD def = element.getDefinition();
+                FrameOLD[] anc = def.getAncestors();
                 RuntimeAgent owner = new RuntimeAgent(element, env.getNamespace() + "/" + id);
 
                 if (map.size() > 0) {
@@ -185,8 +185,8 @@ public class RuntimeAgentFactory {
             props.put("AGENT_COUNT", String.valueOf(agentCount));
 
             HashMap<String, String> map = new HashMap<String, String>();
-            Frame def = a.getDefinition();
-            Frame[] anc = def.getAncestors();
+            FrameOLD def = a.getDefinition();
+            FrameOLD[] anc = def.getAncestors();
             RuntimeAgent owner = new RuntimeAgent(a, simId);
 
             if (map.size() > 0) {

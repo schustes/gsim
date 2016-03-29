@@ -9,7 +9,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 
-import de.s2.gsim.def.objects.Frame;
+import de.s2.gsim.def.objects.FrameOLD;
 import de.s2.gsim.util.Logging;
 
 public class FramePersistenceManager {
@@ -22,11 +22,11 @@ public class FramePersistenceManager {
         this.namespace = namespace;
     }
 
-    public void deleteFrame(Frame f) {
+    public void deleteFrame(FrameOLD f) {
         deletePermanently(f);
     }
 
-    public Frame[] getAllFrames() {
+    public FrameOLD[] getAllFrames() {
 
         long a = 0, b = 0;
         a = System.currentTimeMillis();
@@ -41,7 +41,7 @@ public class FramePersistenceManager {
             for (int i = 0; i < frames.length; i++) {
                 FileInputStream fi = new FileInputStream(frames[i].getCanonicalPath());
                 ObjectInputStream si = new ObjectInputStream(fi);
-                Frame inst = (Frame) si.readObject();
+                FrameOLD inst = (FrameOLD) si.readObject();
                 si.close();
                 list.add(inst);
             }
@@ -51,12 +51,12 @@ public class FramePersistenceManager {
 
         b = System.currentTimeMillis() - a;
         Logging.ModelLogger.info("Loaded " + list.size() + " frames in " + (double) b / 1000 + " seconds.");
-        Frame[] res = new Frame[list.size()];
+        FrameOLD[] res = new FrameOLD[list.size()];
         list.toArray(res);
         return res;
     }
 
-    public Frame reload(String name) {
+    public FrameOLD reload(String name) {
         try {
 
             name = name.replace('\\', '_');
@@ -65,7 +65,7 @@ public class FramePersistenceManager {
             File file = new File(persistDir + "/" + namespace + "/" + name).getCanonicalFile();
             FileInputStream fi = new FileInputStream(file.getCanonicalPath());
             ObjectInputStream si = new ObjectInputStream(fi);
-            Frame inst = (Frame) si.readObject();
+            FrameOLD inst = (FrameOLD) si.readObject();
             si.close();
             return inst;
         } catch (FileNotFoundException e) {
@@ -76,17 +76,17 @@ public class FramePersistenceManager {
         }
     }
 
-    public void saveFrame(Frame f) {
+    public void saveFrame(FrameOLD f) {
         savePermanently(f);
     }
 
-    public void saveFrames(Frame[] pf) {
+    public void saveFrames(FrameOLD[] pf) {
         for (int i = 0; i < pf.length; i++) {
             saveFrame(pf[i]);
         }
     }
 
-    private void deletePermanently(Frame c) {
+    private void deletePermanently(FrameOLD c) {
         File dir = new File(persistDir + "/" + namespace);
 
         if (dir.exists()) {
@@ -105,7 +105,7 @@ public class FramePersistenceManager {
         }
     }
 
-    private void savePermanently(Frame inst) {
+    private void savePermanently(FrameOLD inst) {
         try {
 
             File dir = new File(persistDir + "/" + namespace);

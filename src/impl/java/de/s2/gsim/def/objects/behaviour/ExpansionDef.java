@@ -1,18 +1,18 @@
 package de.s2.gsim.def.objects.behaviour;
 
-import de.s2.gsim.def.objects.Instance;
+import de.s2.gsim.def.objects.InstanceOLD;
 import de.s2.gsim.objects.attribute.NumericalAttribute;
 import de.s2.gsim.objects.attribute.SetAttribute;
 import de.s2.gsim.objects.attribute.StringAttribute;
 
-public class ExpansionDef extends Instance {
+public class ExpansionDef extends InstanceOLD {
 
     /**
      * 
      */
     private static final long serialVersionUID = 1L;
 
-    public ExpansionDef(Instance in) {
+    public ExpansionDef(InstanceOLD in) {
         super(in);
     }
 

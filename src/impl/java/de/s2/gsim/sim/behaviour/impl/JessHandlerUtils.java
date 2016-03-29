@@ -6,7 +6,7 @@ import java.util.HashSet;
 import org.apache.log4j.Logger;
 
 import de.s2.gsim.api.sim.agent.impl.RuntimeAgent;
-import de.s2.gsim.def.objects.Instance;
+import de.s2.gsim.def.objects.InstanceOLD;
 import de.s2.gsim.def.objects.agent.BehaviourDef;
 import de.s2.gsim.def.objects.agent.BehaviourFrame;
 import de.s2.gsim.def.objects.behaviour.ActionDef;
@@ -81,7 +81,7 @@ public class JessHandlerUtils {
             if (a.hasObjectParameter()) {
                 for (String param : a.getObjectClassParams()) {
                     if (param != null && param.length() > 0) {
-                        for (Instance inst : Utils.getChildInstancesOfType(owner, param)) {
+                        for (InstanceOLD inst : Utils.getChildInstancesOfType(owner, param)) {
                             if (inst.getName().matches(".*" + a.getFilterExpression(param) + ".*")) {
                                 assertObjectParam(rete, param, inst.getName());
                             }
@@ -93,21 +93,21 @@ public class JessHandlerUtils {
 
         HashSet<String> uniqueConditions = new HashSet<String>();
 
-        for (Instance r : owner.getBehaviour().getChildInstances(BehaviourFrame.RULE_LIST)) {
-            for (Instance cc : r.getChildInstances(UserRuleFrame.INST_LIST_COND)) {
+        for (InstanceOLD r : owner.getBehaviour().getChildInstances(BehaviourFrame.RULE_LIST)) {
+            for (InstanceOLD cc : r.getChildInstances(UserRuleFrame.INST_LIST_COND)) {
                 ConditionDef c = new ConditionDef(cc);
                 uniqueConditions.add(c.getParameterName());
                 uniqueConditions.add(c.getParameterValue());
             }
         }
 
-        for (Instance r : owner.getBehaviour().getChildInstances(BehaviourFrame.RL_LIST)) {
-            for (Instance cc : r.getChildInstances(UserRuleFrame.INST_LIST_COND)) {
+        for (InstanceOLD r : owner.getBehaviour().getChildInstances(BehaviourFrame.RL_LIST)) {
+            for (InstanceOLD cc : r.getChildInstances(UserRuleFrame.INST_LIST_COND)) {
                 ConditionDef c = new ConditionDef(cc);
                 uniqueConditions.add(c.getParameterName());
                 uniqueConditions.add(c.getParameterValue());
             }
-            for (Instance cc : r.getChildInstances(RLRuleFrame.INST_LIST_EXP)) {
+            for (InstanceOLD cc : r.getChildInstances(RLRuleFrame.INST_LIST_EXP)) {
                 ExpansionDef c = new ExpansionDef(cc);
                 uniqueConditions.add(c.getParameterName());
                 uniqueConditions.add(String.valueOf(c.getMin()));
@@ -115,8 +115,8 @@ public class JessHandlerUtils {
                 uniqueConditions.add(String.valueOf(c.getMax()));
             }
 
-            for (Instance sc : r.getChildInstances(RLRuleFrame.INST_LIST_SHORTCUTS)) {
-                for (Instance cc : sc.getChildInstances(UserRuleFrame.INST_LIST_COND)) {
+            for (InstanceOLD sc : r.getChildInstances(RLRuleFrame.INST_LIST_SHORTCUTS)) {
+                for (InstanceOLD cc : sc.getChildInstances(UserRuleFrame.INST_LIST_COND)) {
                     ConditionDef c = new ConditionDef(cc);
                     if (!c.getParameterName().contains("$")) {
                         throw new RuntimeException("Parse error: selectors must reference action-nodes on their LHS");
@@ -126,7 +126,7 @@ public class JessHandlerUtils {
                 }
 
             }
-            for (Instance eval : r.getChildInstances(RLRuleFrame.INST_LIST_LEARNING)) {
+            for (InstanceOLD eval : r.getChildInstances(RLRuleFrame.INST_LIST_LEARNING)) {
                 String s = eval.getName();
                 if (!eval.getName().startsWith("{")) {
                     ConditionDef c = new ConditionDef(eval);
@@ -176,14 +176,14 @@ public class JessHandlerUtils {
         }
         for (String s : params) {
             String list = s.split("/")[0].trim();
-            Instance[] objects = owner.getChildInstances(list);
-            for (Instance inst : objects) {
+            InstanceOLD[] objects = owner.getChildInstances(list);
+            for (InstanceOLD inst : objects) {
                 assertObjectParam(rete, s, inst.getName());
             }
         }
     }
 
-    private static HashSet buildReplaceConstants(Rete rete, Instance owner, String n) {
+    private static HashSet buildReplaceConstants(Rete rete, InstanceOLD owner, String n) {
 
         if (n.contains("::")) {
             return new HashSet(0);
@@ -204,7 +204,7 @@ public class JessHandlerUtils {
         return buildReplaceConstantsAttRef(rete, owner, n);
     }
 
-    private static HashSet buildReplaceConstantsAttRef(Rete rete, Instance owner, String n) {
+    private static HashSet buildReplaceConstantsAttRef(Rete rete, InstanceOLD owner, String n) {
 
         HashSet list = new HashSet();
         String att = ParsingUtils.resolveAttribute(n);
@@ -235,19 +235,19 @@ public class JessHandlerUtils {
         return list;
     }
 
-    private static HashSet buildReplaceConstantsInstanceRef(Rete rete, Instance owner, String n) {
+    private static HashSet buildReplaceConstantsInstanceRef(Rete rete, InstanceOLD owner, String n) {
 
         HashSet list = new HashSet();
 
         String listName = ParsingUtils.resolveList(n);
         String object = ParsingUtils.resolveObjectClassNoList(n);
 
-        Instance[] insts = owner.getChildInstances(listName);
+        InstanceOLD[] insts = owner.getChildInstances(listName);
         if (insts == null) {
             return list;
         }
 
-        for (Instance inst : insts) {
+        for (InstanceOLD inst : insts) {
 
             /*
              * if (att!=null && n.contains("{")) { String attRef=n.substring(n.indexOf("{")+1, n.lastIndexOf("}")); Attribute ref =
@@ -267,7 +267,7 @@ public class JessHandlerUtils {
         return list;
     }
 
-    private static HashSet buildReplaceVariablesSC(Rete rete, Instance owner, String n) {
+    private static HashSet buildReplaceVariablesSC(Rete rete, InstanceOLD owner, String n) {
 
         HashSet list = new HashSet();
 
@@ -275,12 +275,12 @@ public class JessHandlerUtils {
         String att = ParsingUtils.resolveAttribute(n);
         String object = ParsingUtils.resolveObjectClassNoList(n);
 
-        Instance[] insts = owner.getChildInstances(listName);
+        InstanceOLD[] insts = owner.getChildInstances(listName);
         if (insts == null) {
             return list;
         }
 
-        for (Instance inst : insts) {
+        for (InstanceOLD inst : insts) {
 
             if (att.contains("{")) {
                 String attRef = att.substring(1, att.length() - 1);

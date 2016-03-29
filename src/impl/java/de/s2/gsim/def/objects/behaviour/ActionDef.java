@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 
-import de.s2.gsim.def.objects.Instance;
+import de.s2.gsim.def.objects.InstanceOLD;
 import de.s2.gsim.objects.attribute.Attribute;
 import de.s2.gsim.objects.attribute.NumericalAttribute;
 import de.s2.gsim.objects.attribute.SetAttribute;
@@ -16,7 +16,7 @@ import de.s2.gsim.util.Utils;
  *
  * @see ActionFrame for details.
  */
-public class ActionDef extends Instance {
+public class ActionDef extends InstanceOLD {
 
     static final long serialVersionUID = -6035384056999349555L;
 
@@ -36,7 +36,7 @@ public class ActionDef extends Instance {
      * @param inst
      *            Instance
      */
-    public ActionDef(Instance inst) {
+    public ActionDef(InstanceOLD inst) {
         super(inst);
     }
 

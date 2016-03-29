@@ -3,8 +3,8 @@ package de.s2.gsim.util;
 import java.util.ArrayList;
 import java.util.HashSet;
 
-import de.s2.gsim.def.objects.Frame;
-import de.s2.gsim.def.objects.Instance;
+import de.s2.gsim.def.objects.FrameOLD;
+import de.s2.gsim.def.objects.InstanceOLD;
 import de.s2.gsim.objects.AgentInstance;
 import de.s2.gsim.objects.attribute.Attribute;
 import de.s2.gsim.objects.attribute.IntervalAttribute;
@@ -145,7 +145,7 @@ public class Utils {
         return true;
     }
 
-    public static Instance[] getChildInstancesOfType(Instance agent, String type) {
+    public static InstanceOLD[] getChildInstancesOfType(InstanceOLD agent, String type) {
         HashSet set = new HashSet();
         String[] path = type.split("/");
         String listName = path[0];
@@ -153,15 +153,15 @@ public class Utils {
         String className = path[1];
 
         if (agent.getChildInstances(listName) == null) {
-            return new Instance[0];
+            return new InstanceOLD[0];
         }
 
-        for (Instance obj : agent.getChildInstances(listName)) {
+        for (InstanceOLD obj : agent.getChildInstances(listName)) {
             if (obj.inheritsFrom(className)) {
                 set.add(obj);
             }
         }
-        Instance[] res = new Instance[set.size()];
+        InstanceOLD[] res = new InstanceOLD[set.size()];
         set.toArray(res);
         return res;
 
@@ -467,7 +467,7 @@ public class Utils {
         }
     }
 
-    public static boolean isNumericalAttribute(Instance obj, String pathToAtt) {
+    public static boolean isNumericalAttribute(InstanceOLD obj, String pathToAtt) {
         Attribute a = (Attribute) obj.resolveName(pathToAtt.split("/"));
         return (a instanceof NumericalAttribute);
     }
@@ -490,7 +490,7 @@ public class Utils {
         return -1;
     }
 
-    public static double numericalValue(Instance in, String att) {
+    public static double numericalValue(InstanceOLD in, String att) {
         Attribute attribute = in.getAttribute(att);
         if (att != null && attribute instanceof NumericalAttribute) {
             NumericalAttribute a = (NumericalAttribute) attribute;
@@ -504,7 +504,7 @@ public class Utils {
 
     }
 
-    public static double numericalValue(Instance in, String list, String att) {
+    public static double numericalValue(InstanceOLD in, String list, String att) {
         Attribute attribute = in.getAttribute(list, att);
         if (att != null && attribute instanceof NumericalAttribute) {
             NumericalAttribute a = (NumericalAttribute) attribute;
@@ -554,13 +554,13 @@ public class Utils {
         }
     }
 
-    public static String toInstPath(Instance agent, String framePath, String instName) {
+    public static String toInstPath(InstanceOLD agent, String framePath, String instName) {
         String[] p = framePath.split("/");
         for (int i = 0; i < p.length; i++) {
             p[i] = p[i].trim();
         }
 
-        Frame def = (Frame) agent.getDefinition().resolveName(p);
+        FrameOLD def = (FrameOLD) agent.getDefinition().resolveName(p);
 
         if (def == null) {
             def = agent.getDefinition().getListType(p[0]);

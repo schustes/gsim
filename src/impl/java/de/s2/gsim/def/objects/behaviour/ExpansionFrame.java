@@ -1,10 +1,10 @@
 package de.s2.gsim.def.objects.behaviour;
 
-import de.s2.gsim.def.objects.Frame;
+import de.s2.gsim.def.objects.FrameOLD;
 import de.s2.gsim.objects.attribute.AttributeType;
 import de.s2.gsim.objects.attribute.DomainAttribute;
 
-public class ExpansionFrame extends Frame {
+public class ExpansionFrame extends FrameOLD {
 
     public final static String ATTR_LIST_ATTRS = "attributes";
 
@@ -17,7 +17,7 @@ public class ExpansionFrame extends Frame {
      */
     private static final long serialVersionUID = 1L;
 
-    public ExpansionFrame(Frame f) {
+    public ExpansionFrame(FrameOLD f) {
         super(f);
     }
 

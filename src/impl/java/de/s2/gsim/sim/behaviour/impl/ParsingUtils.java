@@ -1,8 +1,8 @@
 package de.s2.gsim.sim.behaviour.impl;
 
 import de.s2.gsim.api.sim.agent.impl.RuntimeAgent;
-import de.s2.gsim.def.objects.Frame;
-import de.s2.gsim.def.objects.Instance;
+import de.s2.gsim.def.objects.FrameOLD;
+import de.s2.gsim.def.objects.InstanceOLD;
 import de.s2.gsim.def.objects.agent.GenericAgentClass;
 import de.s2.gsim.objects.attribute.Attribute;
 import de.s2.gsim.objects.attribute.AttributeConstants;
@@ -20,8 +20,8 @@ public class ParsingUtils {
             return def.getTypeName();
         }
 
-        Frame[] ancestors = def.getAncestors();
-        for (Frame f : ancestors) {
+        FrameOLD[] ancestors = def.getAncestors();
+        for (FrameOLD f : ancestors) {
             GenericAgentClass agentClass = (GenericAgentClass) f;
             if (agentClass.getBehaviour().getDeclaredRLRule(ruleName) != null) {
                 return agentClass.getTypeName();
@@ -85,8 +85,8 @@ public class ParsingUtils {
             return def.getTypeName();
         }
 
-        Frame[] ancestors = def.getAncestors();
-        for (Frame f : ancestors) {
+        FrameOLD[] ancestors = def.getAncestors();
+        for (FrameOLD f : ancestors) {
             GenericAgentClass agentClass = (GenericAgentClass) f;
             if (agentClass.getBehaviour().getDeclaredRule(ruleName) != null) {
                 return agentClass.getTypeName();
@@ -95,7 +95,7 @@ public class ParsingUtils {
         return "default";
     }
 
-    public static boolean isNumericalAttributeSpec(Instance agent, String attRef) throws GSimEngineException {
+    public static boolean isNumericalAttributeSpec(InstanceOLD agent, String attRef) throws GSimEngineException {
         Attribute att = null;
         if (!attRef.contains("::")) {
             att = (Attribute) agent.resolveName(attRef.split("/"));
@@ -108,7 +108,7 @@ public class ParsingUtils {
             String[] ref0 = attRef.split("::")[0].split("/");
             String[] ref1 = attRef.split("::")[1].split("/");
             String listName = ref0[0];
-            Frame object = agent.getDefinition().getListType(listName);
+            FrameOLD object = agent.getDefinition().getListType(listName);
             if (object != null) {
                 DomainAttribute datt = (DomainAttribute) object.resolveName(ref1);
                 if (datt.getType().equals(AttributeConstants.NUMERICAL) || datt.getType().equals(AttributeConstants.INTERVAL)) {

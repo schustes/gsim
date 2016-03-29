@@ -13,7 +13,7 @@ import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.input.SAXBuilder;
 
-import de.s2.gsim.def.objects.Frame;
+import de.s2.gsim.def.objects.FrameOLD;
 import de.s2.gsim.def.objects.agent.GenericAgentClass;
 import de.s2.gsim.def.objects.behaviour.ActionFrame;
 import de.s2.gsim.def.objects.behaviour.ConditionFrame;
@@ -113,7 +113,7 @@ public class EnvironmentSetup extends EnvironmentBase {
                         while (it.hasNext()) {
                             Element list = (Element) it.next();
 
-                            Frame object = getObjectSubClass(list.getAttributeValue("type"));
+                            FrameOLD object = getObjectSubClass(list.getAttributeValue("type"));
 
                             c.defineObjectList(list.getAttributeValue("name"), object);
                             agentSubClasses.add(c);
@@ -130,7 +130,7 @@ public class EnvironmentSetup extends EnvironmentBase {
                                 while (it2.hasNext()) {
                                     Element o = (Element) it2.next();
                                     String nName = o.getAttribute("name") == null ? object.getTypeName() : o.getAttributeValue("name");
-                                    Frame child = new Frame(new Frame[] { object }, nName, object.getCategory());// new Frame(nName, object,
+                                    FrameOLD child = new FrameOLD(new FrameOLD[] { object }, nName, object.getCategory());// new Frame(nName, object,
                                     // this.getUniqueId());
 
                                     if (o.hasChildren()) {
@@ -642,7 +642,7 @@ public class EnvironmentSetup extends EnvironmentBase {
                 } else {
                     String[] ref0 = attRef.split("::")[0].split("/");
                     String[] ref1 = attRef.split("::")[1].split("/");
-                    Frame object = getObjectSubClass(ref0[1].trim());
+                    FrameOLD object = getObjectSubClass(ref0[1].trim());
                     if (object != null) {
                         att = (DomainAttribute) object.resolveName(ref1);
                     }
@@ -782,7 +782,7 @@ public class EnvironmentSetup extends EnvironmentBase {
         return da;
     }
 
-    private void createObjectFromXML(Element e, Frame f) throws GSimDefException {
+    private void createObjectFromXML(Element e, FrameOLD f) throws GSimDefException {
         // Element e = ex.getChild("attribute-lists");
         if (e.getChildren("list") != null) {
             Iterator it = e.getChildren("list").iterator();
@@ -808,7 +808,7 @@ public class EnvironmentSetup extends EnvironmentBase {
     }
 
     private void createObjects() throws GSimDefException {
-        HashMap<String, Frame> top = createTopLevelObjects(topLevelObjects);
+        HashMap<String, FrameOLD> top = createTopLevelObjects(topLevelObjects);
         GenericAgentClass[] c = getAgentSubClasses();
         for (int i = 0; i < c.length; i++) {
             top.put(c[i].getTypeName(), c[i]);
@@ -824,7 +824,7 @@ public class EnvironmentSetup extends EnvironmentBase {
         HashMap resolved = createSubLevelObjects(top, ind);
         iter = resolved.values().iterator();
         while (iter.hasNext()) {
-            Frame cls = (Frame) iter.next();
+            FrameOLD cls = (FrameOLD) iter.next();
             if (!(cls instanceof GenericAgentClass)) {
                 addObjectSubClass(cls);
             }
@@ -889,11 +889,11 @@ public class EnvironmentSetup extends EnvironmentBase {
         return ind;
     }
 
-    private HashMap<String, Frame> createSubLevelObjects(HashMap<String, Frame> topLevel, HashMap<String, Element> subLevelsXML)
+    private HashMap<String, FrameOLD> createSubLevelObjects(HashMap<String, FrameOLD> topLevel, HashMap<String, Element> subLevelsXML)
             throws GSimDefException {
-        HashMap<String, Frame> ind = new HashMap<String, Frame>(topLevel);
+        HashMap<String, FrameOLD> ind = new HashMap<String, FrameOLD>(topLevel);
 
-        HashMap<String, Frame> resolved = new HashMap<String, Frame>();
+        HashMap<String, FrameOLD> resolved = new HashMap<String, FrameOLD>();
         boolean resolvable = true;
 
         int lastSize = subLevelsXML.size();
@@ -912,10 +912,10 @@ public class EnvironmentSetup extends EnvironmentBase {
                 }
                 if (goes) {
                     iter.remove();
-                    Frame[] fs = new Frame[parentArray.length];
+                    FrameOLD[] fs = new FrameOLD[parentArray.length];
                     boolean hasObjectParent = false;
                     for (int i = 0; i < parentArray.length; i++) {
-                        Frame parentClass = ind.get(parentArray[i]);
+                        FrameOLD parentClass = ind.get(parentArray[i]);
                         if (!(parentClass instanceof GenericAgentClass)) {
                             hasObjectParent = true;
                             resolved.put(parentClass.getTypeName(), parentClass);
@@ -923,11 +923,11 @@ public class EnvironmentSetup extends EnvironmentBase {
                         fs[i] = parentClass;
                     }
                     if (!hasObjectParent) {
-                        Frame[] nn = new Frame[fs.length + 1];
+                        FrameOLD[] nn = new FrameOLD[fs.length + 1];
                         Utils.addToArray(fs, nn, getObjectClass());
                         fs = nn;
                     }
-                    Frame sub = new Frame(fs, name, "object");
+                    FrameOLD sub = new FrameOLD(fs, name, "object");
                     createObjectFromXML(e, sub);
                     ind.put(sub.getTypeName(), sub);
                     resolved.put(sub.getTypeName(), sub);
@@ -971,15 +971,15 @@ public class EnvironmentSetup extends EnvironmentBase {
     }
 
     // create objects that do not inherit from anything.
-    private HashMap<String, Frame> createTopLevelObjects(HashMap<String, Element> o) throws GSimDefException {
+    private HashMap<String, FrameOLD> createTopLevelObjects(HashMap<String, Element> o) throws GSimDefException {
         maybeSetObjectClass(o);
-        HashMap<String, Frame> ind = new HashMap<String, Frame>();
+        HashMap<String, FrameOLD> ind = new HashMap<String, FrameOLD>();
         Iterator iter = o.values().iterator();
         while (iter.hasNext()) {
             Element e = (Element) iter.next();
-            Frame top = getObjectClassRef();
+            FrameOLD top = getObjectClassRef();
             if (!e.getAttributeValue("name").equals(top.getTypeName())) {
-                Frame f = new Frame(new Frame[] { top }, e.getAttributeValue("name"), "object");
+                FrameOLD f = new FrameOLD(new FrameOLD[] { top }, e.getAttributeValue("name"), "object");
                 createObjectFromXML(e, f);
                 ind.put(f.getTypeName(), f);
             }
@@ -1035,9 +1035,9 @@ public class EnvironmentSetup extends EnvironmentBase {
      * @return Frame[]
      */
     @SuppressWarnings("unchecked")
-    private Frame[] loadPossiblyNewActions() {
+    private FrameOLD[] loadPossiblyNewActions() {
 
-        HashSet<Frame> frames = new HashSet<Frame>();
+        HashSet<FrameOLD> frames = new HashSet<FrameOLD>();
         Element root = null;
 
         try {
@@ -1047,7 +1047,7 @@ public class EnvironmentSetup extends EnvironmentBase {
             Element e1 = root.getChild("actions");
 
             if (e1 == null) {
-                return new Frame[0];
+                return new FrameOLD[0];
             }
 
             List actions = e1.getChildren();
@@ -1067,7 +1067,7 @@ public class EnvironmentSetup extends EnvironmentBase {
             e.printStackTrace();
         }
 
-        Frame[] res = new Frame[frames.size()];
+        FrameOLD[] res = new FrameOLD[frames.size()];
         frames.toArray(res);
         return res;
 
@@ -1077,7 +1077,7 @@ public class EnvironmentSetup extends EnvironmentBase {
         Iterator iter = o.values().iterator();
         while (iter.hasNext()) {
             Element e = (Element) iter.next();
-            Frame top = getObjectClassRef();
+            FrameOLD top = getObjectClassRef();
             if (e.getAttributeValue("name").equals(top.getTypeName())) {
                 createObjectFromXML(e, top);
                 setObjectClass(top);

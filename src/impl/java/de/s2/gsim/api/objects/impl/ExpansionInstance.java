@@ -1,7 +1,7 @@
 package de.s2.gsim.api.objects.impl;
 
 import de.s2.gsim.GSimException;
-import de.s2.gsim.def.objects.Unit;
+import de.s2.gsim.def.objects.UnitOLD;
 import de.s2.gsim.def.objects.behaviour.ExpansionDef;
 import de.s2.gsim.objects.Expansion;
 
@@ -87,7 +87,7 @@ public class ExpansionInstance implements Expansion, UnitWrapper {
     }
 
     @Override
-    public Unit toUnit() {
+    public UnitOLD toUnit() {
         return real;
     }
 

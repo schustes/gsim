@@ -13,7 +13,7 @@ import de.s2.gsim.objects.attribute.Attribute;
  * @author Stephan
  * @version 0.1
  */
-public class Unit implements java.io.Serializable {
+public class Unit implements Cloneable {
 
     public static final long serialVersionUID = -5778191656497160894L;
 
@@ -29,11 +29,13 @@ public class Unit implements java.io.Serializable {
 
     protected TypedMap objectLists = new TypedMap();
 
-    public Unit() {
+    @SuppressWarnings("unchecked")
+    public <K extends Unit> K copy() {
+        return (K) clone();
     }
 
     @Override
-    public Object clone() {
+    public Unit clone() {
         Unit u = new Unit();
         u.isSystem = isSystem;
         u.isMutable = isMutable;

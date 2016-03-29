@@ -43,8 +43,7 @@ public class GenericAgent extends Instance {
 
     @Override
     public Object clone() {
-        GenericAgent a = new GenericAgent(this);
-        return a;
+        return new GenericAgent(this);
     }
 
     public BehaviourDef getBehaviour() {

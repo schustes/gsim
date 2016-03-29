@@ -151,7 +151,7 @@ public class GenericAgentClass extends Frame {
     }
 
     @Override
-    public Object clone() {
+    public GenericAgentClass clone() {
         Frame f = (Frame) super.clone();
         GenericAgentClass c = new GenericAgentClass(f);
         c.setBehaviour(getBehaviour());

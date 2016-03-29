@@ -3,7 +3,7 @@ package de.s2.gsim.api.objects.impl;
 import java.util.ArrayList;
 
 import de.s2.gsim.GSimException;
-import de.s2.gsim.def.objects.Unit;
+import de.s2.gsim.def.objects.UnitOLD;
 import de.s2.gsim.def.objects.agent.BehaviourFrame;
 import de.s2.gsim.def.objects.behaviour.ActionFrame;
 import de.s2.gsim.def.objects.behaviour.RLRuleFrame;
@@ -263,7 +263,7 @@ public class BehaviourClass implements Behaviour, UnitWrapper {
     }
 
     @Override
-    public Unit toUnit() {
+    public UnitOLD toUnit() {
         return real;
     }
 

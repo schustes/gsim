@@ -4,13 +4,13 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import de.s2.gsim.def.EntityConstants;
-import de.s2.gsim.def.objects.Frame;
+import de.s2.gsim.def.objects.FrameOLD;
 import de.s2.gsim.def.objects.behaviour.ActionFrame;
 import de.s2.gsim.def.objects.behaviour.RLRuleFrame;
 import de.s2.gsim.def.objects.behaviour.UserRuleFrame;
 import de.s2.gsim.objects.attribute.DomainAttribute;
 
-public class GenericAgentClass extends Frame {
+public class GenericAgentClass extends FrameOLD {
 
     public static final String NAME = "Generic Agent";
 
@@ -37,7 +37,7 @@ public class GenericAgentClass extends Frame {
      * @param f
      *            Frame
      */
-    public GenericAgentClass(Frame f) {
+    public GenericAgentClass(FrameOLD f) {
         super(f);
         behaviour = new BehaviourFrame(f.getTypeName() + "-" + behaviour, EntityConstants.TYPE_BEHAVIOUR);
     }
@@ -56,11 +56,11 @@ public class GenericAgentClass extends Frame {
 
     public GenericAgentClass(GenericAgentClass top, GenericAgentClass otherRole, String name) {
 
-        super(new Frame[] { otherRole }, name, EntityConstants.TYPE_GENERIC);
+        super(new FrameOLD[] { otherRole }, name, EntityConstants.TYPE_GENERIC);
 
         Iterator iter = top.parents.values().iterator();
         while (iter.hasNext()) {
-            Frame p = (Frame) iter.next();
+            FrameOLD p = (FrameOLD) iter.next();
             parents.put(p.getTypeName(), p);
         }
         iter = top.attributeLists.keySet().iterator();
@@ -76,7 +76,7 @@ public class GenericAgentClass extends Frame {
 
         String behaviourName = otherRole.getTypeName() + " & " + top.getTypeName() + "-behaviour";
         BehaviourFrame old = top.getBehaviour();
-        Frame[] oldParents = top.getBehaviour().getParentFrames();
+        FrameOLD[] oldParents = top.getBehaviour().getParentFrames();
         BehaviourFrame[] allParents = new BehaviourFrame[oldParents.length + 1];
         for (int i = 0; i < oldParents.length; i++) {
             allParents[i] = new BehaviourFrame(oldParents[i]);
@@ -116,7 +116,7 @@ public class GenericAgentClass extends Frame {
      *            int
      */
     public GenericAgentClass(GenericAgentClass parent, String name) {
-        super(new Frame[] { parent }, name, "generic");
+        super(new FrameOLD[] { parent }, name, "generic");
         // String name, BehaviourFrame[] parents, String category
         behaviour = (BehaviourFrame) new BehaviourFrame(getTypeName() + "-behaviour", new BehaviourFrame[] { parent.getBehaviour() },
                 BehaviourFrame.CATEGORY).clone();
@@ -156,8 +156,8 @@ public class GenericAgentClass extends Frame {
     }
 
     @Override
-    public Object clone() {
-        Frame f = (Frame) super.clone();
+    public GenericAgentClass clone() {
+        FrameOLD f = (FrameOLD) super.clone();
         GenericAgentClass c = new GenericAgentClass(f);
         c.setBehaviour(getBehaviour());
         return c;

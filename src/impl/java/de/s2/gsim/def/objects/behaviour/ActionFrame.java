@@ -1,6 +1,6 @@
 package de.s2.gsim.def.objects.behaviour;
 
-import de.s2.gsim.def.objects.Frame;
+import de.s2.gsim.def.objects.FrameOLD;
 import de.s2.gsim.objects.attribute.AttributeType;
 import de.s2.gsim.objects.attribute.DomainAttribute;
 
@@ -12,7 +12,7 @@ import de.s2.gsim.objects.attribute.DomainAttribute;
  * object-parameter is specified. There are certain conditions (e.g. Sales development per object class) that use the parameter to determine if a
  * condition is met. But for this, it has to determine the parameter, and that is provided ONLY here.
  */
-public class ActionFrame extends Frame {
+public class ActionFrame extends FrameOLD {
 
     public final static String ATTR_LIST_ATTRS = "attributes";
 
@@ -30,7 +30,7 @@ public class ActionFrame extends Frame {
      * @param def
      *            Frame
      */
-    public ActionFrame(Frame def) {
+    public ActionFrame(FrameOLD def) {
         super(def);
     }
 

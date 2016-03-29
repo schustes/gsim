@@ -172,7 +172,7 @@ public class Frame extends Unit implements java.io.Serializable {
      */
 
     @Override
-    public Object clone() {
+    public Frame clone() {
 
         Frame f = new Frame(getTypeName(), getCategory());
 

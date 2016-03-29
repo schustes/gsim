@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import de.s2.gsim.api.sim.agent.impl.RuntimeAgent;
-import de.s2.gsim.def.objects.Instance;
+import de.s2.gsim.def.objects.InstanceOLD;
 import de.s2.gsim.def.objects.behaviour.ConditionDef;
 import de.s2.gsim.def.objects.behaviour.DependencyTest;
 import de.s2.gsim.def.objects.behaviour.ExpansionDef;
@@ -325,7 +325,7 @@ public class GeneralRLBuilder {
         return String.valueOf(cern.jet.random.Uniform.staticNextIntFromTo(0, 1000));
     }
 
-    private String createRuleIdentifier(Instance inst) {
+    private String createRuleIdentifier(InstanceOLD inst) {
         String x = inst.getName();
         x = x.replace(' ', '_');
         x = x.replace('/', '_');

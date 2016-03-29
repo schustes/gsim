@@ -6,7 +6,7 @@ import java.util.Set;
 
 import cern.jet.random.Uniform;
 import de.s2.gsim.api.sim.agent.impl.RuntimeAgent;
-import de.s2.gsim.def.objects.Instance;
+import de.s2.gsim.def.objects.InstanceOLD;
 import de.s2.gsim.def.objects.behaviour.ConditionDef;
 import de.s2.gsim.def.objects.behaviour.DependencyTest;
 import de.s2.gsim.def.objects.behaviour.RLRule;
@@ -414,7 +414,7 @@ public class RLRulesBuilder {
         return query1;
     }
 
-    private String createRuleIdentifier(Instance inst) {
+    private String createRuleIdentifier(InstanceOLD inst) {
         String x = inst.getName();
         x = x.replace(':', '_');
         x = x.replace(' ', '_');

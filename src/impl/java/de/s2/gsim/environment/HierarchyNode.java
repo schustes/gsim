@@ -1,17 +1,15 @@
-package de.s2.gsim.def;
+package de.s2.gsim.environment;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-
-import de.s2.gsim.def.objects.FrameOLD;
 
 
 /**
  * Is a tree for holding a hierarchy of class Frame.
  *
  */
-public class InheritanceHierarchy implements java.io.Serializable {
+public class HierarchyNode implements java.io.Serializable {
 
     /**
      * 
@@ -20,13 +18,13 @@ public class InheritanceHierarchy implements java.io.Serializable {
 
     private HashMap children = new HashMap();
 
-    private FrameOLD object;
+    private Frame object;
 
-    public InheritanceHierarchy(FrameOLD object) {
-        this.object = object;
+    public HierarchyNode(Frame rootFrame) {
+        this.object = rootFrame;
     }
 
-    public void addChild(InheritanceHierarchy f) {
+    public void addChild(HierarchyNode f) {
         if (!children.containsKey(f.getFrame().getTypeName())) {
             children.put(f.getFrame().getTypeName(), f);
         }
@@ -39,19 +37,19 @@ public class InheritanceHierarchy implements java.io.Serializable {
         Iterator iter = children.values().iterator();
         ArrayList list = new ArrayList();
         while (iter.hasNext()) {
-            InheritanceHierarchy h = (InheritanceHierarchy) iter.next();
+            HierarchyNode h = (HierarchyNode) iter.next();
             h.getAllChildrenRek(list);
         }
         return list.iterator();
     }
 
-    public InheritanceHierarchy getChild(String name) {
-        InheritanceHierarchy o = (InheritanceHierarchy) children.get(name);
+    public HierarchyNode getChild(String name) {
+        HierarchyNode o = (HierarchyNode) children.get(name);
         if (o == null) {
             Iterator iter = getChildren();
             while (iter.hasNext()) {
-                InheritanceHierarchy child = (InheritanceHierarchy) iter.next();
-                InheritanceHierarchy h = child.getChild(name);
+                HierarchyNode child = (HierarchyNode) iter.next();
+                HierarchyNode h = child.getChild(name);
                 if (h != null) {
                     return h;
                 }
@@ -73,7 +71,7 @@ public class InheritanceHierarchy implements java.io.Serializable {
         return children.keySet().iterator();
     }
 
-    public FrameOLD getFrame() {
+    public Frame getFrame() {
         return object;
     }
 
@@ -81,8 +79,8 @@ public class InheritanceHierarchy implements java.io.Serializable {
         return children.size() > 0;
     }
 
-    public boolean insert(FrameOLD f) {
-        FrameOLD[] pf = f.getParentFrames();
+    public boolean insert(Frame f) {
+        Frame[] pf = f.getParentFrames();
 
         for (int i = 0; i < pf.length; i++) {
             String s = pf[i].getTypeName();
@@ -93,19 +91,19 @@ public class InheritanceHierarchy implements java.io.Serializable {
         return true;
     }
 
-    public boolean insert(String parent, FrameOLD f) {
+    public boolean insert(String parent, Frame f) {
 
-        FrameOLD p = object;
+        Frame p = object;
 
         if (p.getTypeName().equals(parent)) {
-            InheritanceHierarchy h = new InheritanceHierarchy(f);
+            HierarchyNode h = new HierarchyNode(f);
             addChild(h);
             return true;
         }
 
         Iterator iter = getChildren();
         while (iter.hasNext()) {
-            InheritanceHierarchy h2 = (InheritanceHierarchy) iter.next();
+            HierarchyNode h2 = (HierarchyNode) iter.next();
             h2.insert(parent, f);
         }
 
@@ -117,7 +115,7 @@ public class InheritanceHierarchy implements java.io.Serializable {
         list.add(this);
         Iterator iter = children.values().iterator();
         while (iter.hasNext()) {
-            InheritanceHierarchy h = (InheritanceHierarchy) iter.next();
+            HierarchyNode h = (HierarchyNode) iter.next();
             h.getAllChildrenRek(list);
         }
     }

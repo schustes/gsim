@@ -1,21 +1,21 @@
 package de.s2.gsim.def.objects.behaviour;
 
-import de.s2.gsim.def.objects.Frame;
-import de.s2.gsim.def.objects.Instance;
+import de.s2.gsim.def.objects.FrameOLD;
+import de.s2.gsim.def.objects.InstanceOLD;
 import de.s2.gsim.objects.attribute.StringAttribute;
 
-public class DependencyTest extends Instance {
+public class DependencyTest extends InstanceOLD {
 
     /**
      * 
      */
     private static final long serialVersionUID = 1L;
 
-    public DependencyTest(Frame f) {
+    public DependencyTest(FrameOLD f) {
         super(f.getTypeName(), f);
     }
 
-    public DependencyTest(Instance f) {
+    public DependencyTest(InstanceOLD f) {
         super(f);
     }
 

@@ -11,11 +11,11 @@ import org.apache.log4j.Logger;
 
 import de.s2.gsim.objects.attribute.DomainAttribute;
 
-public class Frame extends Unit implements java.io.Serializable {
+public class FrameOLD extends UnitOLD implements java.io.Serializable {
 
     static final long serialVersionUID = -651893385550742382L;
 
-    private static Logger logger = Logger.getLogger(Frame.class);
+    private static Logger logger = Logger.getLogger(FrameOLD.class);
 
     protected String category = "";
 
@@ -26,7 +26,7 @@ public class Frame extends Unit implements java.io.Serializable {
     /**
      * Copy constructor.
      */
-    public Frame(Frame f) {
+    public FrameOLD(FrameOLD f) {
         this(f.getParentFrames(), f.getTypeName(), f.getCategory());
 
         setMutable(f.isMutable());
@@ -42,12 +42,12 @@ public class Frame extends Unit implements java.io.Serializable {
         }
         String[] children = f.getDeclaredFrameListNames();
         for (int i = 0; i < children.length; i++) {
-            TypedList list = (TypedList) f.objectLists.get(children[i]);
-            Frame fr = list.getType();
-            objectLists.put(children[i], new TypedList(fr));
-            Frame[] ch = f.getDeclaredChildFrames(children[i]);
+            TypedListOLD list = (TypedListOLD) f.objectLists.get(children[i]);
+            FrameOLD fr = list.getType();
+            objectLists.put(children[i], new TypedListOLD(fr));
+            FrameOLD[] ch = f.getDeclaredChildFrames(children[i]);
             for (int j = 0; j < ch.length; j++) {
-                Frame child = (Frame) ch[j].clone();
+                FrameOLD child = (FrameOLD) ch[j].clone();
                 addChildFrame(children[i], child);
             }
         }
@@ -61,14 +61,14 @@ public class Frame extends Unit implements java.io.Serializable {
     /**
      * "Inhertiance" constructor. Trying to set parents by ref, in order to save memory.
      */
-    public Frame(Frame[] parents, String typeName, String category) {
+    public FrameOLD(FrameOLD[] parents, String typeName, String category) {
         this.typeName = typeName;
         this.category = category;
         // this.id = newId;
         for (int i = 0; i < parents.length; i++) {
             // Frame f = (Frame)parents[i].clone();
 
-            Frame f = parents[i];
+            FrameOLD f = parents[i];
 
             String s = f.getTypeName();
             this.parents.put(s, f);
@@ -82,7 +82,7 @@ public class Frame extends Unit implements java.io.Serializable {
     /**
      * Copy constructor.
      */
-    public Frame(String newName, Frame f) {
+    public FrameOLD(String newName, FrameOLD f) {
         this(f);
         typeName = newName;
     }
@@ -97,7 +97,7 @@ public class Frame extends Unit implements java.io.Serializable {
      * @param uniqueId
      *            int
      */
-    public Frame(String name, String category) {
+    public FrameOLD(String name, String category) {
         typeName = name;
         this.category = category;
         // this.id = uniqueId;
@@ -110,30 +110,30 @@ public class Frame extends Unit implements java.io.Serializable {
      * @see gsim.def.objects.Frame#addOrSetAttribute(java.lang.String, gsim.def.objects.attribute.DomainAttribute)
      */
 
-    public void addChildFrame(String listName, Frame a) {
+    public void addChildFrame(String listName, FrameOLD a) {
 
         if (a == null) {
             return;
         }
 
-        TypedList list = (TypedList) objectLists.get(listName);
+        TypedListOLD list = (TypedListOLD) objectLists.get(listName);
 
         if (list == null) {
             // try to clone parent-list first:
-            Frame type = getListType(listName);
+            FrameOLD type = getListType(listName);
             if (type != null) {
-                list = new TypedList((Frame) type.clone());
+                list = new TypedListOLD((FrameOLD) type.clone());
             } else {
-                list = new TypedList((Frame) a.clone());
+                list = new TypedListOLD((FrameOLD) a.clone());
             }
         }
 
         if (list.contains(a)) {
             list.remove(a);
-            a = (Frame) a.clone();
+            a = (FrameOLD) a.clone();
             list.add(a);
         } else {
-            list.add((Unit) a.clone());
+            list.add((UnitOLD) a.clone());
         }
         objectLists.put(listName, list);
         isDirty = true;
@@ -172,16 +172,16 @@ public class Frame extends Unit implements java.io.Serializable {
      */
 
     @Override
-    public Object clone() {
+    public FrameOLD clone() {
 
-        Frame f = new Frame(getTypeName(), getCategory());
+        FrameOLD f = new FrameOLD(getTypeName(), getCategory());
 
         f.setMutable(isMutable());
         f.setSystem(isSystem());
 
-        Frame[] parents = getParentFrames();
+        FrameOLD[] parents = getParentFrames();
         for (int i = 0; i < parents.length; i++) {
-            Frame fr = parents[i];
+            FrameOLD fr = parents[i];
             String s = fr.getTypeName();
             f.parents.put(s, fr);
             // f.parents.put(s, (Frame) fr.clone());
@@ -202,16 +202,16 @@ public class Frame extends Unit implements java.io.Serializable {
         }
         String[] children = getDeclaredFrameListNames();
         for (int i = 0; i < children.length; i++) {
-            TypedList list = getList(children[i]);// (TypedList)f.objectLists.get(children[i]);
+            TypedListOLD list = getList(children[i]);// (TypedList)f.objectLists.get(children[i]);
 
             if (list != null) {
-                Frame fr = list.getType();
-                f.objectLists.put(children[i], new TypedList(fr));
+                FrameOLD fr = list.getType();
+                f.objectLists.put(children[i], new TypedListOLD(fr));
             }
 
-            Frame[] ch = getChildFrames(children[i]);
+            FrameOLD[] ch = getChildFrames(children[i]);
             for (int j = 0; j < ch.length; j++) {
-                Frame child = (Frame) ch[j].clone();
+                FrameOLD child = (FrameOLD) ch[j].clone();
                 f.addChildFrame(children[i], child);
             }
         }
@@ -238,9 +238,9 @@ public class Frame extends Unit implements java.io.Serializable {
                 }
             }
         } else {
-            Frame[] fs = getAncestors();
+            FrameOLD[] fs = getAncestors();
             for (int i = 0; i < fs.length; i++) {
-                Frame f = fs[i];
+                FrameOLD f = fs[i];
                 if (f.containsAttribute(listName, attributeName)) {
                     return true;
                 }
@@ -255,8 +255,8 @@ public class Frame extends Unit implements java.io.Serializable {
      * @see gsim.def.objects.Frame#containsChildFrame(java.lang.String, gsim.def.objects.Frame)
      */
 
-    public boolean containsChildFrame(String listName, Frame f) {
-        Frame[] children = getChildFrames(listName);
+    public boolean containsChildFrame(String listName, FrameOLD f) {
+        FrameOLD[] children = getChildFrames(listName);
 
         if (children != null) {
             for (int i = 0; i < children.length; i++) {
@@ -271,7 +271,7 @@ public class Frame extends Unit implements java.io.Serializable {
             }
         }
 
-        Frame[] parents = getAncestors();
+        FrameOLD[] parents = getAncestors();
         for (int i = 0; i < parents.length; i++) {
             boolean b = parents[i].containsChildFrame(listName, f);
             if (b) {
@@ -295,7 +295,7 @@ public class Frame extends Unit implements java.io.Serializable {
             }
         }
 
-        Frame[] parents = getAncestors();
+        FrameOLD[] parents = getAncestors();
         for (int i = 0; i < parents.length; i++) {
             boolean b = parents[i].definesChildList(listName);
             if (b) {
@@ -307,11 +307,11 @@ public class Frame extends Unit implements java.io.Serializable {
 
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof Frame)) {
+        if (!(o instanceof FrameOLD)) {
             return false;
         }
 
-        if (getTypeName().equals(((Frame) o).getTypeName())) {
+        if (getTypeName().equals(((FrameOLD) o).getTypeName())) {
             return true;
         } else {
             return false;
@@ -324,13 +324,13 @@ public class Frame extends Unit implements java.io.Serializable {
      * @see gsim.def.objects.Frame#getListType(java.lang.String)
      */
 
-    public Frame getAncestor(String typeName) {
+    public FrameOLD getAncestor(String typeName) {
         if (parents.containsKey(typeName)) {
-            return (Frame) parents.get(typeName);
+            return (FrameOLD) parents.get(typeName);
         } else {
-            Frame[] fs = getAncestors();
+            FrameOLD[] fs = getAncestors();
             for (int i = 0; i < fs.length; i++) {
-                Frame f = fs[i].getParentFrame(typeName);
+                FrameOLD f = fs[i].getParentFrame(typeName);
                 if (f != null) {
                     return f;
                 }
@@ -345,19 +345,19 @@ public class Frame extends Unit implements java.io.Serializable {
      * @see gsim.def.objects.Frame#equals(java.lang.Object)
      */
 
-    public Frame[] getAncestors() {
+    public FrameOLD[] getAncestors() {
         ArrayList list = new ArrayList();
         Iterator iter = parents.keySet().iterator();
         while (iter.hasNext()) {
             String s = (String) iter.next();
-            Frame f = (Frame) parents.get(s);
+            FrameOLD f = (FrameOLD) parents.get(s);
             list.add(f);
-            Frame[] fs = f.getAncestors();
+            FrameOLD[] fs = f.getAncestors();
             for (int i = 0; i < fs.length; i++) {
                 list.add(fs[i]);
             }
         }
-        Frame[] all = new Frame[list.size()];
+        FrameOLD[] all = new FrameOLD[list.size()];
         list.toArray(all);
         return all;
     }
@@ -398,7 +398,7 @@ public class Frame extends Unit implements java.io.Serializable {
                 }
             }
         }
-        Frame[] fs = getAncestors();
+        FrameOLD[] fs = getAncestors();
         for (int i = 0; i < fs.length; i++) {
             DomainAttribute da = fs[i].getAttribute(listname, attrName);
             if (da != null) {
@@ -421,7 +421,7 @@ public class Frame extends Unit implements java.io.Serializable {
             list2.addAll(list);
         }
 
-        Frame[] fs = getAncestors();
+        FrameOLD[] fs = getAncestors();
         for (int i = 0; i < fs.length; i++) {
             DomainAttribute[] da = fs[i].getAttributes(listname);
             if (da != null) {
@@ -449,9 +449,9 @@ public class Frame extends Unit implements java.io.Serializable {
             list.add(key);
         }
 
-        Frame[] fs = getAncestors();
+        FrameOLD[] fs = getAncestors();
         for (int i = 0; i < fs.length; i++) {
-            Frame f = fs[i];
+            FrameOLD f = fs[i];
             String[] s = f.getAttributesListNames();
             for (int j = 0; j < s.length; j++) {
                 if (!list.contains(s[j])) {
@@ -481,22 +481,22 @@ public class Frame extends Unit implements java.io.Serializable {
      * @see gsim.def.objects.Frame#getAttributesListNames()
      */
 
-    public Frame getChildFrame(String listname, String frameName) {
+    public FrameOLD getChildFrame(String listname, String frameName) {
         ArrayList list = (ArrayList) objectLists.get(listname);
         if (list != null) {
             Iterator iter = list.iterator();
             while (iter.hasNext()) {
-                Frame attr = (Frame) iter.next();
+                FrameOLD attr = (FrameOLD) iter.next();
                 if (attr.getTypeName().equals(frameName)) {
-                    return (Frame) attr.clone();
+                    return (FrameOLD) attr.clone();
                 }
             }
         } else {
-            Frame[] fs = getAncestors();
+            FrameOLD[] fs = getAncestors();
             for (int i = 0; i < fs.length; i++) {
-                Frame da = fs[i].getChildFrame(listname, frameName);
+                FrameOLD da = fs[i].getChildFrame(listname, frameName);
                 if (da != null) {
-                    return (Frame) da.clone();
+                    return (FrameOLD) da.clone();
                 }
             }
         }
@@ -519,7 +519,7 @@ public class Frame extends Unit implements java.io.Serializable {
             }
         }
 
-        Frame[] parents = getAncestors();
+        FrameOLD[] parents = getAncestors();
         for (int i = 0; i < parents.length; i++) {
             String[] s = parents[i].getChildFrameListNames();
             for (int j = 0; j < s.length; j++) {
@@ -540,7 +540,7 @@ public class Frame extends Unit implements java.io.Serializable {
      * @see gsim.def.objects.Frame#getChildFrame(java.lang.String, java.lang.String)
      */
 
-    public Frame[] getChildFrames(String listname) {
+    public FrameOLD[] getChildFrames(String listname) {
 
         ArrayList list = (ArrayList) objectLists.get(listname);
         HashSet sum = new HashSet();
@@ -549,9 +549,9 @@ public class Frame extends Unit implements java.io.Serializable {
             sum.addAll(list);
         }
 
-        Frame[] fs = getAncestors();
+        FrameOLD[] fs = getAncestors();
         for (int i = 0; i < fs.length; i++) {
-            Frame[] da = fs[i].getChildFrames(listname);
+            FrameOLD[] da = fs[i].getChildFrames(listname);
             if (da != null) {
                 for (int j = 0; j < da.length; j++) {
                     sum.add(da[j]);
@@ -559,7 +559,7 @@ public class Frame extends Unit implements java.io.Serializable {
             }
         }
 
-        Frame[] children = new Frame[sum.size()];
+        FrameOLD[] children = new FrameOLD[sum.size()];
         sum.toArray(children);
         return children;
 
@@ -619,10 +619,10 @@ public class Frame extends Unit implements java.io.Serializable {
      * @see gsim.def.objects.Frame#getDeclaredAttributes(java.lang.String)
      */
 
-    public Frame[] getDeclaredChildFrames(String listname) {
+    public FrameOLD[] getDeclaredChildFrames(String listname) {
         ArrayList list = (ArrayList) objectLists.get(listname);
         if (list != null) {
-            Frame[] atts = new Frame[list.size()];
+            FrameOLD[] atts = new FrameOLD[list.size()];
             list.toArray(atts);
             return atts;
         }
@@ -635,12 +635,12 @@ public class Frame extends Unit implements java.io.Serializable {
      * @see gsim.def.objects.Frame#getDeclaredAttributesListNames()
      */
 
-    public Frame getDeclaredFrame(String listname, String attrName) {
+    public FrameOLD getDeclaredFrame(String listname, String attrName) {
         ArrayList list = (ArrayList) objectLists.get(listname);
         if (list != null) {
             ListIterator iter = list.listIterator();
             while (iter.hasNext()) {
-                Frame attr = (Frame) iter.next();
+                FrameOLD attr = (FrameOLD) iter.next();
                 if (attr.getTypeName().equals(attrName)) {
                     return attr;
                 }
@@ -673,12 +673,12 @@ public class Frame extends Unit implements java.io.Serializable {
      * @see gsim.def.objects.Frame#getDeclaredFrame(java.lang.String, java.lang.String)
      */
 
-    public TypedList getList(String name) {
-        TypedList l = (TypedList) objectLists.get(name);
+    public TypedListOLD getList(String name) {
+        TypedListOLD l = (TypedListOLD) objectLists.get(name);
         if (l == null) {
             Iterator iter = parents.values().iterator();
             while (iter.hasNext()) {
-                Frame p = (Frame) iter.next();
+                FrameOLD p = (FrameOLD) iter.next();
                 return p.getList(name);
             }
         } else {
@@ -693,12 +693,12 @@ public class Frame extends Unit implements java.io.Serializable {
      * @see gsim.def.objects.Frame#getDeclaredFrameListNames()
      */
 
-    public Frame getListType(String listName) {
-        TypedList list = getList(listName);
+    public FrameOLD getListType(String listName) {
+        TypedListOLD list = getList(listName);
         if (list == null) {
             Iterator iter = parents.values().iterator();
             while (iter.hasNext()) {
-                Frame p = (Frame) iter.next();
+                FrameOLD p = (FrameOLD) iter.next();
                 return p.getListType(listName);
             }
         } else {
@@ -713,9 +713,9 @@ public class Frame extends Unit implements java.io.Serializable {
      * @see gsim.def.objects.Frame#getParentFrame(java.lang.String)
      */
 
-    public Frame getParentFrame(String typeName) {
+    public FrameOLD getParentFrame(String typeName) {
         if (parents.containsKey(typeName)) {
-            return (Frame) parents.get(typeName);
+            return (FrameOLD) parents.get(typeName);
         }
         return null;
     }
@@ -726,9 +726,9 @@ public class Frame extends Unit implements java.io.Serializable {
      * @see gsim.def.objects.Frame#getParentFrames()
      */
 
-    public Frame[] getParentFrames() {
+    public FrameOLD[] getParentFrames() {
         Collection list = parents.values();
-        Frame[] all = new Frame[list.size()];
+        FrameOLD[] all = new FrameOLD[list.size()];
         list.toArray(all);
         return all;
     }
@@ -750,8 +750,8 @@ public class Frame extends Unit implements java.io.Serializable {
      */
 
     public boolean isDeclaredAttribute(String listName, String attributeName) {
-        Frame[] p = getAncestors();
-        for (Frame f : p) {
+        FrameOLD[] p = getAncestors();
+        for (FrameOLD f : p) {
             ArrayList list = (ArrayList) f.attributeLists.get(listName);
             if (list != null) {
                 Iterator iter = list.iterator();
@@ -783,8 +783,8 @@ public class Frame extends Unit implements java.io.Serializable {
      */
 
     public boolean isDeclaredAttributeList(String listName) {
-        Frame[] p = getAncestors();
-        for (Frame f : p) {
+        FrameOLD[] p = getAncestors();
+        for (FrameOLD f : p) {
             String[] l = f.getDeclaredAttributesListNames();
             for (String s : l) {
                 if (s.equals(listName)) {
@@ -824,7 +824,7 @@ public class Frame extends Unit implements java.io.Serializable {
      */
 
     public boolean isSuccessor(String ancestorName) {
-        Frame[] ancestors = getAncestors();
+        FrameOLD[] ancestors = getAncestors();
         for (int i = 0; i < ancestors.length; i++) {
             if (ancestors[i].getTypeName().equals(ancestorName)) {
                 return true;
@@ -896,7 +896,7 @@ public class Frame extends Unit implements java.io.Serializable {
         if (list != null) {
             Iterator iter = list.iterator();
             while (iter.hasNext()) {
-                Frame attr = (Frame) iter.next();
+                FrameOLD attr = (FrameOLD) iter.next();
                 if (attr.getTypeName().equals(frameName)) {
                     iter.remove();
                     isDirty = true;
@@ -904,7 +904,7 @@ public class Frame extends Unit implements java.io.Serializable {
                 }
             }
         } else {
-            Frame[] fs = getAncestors();
+            FrameOLD[] fs = getAncestors();
             for (int i = 0; i < fs.length; i++) {
                 fs[i].removeChildFrame(listname, frameName);
             }
@@ -928,7 +928,7 @@ public class Frame extends Unit implements java.io.Serializable {
                 }
             }
         }
-        Frame[] fs = getAncestors();
+        FrameOLD[] fs = getAncestors();
         for (int i = 0; i < fs.length; i++) {
             fs[i].removeChildFrameList(listname);
         }
@@ -958,7 +958,7 @@ public class Frame extends Unit implements java.io.Serializable {
             // throw new RuntimeException("Path contains key to attribute, but has
             // unresolved names left");
         } else if (path.length == 2) {
-            Frame[] p = getAncestors();
+            FrameOLD[] p = getAncestors();
             for (int i = 0; i < p.length; i++) {
                 Object a = p[i].resolveName(path);
                 if (a != null) {
@@ -975,7 +975,7 @@ public class Frame extends Unit implements java.io.Serializable {
             if (path.length == 2) {
                 return getChildFrame(path[0], path[1]);
             } else if (path.length > 2) {
-                Frame inst = getChildFrame(path[0], path[1]);
+                FrameOLD inst = getChildFrame(path[0], path[1]);
                 logger.debug("..." + inst.getTypeName());
                 if (inst != null) {
                     String[] nPath = new String[path.length - 2];
@@ -993,7 +993,7 @@ public class Frame extends Unit implements java.io.Serializable {
             // list, but specifies no instance name");
         }
 
-        Frame[] p = getAncestors();
+        FrameOLD[] p = getAncestors();
         for (int i = 0; i < p.length; i++) {
             Object a = p[i].resolveName(path);
             if (a != null) {
@@ -1013,11 +1013,11 @@ public class Frame extends Unit implements java.io.Serializable {
      * @see gsim.def.objects.Frame#setAncestor(gsim.def.objects.Frame)
      */
 
-    public void setAncestor(Frame newParent) {
+    public void setAncestor(FrameOLD newParent) {
         if (parents.containsKey(newParent.getTypeName())) {
             parents.put(newParent.getTypeName(), newParent);
         } else {
-            Frame[] fs = getAncestors();
+            FrameOLD[] fs = getAncestors();
             for (int i = 0; i < fs.length; i++) {
                 fs[i].setAncestor(newParent);
             }

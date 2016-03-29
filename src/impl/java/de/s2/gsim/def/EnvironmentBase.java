@@ -6,9 +6,9 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.ListIterator;
 
-import de.s2.gsim.def.objects.Frame;
-import de.s2.gsim.def.objects.Instance;
-import de.s2.gsim.def.objects.Unit;
+import de.s2.gsim.def.objects.FrameOLD;
+import de.s2.gsim.def.objects.InstanceOLD;
+import de.s2.gsim.def.objects.UnitOLD;
 import de.s2.gsim.def.objects.UnitUtils;
 import de.s2.gsim.def.objects.agent.BehaviourDef;
 import de.s2.gsim.def.objects.agent.BehaviourFrame;
@@ -48,27 +48,27 @@ public class EnvironmentBase {
 
     protected TimeOrderedSet<GenericAgentClass> agentSubClasses = new TimeOrderedSet<GenericAgentClass>();
 
-    protected Frame behaviourClass;
+    protected FrameOLD behaviourClass;
 
-    protected TimeOrderedSet<Frame> behaviourClasses = new TimeOrderedSet<Frame>();
+    protected TimeOrderedSet<FrameOLD> behaviourClasses = new TimeOrderedSet<FrameOLD>();
 
     protected HashMap<String, String> dataHandlers = new HashMap<String, String>();
 
     protected String ns;
 
-    protected Frame objectClass;
+    protected FrameOLD objectClass;
 
-    protected TimeOrderedSet<Instance> objects = new TimeOrderedSet<Instance>();
+    protected TimeOrderedSet<InstanceOLD> objects = new TimeOrderedSet<InstanceOLD>();
 
-    protected TimeOrderedSet<Frame> objectSubClasses = new TimeOrderedSet<Frame>();
+    protected TimeOrderedSet<FrameOLD> objectSubClasses = new TimeOrderedSet<FrameOLD>();
 
-    protected HashSet<Unit> removed = new HashSet<Unit>();
+    protected HashSet<UnitOLD> removed = new HashSet<UnitOLD>();
 
     protected HashMap<String, String> systemAgents = new HashMap<String, String>();
 
     public EnvironmentBase() {
         agentClass = new GenericAgentClass();
-        objectClass = new Frame("Object", "object");
+        objectClass = new FrameOLD("Object", "object");
     }
 
     public GenericAgentClass addAgentClassAttribute(GenericAgentClass cls, String[] path, DomainAttribute a) {
@@ -85,7 +85,7 @@ public class EnvironmentBase {
                 c.setAncestor(here);
                 c.setDirty(true);
                 iter.set(c);
-                ListIterator<Instance> successorMembers = getInstancesOfClass(c).listIterator();
+                ListIterator<InstanceOLD> successorMembers = getInstancesOfClass(c).listIterator();
                 while (successorMembers.hasNext()) {
                     GenericAgent succ = (GenericAgent) successorMembers.next();
                     succ.setFrame(c);
@@ -138,7 +138,7 @@ public class EnvironmentBase {
                     beh.addRLRule(new RLRuleFrame(new RLRuleFrame[] { (RLRuleFrame) f }, f.getTypeName(), f.getCategory()));
                 }
                 iter.set(p);
-                ListIterator<Instance> successorMembers = getInstancesOfClass(p).listIterator();
+                ListIterator<InstanceOLD> successorMembers = getInstancesOfClass(p).listIterator();
                 while (successorMembers.hasNext()) {
                     GenericAgent a = (GenericAgent) successorMembers.next();
                     a.setDirty(true);
@@ -154,7 +154,7 @@ public class EnvironmentBase {
             }
         }
 
-        ListIterator<Instance> iter2 = getInstancesOfClass(here).listIterator();
+        ListIterator<InstanceOLD> iter2 = getInstancesOfClass(here).listIterator();
         while (iter.hasNext()) {
             GenericAgent p = (GenericAgent) iter2.next();
             if (!(f instanceof RLRuleFrame)) {
@@ -178,13 +178,13 @@ public class EnvironmentBase {
         }
     }
 
-    public Frame addChildFrame(Frame cls, String[] path, Frame f) {
-        Frame here = findObjectClass(cls);
+    public FrameOLD addChildFrame(FrameOLD cls, String[] path, FrameOLD f) {
+        FrameOLD here = findObjectClass(cls);
         UnitUtils.getInstance().setChildFrame(here, path, f);
         here.setDirty(true);
         objectSubClasses.add(here);
 
-        Frame[] c = getAllObjectSuccessors(cls.getTypeName());
+        FrameOLD[] c = getAllObjectSuccessors(cls.getTypeName());
         for (int i = 0; i < c.length; i++) {
             c[i].setAncestor(here);
             // c[i].setChildFrame(path, f);
@@ -192,23 +192,23 @@ public class EnvironmentBase {
         Iterator iter = getInstancesOfClass(f).iterator();
 
         while (iter.hasNext()) {
-            Instance inst = (Instance) iter.next();
-            Instance instance = new Instance(f.getTypeName(), f);
+            InstanceOLD inst = (InstanceOLD) iter.next();
+            InstanceOLD instance = new InstanceOLD(f.getTypeName(), f);
             UnitUtils.getInstance().setChildInstance(inst, path, instance);
         }
 
         addChildFrameInReferringObjects(cls, path, f);
-        return (Frame) here.clone();
+        return (FrameOLD) here.clone();
 
     }
 
-    public void addChildFrameInReferringAgents(Frame here, String[] path, Frame added) {
+    public void addChildFrameInReferringAgents(FrameOLD here, String[] path, FrameOLD added) {
         GenericAgentClass[] objects = getAgentSubClasses();
         for (int i = 0; i < objects.length; i++) {
             GenericAgentClass c = objects[i];
             String[] s = c.getDeclaredFrameListNames();
             for (int j = 0; j < s.length; j++) {
-                Frame[] ff = c.getChildFrames(s[j]);
+                FrameOLD[] ff = c.getChildFrames(s[j]);
                 for (int k = 0; k < ff.length; k++) {
                     if (ff[k].isSuccessor(here.getTypeName()) || ff[k].getTypeName().equals(here.getTypeName())) {
                         String[] newPath = new String[path.length + 2];
@@ -224,7 +224,7 @@ public class EnvironmentBase {
         }
     }
 
-    public GenericAgentClass addChildObject(GenericAgentClass cls, String[] path, Frame f) {
+    public GenericAgentClass addChildObject(GenericAgentClass cls, String[] path, FrameOLD f) {
         GenericAgentClass here = this.findGenericAgentClass(cls);
 
         String name = f.getTypeName();
@@ -244,21 +244,21 @@ public class EnvironmentBase {
                 c.setAncestor(here);
                 iter.set(c);
 
-                ListIterator<Instance> successors = getInstancesOfClass(c).listIterator();
+                ListIterator<InstanceOLD> successors = getInstancesOfClass(c).listIterator();
                 while (successors.hasNext()) {
                     GenericAgent a = (GenericAgent) successors.next();
                     a.setDirty(true);
-                    a.addChildInstance(listName, new Instance(name, f));
+                    a.addChildInstance(listName, new InstanceOLD(name, f));
                     a.setFrame(c);
                     successors.set(a);
                 }
             }
         }
 
-        ListIterator<Instance> iter2 = getInstancesOfClass(here).listIterator();
+        ListIterator<InstanceOLD> iter2 = getInstancesOfClass(here).listIterator();
         while (iter2.hasNext()) {
             GenericAgent a = (GenericAgent) iter2.next();
-            a.addChildInstance(listName, new Instance(name, f));
+            a.addChildInstance(listName, new InstanceOLD(name, f));
             a.setFrame(here);
             a.setDirty(true);
             iter2.set(a);
@@ -270,16 +270,16 @@ public class EnvironmentBase {
         return (GenericAgentClass) here.clone();
     }
 
-    public Frame addObjectClassAttribute(Frame cls, String[] path, DomainAttribute a) {
-        Frame here = findObjectClass(cls);
+    public FrameOLD addObjectClassAttribute(FrameOLD cls, String[] path, DomainAttribute a) {
+        FrameOLD here = findObjectClass(cls);
 
         UnitUtils.getInstance().setChildAttribute(here, Utils.removeFromArray(path, a.getName()), a);
         here.setDirty(true);
 
-        ListIterator<Frame> iter = objectSubClasses.listIterator();
+        ListIterator<FrameOLD> iter = objectSubClasses.listIterator();
 
         while (iter.hasNext()) {
-            Frame c = iter.next();
+            FrameOLD c = iter.next();
             if (c.isSuccessor(cls.getTypeName())) {
                 c.setAncestor(here);
                 iter.set(c);
@@ -290,10 +290,10 @@ public class EnvironmentBase {
 
         addChildAttributeInReferringObjects(cls, path, a);
         addChildAttributeInReferringAgents(cls, path, a);
-        return (Frame) here.clone();
+        return (FrameOLD) here.clone();
     }
 
-    public void addObjectSubClass(Frame cls) {
+    public void addObjectSubClass(FrameOLD cls) {
         objectSubClasses.add(cls);
     }
 
@@ -314,8 +314,8 @@ public class EnvironmentBase {
     }
 
     public BehaviourFrame addRuleToBehaviour(BehaviourFrame fr, UserRuleFrame ur) {
-        ListIterator<Frame> iter = behaviourClasses.listIterator();
-        Frame here = null;
+        ListIterator<FrameOLD> iter = behaviourClasses.listIterator();
+        FrameOLD here = null;
         while (iter.hasNext()) {
             BehaviourFrame f = (BehaviourFrame) iter.next();
             if (f.getTypeName().equals(fr.getTypeName())) {
@@ -339,7 +339,7 @@ public class EnvironmentBase {
     public GenericAgentClass changeAgentClassBehaviour(GenericAgentClass c, BehaviourFrame b) {
 
         GenericAgentClass here = this.findGenericAgentClass(c);
-        ListIterator<Instance> successorMembers = null;
+        ListIterator<InstanceOLD> successorMembers = null;
 
         ArrayList<String> removed = new ArrayList<String>(b.removed);
         b.removed.clear();
@@ -469,21 +469,21 @@ public class EnvironmentBase {
         return (BehaviourFrame) p.clone();
     }
 
-    public Frame createObjectSubClass(String name, Frame parent) {
+    public FrameOLD createObjectSubClass(String name, FrameOLD parent) {
         if (parent == null) {
-            Frame p = new Frame(name, EntityConstants.TYPE_OBJECT);
+            FrameOLD p = new FrameOLD(name, EntityConstants.TYPE_OBJECT);
             p.setSystem(false);
             objectSubClasses.add(p);
-            return (Frame) p.clone();
+            return (FrameOLD) p.clone();
         } else {
-            Frame p = new Frame(new Frame[] { parent }, name, EntityConstants.TYPE_OBJECT);
+            FrameOLD p = new FrameOLD(new FrameOLD[] { parent }, name, EntityConstants.TYPE_OBJECT);
             p.setSystem(false);
             objectSubClasses.add(p);
-            return (Frame) p.clone();
+            return (FrameOLD) p.clone();
         }
     }
 
-    public GenericAgentClass extendAgentClassRole(GenericAgentClass original, Frame role) {
+    public GenericAgentClass extendAgentClassRole(GenericAgentClass original, FrameOLD role) {
 
         GenericAgentClass newRoleType = (GenericAgentClass) role.clone();
         // newRoleType.setTypeName(original.getTypeName());
@@ -583,9 +583,9 @@ public class EnvironmentBase {
 
     public GenericAgentClass[] getAllAgentClassSuccessors(String x) {
         ListIterator iter = agentSubClasses.listIterator();
-        HashSet<Frame> set = new HashSet<Frame>();
+        HashSet<FrameOLD> set = new HashSet<FrameOLD>();
         while (iter.hasNext()) {
-            Frame c = (Frame) iter.next();
+            FrameOLD c = (FrameOLD) iter.next();
             if (c.isSuccessor(x)) {
                 set.add(c);
             }
@@ -595,20 +595,20 @@ public class EnvironmentBase {
         return res;
     }
 
-    public ArrayList<Instance> getAllInstancesOfClass(Frame f) {
-        ArrayList<Instance> set = new ArrayList<Instance>();
+    public ArrayList<InstanceOLD> getAllInstancesOfClass(FrameOLD f) {
+        ArrayList<InstanceOLD> set = new ArrayList<InstanceOLD>();
         Iterator iter = null;
 
         if (f instanceof GenericAgentClass) {
             iter = agents.iterator();
-        } else if (f instanceof Frame) {
+        } else if (f instanceof FrameOLD) {
             iter = objects.iterator();
         }
 
         if (iter != null) {
 
             while (iter.hasNext()) {
-                Instance cust = (Instance) iter.next();
+                InstanceOLD cust = (InstanceOLD) iter.next();
                 if (cust.inheritsFrom(f)) {
                     set.add(cust);
                 }
@@ -617,16 +617,16 @@ public class EnvironmentBase {
         return set;
     }
 
-    public Frame[] getAllObjectSuccessors(String x) {
+    public FrameOLD[] getAllObjectSuccessors(String x) {
         ListIterator iter = objectSubClasses.listIterator();
-        HashSet<Frame> set = new HashSet<Frame>();
+        HashSet<FrameOLD> set = new HashSet<FrameOLD>();
         while (iter.hasNext()) {
-            Frame c = (Frame) iter.next();
+            FrameOLD c = (FrameOLD) iter.next();
             if (c.isSuccessor(x)) {
                 set.add(c);
             }
         }
-        Frame[] res = new Frame[set.size()];
+        FrameOLD[] res = new FrameOLD[set.size()];
         set.toArray(res);
         return res;
     }
@@ -653,12 +653,12 @@ public class EnvironmentBase {
     }
 
     public GenericAgentClass[] getImmediateAgentClassSuccessors(String frame) {
-        Frame f = this.findGenericAgentClass(frame);
+        FrameOLD f = this.findGenericAgentClass(frame);
         HashSet<GenericAgentClass> successors = new HashSet<GenericAgentClass>();
         Iterator iter = agentSubClasses.iterator();
         while (iter.hasNext()) {
             GenericAgentClass p = (GenericAgentClass) iter.next();
-            Frame fr = p.getParentFrame(f.getTypeName());
+            FrameOLD fr = p.getParentFrame(f.getTypeName());
             if (fr != null && fr.getTypeName().equals(frame)) {
                 successors.add(p);
             }
@@ -668,37 +668,37 @@ public class EnvironmentBase {
         return ff;
     }
 
-    public Frame[] getImmediateObjectSuccessors(String frame) {
-        Frame f = findProductClass(frame);
-        HashSet<Frame> successors = new HashSet<Frame>();
+    public FrameOLD[] getImmediateObjectSuccessors(String frame) {
+        FrameOLD f = findProductClass(frame);
+        HashSet<FrameOLD> successors = new HashSet<FrameOLD>();
         Iterator iter = objectSubClasses.iterator();
         while (iter.hasNext()) {
-            Frame p = (Frame) iter.next();
-            Frame fr = p.getParentFrame(f.getTypeName());
+            FrameOLD p = (FrameOLD) iter.next();
+            FrameOLD fr = p.getParentFrame(f.getTypeName());
             if (fr != null && fr.getTypeName().equals(frame)) {
                 successors.add(p);
             }
         }
-        Frame[] ff = new Frame[successors.size()];
+        FrameOLD[] ff = new FrameOLD[successors.size()];
         successors.toArray(ff);
         return ff;
     }
 
-    public ArrayList<Instance> getInstancesOfClass(Frame f) {
-        ArrayList<Instance> set = new ArrayList<Instance>();
+    public ArrayList<InstanceOLD> getInstancesOfClass(FrameOLD f) {
+        ArrayList<InstanceOLD> set = new ArrayList<InstanceOLD>();
         Iterator iter = null;
 
         if (f instanceof GenericAgentClass) {
             iter = agents.iterator();
-        } else if (f instanceof Frame) {
+        } else if (f instanceof FrameOLD) {
             iter = objects.iterator();
         }
 
         if (iter != null) {
 
             while (iter.hasNext()) {
-                Instance cust = (Instance) iter.next();
-                Frame directAncestor = cust.getDefinition();
+                InstanceOLD cust = (InstanceOLD) iter.next();
+                FrameOLD directAncestor = cust.getDefinition();
                 if (directAncestor != null && directAncestor.getTypeName().equals(f.getTypeName())) {
                     set.add(cust);
                 }
@@ -707,28 +707,28 @@ public class EnvironmentBase {
         return set;
     }
 
-    public Frame getObjectClass() {
+    public FrameOLD getObjectClass() {
         return objectClass;
     }
 
-    public Frame getObjectClassRef() {
+    public FrameOLD getObjectClassRef() {
         return objectClass;
     }
 
-    public Frame getObjectSubClass(String productName) {
+    public FrameOLD getObjectSubClass(String productName) {
         Iterator iter = objectSubClasses.listIterator();
         while (iter.hasNext()) {
-            Frame cls = (Frame) iter.next();
+            FrameOLD cls = (FrameOLD) iter.next();
             if (cls.getTypeName().equals(productName)) {
-                return (Frame) cls.clone();
+                return (FrameOLD) cls.clone();
             }
         }
         return null;
 
     }
 
-    public Frame[] getObjectSubClasses() {
-        Frame[] res = new Frame[objectSubClasses.size()];
+    public FrameOLD[] getObjectSubClasses() {
+        FrameOLD[] res = new FrameOLD[objectSubClasses.size()];
         objectSubClasses.toArray(res);
         return res;
     }
@@ -779,18 +779,18 @@ public class EnvironmentBase {
         return (GenericAgentClass) here.clone();
     }
 
-    public Frame modifyObjectClassAttribute(Frame cls, String[] path, DomainAttribute a) {
-        Frame here = findObjectClass(cls);
+    public FrameOLD modifyObjectClassAttribute(FrameOLD cls, String[] path, DomainAttribute a) {
+        FrameOLD here = findObjectClass(cls);
 
         UnitUtils.getInstance().setChildAttribute(here, Utils.removeFromArray(path, a.getName()), a);
         here.setDirty(true);
 
         objectSubClasses.add(here);
 
-        ListIterator<Frame> iter = objectSubClasses.listIterator();
+        ListIterator<FrameOLD> iter = objectSubClasses.listIterator();
 
         while (iter.hasNext()) {
-            Frame c = iter.next();
+            FrameOLD c = iter.next();
             c.setDirty(true);
             if (c.isSuccessor(cls.getTypeName())) {
                 c.setAncestor(here);
@@ -798,7 +798,7 @@ public class EnvironmentBase {
                 iter.set(c);
             }
         }
-        return (Frame) here.clone();
+        return (FrameOLD) here.clone();
     }
 
     public void removeAgentClass(GenericAgentClass cls) {
@@ -829,7 +829,7 @@ public class EnvironmentBase {
 
         iter = objectSubClasses.listIterator();
         while (iter.hasNext()) {
-            Frame cc = (Frame) iter.next();
+            FrameOLD cc = (FrameOLD) iter.next();
             if (cc.isSuccessor(cls.getTypeName())) {
                 iter.remove();
                 removed.add(cc);
@@ -837,7 +837,7 @@ public class EnvironmentBase {
 
             ListIterator iter2 = getInstancesOfClass(cc).listIterator();
             while (iter2.hasNext()) {
-                Instance c = (Instance) iter2.next();
+                InstanceOLD c = (InstanceOLD) iter2.next();
                 removed.add(c);
                 iter2.remove();
             }
@@ -867,7 +867,7 @@ public class EnvironmentBase {
                 c.setDirty(true);
                 c.setAncestor(here);
                 iter.set(c);
-                ListIterator<Instance> successorMembers = getInstancesOfClass(c).listIterator();
+                ListIterator<InstanceOLD> successorMembers = getInstancesOfClass(c).listIterator();
                 while (successorMembers.hasNext()) {
                     GenericAgent succ = (GenericAgent) successorMembers.next();
                     UnitUtils.getInstance().removeAttribute(succ, path, a);
@@ -878,7 +878,7 @@ public class EnvironmentBase {
             }
         }
 
-        ListIterator<Instance> members = getInstancesOfClass(cls).listIterator();
+        ListIterator<InstanceOLD> members = getInstancesOfClass(cls).listIterator();
         while (members.hasNext()) {
             GenericAgent c = (GenericAgent) members.next();
             UnitUtils.getInstance().removeAttribute(c, path, a);
@@ -896,31 +896,31 @@ public class EnvironmentBase {
 
     }
 
-    public Frame removeAttributeList(Frame owner, String listName) throws GSimDefException {
-        Frame here = findObjectClass(owner);
+    public FrameOLD removeAttributeList(FrameOLD owner, String listName) throws GSimDefException {
+        FrameOLD here = findObjectClass(owner);
 
         here.removeAttributeList(listName);
         objectSubClasses.add(here);
 
         Iterator members = getInstancesOfClass(here).iterator();
         while (members.hasNext()) {
-            Instance c = (Instance) members.next();
+            InstanceOLD c = (InstanceOLD) members.next();
             c.setFrame(here);
             c.removeAttributeList(listName);
             agents.add((GenericAgent) c);
         }
 
-        ListIterator<Frame> iter = objectSubClasses.listIterator();
+        ListIterator<FrameOLD> iter = objectSubClasses.listIterator();
 
         while (iter.hasNext()) {
-            Frame c = iter.next();
+            FrameOLD c = iter.next();
             if (c.isSuccessor(here.getTypeName())) {
                 c.setAncestor(here);
                 c.removeAttributeList(listName);
                 iter.set(c);
                 members = getInstancesOfClass(c).iterator();
                 while (members.hasNext()) {
-                    Instance cc = (Instance) members.next();
+                    InstanceOLD cc = (InstanceOLD) members.next();
                     cc.setFrame(c);
                     cc.removeAttributeList(listName);
                     agents.add((GenericAgent) cc);
@@ -931,7 +931,7 @@ public class EnvironmentBase {
         // this.removeFrameInReferringAgents(removed, path);
         // this.removeFrameInReferringObjects(removed, path);
 
-        return (Frame) here.clone();
+        return (FrameOLD) here.clone();
 
     }
 
@@ -972,22 +972,22 @@ public class EnvironmentBase {
 
     }
 
-    public Frame removeChildFrame(Frame cls, String[] path, Frame f) {
-        Frame here = findObjectClass(cls);
+    public FrameOLD removeChildFrame(FrameOLD cls, String[] path, FrameOLD f) {
+        FrameOLD here = findObjectClass(cls);
         UnitUtils.getInstance().removeChildFrame(here, path, f.getTypeName());
         here.setDirty(true);
         objectSubClasses.add(here);
 
-        Frame[] c = getAllObjectSuccessors(cls.getTypeName());
+        FrameOLD[] c = getAllObjectSuccessors(cls.getTypeName());
         for (int i = 0; i < c.length; i++) {
             UnitUtils.getInstance().removeChildFrame(c[i], path, f.getTypeName());
         }
 
         Iterator iter = getInstancesOfClass(f).iterator();
         while (iter.hasNext()) {
-            Instance inst = (Instance) iter.next();
+            InstanceOLD inst = (InstanceOLD) iter.next();
 
-            Instance[] list = (Instance[]) inst.resolveName(path);
+            InstanceOLD[] list = (InstanceOLD[]) inst.resolveName(path);
             if (list != null) {
                 for (int i = 0; i < list.length; i++) {
                     if (list[i].inheritsFrom(f)) {
@@ -999,7 +999,7 @@ public class EnvironmentBase {
         // this.removeFrameInReferringObjects(f, path);
         // this.removeFrameInReferringAgents(f, path);
 
-        return (Frame) here.clone();
+        return (FrameOLD) here.clone();
     }
 
     public GenericAgentClass removeChildFrame(GenericAgentClass cls, String[] path, String name) {
@@ -1041,13 +1041,13 @@ public class EnvironmentBase {
         return (GenericAgentClass) here.clone();
     }
 
-    public void removeObjectClass(Frame cls) {
-        ListIterator<Frame> iter = null;
-        Frame here = findObjectClass(cls);
+    public void removeObjectClass(FrameOLD cls) {
+        ListIterator<FrameOLD> iter = null;
+        FrameOLD here = findObjectClass(cls);
 
         iter = objectSubClasses.listIterator();
         while (iter.hasNext()) {
-            Frame c = iter.next();
+            FrameOLD c = iter.next();
             if (c.isSuccessor(here.getTypeName())) {
                 removed.add(c);
                 iter.remove();
@@ -1060,16 +1060,16 @@ public class EnvironmentBase {
 
     }
 
-    public Frame removeObjectClassAttribute(Frame cls, String[] path, String a) {
-        Frame here = findObjectClass(cls);
+    public FrameOLD removeObjectClassAttribute(FrameOLD cls, String[] path, String a) {
+        FrameOLD here = findObjectClass(cls);
 
         UnitUtils.getInstance().removeAttribute(here, path, a);
         here.setDirty(true);
 
-        ListIterator<Frame> iter = objectSubClasses.listIterator();
+        ListIterator<FrameOLD> iter = objectSubClasses.listIterator();
 
         while (iter.hasNext()) {
-            Frame c = iter.next();
+            FrameOLD c = iter.next();
             if (c.isSuccessor(cls.getTypeName())) {
                 c.setDirty(true);
                 UnitUtils.getInstance().removeAttribute(c, path, a);
@@ -1078,9 +1078,9 @@ public class EnvironmentBase {
             }
         }
 
-        ListIterator<Instance> iter2 = objects.listIterator();
+        ListIterator<InstanceOLD> iter2 = objects.listIterator();
         while (iter2.hasNext()) {
-            Instance c = iter2.next();
+            InstanceOLD c = iter2.next();
             if (c.inheritsFrom(cls)) {
                 c.setDirty(true);
                 UnitUtils.getInstance().removeAttribute(c, path, a);
@@ -1094,7 +1094,7 @@ public class EnvironmentBase {
         removeDeletedAttributeInReferringObjects(here, path, a);
         removeDeletedAttributeInReferringAgents(here, path, a);
 
-        return (Frame) here.clone();
+        return (FrameOLD) here.clone();
 
     }
 
@@ -1118,35 +1118,35 @@ public class EnvironmentBase {
         agentClass = c;
     }
 
-    void setObjectClass(Frame c) {
+    void setObjectClass(FrameOLD c) {
         objectClass = c;
     }
 
-    protected TimeOrderedSet<?> clone(TimeOrderedSet<? extends Unit> set) {
-        TimeOrderedSet<Unit> n = new TimeOrderedSet<Unit>();
+    protected TimeOrderedSet<?> clone(TimeOrderedSet<? extends UnitOLD> set) {
+        TimeOrderedSet<UnitOLD> n = new TimeOrderedSet<UnitOLD>();
         Iterator iter = set.iterator();
         while (iter.hasNext()) {
-            Unit u = (Unit) iter.next();
-            n.add((Unit) u.clone());
+            UnitOLD u = (UnitOLD) iter.next();
+            n.add((UnitOLD) u.clone());
         }
         return n;
     }
 
     protected void copyEnvironment(EnvironmentBase env) throws GSimDefException {
         try {
-            behaviourClasses = new TimeOrderedSet<Frame>(this.clone(env.behaviourClasses));
-            objects = new TimeOrderedSet<Instance>(this.clone(env.objects));
-            objectSubClasses = new TimeOrderedSet<Frame>(this.clone(env.objectSubClasses));
+            behaviourClasses = new TimeOrderedSet<FrameOLD>(this.clone(env.behaviourClasses));
+            objects = new TimeOrderedSet<InstanceOLD>(this.clone(env.objects));
+            objectSubClasses = new TimeOrderedSet<FrameOLD>(this.clone(env.objectSubClasses));
             agentClass = (GenericAgentClass) env.agentClass.clone();
 
             agentSubClasses = new TimeOrderedSet<GenericAgentClass>(this.clone(env.agentSubClasses));
             agents = new TimeOrderedSet<GenericAgent>(this.clone(env.agents));
 
             if (env.behaviourClass != null) {
-                behaviourClass = (Frame) env.behaviourClass.clone();
+                behaviourClass = (FrameOLD) env.behaviourClass.clone();
             }
             agentClass = (GenericAgentClass) env.agentClass.clone();
-            objectClass = (Frame) env.objectClass.clone();
+            objectClass = (FrameOLD) env.objectClass.clone();
 
             agentPauses = new HashMap<String, String>(env.agentPauses);
             dataHandlers = new HashMap<String, String>(env.dataHandlers);
@@ -1198,10 +1198,10 @@ public class EnvironmentBase {
         return null;
     }
 
-    protected Instance findObject(String extern) {
+    protected InstanceOLD findObject(String extern) {
         Iterator iter = objects.iterator();
         while (iter.hasNext()) {
-            Instance cls = (Instance) iter.next();
+            InstanceOLD cls = (InstanceOLD) iter.next();
             if (cls.getName().equals(extern)) {
                 return cls;
             }
@@ -1209,10 +1209,10 @@ public class EnvironmentBase {
         return null;
     }
 
-    protected Frame findObjectClass(Frame extern) {
+    protected FrameOLD findObjectClass(FrameOLD extern) {
         Iterator iter = objectSubClasses.listIterator();
         while (iter.hasNext()) {
-            Frame cls = (Frame) iter.next();
+            FrameOLD cls = (FrameOLD) iter.next();
             if (cls.getTypeName().equals(extern.getTypeName())) {
                 return cls;
             }
@@ -1223,10 +1223,10 @@ public class EnvironmentBase {
         return null;
     }
 
-    protected Frame findProductClass(String extern) {
+    protected FrameOLD findProductClass(String extern) {
         Iterator iter = objectSubClasses.listIterator();
         while (iter.hasNext()) {
-            Frame cls = (Frame) iter.next();
+            FrameOLD cls = (FrameOLD) iter.next();
             if (cls.getTypeName().equals(extern)) {
                 return cls;
             }
@@ -1234,13 +1234,13 @@ public class EnvironmentBase {
         return null;
     }
 
-    protected void removeDeletedAttributeInReferringAgents(Frame here, String[] path, String deleted) {
+    protected void removeDeletedAttributeInReferringAgents(FrameOLD here, String[] path, String deleted) {
         GenericAgentClass[] objects = getAgentSubClasses();
         for (int i = 0; i < objects.length; i++) {
             GenericAgentClass c = objects[i];
             String[] s = c.getDeclaredFrameListNames();
             for (int j = 0; j < s.length; j++) {
-                Frame[] ff = c.getChildFrames(s[j]);
+                FrameOLD[] ff = c.getChildFrames(s[j]);
                 for (int k = 0; k < ff.length; k++) {
                     if (ff[k].isSuccessor(here.getTypeName()) || ff[k].getTypeName().equals(here.getTypeName())) {
                         String[] newPath = new String[path.length + 2];
@@ -1256,13 +1256,13 @@ public class EnvironmentBase {
         }
     }
 
-    protected void removeDeletedAttributeInReferringObjects(Frame here, String[] path, String deleted) {
-        Frame[] objects = getObjectSubClasses();
+    protected void removeDeletedAttributeInReferringObjects(FrameOLD here, String[] path, String deleted) {
+        FrameOLD[] objects = getObjectSubClasses();
         for (int i = 0; i < objects.length; i++) {
-            Frame c = objects[i];
+            FrameOLD c = objects[i];
             String[] s = c.getDeclaredFrameListNames();
             for (int j = 0; j < s.length; j++) {
-                Frame[] ff = c.getChildFrames(s[j]);
+                FrameOLD[] ff = c.getChildFrames(s[j]);
                 for (int k = 0; k < ff.length; k++) {
                     if (ff[k].isSuccessor(here.getTypeName()) || ff[k].getTypeName().equals(here.getTypeName())) {
                         String[] newPath = new String[path.length + 2];
@@ -1278,13 +1278,13 @@ public class EnvironmentBase {
         }
     }
 
-    protected void removeFrameInReferringAgents(Frame removed, String[] path) {
+    protected void removeFrameInReferringAgents(FrameOLD removed, String[] path) {
         GenericAgentClass[] objects = getAgentSubClasses();
         for (int i = 0; i < objects.length; i++) {
             GenericAgentClass c = objects[i];
             String[] s = c.getDeclaredFrameListNames();
             for (int j = 0; j < s.length; j++) {
-                Frame[] ff = c.getChildFrames(s[j]);
+                FrameOLD[] ff = c.getChildFrames(s[j]);
                 for (int k = 0; k < ff.length; k++) {
                     if (ff[k] != null && (ff[k].isSuccessor(removed.getTypeName()) || ff[k].getTypeName().equals(removed.getTypeName()))) {
                         String[] newPath = new String[1];
@@ -1298,13 +1298,13 @@ public class EnvironmentBase {
 
     // if a frame is being removed, delete references to this frame in all other
     // objects that are holding references to this frame.
-    protected void removeFrameInReferringObjects(Frame removed, String[] path) {
-        Frame[] objects = getObjectSubClasses();
+    protected void removeFrameInReferringObjects(FrameOLD removed, String[] path) {
+        FrameOLD[] objects = getObjectSubClasses();
         for (int i = 0; i < objects.length; i++) {
-            Frame c = objects[i];
+            FrameOLD c = objects[i];
             String[] s = c.getDeclaredFrameListNames();
             for (int j = 0; j < s.length; j++) {
-                Frame[] ff = c.getChildFrames(s[j]);
+                FrameOLD[] ff = c.getChildFrames(s[j]);
                 for (int k = 0; k < ff.length; k++) {
                     if (ff[k].isSuccessor(removed.getTypeName()) || ff[k].getTypeName().equals(removed.getTypeName())) {
                         String[] newPath = new String[path.length + 2];
@@ -1324,13 +1324,13 @@ public class EnvironmentBase {
         this.ns = ns;
     }
 
-    private void addChildAttributeInReferringAgents(Frame here, String[] path, DomainAttribute added) {
+    private void addChildAttributeInReferringAgents(FrameOLD here, String[] path, DomainAttribute added) {
         GenericAgentClass[] objects = getAgentSubClasses();
         for (int i = 0; i < objects.length; i++) {
             GenericAgentClass c = objects[i];
             String[] s = c.getDeclaredFrameListNames();
             for (int j = 0; j < s.length; j++) {
-                Frame[] ff = c.getChildFrames(s[j]);
+                FrameOLD[] ff = c.getChildFrames(s[j]);
                 for (int k = 0; k < ff.length; k++) {
                     if (ff[k].isSuccessor(here.getTypeName()) || ff[k].getTypeName().equals(here.getTypeName())) {
                         String[] newPath = new String[path.length + 2];
@@ -1346,13 +1346,13 @@ public class EnvironmentBase {
         }
     }
 
-    private void addChildAttributeInReferringObjects(Frame here, String[] path, DomainAttribute added) {
-        Frame[] objects = getObjectSubClasses();
+    private void addChildAttributeInReferringObjects(FrameOLD here, String[] path, DomainAttribute added) {
+        FrameOLD[] objects = getObjectSubClasses();
         for (int i = 0; i < objects.length; i++) {
-            Frame c = objects[i];
+            FrameOLD c = objects[i];
             String[] s = c.getDeclaredFrameListNames();
             for (int j = 0; j < s.length; j++) {
-                Frame[] ff = c.getChildFrames(s[j]);
+                FrameOLD[] ff = c.getChildFrames(s[j]);
                 for (int k = 0; k < ff.length; k++) {
                     if (ff[k].isSuccessor(here.getTypeName()) || ff[k].getTypeName().equals(here.getTypeName())) {
                         String[] newPath = new String[path.length + 2];
@@ -1369,13 +1369,13 @@ public class EnvironmentBase {
     }
 
     // when a containing object of a frame was added or in any way modified
-    private void addChildFrameInReferringObjects(Frame here, String[] path, Frame added) {
-        Frame[] objects = getObjectSubClasses();
+    private void addChildFrameInReferringObjects(FrameOLD here, String[] path, FrameOLD added) {
+        FrameOLD[] objects = getObjectSubClasses();
         for (int i = 0; i < objects.length; i++) {
-            Frame c = objects[i];
+            FrameOLD c = objects[i];
             String[] s = c.getDeclaredFrameListNames();
             for (int j = 0; j < s.length; j++) {
-                Frame[] ff = c.getChildFrames(s[j]);
+                FrameOLD[] ff = c.getChildFrames(s[j]);
                 for (int k = 0; k < ff.length; k++) {
                     if (ff[k].isSuccessor(here.getTypeName()) || ff[k].getTypeName().equals(here.getTypeName())) {
                         String[] newPath = new String[path.length + 2];

@@ -35,7 +35,7 @@ public class ActionCollectionFrame extends Frame {
     }
 
     @Override
-    public Object clone() {
+    public ActionCollectionFrame clone() {
         ActionCollectionFrame f = new ActionCollectionFrame(this);
         return f;
     }

@@ -3,7 +3,7 @@ package de.s2.gsim.api.objects.impl;
 import java.util.ArrayList;
 
 import de.s2.gsim.GSimException;
-import de.s2.gsim.def.objects.Unit;
+import de.s2.gsim.def.objects.UnitOLD;
 import de.s2.gsim.def.objects.behaviour.ActionFrame;
 import de.s2.gsim.def.objects.behaviour.ConditionFrame;
 import de.s2.gsim.def.objects.behaviour.UserRuleFrame;
@@ -215,7 +215,7 @@ public class SelectionNodeClass extends RuleClass implements SelectionNode {
     }
 
     @Override
-    public Unit toUnit() {
+    public UnitOLD toUnit() {
         return real;
     }
 

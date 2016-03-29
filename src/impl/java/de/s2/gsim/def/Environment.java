@@ -10,8 +10,8 @@ import java.util.ListIterator;
 
 import org.apache.log4j.Logger;
 
-import de.s2.gsim.def.objects.Frame;
-import de.s2.gsim.def.objects.Instance;
+import de.s2.gsim.def.objects.FrameOLD;
+import de.s2.gsim.def.objects.InstanceOLD;
 import de.s2.gsim.def.objects.UnitUtils;
 import de.s2.gsim.def.objects.agent.BehaviourDef;
 import de.s2.gsim.def.objects.agent.BehaviourFrame;
@@ -50,7 +50,7 @@ public class Environment extends EnvironmentBase implements java.io.Serializable
         EnvironmentSetup setup = new EnvironmentSetup(setupFile);
 
         agentClass = new GenericAgentClass();
-        objectClass = new Frame("Object", "object");
+        objectClass = new FrameOLD("Object", "object");
 
         // EnvironmentSetup setup = new EnvironmentSetup(setupFile);
 
@@ -67,7 +67,7 @@ public class Environment extends EnvironmentBase implements java.io.Serializable
         this.ns = ns;
 
         agentClass = new GenericAgentClass();
-        objectClass = new Frame("Object", "object");
+        objectClass = new FrameOLD("Object", "object");
 
         EnvironmentSetup setup = new EnvironmentSetup(setupFile);
 
@@ -82,7 +82,7 @@ public class Environment extends EnvironmentBase implements java.io.Serializable
     }
 
     public BehaviourFrame activateBehaviourRule(BehaviourFrame fr, UserRuleFrame ur, boolean activated) {
-        ListIterator<Frame> iter = behaviourClasses.listIterator();
+        ListIterator<FrameOLD> iter = behaviourClasses.listIterator();
         BehaviourFrame here = null;
         while (iter.hasNext()) {
             BehaviourFrame f = (BehaviourFrame) iter.next();
@@ -121,30 +121,30 @@ public class Environment extends EnvironmentBase implements java.io.Serializable
         return (GenericAgent) here.clone();
     }
 
-    public Frame addAttributeList(Frame owner, String listName) throws GSimDefException {
-        Frame here = findObjectClass(owner);
+    public FrameOLD addAttributeList(FrameOLD owner, String listName) throws GSimDefException {
+        FrameOLD here = findObjectClass(owner);
 
         here.defineAttributeList(listName);
         objectSubClasses.add(here);
 
         Iterator members = getInstancesOfClass(here).iterator();
         while (members.hasNext()) {
-            Instance c = (Instance) members.next();
+            InstanceOLD c = (InstanceOLD) members.next();
             c.setFrame(here);
             c.defineAttributeList(listName);
             agents.add((GenericAgent) c);
         }
 
-        ListIterator<Frame> iter = objectSubClasses.listIterator();
+        ListIterator<FrameOLD> iter = objectSubClasses.listIterator();
 
         while (iter.hasNext()) {
-            Frame c = iter.next();
+            FrameOLD c = iter.next();
             if (c.isSuccessor(here.getTypeName())) {
                 c.setAncestor(here);
                 iter.set(c);
                 members = getInstancesOfClass(c).iterator();
                 while (members.hasNext()) {
-                    Instance cc = (Instance) members.next();
+                    InstanceOLD cc = (InstanceOLD) members.next();
                     cc.setFrame(c);
                     c.defineAttributeList(listName);
                     agents.add((GenericAgent) cc);
@@ -152,7 +152,7 @@ public class Environment extends EnvironmentBase implements java.io.Serializable
             }
         }
 
-        return (Frame) here.clone();
+        return (FrameOLD) here.clone();
 
     }
 
@@ -191,7 +191,7 @@ public class Environment extends EnvironmentBase implements java.io.Serializable
 
     }
 
-    public GenericAgent addChildInstance(GenericAgent a, String[] path, Instance child) {
+    public GenericAgent addChildInstance(GenericAgent a, String[] path, InstanceOLD child) {
         GenericAgent here = findGenericAgent(a.getName());
         UnitUtils.getInstance().setChildInstance(here, path, child);
         UserRule[] rules = here.getBehaviour().getRules();
@@ -203,7 +203,7 @@ public class Environment extends EnvironmentBase implements java.io.Serializable
         return (GenericAgent) here.clone();
     }
 
-    public GenericAgentClass addChildObjectList(GenericAgentClass owner, String listName, Frame type) throws GSimDefException {
+    public GenericAgentClass addChildObjectList(GenericAgentClass owner, String listName, FrameOLD type) throws GSimDefException {
         GenericAgentClass here = this.findGenericAgentClass(owner);
 
         here.defineObjectList(listName, type);
@@ -260,8 +260,8 @@ public class Environment extends EnvironmentBase implements java.io.Serializable
     public GenericAgent changeChildInstanceName(GenericAgentClass owner, String[] pathToChild, String newName) {
         GenericAgent old = findGenericAgent(owner.getName());
         Object o = old.resolveName(pathToChild);
-        if (o instanceof Instance) {
-            Instance in = (Instance) o;
+        if (o instanceof InstanceOLD) {
+            InstanceOLD in = (InstanceOLD) o;
             in.changeName(newName);
             UnitUtils.getInstance().setChildInstance(old, pathToChild, in);
         }
@@ -272,19 +272,19 @@ public class Environment extends EnvironmentBase implements java.io.Serializable
 
     public Object cloneEnvironment() {
         Environment env = new Environment(ns);
-        env.behaviourClasses = new TimeOrderedSet<Frame>(this.clone(behaviourClasses));
-        env.objects = new TimeOrderedSet<Instance>(this.clone(objects));
-        env.objectSubClasses = new TimeOrderedSet<Frame>(this.clone(objectSubClasses));
+        env.behaviourClasses = new TimeOrderedSet<FrameOLD>(this.clone(behaviourClasses));
+        env.objects = new TimeOrderedSet<InstanceOLD>(this.clone(objects));
+        env.objectSubClasses = new TimeOrderedSet<FrameOLD>(this.clone(objectSubClasses));
         env.agentClass = (GenericAgentClass) agentClass.clone();
 
         env.agentSubClasses = new TimeOrderedSet<GenericAgentClass>(this.clone(agentSubClasses));
         env.agents = new TimeOrderedSet<GenericAgent>(this.clone(agents));
 
         if (behaviourClass != null) {
-            env.behaviourClass = (Frame) behaviourClass.clone();
+            env.behaviourClass = (FrameOLD) behaviourClass.clone();
         }
         env.agentClass = (GenericAgentClass) agentClass.clone();
-        env.objectClass = (Frame) objectClass.clone();
+        env.objectClass = (FrameOLD) objectClass.clone();
 
         env.agentPauses = new HashMap<String, String>(agentPauses);
         env.dataHandlers = new HashMap<String, String>(dataHandlers);
@@ -305,7 +305,7 @@ public class Environment extends EnvironmentBase implements java.io.Serializable
 
         ListIterator<GenericAgent> iter = agents.listIterator();
         while (iter.hasNext()) {
-            Instance in = iter.next();
+            InstanceOLD in = iter.next();
             if (in.isDirty()) {
                 GenericAgent f = (GenericAgent) instanceControl.reload(in.getName());
                 if (f != null) {
@@ -318,7 +318,7 @@ public class Environment extends EnvironmentBase implements java.io.Serializable
 
         ListIterator<GenericAgentClass> iter2 = agentSubClasses.listIterator();
         while (iter2.hasNext()) {
-            Frame in = iter2.next();
+            FrameOLD in = iter2.next();
             if (in.isDirty()) {
                 GenericAgentClass f = (GenericAgentClass) frameControl.reload(in.getTypeName());
                 if (f != null) {
@@ -329,11 +329,11 @@ public class Environment extends EnvironmentBase implements java.io.Serializable
             }
         }
 
-        ListIterator<Frame> iter3 = objectSubClasses.listIterator();
+        ListIterator<FrameOLD> iter3 = objectSubClasses.listIterator();
         while (iter3.hasNext()) {
-            Frame in = iter3.next();
+            FrameOLD in = iter3.next();
             if (in.isDirty()) {
-                Frame f = frameControl.reload(in.getTypeName());
+                FrameOLD f = frameControl.reload(in.getTypeName());
                 if (f != null) {
                     iter3.set(f);
                 } else {
@@ -342,11 +342,11 @@ public class Environment extends EnvironmentBase implements java.io.Serializable
             }
         }
 
-        ListIterator<Instance> iter4 = objects.listIterator();
+        ListIterator<InstanceOLD> iter4 = objects.listIterator();
         while (iter4.hasNext()) {
-            Instance in = iter.next();
+            InstanceOLD in = iter.next();
             if (in.isDirty()) {
-                Instance f = instanceControl.reload(in.getName());
+                InstanceOLD f = instanceControl.reload(in.getName());
                 if (f != null) {
                     iter4.set(f);
                 } else {
@@ -362,13 +362,13 @@ public class Environment extends EnvironmentBase implements java.io.Serializable
         HashMap<String, InheritanceHierarchy> nodes = new HashMap<String, InheritanceHierarchy>();
         ListIterator iter = agentSubClasses.listIterator();
 
-        Frame root = agentClass;
-        InheritanceHierarchy node = new InheritanceHierarchy((Frame) root.clone());
+        FrameOLD root = agentClass;
+        InheritanceHierarchy node = new InheritanceHierarchy((FrameOLD) root.clone());
         nodes.put(node.getFrame().getTypeName(), node);
 
         while (iter.hasNext()) {
-            Frame c = (Frame) iter.next();
-            Frame cc = (Frame) c.clone();
+            FrameOLD c = (FrameOLD) iter.next();
+            FrameOLD cc = (FrameOLD) c.clone();
             node.insert(cc);
             nodes.put(node.getFrame().getTypeName(), node);
         }
@@ -384,13 +384,13 @@ public class Environment extends EnvironmentBase implements java.io.Serializable
 
         HashMap<String, InheritanceHierarchy> nodes = new HashMap<String, InheritanceHierarchy>();
         ListIterator iter = behaviourClasses.listIterator();
-        Frame root = behaviourClass;
-        InheritanceHierarchy node = new InheritanceHierarchy((Frame) root.clone());
-        node.insert((Frame) root.clone());
+        FrameOLD root = behaviourClass;
+        InheritanceHierarchy node = new InheritanceHierarchy((FrameOLD) root.clone());
+        node.insert((FrameOLD) root.clone());
 
         while (iter.hasNext()) {
             BehaviourFrame c = (BehaviourFrame) iter.next();
-            node.insert((Frame) c.clone());
+            node.insert((FrameOLD) c.clone());
             nodes.put(node.getFrame().getTypeName(), node);
         }
 
@@ -406,13 +406,13 @@ public class Environment extends EnvironmentBase implements java.io.Serializable
         HashMap<String, InheritanceHierarchy> nodes = new HashMap<String, InheritanceHierarchy>();
         ListIterator iter = objectSubClasses.listIterator();
 
-        Frame root = objectClass;
-        InheritanceHierarchy node = new InheritanceHierarchy((Frame) root.clone());
+        FrameOLD root = objectClass;
+        InheritanceHierarchy node = new InheritanceHierarchy((FrameOLD) root.clone());
         nodes.put(node.getFrame().getTypeName(), node);
 
         while (iter.hasNext()) {
-            Frame c = (Frame) iter.next();
-            node.insert((Frame) c.clone());
+            FrameOLD c = (FrameOLD) iter.next();
+            node.insert((FrameOLD) c.clone());
             nodes.put(node.getFrame().getTypeName(), node);
         }
 
@@ -469,12 +469,12 @@ public class Environment extends EnvironmentBase implements java.io.Serializable
         return ns;
     }
 
-    public Instance getObject(String name) {
-        Instance here = findObject(name);
+    public InstanceOLD getObject(String name) {
+        InstanceOLD here = findObject(name);
         if (here == null) {
             return null;
         }
-        return (Instance) here.clone();
+        return (InstanceOLD) here.clone();
     }
 
     public int getTotalAgentCount() {
@@ -543,10 +543,10 @@ public class Environment extends EnvironmentBase implements java.io.Serializable
 
     }
 
-    public Instance instanciateFrame(Frame cls, String name) {
-        Instance inst = new Instance(name, cls);
+    public InstanceOLD instanciateFrame(FrameOLD cls, String name) {
+        InstanceOLD inst = new InstanceOLD(name, cls);
         objects.add(inst);
-        return (Instance) inst.clone();
+        return (InstanceOLD) inst.clone();
     }
 
     public GenericAgent modifyAgentAttribute(GenericAgent inst, String[] path, Attribute att) {
@@ -563,12 +563,12 @@ public class Environment extends EnvironmentBase implements java.io.Serializable
         return (GenericAgent) agent.clone();
     }
 
-    public Instance modifyObjectAttribute(Instance inst, String[] path, Attribute att) {
-        Instance here = findObject(inst.getName());
+    public InstanceOLD modifyObjectAttribute(InstanceOLD inst, String[] path, Attribute att) {
+        InstanceOLD here = findObject(inst.getName());
         UnitUtils.getInstance().setChildAttribute(here, path, att);
         here.setDirty(true);
         objects.add(here);
-        return (Instance) here.clone();
+        return (InstanceOLD) here.clone();
     }
 
     public GenericAgent removeChildInstance(GenericAgent owner, String[] path, String child) {
@@ -625,10 +625,10 @@ public class Environment extends EnvironmentBase implements java.io.Serializable
         }
     }
 
-    public void removeObject(Instance object) {
+    public void removeObject(InstanceOLD object) {
         Iterator iter = objects.iterator();
         while (iter.hasNext()) {
-            Instance a = (Instance) iter.next();
+            InstanceOLD a = (InstanceOLD) iter.next();
             if (a.getName().equals(object.getName())) {
                 iter.remove();
                 removed.add(a);
@@ -646,31 +646,31 @@ public class Environment extends EnvironmentBase implements java.io.Serializable
 
         while (iter.hasNext()) {
             Object o = iter.next();
-            if (o instanceof Frame) {
-                frameControl.deleteFrame((Frame) o);
-            } else if (o instanceof Instance) {
-                instanceControl.deleteInstance((Instance) o);
+            if (o instanceof FrameOLD) {
+                frameControl.deleteFrame((FrameOLD) o);
+            } else if (o instanceof InstanceOLD) {
+                instanceControl.deleteInstance((InstanceOLD) o);
             }
         }
         removed.clear();
 
         iter = agentSubClasses.listIterator();
         while (iter.hasNext()) {
-            Frame f = (Frame) iter.next();
+            FrameOLD f = (FrameOLD) iter.next();
             if (f.isDirty()) {
                 frameControl.saveFrame(f);
             }
         }
         iter = objectSubClasses.listIterator();
         while (iter.hasNext()) {
-            Frame f = (Frame) iter.next();
+            FrameOLD f = (FrameOLD) iter.next();
             if (f.isDirty()) {
                 frameControl.saveFrame(f);
             }
         }
         iter = behaviourClasses.listIterator();
         while (iter.hasNext()) {
-            Frame f = (Frame) iter.next();
+            FrameOLD f = (FrameOLD) iter.next();
             if (f.isDirty()) {
                 frameControl.saveFrame(f);
             }
@@ -678,7 +678,7 @@ public class Environment extends EnvironmentBase implements java.io.Serializable
 
         iter = agents.iterator();
         while (iter.hasNext()) {
-            Instance inst = (Instance) iter.next();
+            InstanceOLD inst = (InstanceOLD) iter.next();
             if (inst.isDirty()) {
                 inst.setDirty(false);
                 instanceControl.saveInstance(inst);
@@ -686,7 +686,7 @@ public class Environment extends EnvironmentBase implements java.io.Serializable
         }
         iter = objects.iterator();
         while (iter.hasNext()) {
-            Instance inst = (Instance) iter.next();
+            InstanceOLD inst = (InstanceOLD) iter.next();
             if (inst.isDirty()) {
                 inst.setDirty(false);
                 instanceControl.saveInstance(inst);
@@ -713,7 +713,7 @@ public class Environment extends EnvironmentBase implements java.io.Serializable
 
         agentSubClasses.add(here);
 
-        ListIterator<Instance> iter = getInstancesOfClass(here).listIterator();
+        ListIterator<InstanceOLD> iter = getInstancesOfClass(here).listIterator();
         while (iter.hasNext()) {
             GenericAgent p = (GenericAgent) iter.next();
             p.setDirty(true);
@@ -749,7 +749,7 @@ public class Environment extends EnvironmentBase implements java.io.Serializable
                 }
                 p.setBehaviour(pb);
                 iter2.set(p);
-                ListIterator<Instance> successorMembers = getInstancesOfClass(p).listIterator();
+                ListIterator<InstanceOLD> successorMembers = getInstancesOfClass(p).listIterator();
                 while (successorMembers.hasNext()) {
                     GenericAgent a = (GenericAgent) iter.next();
                     p.setDirty(true);
@@ -814,8 +814,8 @@ public class Environment extends EnvironmentBase implements java.io.Serializable
         FramePersistenceManager frameControl = new FramePersistenceManager(ns);
         InstancePersistenceManager instanceControl = new InstancePersistenceManager(ns);
 
-        Frame[] all = frameControl.getAllFrames();
-        Instance[] in = instanceControl.loadAll();
+        FrameOLD[] all = frameControl.getAllFrames();
+        InstanceOLD[] in = instanceControl.loadAll();
 
         for (int i = 0; i < all.length; i++) {
             if (all[i] instanceof GenericAgentClass) {

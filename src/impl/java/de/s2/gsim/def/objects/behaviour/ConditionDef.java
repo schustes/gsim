@@ -1,9 +1,9 @@
 package de.s2.gsim.def.objects.behaviour;
 
-import de.s2.gsim.def.objects.Instance;
+import de.s2.gsim.def.objects.InstanceOLD;
 import de.s2.gsim.objects.attribute.StringAttribute;
 
-public class ConditionDef extends Instance {
+public class ConditionDef extends InstanceOLD {
 
     static final long serialVersionUID = 437787152226881019L;
 
@@ -17,7 +17,7 @@ public class ConditionDef extends Instance {
      * @param inst
      *            Instance
      */
-    public ConditionDef(Instance inst) {
+    public ConditionDef(InstanceOLD inst) {
         super(inst);
     }
 

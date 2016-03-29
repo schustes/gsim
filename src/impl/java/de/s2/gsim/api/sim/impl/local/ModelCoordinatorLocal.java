@@ -16,7 +16,7 @@ import de.s2.gsim.api.sim.agent.impl.ApplicationAgentImpl;
 import de.s2.gsim.api.sim.agent.impl.RuntimeAgent;
 import de.s2.gsim.def.Environment;
 import de.s2.gsim.def.ModelDefinitionEnvironment;
-import de.s2.gsim.def.objects.Instance;
+import de.s2.gsim.def.objects.InstanceOLD;
 import de.s2.gsim.def.objects.agent.GenericAgent;
 import de.s2.gsim.objects.AgentInstance;
 import de.s2.gsim.objects.AppAgent;
@@ -301,7 +301,7 @@ public class ModelCoordinatorLocal implements Simulation, Steppable {
 		RuntimeAgent agent = agents.get(agentInstance.getName());
 		for (String list : agentInstance.getObjectListNames()) {
 			for (ObjectInstance inst : agentInstance.getObjects(list)) {
-				agent.setChildInstance(list, (Instance) inst);
+				agent.setChildInstance(list, (InstanceOLD) inst);
 			}
 		}
 		for (String list : agentInstance.getAttributeListNames()) {

@@ -2,21 +2,21 @@ package de.s2.gsim.def.objects;
 
 import java.util.ArrayList;
 
-public class TypedList extends ArrayList<Unit> {
+public class TypedListOLD extends ArrayList<UnitOLD> {
 
     private static final long serialVersionUID = 1L;
 
-    private Frame type;
+    private FrameOLD type;
 
-    public TypedList(Frame f) {
+    public TypedListOLD(FrameOLD f) {
         type = f;
     }
 
-    public TypedList(TypedList c) {
+    public TypedListOLD(TypedListOLD c) {
         super(c);
     }
 
-    public Frame getType() {
+    public FrameOLD getType() {
         return type;
     }
 

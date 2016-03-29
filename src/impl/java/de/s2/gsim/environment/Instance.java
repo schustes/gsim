@@ -154,7 +154,7 @@ public class Instance extends Unit {
     }
 
     @Override
-    public Object clone() {
+    public Instance clone() {
         Instance in = new Instance(this);
 
         String[] attrListNames = getAttributesListNames();

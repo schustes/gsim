@@ -1,7 +1,7 @@
 package de.s2.gsim.api.objects.impl;
 
 import de.s2.gsim.GSimException;
-import de.s2.gsim.def.objects.Instance;
+import de.s2.gsim.def.objects.InstanceOLD;
 import de.s2.gsim.def.objects.behaviour.ActionDef;
 import de.s2.gsim.def.objects.behaviour.ConditionDef;
 import de.s2.gsim.def.objects.behaviour.ExpansionDef;
@@ -27,7 +27,7 @@ public class RLActionNodeInstance extends RuleInstance implements RLActionNode, 
 
     @Override
     public void addOrSetCondition(Condition cond) throws GSimException {
-        Instance inst = (Instance) ((UnitWrapper) cond).toUnit();
+        InstanceOLD inst = (InstanceOLD) ((UnitWrapper) cond).toUnit();
         ConditionDef c = new ConditionDef(inst);
         real.setCondition(c);
         owner.addOrSetRule(this);
@@ -35,7 +35,7 @@ public class RLActionNodeInstance extends RuleInstance implements RLActionNode, 
 
     @Override
     public void addOrSetConsequent(de.s2.gsim.objects.Action cons) throws GSimException {
-        ActionDef a = new ActionDef((Instance) ((UnitWrapper) cons).toUnit());
+        ActionDef a = new ActionDef((InstanceOLD) ((UnitWrapper) cons).toUnit());
         real.addConsequence(a);
         owner.addOrSetRLActionNode(this);
     }

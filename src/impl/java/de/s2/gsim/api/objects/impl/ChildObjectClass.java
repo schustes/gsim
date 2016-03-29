@@ -3,8 +3,8 @@ package de.s2.gsim.api.objects.impl;
 import java.util.ArrayList;
 
 import de.s2.gsim.GSimException;
-import de.s2.gsim.def.objects.Frame;
-import de.s2.gsim.def.objects.Unit;
+import de.s2.gsim.def.objects.FrameOLD;
+import de.s2.gsim.def.objects.UnitOLD;
 import de.s2.gsim.objects.AgentClass;
 import de.s2.gsim.objects.ObjectClass;
 import de.s2.gsim.objects.attribute.DomainAttribute;
@@ -22,9 +22,9 @@ public class ChildObjectClass implements ObjectClass, UnitWrapper {
 
     private String list = "";
 
-    private Frame real;
+    private FrameOLD real;
 
-    public ChildObjectClass(AgentClass env, String list, Frame real) {
+    public ChildObjectClass(AgentClass env, String list, FrameOLD real) {
         this.env = env;
         this.real = real;
         this.list = list;
@@ -231,7 +231,7 @@ public class ChildObjectClass implements ObjectClass, UnitWrapper {
     }
 
     @Override
-    public Unit toUnit() {
+    public UnitOLD toUnit() {
         return real;
     }
 

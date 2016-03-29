@@ -13,7 +13,7 @@ import de.s2.gsim.objects.attribute.Attribute;
  * @author Stephan
  * @version 0.1
  */
-public class Unit implements java.io.Serializable {
+public class UnitOLD implements Cloneable {
 
     public static final long serialVersionUID = -5778191656497160894L;
 
@@ -27,17 +27,22 @@ public class Unit implements java.io.Serializable {
 
     protected String name = "";
 
-    protected TypedMap objectLists = new TypedMap();
+    protected TypedMapOLD objectLists = new TypedMapOLD();
 
-    public Unit() {
+    public UnitOLD() {
+    }
+
+    @SuppressWarnings("unchecked")
+    public <K extends UnitOLD> K copy() {
+        return (K) clone();
     }
 
     @Override
-    public Object clone() {
-        Unit u = new Unit();
+    public UnitOLD clone() {
+        UnitOLD u = new UnitOLD();
         u.isSystem = isSystem;
         u.isMutable = isMutable;
-        u.objectLists = new TypedMap(objectLists);
+        u.objectLists = new TypedMapOLD(objectLists);
         u.attributeLists = new HashMap<String, List<Attribute>>();
         return u;
     }
@@ -46,8 +51,8 @@ public class Unit implements java.io.Serializable {
         attributeLists.put(listname, new ArrayList<Attribute>());
     }
 
-    public void defineObjectList(String listname, Frame type) {
-        TypedList list = new TypedList(type);
+    public void defineObjectList(String listname, FrameOLD type) {
+        TypedListOLD list = new TypedListOLD(type);
         objectLists.put(listname, list);
     }
 
@@ -59,7 +64,7 @@ public class Unit implements java.io.Serializable {
         return name;
     }
 
-    public TypedMap getObjectLists() {
+    public TypedMapOLD getObjectLists() {
         return objectLists;
     }
 

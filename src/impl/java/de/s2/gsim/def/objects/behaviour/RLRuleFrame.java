@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
 
-import de.s2.gsim.def.objects.Frame;
+import de.s2.gsim.def.objects.FrameOLD;
 import de.s2.gsim.objects.attribute.AttributeType;
 import de.s2.gsim.objects.attribute.DomainAttribute;
 
@@ -24,17 +24,17 @@ public class RLRuleFrame extends UserRuleFrame {
 
     private static final long serialVersionUID = 1L;
 
-    public RLRuleFrame(Frame f) {
+    public RLRuleFrame(FrameOLD f) {
         super(f);
         // init();
     }
 
-    public RLRuleFrame(Frame cloneFrom, String newName) {
+    public RLRuleFrame(FrameOLD cloneFrom, String newName) {
         super(cloneFrom);
         super.setTypeName(newName);
     }
 
-    public RLRuleFrame(Frame[] parents, String name, String category) {
+    public RLRuleFrame(FrameOLD[] parents, String name, String category) {
         super(parents, name, category);
         init();
     }
@@ -75,7 +75,7 @@ public class RLRuleFrame extends UserRuleFrame {
 
     public void addTest(DependencyTestFrame test) {
 
-        Frame in = getChildFrame(RLRuleFrame.INST_LIST_TESTS, "TestCollection");
+        FrameOLD in = getChildFrame(RLRuleFrame.INST_LIST_TESTS, "TestCollection");
 
         DependencyTestDefinitionFrame fr = null;
 
@@ -95,7 +95,7 @@ public class RLRuleFrame extends UserRuleFrame {
 
     @Override
     public Object clone() {
-        Frame f = (Frame) super.clone();
+        FrameOLD f = (FrameOLD) super.clone();
         RLRuleFrame c = new RLRuleFrame(f);
         // c.init();
         return c;
@@ -122,7 +122,7 @@ public class RLRuleFrame extends UserRuleFrame {
     }
 
     public ConditionFrame getEvaluationFunction() {
-        Frame[] inst = getChildFrames(INST_LIST_LEARNING);
+        FrameOLD[] inst = getChildFrames(INST_LIST_LEARNING);
         ArrayList list = new ArrayList();
         for (int i = 0; i < inst.length; i++) {
             if (!inst[i].getTypeName().startsWith("{")) {
@@ -151,7 +151,7 @@ public class RLRuleFrame extends UserRuleFrame {
     }
 
     public ExpansionFrame[] getExpansions() {
-        Frame[] f = super.getChildFrames(INST_LIST_EXP);
+        FrameOLD[] f = super.getChildFrames(INST_LIST_EXP);
         ExpansionFrame[] e = new ExpansionFrame[f.length];
         for (int i = 0; i < f.length; i++) {
             e[i] = new ExpansionFrame(f[i]);
@@ -170,7 +170,7 @@ public class RLRuleFrame extends UserRuleFrame {
     }
 
     public UserRuleFrame[] getSelectionRules() {
-        Frame[] f = super.getChildFrames(INST_LIST_SHORTCUTS);
+        FrameOLD[] f = super.getChildFrames(INST_LIST_SHORTCUTS);
         UserRuleFrame[] res = new UserRuleFrame[f.length];
         for (int i = 0; i < f.length; i++) {
             res[i] = new UserRuleFrame(f[i]);
@@ -267,7 +267,7 @@ public class RLRuleFrame extends UserRuleFrame {
     }
 
     public void setEvaluationFunction(ConditionFrame f) {
-        for (Frame a : super.getChildFrames(RLRuleFrame.INST_LIST_LEARNING)) {
+        for (FrameOLD a : super.getChildFrames(RLRuleFrame.INST_LIST_LEARNING)) {
             super.removeChildFrame(RLRuleFrame.INST_LIST_LEARNING, a.getTypeName());
         }
 

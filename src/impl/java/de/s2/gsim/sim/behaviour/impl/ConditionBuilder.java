@@ -7,7 +7,7 @@ import cern.jet.random.Uniform;
 import de.s2.gsim.GSimCore;
 import de.s2.gsim.GSimCoreFactory;
 import de.s2.gsim.def.ModelDefinitionEnvironment;
-import de.s2.gsim.def.objects.Instance;
+import de.s2.gsim.def.objects.InstanceOLD;
 import de.s2.gsim.def.objects.behaviour.ConditionDef;
 import de.s2.gsim.def.objects.behaviour.ExpansionDef;
 import de.s2.gsim.objects.AgentClass;
@@ -144,7 +144,7 @@ public class ConditionBuilder {
 
     }
 
-    public String createCondition(Instance agent, ConditionDef cond, Object2VariableBindingTable objRefs, String ruleSoFar) throws GSimEngineException {
+    public String createCondition(InstanceOLD agent, ConditionDef cond, Object2VariableBindingTable objRefs, String ruleSoFar) throws GSimEngineException {
 
         String n = "";
 
@@ -424,7 +424,7 @@ public class ConditionBuilder {
      * @return the string with the jess expression for that condition
      * @throws GSimEngineException
      */
-    public String createVariableCondition(Instance owner, ConditionDef cond, Object2VariableBindingTable objRefs, String nRule_1)
+    public String createVariableCondition(InstanceOLD owner, ConditionDef cond, Object2VariableBindingTable objRefs, String nRule_1)
             throws GSimEngineException {
 
         int k = Uniform.staticNextIntFromTo(0, 1000);
@@ -575,7 +575,7 @@ public class ConditionBuilder {
         return s.trim().startsWith("(");
     }
 
-    private boolean isNumericalAttribute(Instance obj, String pathToAtt) {
+    private boolean isNumericalAttribute(InstanceOLD obj, String pathToAtt) {
         Attribute a = (Attribute) obj.resolveName(pathToAtt.split("/"));
         return (a instanceof NumericalAttribute);
     }

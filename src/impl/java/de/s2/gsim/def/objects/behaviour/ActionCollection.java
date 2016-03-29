@@ -1,8 +1,8 @@
 package de.s2.gsim.def.objects.behaviour;
 
-import de.s2.gsim.def.objects.Instance;
+import de.s2.gsim.def.objects.InstanceOLD;
 
-public class ActionCollection extends Instance {
+public class ActionCollection extends InstanceOLD {
 
     static final long serialVersionUID = -9032868199755804359L;
 
@@ -10,12 +10,12 @@ public class ActionCollection extends Instance {
         super(f.getTypeName(), f);
     }
 
-    public ActionCollection(Instance inst) {
+    public ActionCollection(InstanceOLD inst) {
         super(inst);
     }
 
     public ActionDef getAction(String name) {
-        Instance inst = this.getChildInstance(ActionCollectionFrame.INST_ACTION_LIST, name);
+        InstanceOLD inst = this.getChildInstance(ActionCollectionFrame.INST_ACTION_LIST, name);
         if (inst != null) {
             return new ActionDef(inst);
         }
@@ -23,7 +23,7 @@ public class ActionCollection extends Instance {
     }
 
     public ActionDef[] getActions() {
-        Instance[] inst = getChildInstances(ActionCollectionFrame.INST_ACTION_LIST);
+        InstanceOLD[] inst = getChildInstances(ActionCollectionFrame.INST_ACTION_LIST);
         if (inst == null) {
             return new ActionDef[0];
         }

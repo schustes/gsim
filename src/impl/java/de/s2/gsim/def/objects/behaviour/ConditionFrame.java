@@ -1,6 +1,6 @@
 package de.s2.gsim.def.objects.behaviour;
 
-import de.s2.gsim.def.objects.Frame;
+import de.s2.gsim.def.objects.FrameOLD;
 import de.s2.gsim.objects.attribute.AttributeType;
 import de.s2.gsim.objects.attribute.DomainAttribute;
 
@@ -8,7 +8,7 @@ import de.s2.gsim.objects.attribute.DomainAttribute;
  * Represents one condition element. Each possible condition element contains only one parameter, and may have limited range of applicable operators.
  * The one parameter is unique for each consequence. For displaying all condition elements, one has to use the instances..not very accurate..?
  */
-public class ConditionFrame extends Frame {
+public class ConditionFrame extends FrameOLD {
 
     public final static String ATTR_LIST_ATTRS = "attributes";
 
@@ -20,7 +20,7 @@ public class ConditionFrame extends Frame {
 
     static final long serialVersionUID = 8165736680329194821L;
 
-    public ConditionFrame(Frame f) {
+    public ConditionFrame(FrameOLD f) {
         super(f);
     }
 

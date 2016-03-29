@@ -5,9 +5,9 @@ import java.util.Iterator;
 
 import de.s2.gsim.GSimException;
 import de.s2.gsim.def.Environment;
-import de.s2.gsim.def.objects.Frame;
-import de.s2.gsim.def.objects.TypedList;
-import de.s2.gsim.def.objects.Unit;
+import de.s2.gsim.def.objects.FrameOLD;
+import de.s2.gsim.def.objects.TypedListOLD;
+import de.s2.gsim.def.objects.UnitOLD;
 import de.s2.gsim.def.objects.agent.BehaviourFrame;
 import de.s2.gsim.def.objects.agent.GenericAgentClass;
 import de.s2.gsim.objects.AgentClass;
@@ -64,7 +64,7 @@ public class AgentClassDef extends ObjectClassDef implements AgentClass, UnitWra
         }
 
         try {
-            real = env.addChildObject((GenericAgentClass) real, new String[] { list }, (Frame) ((UnitWrapper) object).toUnit());
+            real = env.addChildObject((GenericAgentClass) real, new String[] { list }, (FrameOLD) ((UnitWrapper) object).toUnit());
         } catch (Exception e) {
             throw new GSimException(e);
         }
@@ -154,7 +154,7 @@ public class AgentClassDef extends ObjectClassDef implements AgentClass, UnitWra
         }
 
         try {
-            Frame[] f = real.getChildFrames(list);
+            FrameOLD[] f = real.getChildFrames(list);
             ObjectClass[] ret = new ObjectClass[f.length];
             for (int i = 0; i < f.length; i++) {
                 ret[i] = new ChildObjectClass(this, list, f[i]);
@@ -230,14 +230,14 @@ public class AgentClassDef extends ObjectClassDef implements AgentClass, UnitWra
 
             if (o instanceof DomainAttribute) {
                 return o;
-            } else if (o instanceof Frame) {
-                return new ObjectClassDef(env, (Frame) o);
-            } else if (o instanceof TypedList) {
-                TypedList list = (TypedList) o;
+            } else if (o instanceof FrameOLD) {
+                return new ObjectClassDef(env, (FrameOLD) o);
+            } else if (o instanceof TypedListOLD) {
+                TypedListOLD list = (TypedListOLD) o;
                 ArrayList<ObjectClassDef> ret = new ArrayList<ObjectClassDef>();
                 Iterator iter = list.iterator();
                 while (iter.hasNext()) {
-                    Frame f = (Frame) iter.next();
+                    FrameOLD f = (FrameOLD) iter.next();
                     ObjectClassDef c = new ObjectClassDef(env, f);
                     ret.add(c);
                 }
@@ -317,7 +317,7 @@ public class AgentClassDef extends ObjectClassDef implements AgentClass, UnitWra
      * @link gsim.objects.ObjectClassIF
      */
     @Override
-    public Unit toUnit() {
+    public UnitOLD toUnit() {
         return real;
     }
 

@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import de.s2.gsim.GSimException;
-import de.s2.gsim.def.objects.Frame;
-import de.s2.gsim.def.objects.TypedList;
+import de.s2.gsim.def.objects.FrameOLD;
+import de.s2.gsim.def.objects.TypedListOLD;
 import de.s2.gsim.def.objects.agent.BehaviourFrame;
 import de.s2.gsim.def.objects.agent.GenericAgentClass;
 import de.s2.gsim.objects.AgentClass;
@@ -43,7 +43,7 @@ public class AgentClassSim implements AgentClass, ObjectClass {
     public void addOrSetObject(String list, ObjectClass object) throws GSimException {
 
         try {
-            real.addChildFrame(list, (Frame) ((UnitWrapper) object).toUnit());
+            real.addChildFrame(list, (FrameOLD) ((UnitWrapper) object).toUnit());
         } catch (Exception e) {
             throw new GSimException(e);
         }
@@ -178,7 +178,7 @@ public class AgentClassSim implements AgentClass, ObjectClass {
     public ObjectClass[] getObjects(String list) throws GSimException {
 
         try {
-            Frame[] f = real.getChildFrames(list);
+            FrameOLD[] f = real.getChildFrames(list);
             ObjectClass[] ret = new ObjectClass[f.length];
             for (int i = 0; i < f.length; i++) {
                 ret[i] = new ChildObjectClass(this, list, f[i]);
@@ -244,14 +244,14 @@ public class AgentClassSim implements AgentClass, ObjectClass {
 
             if (o instanceof Attribute) {
                 return o;
-            } else if (o instanceof Frame) {
-                return new ChildObjectClass(this, p[0], (Frame) o);
-            } else if (o instanceof TypedList) {
-                TypedList list = (TypedList) o;
+            } else if (o instanceof FrameOLD) {
+                return new ChildObjectClass(this, p[0], (FrameOLD) o);
+            } else if (o instanceof TypedListOLD) {
+                TypedListOLD list = (TypedListOLD) o;
                 ArrayList<ChildObjectClass> ret = new ArrayList<ChildObjectClass>();
                 Iterator iter = list.iterator();
                 while (iter.hasNext()) {
-                    Frame f = (Frame) iter.next();
+                    FrameOLD f = (FrameOLD) iter.next();
                     ChildObjectClass c = new ChildObjectClass(this, p[0], f);
                     ret.add(c);
                 }

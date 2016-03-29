@@ -1,12 +1,12 @@
 package de.s2.gsim.def.objects.agent;
 
-import de.s2.gsim.def.objects.Instance;
+import de.s2.gsim.def.objects.InstanceOLD;
 import de.s2.gsim.objects.attribute.Attribute;
 
 /**
  * Provides a basic implementation of the Agent class. This agent type can be used for anything in a model, but some logic will have to be provided.
  */
-public class GenericAgent extends Instance {
+public class GenericAgent extends InstanceOLD {
 
     public static final long serialVersionUID = 101191270000954720L;
 

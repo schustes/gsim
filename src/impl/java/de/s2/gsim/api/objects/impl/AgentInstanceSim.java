@@ -6,10 +6,10 @@ import java.util.Iterator;
 import java.util.List;
 
 import de.s2.gsim.GSimException;
-import de.s2.gsim.def.objects.Frame;
-import de.s2.gsim.def.objects.Instance;
-import de.s2.gsim.def.objects.TypedList;
-import de.s2.gsim.def.objects.Unit;
+import de.s2.gsim.def.objects.FrameOLD;
+import de.s2.gsim.def.objects.InstanceOLD;
+import de.s2.gsim.def.objects.TypedListOLD;
+import de.s2.gsim.def.objects.UnitOLD;
 import de.s2.gsim.def.objects.UnitUtils;
 import de.s2.gsim.def.objects.agent.BehaviourDef;
 import de.s2.gsim.def.objects.agent.GenericAgent;
@@ -51,7 +51,7 @@ public class AgentInstanceSim implements AgentInstance, ObjectInstance, UnitWrap
 
         try {
             GenericAgent a = real;
-            a.addChildInstance(list, (Instance) object);
+            a.addChildInstance(list, (InstanceOLD) object);
         } catch (Exception e) {
             throw new GSimException(e);
         }
@@ -66,8 +66,8 @@ public class AgentInstanceSim implements AgentInstance, ObjectInstance, UnitWrap
 
     @Override
     public ObjectInstance createObjectFromListType(String objectName, String listName) {
-        Frame f = real.getDefinition().getListType(listName);
-        Instance instance = new Instance(objectName, f);
+        FrameOLD f = real.getDefinition().getListType(listName);
+        InstanceOLD instance = new InstanceOLD(objectName, f);
         return new ChildObjectInstance(this, listName, instance);
         // return new ObjectInstanceSim(instance);
     }
@@ -227,7 +227,7 @@ public class AgentInstanceSim implements AgentInstance, ObjectInstance, UnitWrap
 
     @Override
     public ObjectInstance getObject(String list, String objectName) throws GSimException {
-        Instance in = real.getChildInstance(list, objectName);
+        InstanceOLD in = real.getChildInstance(list, objectName);
         if (in != null) {
             return new ChildObjectInstance(this, list, in);
         } else {
@@ -268,7 +268,7 @@ public class AgentInstanceSim implements AgentInstance, ObjectInstance, UnitWrap
 
         try {
 
-            Instance[] f = real.getChildInstances(list);
+            InstanceOLD[] f = real.getChildInstances(list);
             ObjectInstance[] ret = new ObjectInstance[f.length];
             for (int i = 0; i < f.length; i++) {
                 ret[i] = new ChildObjectInstance(this, list, f[i]);
@@ -322,7 +322,7 @@ public class AgentInstanceSim implements AgentInstance, ObjectInstance, UnitWrap
 
     @Override
     public void removeAllObjects(String list) {
-        Frame type = real.getDefinition().getListType(list);
+        FrameOLD type = real.getDefinition().getListType(list);
         real.removeChildInstanceList(list);
         real.defineObjectList(list, type);
     }
@@ -389,14 +389,14 @@ public class AgentInstanceSim implements AgentInstance, ObjectInstance, UnitWrap
 
             if (o instanceof Attribute) {
                 return o;
-            } else if (o instanceof Instance) {
-                return new ChildObjectInstance(this, p[0], (Instance) o);
-            } else if (o instanceof TypedList) {
-                TypedList list = (TypedList) o;
+            } else if (o instanceof InstanceOLD) {
+                return new ChildObjectInstance(this, p[0], (InstanceOLD) o);
+            } else if (o instanceof TypedListOLD) {
+                TypedListOLD list = (TypedListOLD) o;
                 ArrayList<ChildObjectInstance> ret = new ArrayList<ChildObjectInstance>();
                 Iterator iter = list.iterator();
                 while (iter.hasNext()) {
-                    Instance f = (Instance) iter.next();
+                    InstanceOLD f = (InstanceOLD) iter.next();
                     ChildObjectInstance c = new ChildObjectInstance(this, p[0], f);
                     ret.add(c);
                 }
@@ -525,7 +525,7 @@ public class AgentInstanceSim implements AgentInstance, ObjectInstance, UnitWrap
         try {
             SetAttribute a = (SetAttribute) real.getAttribute(list, attName);
             if (a == null) {
-                Frame f = real.getDefinition();
+                FrameOLD f = real.getDefinition();
                 DomainAttribute def = f.getAttribute(list, attName);
                 a = new SetAttribute(attName, def.getFillers());
             }
@@ -565,7 +565,7 @@ public class AgentInstanceSim implements AgentInstance, ObjectInstance, UnitWrap
     }
 
     @Override
-    public Unit toUnit() {
+    public UnitOLD toUnit() {
         return real;
     }
 

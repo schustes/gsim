@@ -1,7 +1,7 @@
 package de.s2.gsim.api.objects.impl;
 
 import de.s2.gsim.GSimException;
-import de.s2.gsim.def.objects.Unit;
+import de.s2.gsim.def.objects.UnitOLD;
 import de.s2.gsim.def.objects.behaviour.ActionDef;
 import de.s2.gsim.objects.Behaviour;
 
@@ -78,7 +78,7 @@ public class ActionInstanceDefinition implements de.s2.gsim.objects.Action, Unit
     }
 
     @Override
-    public Unit toUnit() {
+    public UnitOLD toUnit() {
         return real;
     }
 

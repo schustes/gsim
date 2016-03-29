@@ -64,7 +64,7 @@ public class RLRuleFrame extends UserRuleFrame {
     }
 
     @Override
-    public Object clone() {
+    public Frame clone() {
         Frame f = (Frame) super.clone();
         RLRuleFrame c = new RLRuleFrame(f);
         return c;

@@ -5,9 +5,9 @@ import java.util.List;
 
 import de.s2.gsim.GSimException;
 import de.s2.gsim.def.Environment;
-import de.s2.gsim.def.objects.Frame;
-import de.s2.gsim.def.objects.Instance;
-import de.s2.gsim.def.objects.Unit;
+import de.s2.gsim.def.objects.FrameOLD;
+import de.s2.gsim.def.objects.InstanceOLD;
+import de.s2.gsim.def.objects.UnitOLD;
 import de.s2.gsim.objects.ObjectInstance;
 import de.s2.gsim.objects.attribute.Attribute;
 import de.s2.gsim.objects.attribute.DomainAttribute;
@@ -24,16 +24,16 @@ public class ObjectInstanceDef implements ObjectInstance, UnitWrapper {
 
     protected Environment env;
 
-    protected Instance real;
+    protected InstanceOLD real;
 
-    public ObjectInstanceDef(Environment env, Instance real) {
+    public ObjectInstanceDef(Environment env, InstanceOLD real) {
         this.env = env;
         this.real = real;
     }
 
     @Override
     public ObjectInstance copy() {
-        Instance copy = new Instance(real);
+        InstanceOLD copy = new InstanceOLD(real);
         return new ObjectInstanceDef(env, copy);
     }
 
@@ -372,7 +372,7 @@ public class ObjectInstanceDef implements ObjectInstance, UnitWrapper {
         try {
             SetAttribute a = (SetAttribute) real.getAttribute(list, attName);
             if (a == null) {
-                Frame f = real.getDefinition();
+                FrameOLD f = real.getDefinition();
                 DomainAttribute def = f.getAttribute(list, attName);
                 a = new SetAttribute(attName, def.getFillers());
             }
@@ -418,7 +418,7 @@ public class ObjectInstanceDef implements ObjectInstance, UnitWrapper {
      * @link gsim.objects.ObjectInstanceIF
      */
     @Override
-    public Unit toUnit() {
+    public UnitOLD toUnit() {
         return real;
     }
 
