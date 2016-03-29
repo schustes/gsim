@@ -4,15 +4,15 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import de.s2.gsim.GSimException;
+import de.s2.gsim.def.objects.Frame;
+import de.s2.gsim.def.objects.TypedList;
+import de.s2.gsim.def.objects.agent.BehaviourFrame;
+import de.s2.gsim.def.objects.agent.GenericAgentClass;
 import de.s2.gsim.objects.AgentClass;
 import de.s2.gsim.objects.Behaviour;
 import de.s2.gsim.objects.ObjectClass;
 import de.s2.gsim.objects.attribute.Attribute;
 import de.s2.gsim.objects.attribute.DomainAttribute;
-import gsim.def.objects.Frame;
-import gsim.def.objects.TypedList;
-import gsim.def.objects.agent.BehaviourFrame;
-import gsim.def.objects.agent.GenericAgentClass;
 
 public class AgentClassSim implements AgentClass, ObjectClass {
 

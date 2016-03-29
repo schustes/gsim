@@ -1,12 +1,5 @@
 package de.s2.gsim.api.impl;
 
-import gsim.def.Environment;
-import gsim.def.InheritanceHierarchy;
-import gsim.def.objects.Frame;
-import gsim.def.objects.Instance;
-import gsim.def.objects.agent.GenericAgent;
-import gsim.def.objects.agent.GenericAgentClass;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,7 +9,13 @@ import de.s2.gsim.api.objects.impl.AgentInstanceDef;
 import de.s2.gsim.api.objects.impl.ObjectClassDef;
 import de.s2.gsim.api.objects.impl.ObjectInstanceDef;
 import de.s2.gsim.api.objects.impl.UnitWrapper;
+import de.s2.gsim.def.Environment;
+import de.s2.gsim.def.InheritanceHierarchy;
 import de.s2.gsim.def.ModelDefinitionEnvironment;
+import de.s2.gsim.def.objects.Frame;
+import de.s2.gsim.def.objects.Instance;
+import de.s2.gsim.def.objects.agent.GenericAgent;
+import de.s2.gsim.def.objects.agent.GenericAgentClass;
 import de.s2.gsim.objects.AgentClass;
 import de.s2.gsim.objects.AgentInstance;
 import de.s2.gsim.objects.ObjectClass;
@@ -67,16 +66,13 @@ public class EnvironmentWrapper implements ModelDefinitionEnvironment {
     @Override
     public ObjectClass createObjectClass(String name, String parent) throws GSimException {
         try {
-            Frame g = name != null ? env.getObjectSubClass(name) : env.getObjectClass();
+            Frame parentFrame = parent != null ? env.getObjectSubClass(parent) : env.getObjectClass();
 
-            if (g == null) {
-                g = env.getObjectClass();
-                if (!g.getTypeName().equals(parent)) {
-                    throw new GSimException("No parent with name " + parent + " found, and top-object=" + g.getTypeName() + ", param=" + parent);
-                }
+            if (parentFrame == null) {
+            	throw new GSimException("No parent with name " + parent + " found!");
             }
 
-            Frame newObjectClass = env.createObjectSubClass(name, g);
+            Frame newObjectClass = env.createObjectSubClass(name, parentFrame);
             return new ObjectClassDef(env, newObjectClass);
 
         } catch (Exception e) {

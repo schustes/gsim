@@ -3,12 +3,12 @@ package de.s2.gsim.api.objects.impl;
 import java.util.ArrayList;
 
 import de.s2.gsim.GSimException;
+import de.s2.gsim.def.objects.Unit;
+import de.s2.gsim.def.objects.behaviour.ActionFrame;
+import de.s2.gsim.def.objects.behaviour.ConditionFrame;
+import de.s2.gsim.def.objects.behaviour.UserRuleFrame;
 import de.s2.gsim.objects.Condition;
 import de.s2.gsim.objects.Rule;
-import gsim.def.objects.Unit;
-import gsim.def.objects.behaviour.ActionFrame;
-import gsim.def.objects.behaviour.ConditionFrame;
-import gsim.def.objects.behaviour.UserRuleFrame;
 
 public class RuleClass implements Rule, UnitWrapper {
 

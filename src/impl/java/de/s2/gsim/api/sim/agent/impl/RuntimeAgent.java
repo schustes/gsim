@@ -5,15 +5,15 @@ import java.util.HashMap;
 import org.apache.log4j.Logger;
 
 import de.s2.gsim.api.objects.impl.AgentInstanceSim;
+import de.s2.gsim.def.objects.Instance;
+import de.s2.gsim.def.objects.agent.GenericAgent;
+import de.s2.gsim.def.objects.agent.GenericAgentClass;
 import de.s2.gsim.objects.AgentInstance;
 import de.s2.gsim.sim.agent.ApplicationAgent;
 import de.s2.gsim.sim.agent.RtAgent;
+import de.s2.gsim.sim.behaviour.impl.JessHandler;
 import de.s2.gsim.sim.communication.AgentType;
 import de.s2.gsim.sim.communication.Communicator;
-import gsim.def.objects.Instance;
-import gsim.def.objects.agent.GenericAgent;
-import gsim.def.objects.agent.GenericAgentClass;
-import gsim.sim.behaviour.impl.JessHandler;
 
 public class RuntimeAgent extends GenericAgent implements AgentType, RtAgent {
 

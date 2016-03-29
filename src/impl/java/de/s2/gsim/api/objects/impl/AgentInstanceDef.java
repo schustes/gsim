@@ -6,6 +6,12 @@ import java.util.Iterator;
 import org.apache.log4j.Logger;
 
 import de.s2.gsim.GSimException;
+import de.s2.gsim.def.Environment;
+import de.s2.gsim.def.objects.Frame;
+import de.s2.gsim.def.objects.Instance;
+import de.s2.gsim.def.objects.TypedList;
+import de.s2.gsim.def.objects.agent.BehaviourDef;
+import de.s2.gsim.def.objects.agent.GenericAgent;
 import de.s2.gsim.objects.AgentInstance;
 import de.s2.gsim.objects.Behaviour;
 import de.s2.gsim.objects.ObjectInstance;
@@ -15,12 +21,6 @@ import de.s2.gsim.objects.attribute.IntervalAttribute;
 import de.s2.gsim.objects.attribute.NumericalAttribute;
 import de.s2.gsim.objects.attribute.SetAttribute;
 import de.s2.gsim.objects.attribute.StringAttribute;
-import gsim.def.Environment;
-import gsim.def.objects.Frame;
-import gsim.def.objects.Instance;
-import gsim.def.objects.TypedList;
-import gsim.def.objects.agent.BehaviourDef;
-import gsim.def.objects.agent.GenericAgent;
 
 public class AgentInstanceDef extends ObjectInstanceDef implements AgentInstance, UnitWrapper {
 

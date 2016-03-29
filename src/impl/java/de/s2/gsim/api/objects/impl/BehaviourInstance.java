@@ -1,18 +1,18 @@
 package de.s2.gsim.api.objects.impl;
 
 import de.s2.gsim.GSimException;
+import de.s2.gsim.def.objects.Unit;
+import de.s2.gsim.def.objects.agent.BehaviourDef;
+import de.s2.gsim.def.objects.agent.BehaviourFrame;
+import de.s2.gsim.def.objects.behaviour.ActionDef;
+import de.s2.gsim.def.objects.behaviour.ActionFrame;
+import de.s2.gsim.def.objects.behaviour.ConditionDef;
+import de.s2.gsim.def.objects.behaviour.RLRule;
+import de.s2.gsim.def.objects.behaviour.UserRule;
 import de.s2.gsim.objects.AgentInstance;
 import de.s2.gsim.objects.Behaviour;
 import de.s2.gsim.objects.RLActionNode;
 import de.s2.gsim.objects.Rule;
-import gsim.def.objects.Unit;
-import gsim.def.objects.agent.BehaviourDef;
-import gsim.def.objects.agent.BehaviourFrame;
-import gsim.def.objects.behaviour.ActionDef;
-import gsim.def.objects.behaviour.ActionFrame;
-import gsim.def.objects.behaviour.ConditionDef;
-import gsim.def.objects.behaviour.RLRule;
-import gsim.def.objects.behaviour.UserRule;
 
 public class BehaviourInstance implements Behaviour, UnitWrapper {
 

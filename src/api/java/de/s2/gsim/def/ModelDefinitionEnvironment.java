@@ -81,7 +81,7 @@ public interface ModelDefinitionEnvironment {
      * Creates an ObjectClass.
      * 
      * @param name name of the object type
-     * @param parent parent of the object type (nulli if partent is top frame)
+     * @param parent parent of the object type (nulli if parent is top frame)
      * @return ObjectClassIF
      * @throws GSimException
      */

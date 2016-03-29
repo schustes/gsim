@@ -3,12 +3,12 @@ package de.s2.gsim.api.objects.impl;
 import java.util.ArrayList;
 
 import de.s2.gsim.GSimException;
+import de.s2.gsim.def.objects.Unit;
+import de.s2.gsim.def.objects.behaviour.ActionDef;
+import de.s2.gsim.def.objects.behaviour.ConditionDef;
+import de.s2.gsim.def.objects.behaviour.UserRule;
 import de.s2.gsim.objects.Condition;
 import de.s2.gsim.objects.SelectionNode;
-import gsim.def.objects.Unit;
-import gsim.def.objects.behaviour.ActionDef;
-import gsim.def.objects.behaviour.ConditionDef;
-import gsim.def.objects.behaviour.UserRule;
 
 public class SelectionNodeInstance extends RuleInstance implements SelectionNode {
 

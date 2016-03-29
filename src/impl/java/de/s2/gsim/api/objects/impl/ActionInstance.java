@@ -2,9 +2,9 @@ package de.s2.gsim.api.objects.impl;
 
 
 import de.s2.gsim.GSimException;
+import de.s2.gsim.def.objects.Unit;
+import de.s2.gsim.def.objects.behaviour.ActionDef;
 import de.s2.gsim.objects.Rule;
-import gsim.def.objects.Unit;
-import gsim.def.objects.behaviour.ActionDef;
 
 public class ActionInstance implements de.s2.gsim.objects.Action, UnitWrapper {
 

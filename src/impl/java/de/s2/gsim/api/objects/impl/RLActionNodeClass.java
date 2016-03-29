@@ -1,16 +1,16 @@
 package de.s2.gsim.api.objects.impl;
 
 import de.s2.gsim.GSimException;
+import de.s2.gsim.def.objects.Frame;
+import de.s2.gsim.def.objects.behaviour.ActionFrame;
+import de.s2.gsim.def.objects.behaviour.ConditionFrame;
+import de.s2.gsim.def.objects.behaviour.ExpansionFrame;
+import de.s2.gsim.def.objects.behaviour.RLRuleFrame;
+import de.s2.gsim.def.objects.behaviour.UserRuleFrame;
 import de.s2.gsim.objects.Condition;
 import de.s2.gsim.objects.Expansion;
 import de.s2.gsim.objects.RLActionNode;
 import de.s2.gsim.objects.SelectionNode;
-import gsim.def.objects.Frame;
-import gsim.def.objects.behaviour.ActionFrame;
-import gsim.def.objects.behaviour.ConditionFrame;
-import gsim.def.objects.behaviour.ExpansionFrame;
-import gsim.def.objects.behaviour.RLRuleFrame;
-import gsim.def.objects.behaviour.UserRuleFrame;
 
 public class RLActionNodeClass extends RuleClass implements RLActionNode, UnitWrapper {
 

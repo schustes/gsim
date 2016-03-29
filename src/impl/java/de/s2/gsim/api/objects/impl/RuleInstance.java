@@ -1,16 +1,16 @@
 package de.s2.gsim.api.objects.impl;
 
 import de.s2.gsim.GSimException;
+import de.s2.gsim.def.objects.Instance;
+import de.s2.gsim.def.objects.Unit;
+import de.s2.gsim.def.objects.behaviour.ActionDef;
+import de.s2.gsim.def.objects.behaviour.ConditionDef;
+import de.s2.gsim.def.objects.behaviour.ExpansionDef;
+import de.s2.gsim.def.objects.behaviour.RLRuleFrame;
+import de.s2.gsim.def.objects.behaviour.UserRule;
 import de.s2.gsim.objects.Condition;
 import de.s2.gsim.objects.Expansion;
 import de.s2.gsim.objects.Rule;
-import gsim.def.objects.Instance;
-import gsim.def.objects.Unit;
-import gsim.def.objects.behaviour.ActionDef;
-import gsim.def.objects.behaviour.ConditionDef;
-import gsim.def.objects.behaviour.ExpansionDef;
-import gsim.def.objects.behaviour.RLRuleFrame;
-import gsim.def.objects.behaviour.UserRule;
 
 public class RuleInstance implements Rule, UnitWrapper {
 

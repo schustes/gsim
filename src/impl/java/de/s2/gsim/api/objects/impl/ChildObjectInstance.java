@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.s2.gsim.GSimException;
+import de.s2.gsim.def.objects.Frame;
+import de.s2.gsim.def.objects.Instance;
+import de.s2.gsim.def.objects.Unit;
 import de.s2.gsim.objects.AgentInstance;
 import de.s2.gsim.objects.ObjectInstance;
 import de.s2.gsim.objects.attribute.Attribute;
@@ -12,9 +15,6 @@ import de.s2.gsim.objects.attribute.IntervalAttribute;
 import de.s2.gsim.objects.attribute.NumericalAttribute;
 import de.s2.gsim.objects.attribute.SetAttribute;
 import de.s2.gsim.objects.attribute.StringAttribute;
-import gsim.def.objects.Frame;
-import gsim.def.objects.Instance;
-import gsim.def.objects.Unit;
 
 public class ChildObjectInstance implements ObjectInstance, UnitWrapper {
 

@@ -1,9 +1,9 @@
 package de.s2.gsim.api.objects.impl;
 
 import de.s2.gsim.GSimException;
+import de.s2.gsim.def.objects.Unit;
+import de.s2.gsim.def.objects.behaviour.ExpansionDef;
 import de.s2.gsim.objects.Expansion;
-import gsim.def.objects.Unit;
-import gsim.def.objects.behaviour.ExpansionDef;
 
 public class ExpansionInstance implements Expansion, UnitWrapper {
 

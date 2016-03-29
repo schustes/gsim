@@ -3,11 +3,11 @@ package de.s2.gsim.api.objects.impl;
 import java.util.ArrayList;
 
 import de.s2.gsim.GSimException;
+import de.s2.gsim.def.objects.Frame;
+import de.s2.gsim.def.objects.Unit;
 import de.s2.gsim.objects.AgentClass;
 import de.s2.gsim.objects.ObjectClass;
 import de.s2.gsim.objects.attribute.DomainAttribute;
-import gsim.def.objects.Frame;
-import gsim.def.objects.Unit;
 
 public class ChildObjectClass implements ObjectClass, UnitWrapper {
 

@@ -3,15 +3,15 @@ package de.s2.gsim.api.objects.impl;
 import java.util.ArrayList;
 
 import de.s2.gsim.GSimException;
+import de.s2.gsim.def.objects.Unit;
+import de.s2.gsim.def.objects.agent.BehaviourFrame;
+import de.s2.gsim.def.objects.behaviour.ActionFrame;
+import de.s2.gsim.def.objects.behaviour.RLRuleFrame;
+import de.s2.gsim.def.objects.behaviour.UserRuleFrame;
 import de.s2.gsim.objects.AgentClass;
 import de.s2.gsim.objects.Behaviour;
 import de.s2.gsim.objects.RLActionNode;
 import de.s2.gsim.objects.Rule;
-import gsim.def.objects.Unit;
-import gsim.def.objects.agent.BehaviourFrame;
-import gsim.def.objects.behaviour.ActionFrame;
-import gsim.def.objects.behaviour.RLRuleFrame;
-import gsim.def.objects.behaviour.UserRuleFrame;
 
 public class BehaviourClass implements Behaviour, UnitWrapper {
 
@@ -219,7 +219,7 @@ public class BehaviourClass implements Behaviour, UnitWrapper {
         try {
             real.removeRLRule(name);
             owner.setBehaviour(this);
-        } catch (gsim.def.GSimDefException e) {
+        } catch (de.s2.gsim.def.GSimDefException e) {
             throw new GSimException(e.getMessage());
         }
     }
@@ -229,7 +229,7 @@ public class BehaviourClass implements Behaviour, UnitWrapper {
         try {
             real.removeRule(name);
             owner.setBehaviour(this);
-        } catch (gsim.def.GSimDefException e) {
+        } catch (de.s2.gsim.def.GSimDefException e) {
             throw new GSimException(e.getMessage());
         }
     }
