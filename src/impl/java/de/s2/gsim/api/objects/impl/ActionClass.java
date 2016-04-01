@@ -1,12 +1,10 @@
 package de.s2.gsim.api.objects.impl;
 
 import de.s2.gsim.GSimException;
-import de.s2.gsim.def.objects.UnitOLD;
-import de.s2.gsim.def.objects.behaviour.ActionFrame;
+import de.s2.gsim.environment.ActionFrame;
+import de.s2.gsim.environment.Unit;
 
 public class ActionClass implements de.s2.gsim.objects.Action, UnitWrapper {
-
-    private static final long serialVersionUID = 1L;
 
     private RuleClass owner;
 
@@ -75,7 +73,7 @@ public class ActionClass implements de.s2.gsim.objects.Action, UnitWrapper {
     }
 
     @Override
-    public UnitOLD toUnit() {
+    public Unit toUnit() {
         return real;
     }
 

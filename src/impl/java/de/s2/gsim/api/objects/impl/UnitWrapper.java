@@ -1,9 +1,9 @@
 package de.s2.gsim.api.objects.impl;
 
-import de.s2.gsim.def.objects.UnitOLD;
+import de.s2.gsim.environment.Unit;
 
 public interface UnitWrapper {
 
-    public UnitOLD toUnit();
+    public Unit toUnit();
 
 }

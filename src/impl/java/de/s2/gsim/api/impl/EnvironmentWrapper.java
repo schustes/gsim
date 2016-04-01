@@ -1,7 +1,6 @@
 package de.s2.gsim.api.impl;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import de.s2.gsim.GSimException;
 import de.s2.gsim.api.objects.impl.AgentClassDef;
@@ -9,13 +8,12 @@ import de.s2.gsim.api.objects.impl.AgentInstanceDef;
 import de.s2.gsim.api.objects.impl.ObjectClassDef;
 import de.s2.gsim.api.objects.impl.ObjectInstanceDef;
 import de.s2.gsim.api.objects.impl.UnitWrapper;
-import de.s2.gsim.def.Environment;
-import de.s2.gsim.def.InheritanceHierarchy;
 import de.s2.gsim.def.ModelDefinitionEnvironment;
 import de.s2.gsim.def.objects.FrameOLD;
 import de.s2.gsim.def.objects.InstanceOLD;
-import de.s2.gsim.def.objects.agent.GenericAgent;
-import de.s2.gsim.def.objects.agent.GenericAgentClass;
+import de.s2.gsim.environment.Environment;
+import de.s2.gsim.environment.GenericAgent;
+import de.s2.gsim.environment.GenericAgentClass;
 import de.s2.gsim.objects.AgentClass;
 import de.s2.gsim.objects.AgentInstance;
 import de.s2.gsim.objects.ObjectClass;

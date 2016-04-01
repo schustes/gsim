@@ -6,23 +6,9 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.ListIterator;
 
-import de.s2.gsim.def.EntityConstants;
-import de.s2.gsim.def.EnvironmentBase;
-import de.s2.gsim.def.GSimDefException;
-import de.s2.gsim.def.TimeOrderedSet;
 import de.s2.gsim.def.objects.FrameOLD;
 import de.s2.gsim.def.objects.InstanceOLD;
 import de.s2.gsim.def.objects.UnitOLD;
-import de.s2.gsim.def.objects.UnitUtils;
-import de.s2.gsim.def.objects.agent.BehaviourDef;
-import de.s2.gsim.def.objects.agent.BehaviourFrame;
-import de.s2.gsim.def.objects.agent.GenericAgent;
-import de.s2.gsim.def.objects.agent.GenericAgentClass;
-import de.s2.gsim.def.objects.behaviour.ActionFrame;
-import de.s2.gsim.def.objects.behaviour.RLRule;
-import de.s2.gsim.def.objects.behaviour.RLRuleFrame;
-import de.s2.gsim.def.objects.behaviour.UserRule;
-import de.s2.gsim.def.objects.behaviour.UserRuleFrame;
 import de.s2.gsim.objects.attribute.AttributeFactory;
 import de.s2.gsim.objects.attribute.DomainAttribute;
 import de.s2.gsim.util.Utils;
@@ -38,7 +24,7 @@ public class AgentClassOperations {
     public GenericAgentClass addAgentClassAttribute(GenericAgentClass cls, String[] path, DomainAttribute a) {
 
         GenericAgentClass here = this.findGenericAgentClass(cls);
-        UnitUtils.getInstance().setChildAttribute(here, Utils.removeFromArray(path, a.getName()), a);
+        UnitOperations.setChildAttribute(here, Utils.removeFromArray(path, a.getName()), a);
         here.setDirty(true);
 
         ListIterator<GenericAgentClass> iter = agentSubClasses.listIterator();
@@ -53,7 +39,7 @@ public class AgentClassOperations {
                 while (successorMembers.hasNext()) {
                     GenericAgent succ = (GenericAgent) successorMembers.next();
                     succ.setFrame(c);
-                    UnitUtils.getInstance().setChildAttribute(succ, path, AttributeFactory.createDefaultAttribute(a));
+                    UnitOperations.setChildAttribute(succ, path, AttributeFactory.createDefaultAttribute(a));
                     agents.add(succ);
                     succ.setDirty(true);
                 }
@@ -65,7 +51,7 @@ public class AgentClassOperations {
             GenericAgent c = (GenericAgent) members.next();
             c.setFrame(cls);
             c.setDirty(true);
-            UnitUtils.getInstance().setChildAttribute(c, path, AttributeFactory.createDefaultAttribute(a));
+            UnitOperations.setChildAttribute(c, path, AttributeFactory.createDefaultAttribute(a));
             agents.add(c);
         }
 
@@ -169,7 +155,7 @@ public class AgentClassOperations {
 
         String name = f.getTypeName();
 
-        UnitUtils.getInstance().setChildFrame(here, path, f);
+        UnitOperations.setChildFrame(here, path, f);
         here.setDirty(true);
 
         agentSubClasses.add(here);
@@ -507,7 +493,7 @@ public class AgentClassOperations {
     public GenericAgentClass modifyAgentClassAttribute(GenericAgentClass cls, String[] path, DomainAttribute a) {
         GenericAgentClass here = this.findGenericAgentClass(cls);
 
-        UnitUtils.getInstance().setChildAttribute(here, Utils.removeFromArray(path, a.getName()), a);
+        UnitOperations.setChildAttribute(here, Utils.removeFromArray(path, a.getName()), a);
         here.setDirty(true);
         agentSubClasses.add(here);
 
@@ -518,14 +504,14 @@ public class AgentClassOperations {
 
             if (c.isSuccessor(cls.getTypeName())) {
                 c.setDirty(true);
-                UnitUtils.getInstance().setChildAttribute(c, Utils.removeFromArray(path, a.getName()), (DomainAttribute) a.clone());
+                UnitOperations.setChildAttribute(c, Utils.removeFromArray(path, a.getName()), (DomainAttribute) a.clone());
                 c.setAncestor(here);
                 iter.set(c);
                 ListIterator successorMembers = getInstancesOfClass(c).listIterator();
                 while (successorMembers.hasNext()) {
                     GenericAgent succ = (GenericAgent) successorMembers.next();
                     succ.setDirty(true);
-                    UnitUtils.getInstance().setChildAttribute(succ, Utils.removeFromArray(path, a.getName()),
+                    UnitOperations.setChildAttribute(succ, Utils.removeFromArray(path, a.getName()),
                             AttributeFactory.createDefaultAttribute(a));
                     agents.add(succ);
                 }
@@ -536,7 +522,7 @@ public class AgentClassOperations {
         while (members.hasNext()) {
             GenericAgent c = (GenericAgent) members.next();
             c.setDirty(true);
-            UnitUtils.getInstance().setChildAttribute(c, Utils.removeFromArray(path, a.getName()), AttributeFactory.createDefaultAttribute(a));
+            UnitOperations.setChildAttribute(c, Utils.removeFromArray(path, a.getName()), AttributeFactory.createDefaultAttribute(a));
             agents.add(c);
         }
         return (GenericAgentClass) here.clone();
@@ -597,21 +583,21 @@ public class AgentClassOperations {
     public GenericAgentClass removeAgentClassAttribute(GenericAgentClass cls, String[] path, String a) {
         GenericAgentClass here = this.findGenericAgentClass(cls);
 
-        UnitUtils.getInstance().removeAttribute(here, path, a);
+        UnitOperations.removeAttribute(here, path, a);
         here.setDirty(true);
         ListIterator<GenericAgentClass> iter = agentSubClasses.listIterator();
 
         while (iter.hasNext()) {
             GenericAgentClass c = iter.next();
             if (c.isSuccessor(cls.getTypeName())) {
-                UnitUtils.getInstance().removeAttribute(c, path, a);
+                UnitOperations.removeAttribute(c, path, a);
                 c.setDirty(true);
                 c.setAncestor(here);
                 iter.set(c);
                 ListIterator<InstanceOLD> successorMembers = getInstancesOfClass(c).listIterator();
                 while (successorMembers.hasNext()) {
                     GenericAgent succ = (GenericAgent) successorMembers.next();
-                    UnitUtils.getInstance().removeAttribute(succ, path, a);
+                    UnitOperations.removeAttribute(succ, path, a);
                     succ.setDirty(true);
                     succ.setFrame(c);
                     successorMembers.set(succ);
@@ -622,7 +608,7 @@ public class AgentClassOperations {
         ListIterator<InstanceOLD> members = getInstancesOfClass(cls).listIterator();
         while (members.hasNext()) {
             GenericAgent c = (GenericAgent) members.next();
-            UnitUtils.getInstance().removeAttribute(c, path, a);
+            UnitOperations.removeAttribute(c, path, a);
             c.setDirty(true);
             c.setFrame(cls);
             members.set(c);
@@ -682,14 +668,14 @@ public class AgentClassOperations {
         String[] fullPath = new String[path.length + 1];
         Utils.addToArray(path, fullPath, name);
 
-        UnitUtils.getInstance().removeChildFrame(here, path, name);
+        UnitOperations.removeChildFrame(here, path, name);
         agentSubClasses.add(here);
 
         Iterator members = getInstancesOfClass(here).iterator();
         while (members.hasNext()) {
             GenericAgent c = (GenericAgent) members.next();
             c.setFrame(here);
-            UnitUtils.getInstance().removeChildInstance(c, path, name);
+            UnitOperations.removeChildInstance(c, path, name);
             agents.add(c);
         }
 
@@ -699,13 +685,13 @@ public class AgentClassOperations {
             GenericAgentClass c = iter.next();
             if (c.isSuccessor(here.getTypeName()) && c.getDeclaredFrame(path[0], name) != null) {
                 c.setAncestor(here);
-                UnitUtils.getInstance().removeChildFrame(c, path, name);
+                UnitOperations.removeChildFrame(c, path, name);
                 iter.set(c);
                 members = getInstancesOfClass(c).iterator();
                 while (members.hasNext()) {
                     GenericAgent cc = (GenericAgent) members.next();
                     cc.setFrame(c);
-                    UnitUtils.getInstance().removeChildInstance(cc, path, name);
+                    UnitOperations.removeChildInstance(cc, path, name);
                     agents.add(cc);
                 }
             }
