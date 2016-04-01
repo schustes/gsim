@@ -315,7 +315,7 @@ public class ObjectClassOperations {
     private void addChildAttributeInReferringObjects(Frame here, Path<DomainAttribute> path, DomainAttribute added) {
 
         
-        container.getObjectSubClasses().stream().filter
+        container.getObjectSubClasses().stream().flatMap(frame -> frame.getDeclaredFrameListNames().stream()).;
         
         Frame[] objects = getObjectSubClasses();
         for (int i = 0; i < objects.length; i++) {
