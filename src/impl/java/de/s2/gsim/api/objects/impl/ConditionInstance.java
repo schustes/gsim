@@ -1,8 +1,8 @@
 package de.s2.gsim.api.objects.impl;
 
 import de.s2.gsim.GSimException;
-import de.s2.gsim.def.objects.UnitOLD;
-import de.s2.gsim.def.objects.behaviour.ConditionDef;
+import de.s2.gsim.environment.ConditionDef;
+import de.s2.gsim.environment.Unit;
 import de.s2.gsim.objects.Condition;
 
 public class ConditionInstance implements Condition, UnitWrapper {
@@ -55,7 +55,7 @@ public class ConditionInstance implements Condition, UnitWrapper {
     }
 
     @Override
-    public UnitOLD toUnit() {
+    public Unit toUnit() {
         return real;
     }
 

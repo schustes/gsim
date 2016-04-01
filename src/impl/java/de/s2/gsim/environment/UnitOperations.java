@@ -13,7 +13,7 @@ import de.s2.gsim.util.Utils;
  * @author Stephan
  *
  */
-abstract class UnitOperations {
+public abstract class UnitOperations {
 
 	/**
 	 * Copies all properties (instances and attributes) from one instance to another.
@@ -244,6 +244,7 @@ abstract class UnitOperations {
 	 * @param a
 	 *            DomainAttribute
 	 */
+    @Deprecated
 	public static void setChildAttribute(Frame f, String[] pathToChild,
 			DomainAttribute a) {
 		if (pathToChild.length == 1) {

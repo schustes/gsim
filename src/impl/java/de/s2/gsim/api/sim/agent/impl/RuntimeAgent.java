@@ -5,9 +5,9 @@ import java.util.HashMap;
 import org.apache.log4j.Logger;
 
 import de.s2.gsim.api.objects.impl.AgentInstanceSim;
-import de.s2.gsim.def.objects.InstanceOLD;
-import de.s2.gsim.def.objects.agent.GenericAgent;
-import de.s2.gsim.def.objects.agent.GenericAgentClass;
+import de.s2.gsim.environment.GenericAgent;
+import de.s2.gsim.environment.GenericAgentClass;
+import de.s2.gsim.environment.Instance;
 import de.s2.gsim.objects.AgentInstance;
 import de.s2.gsim.sim.agent.ApplicationAgent;
 import de.s2.gsim.sim.agent.RtAgent;
@@ -87,7 +87,7 @@ public class RuntimeAgent extends GenericAgent implements AgentType, RtAgent {
     }
 
     @Override
-    public void addChildInstance(String list, InstanceOLD inst) {
+    public void addChildInstance(String list, Instance inst) {
         super.addChildInstance(list, inst);
         if (ruleBase != null) {
             ruleBase.instanceChanged(list + "/" + inst.getDefinition().getTypeName());

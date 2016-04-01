@@ -1,6 +1,6 @@
 package de.s2.gsim.environment;
 
-public class GSimDefException extends java.rmi.RemoteException {
+public class GSimDefException extends RuntimeException {
 
     private static final long serialVersionUID = 1L;
 

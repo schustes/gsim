@@ -8,7 +8,7 @@ import java.util.stream.Stream;
  * @author Stephan
  *
  */
-public class Environment {
+public class Environment implements Cloneable {
 
     /**
      * Reference to all entities.
@@ -59,6 +59,12 @@ public class Environment {
     public Environment(String ns) {
         this.ns = ns;
         this.container = new EntitiesContainer(ns);
+    }
+
+    public Environment clone() {
+        Environment newEnvironment = new Environment(this.ns);
+        newEnvironment.copyFromEnvironment(this);
+        return newEnvironment;
     }
 
     /**

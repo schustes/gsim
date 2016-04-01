@@ -3,19 +3,14 @@ package de.s2.gsim.api.objects.impl;
 import java.util.ArrayList;
 
 import de.s2.gsim.GSimException;
-import de.s2.gsim.def.objects.UnitOLD;
-import de.s2.gsim.def.objects.behaviour.ActionFrame;
-import de.s2.gsim.def.objects.behaviour.ConditionFrame;
-import de.s2.gsim.def.objects.behaviour.UserRuleFrame;
+import de.s2.gsim.environment.ActionFrame;
+import de.s2.gsim.environment.ConditionFrame;
+import de.s2.gsim.environment.Unit;
+import de.s2.gsim.environment.UserRuleFrame;
 import de.s2.gsim.objects.Condition;
 import de.s2.gsim.objects.SelectionNode;
 
 public class SelectionNodeClass extends RuleClass implements SelectionNode {
-
-    /**
-     *
-     */
-    private static final long serialVersionUID = 1L;
 
     private RLActionNodeClass owner;
 
@@ -215,7 +210,7 @@ public class SelectionNodeClass extends RuleClass implements SelectionNode {
     }
 
     @Override
-    public UnitOLD toUnit() {
+    public Unit toUnit() {
         return real;
     }
 

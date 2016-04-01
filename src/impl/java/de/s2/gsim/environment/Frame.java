@@ -1,107 +1,149 @@
 package de.s2.gsim.environment;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.ListIterator;
-
-import org.apache.log4j.Logger;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import de.s2.gsim.objects.attribute.DomainAttribute;
 
-public class Frame extends Unit implements java.io.Serializable {
-
-    static final long serialVersionUID = -651893385550742382L;
-
-    private static Logger logger = Logger.getLogger(Frame.class);
-
-    protected String category = "";
-
-    protected HashMap parents = new HashMap();
-
-    protected String typeName = null;
+/**
+ * Frame class. A frame is a template for any object or agent classes.
+ * 
+ * @author stephan
+ *
+ */
+public class Frame extends Unit {
 
     /**
-     * Copy constructor.
+     * An optional classification.
      */
-    public Frame(Frame f) {
-        this(f.getParentFrames(), f.getTypeName(), f.getCategory());
-
-        setMutable(f.isMutable());
-        setSystem(f.isSystem());
-
-        String[] lists = f.getDeclaredAttributesListNames();
-        for (int i = 0; i < lists.length; i++) {
-            attributeLists.put(lists[i], new ArrayList());
-            DomainAttribute[] da = f.getDeclaredAttributes(lists[i]);
-            for (int j = 0; j < da.length; j++) {
-                addOrSetAttribute(lists[i], (DomainAttribute) da[j].clone());
-            }
-        }
-        String[] children = f.getDeclaredFrameListNames();
-        for (int i = 0; i < children.length; i++) {
-            TypedList list = (TypedList) f.objectLists.get(children[i]);
-            Frame fr = list.getType();
-            objectLists.put(children[i], new TypedList(fr));
-            Frame[] ch = f.getDeclaredChildFrames(children[i]);
-            for (int j = 0; j < ch.length; j++) {
-                Frame child = (Frame) ch[j].clone();
-                addChildFrame(children[i], child);
-            }
-        }
-
-        isSystem = f.isSystem();
-        isMutable = f.isMutable();
-        isDirty = true;
-
-    }
+    private String category = "";
 
     /**
-     * "Inhertiance" constructor. Trying to set parents by ref, in order to save memory.
+     * A map with parent names and the respective frames.
      */
-    public Frame(Frame[] parents, String typeName, String category) {
-        this.typeName = typeName;
-        this.category = category;
-        // this.id = newId;
-        for (int i = 0; i < parents.length; i++) {
-            // Frame f = (Frame)parents[i].clone();
-
-            Frame f = parents[i];
-
-            String s = f.getTypeName();
-            this.parents.put(s, f);
-            isSystem = parents[i].isSystem();
-            isMutable = parents[i].isMutable();
-            isDirty = true;
-        }
-
-    }
+    private Map<String, Frame> parents = new HashMap<>();
 
     /**
-     * Copy constructor.
+     * Name of the frame.
      */
-    public Frame(String newName, Frame f) {
-        this(f);
-        typeName = newName;
+    private String name;
+
+
+    /**
+     * Private base constructor.
+     */
+    private Frame(String name) {
+        this.name = name;
     }
 
     /**
      * Construct a top-level frame without any attributes and children.
      * 
-     * @param name
-     *            String
-     * @param category
-     *            String
-     * @param uniqueId
-     *            int
+     * @param name name
+     * @param category category
      */
-    public Frame(String name, String category) {
-        typeName = name;
+    private Frame(String name, String category) {
+        this.name = name;
         this.category = category;
-        // this.id = uniqueId;
         isDirty = true;
+    }
+
+    /**
+     * Creates a frame that inherits from the given list of parent frames.
+     *
+     * The inheritance mechanism puts all parent lists, object and attributes in its own container; these objects are not copied into the new frame.
+     * Any operations that do not operate on declared entities, are thus implicitly operations on these parent objects. It means also that operations
+     * on parents are immediately visible. Modifications applied to this frame are not propagated to the parents.
+     * 
+     * @param parents parents to inherit from
+     * @param typeName
+     * @param category
+     * @return
+     */
+    public static Frame inherit(List<Frame> parents, String typeName, String category) {
+        Frame f = new Frame(typeName, category);
+        for (Frame parent : parents) {
+            f.parents.put(f.getTypeName(), parent);
+            f.isSystem = parent.isSystem();
+            f.isMutable = parent.isMutable();
+            f.isDirty = true;
+        }
+        return f;
+    }
+
+    /**
+     * Creates a new Frame.
+     * 
+     * @param name the name
+     * @param category an additional classification
+     * @return the new Frame
+     */
+    public static Frame newFrame(String name, String category) {
+        return new Frame(name, category);
+    }
+
+    /**
+     * Creates a new Frame.
+     * 
+     * @param name the name
+     * @return the new Frame
+     */
+    public static Frame newFrame(String name) {
+        return new Frame(name);
+    }
+
+    /**
+     * Creates a copy of the given frame with a new name, inheriting all its parents and copying all its attribute and object lists.
+     * 
+     * @param from the frame to copy from
+     * @param newName the new name
+     * @return the new frame
+     */
+    public static Frame copy(Frame from, String newName) {
+        Frame f = copy(from);
+        f.setTypeName(newName);
+        return f;
+    }
+
+    /**
+     * Creates an exact copy of the given frame with a new name, inheriting all its parents and copying all its attribute and object lists.
+     * 
+     * @param from the frame to copy from
+     * @return the new frame
+     */
+    public static Frame copy(Frame from) {
+
+        Frame frame = Frame.inherit(from.getParentFrames(), from.getTypeName(), from.getCategory());
+        frame.setMutable(from.isMutable());
+        frame.setSystem(from.isSystem());
+
+        from.getDeclaredAttributesListNames().stream().forEach(attList -> {
+            frame.attributeLists.put(attList, new ArrayList<DomainAttribute>());
+            from.getDeclaredAttributes(attList).forEach(att -> frame.addOrSetAttribute(attList, att));
+        });
+
+        from.getDeclaredFrameListNames().stream().forEach(frameList -> {
+            TypedList list = (TypedList) from.objectLists.get(frameList);
+            Frame fr = list.getType();
+            frame.objectLists.put(frameList, new TypedList(fr));
+            from.getDeclaredChildFrames(frameList).forEach(child -> {
+                frame.addChildFrame(frameList, child.clone());
+            });
+
+        });
+
+        frame.isSystem = from.isSystem();
+        frame.isMutable = from.isMutable();
+        frame.isDirty = true;
+
+        return frame;
+
     }
 
     /*
@@ -148,7 +190,7 @@ public class Frame extends Unit implements java.io.Serializable {
     @SuppressWarnings("unchecked")
     public void addOrSetAttribute(String listName, DomainAttribute a) {
         ArrayList list = (ArrayList) attributeLists.get(listName); // searches in
-                                                                   // current
+        // current
         // layer
 
         if (list == null) {
@@ -339,27 +381,22 @@ public class Frame extends Unit implements java.io.Serializable {
         return null;
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see gsim.def.objects.Frame#equals(java.lang.Object)
+    /**
+     * Returns all ancestors, i.e. parents, grandparents and so on, in a flat list.
+     * 
+     * @return the ancestors or empty list if there are none
      */
+    public List<Frame> getAncestors() {
 
-    public Frame[] getAncestors() {
-        ArrayList list = new ArrayList();
-        Iterator iter = parents.keySet().iterator();
-        while (iter.hasNext()) {
-            String s = (String) iter.next();
-            Frame f = (Frame) parents.get(s);
-            list.add(f);
-            Frame[] fs = f.getAncestors();
-            for (int i = 0; i < fs.length; i++) {
-                list.add(fs[i]);
+        List<Frame> ancestors = new ArrayList<>();
+        parents.values().stream().forEach(frame -> {
+            ancestors.add(frame);
+            for (Frame f : frame.getAncestors()) {
+                ancestors.add(f);
             }
-        }
-        Frame[] all = new Frame[list.size()];
-        list.toArray(all);
-        return all;
+        });
+
+        return ancestors;
     }
 
     /*
@@ -534,22 +571,14 @@ public class Frame extends Unit implements java.io.Serializable {
         return keys;
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see gsim.def.objects.Frame#getChildFrame(java.lang.String, java.lang.String)
-     */
+    public List<Frame> getChildFrames(String listname) {
 
-    public Frame[] getChildFrames(String listname) {
+        List<Frame> declared = objectLists.get(listname).stream().filter(f -> f instanceof Frame).map(f -> (Frame) f).collect(Collectors.toList());
 
-        ArrayList list = (ArrayList) objectLists.get(listname);
-        HashSet sum = new HashSet();
-
-        if (list != null) {
-            sum.addAll(list);
-        }
+        HashSet<Frame> sum = new HashSet<>();
 
         Frame[] fs = getAncestors();
+
         for (int i = 0; i < fs.length; i++) {
             Frame[] da = fs[i].getChildFrames(listname);
             if (da != null) {
@@ -585,48 +614,32 @@ public class Frame extends Unit implements java.io.Serializable {
         return null;
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see gsim.def.objects.Frame#getChildFrames(java.lang.String)
+    /**
+     * Get the attributes declared on this frame for the given list.
+     * 
+     * @param listname the listname to retrieve the attributes from
+     * @return a list of attributes
      */
-
-    public DomainAttribute[] getDeclaredAttributes(String listname) {
-        ArrayList list = (ArrayList) attributeLists.get(listname);
-        if (list != null) {
-            DomainAttribute[] atts = new DomainAttribute[list.size()];
-            list.toArray(atts);
-            return atts;
-        }
-        return null;
+    public List<DomainAttribute> getDeclaredAttributes(String listname) {
+        return attributeLists.get(listname).stream().filter(a -> a instanceof DomainAttribute).map(da -> (DomainAttribute) da)
+                .collect(Collectors.toList());
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see gsim.def.objects.Frame#getDeclaredAttribute(java.lang.String, java.lang.String)
-     */
-
-    public String[] getDeclaredAttributesListNames() {
-        String[] keys = new String[attributeLists.keySet().size()];
-        attributeLists.keySet().toArray(keys);
-        return keys;
+    public List<String> getDeclaredAttributesListNames() {
+        return new ArrayList<String>(attributeLists.keySet());
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see gsim.def.objects.Frame#getDeclaredAttributes(java.lang.String)
+    /**
+     * Gets the declared objects held by this frame.
+     * 
+     * @param listname the listname to retrieve the objects from
+     * @return a list of frames or empty list if the list does not exist
      */
-
-    public Frame[] getDeclaredChildFrames(String listname) {
-        ArrayList list = (ArrayList) objectLists.get(listname);
-        if (list != null) {
-            Frame[] atts = new Frame[list.size()];
-            list.toArray(atts);
-            return atts;
+    public List<Frame> getDeclaredChildFrames(String listname) {
+        if (!objectLists.containsKey(listname)) {
+            return new ArrayList<Frame>();
         }
-        return null;
+        return objectLists.get(listname).stream().filter(o -> o instanceof Frame).map(o -> (Frame) o).collect(Collectors.toList());
     }
 
     /*
@@ -649,22 +662,8 @@ public class Frame extends Unit implements java.io.Serializable {
         return null;
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see gsim.def.objects.Frame#getDeclaredChildFrames(java.lang.String)
-     */
-
-    public String[] getDeclaredFrameListNames() {
-        Iterator iter = objectLists.keySet().iterator();
-        ArrayList list = new ArrayList();
-        while (iter.hasNext()) {
-            String key = (String) iter.next();
-            list.add(key);
-        }
-        String[] keys = new String[list.size()];
-        list.toArray(keys);
-        return keys;
+    public List<String> getDeclaredFrameListNames() {
+        return new ArrayList<String>(objectLists.keySet());
     }
 
     /*
@@ -720,17 +719,13 @@ public class Frame extends Unit implements java.io.Serializable {
         return null;
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see gsim.def.objects.Frame#getParentFrames()
+    /**
+     * Get the parents (immediate ancestors).
+     * 
+     * @return the parent frames or emtpy lists if none exist
      */
-
-    public Frame[] getParentFrames() {
-        Collection list = parents.values();
-        Frame[] all = new Frame[list.size()];
-        list.toArray(all);
-        return all;
+    public List<Frame> getParentFrames() {
+        return new ArrayList<>(parents.values());
     }
 
     /*
@@ -740,7 +735,7 @@ public class Frame extends Unit implements java.io.Serializable {
      */
 
     public String getTypeName() {
-        return typeName;
+        return name;
     }
 
     /*
@@ -934,11 +929,57 @@ public class Frame extends Unit implements java.io.Serializable {
         }
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see gsim.def.objects.Frame#resolveName(java.lang.String[])
-     */
+    @SuppressWarnings("unchecked")
+    public <T> T resolvePath(Path<T> path) {
+        return resolvePath(path, true);
+    }
+
+    @SuppressWarnings("unchecked")
+    private <T> T resolvePath(Path<T> path, boolean searchAncestors) {
+
+        // Terminal frame
+        if (this.getTypeName().equals(path.getName()) && path.isTerminal()) {
+            return (T) this;
+        }
+
+        // Frame is in path but has successors - step into child object
+        if (this.getTypeName().equals(path.getName())) {
+            return (T) resolvePath(path.next());
+        }
+
+        // Step into attribute lists to find attribute
+        if (attributeLists.containsKey(path.getName()) && !path.isTerminal()) {
+            return (T) this.getAttribute(path.getName(), path.next().getName());
+        }
+
+        // found attribute
+        if (attributeLists.containsKey(path.getName())) {
+            return (T) this.attributeLists.get(path.getName());
+        }
+
+        // step into object lists to find object
+        if (objectLists.containsKey(path.getName()) && !path.isTerminal()) {
+            return (T) this.getChildFrame(path.getName(), path.next().getName()).resolvePath(path.next());
+        }
+
+        // found object
+        if (objectLists.containsKey(path.getName())) {
+            return (T) this.getObjectLists().get(path.getName());
+        }
+
+        // If not found, check whether the object is declared in any parent frame
+        if (searchAncestors) {
+            for (Frame ancestor : getAncestors()) {
+                T t = ancestor.resolvePath(path);
+                if (t != null) {
+                    return t;
+                }
+            }
+        }
+
+        throw new GSimDefException(String.format("The path %s could not be resolved", path));
+
+    }
 
     public Object resolveName(String[] path) {
 
@@ -1025,15 +1066,20 @@ public class Frame extends Unit implements java.io.Serializable {
         isDirty = true;
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see gsim.def.objects.Frame#setTypeName(java.lang.String)
-     */
-
     public void setTypeName(String s) {
-        typeName = s;
+        name = s;
         isDirty = true;
+    }
+
+    /**
+     * Replaces the values of attribute identified by {@link Path} with the ones from the given.
+     * 
+     * @param path the path
+     * @param newValue the new attribute (values are copied)
+     */
+    public void setChildAttribute(Path<DomainAttribute> path, DomainAttribute newValue) {
+        DomainAttribute attr = this.resolvePath(path, false);
+        attr.copyFrom(newValue);
     }
 
 }

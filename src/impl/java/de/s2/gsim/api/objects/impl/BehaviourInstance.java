@@ -1,14 +1,14 @@
 package de.s2.gsim.api.objects.impl;
 
 import de.s2.gsim.GSimException;
-import de.s2.gsim.def.objects.UnitOLD;
-import de.s2.gsim.def.objects.agent.BehaviourDef;
-import de.s2.gsim.def.objects.agent.BehaviourFrame;
-import de.s2.gsim.def.objects.behaviour.ActionDef;
-import de.s2.gsim.def.objects.behaviour.ActionFrame;
-import de.s2.gsim.def.objects.behaviour.ConditionDef;
-import de.s2.gsim.def.objects.behaviour.RLRule;
-import de.s2.gsim.def.objects.behaviour.UserRule;
+import de.s2.gsim.environment.ActionDef;
+import de.s2.gsim.environment.ActionFrame;
+import de.s2.gsim.environment.BehaviourDef;
+import de.s2.gsim.environment.BehaviourFrame;
+import de.s2.gsim.environment.ConditionDef;
+import de.s2.gsim.environment.RLRule;
+import de.s2.gsim.environment.Unit;
+import de.s2.gsim.environment.UserRule;
 import de.s2.gsim.objects.AgentInstance;
 import de.s2.gsim.objects.Behaviour;
 import de.s2.gsim.objects.RLActionNode;
@@ -199,7 +199,7 @@ public class BehaviourInstance implements Behaviour, UnitWrapper {
     }
 
     @Override
-    public UnitOLD toUnit() {
+    public Unit toUnit() {
         return real;
     }
 

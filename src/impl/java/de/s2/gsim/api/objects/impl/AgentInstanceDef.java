@@ -6,12 +6,12 @@ import java.util.Iterator;
 import org.apache.log4j.Logger;
 
 import de.s2.gsim.GSimException;
-import de.s2.gsim.def.Environment;
-import de.s2.gsim.def.objects.FrameOLD;
-import de.s2.gsim.def.objects.InstanceOLD;
-import de.s2.gsim.def.objects.TypedListOLD;
-import de.s2.gsim.def.objects.agent.BehaviourDef;
-import de.s2.gsim.def.objects.agent.GenericAgent;
+import de.s2.gsim.environment.BehaviourDef;
+import de.s2.gsim.environment.Environment;
+import de.s2.gsim.environment.Frame;
+import de.s2.gsim.environment.GenericAgent;
+import de.s2.gsim.environment.Instance;
+import de.s2.gsim.environment.TypedList;
 import de.s2.gsim.objects.AgentInstance;
 import de.s2.gsim.objects.Behaviour;
 import de.s2.gsim.objects.ObjectInstance;
@@ -47,7 +47,7 @@ public class AgentInstanceDef extends ObjectInstanceDef implements AgentInstance
 
         try {
             GenericAgent a = (GenericAgent) real;
-            real = env.addChildInstance(a, new String[] { list }, (InstanceOLD) object);
+            real = env.addChildInstance(a, new String[] { list }, (Instance) object);
         } catch (Exception e) {
             throw new GSimException(e);
         }
@@ -56,8 +56,8 @@ public class AgentInstanceDef extends ObjectInstanceDef implements AgentInstance
 
     @Override
     public ObjectInstance createObjectFromListType(String objectName, String listName) {
-        FrameOLD f = real.getDefinition().getListType(listName);
-        InstanceOLD instance = new InstanceOLD(objectName, f);
+        Frame f = real.getDefinition().getListType(listName);
+        Instance instance = new Instance(objectName, f);
         return new ChildObjectInstance(this, listName, instance);
     }
 
@@ -97,7 +97,7 @@ public class AgentInstanceDef extends ObjectInstanceDef implements AgentInstance
 
     @Override
     public ObjectInstance getObject(String list, String objectName) throws GSimException {
-        InstanceOLD in = real.getChildInstance(list, objectName);
+        Instance in = real.getChildInstance(list, objectName);
         if (in != null) {
             return new ChildObjectInstance(this, list, in);
         } else {
@@ -138,7 +138,7 @@ public class AgentInstanceDef extends ObjectInstanceDef implements AgentInstance
 
         try {
 
-            InstanceOLD[] f = real.getChildInstances(list);
+            Instance[] f = real.getChildInstances(list);
             ObjectInstance[] ret = new ObjectInstance[f.length];
             for (int i = 0; i < f.length; i++) {
                 ret[i] = new ChildObjectInstance(this, list, f[i]);
@@ -223,14 +223,14 @@ public class AgentInstanceDef extends ObjectInstanceDef implements AgentInstance
 
             if (o instanceof Attribute) {
                 return o;
-            } else if (o instanceof InstanceOLD) {
-                return new ObjectInstanceDef(env, (InstanceOLD) o);
-            } else if (o instanceof TypedListOLD) {
-                TypedListOLD list = (TypedListOLD) o;
+            } else if (o instanceof Instance) {
+                return new ObjectInstanceDef(env, (Instance) o);
+            } else if (o instanceof TypedList) {
+                TypedList list = (TypedList) o;
                 ArrayList<ObjectInstanceDef> ret = new ArrayList<ObjectInstanceDef>();
                 Iterator iter = list.iterator();
                 while (iter.hasNext()) {
-                    InstanceOLD f = (InstanceOLD) iter.next();
+                    Instance f = (Instance) iter.next();
                     ObjectInstanceDef c = new ObjectInstanceDef(env, f);
                     ret.add(c);
                 }
@@ -351,7 +351,7 @@ public class AgentInstanceDef extends ObjectInstanceDef implements AgentInstance
         try {
             SetAttribute a = (SetAttribute) real.getAttribute(list, attName);
             if (a == null) {
-                FrameOLD f = real.getDefinition();
+                Frame f = real.getDefinition();
                 DomainAttribute def = f.getAttribute(list, attName);
                 a = new SetAttribute(attName, def.getFillers());
             }

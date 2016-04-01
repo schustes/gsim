@@ -5,7 +5,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.log4j.Logger;
 
-import de.s2.gsim.sim.SimulationListener;
 import de.s2.gsim.sim.SimulationScheduler;
 import de.s2.gsim.sim.Steppable;
 

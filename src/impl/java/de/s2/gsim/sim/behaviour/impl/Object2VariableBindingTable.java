@@ -4,11 +4,11 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 import cern.jet.random.Uniform;
-import de.s2.gsim.def.objects.behaviour.ActionDef;
-import de.s2.gsim.def.objects.behaviour.ConditionDef;
-import de.s2.gsim.def.objects.behaviour.ExpansionDef;
-import de.s2.gsim.def.objects.behaviour.RLRule;
-import de.s2.gsim.def.objects.behaviour.UserRule;
+import de.s2.gsim.environment.ActionDef;
+import de.s2.gsim.environment.ConditionDef;
+import de.s2.gsim.environment.ExpansionDef;
+import de.s2.gsim.environment.RLRule;
+import de.s2.gsim.environment.UserRule;
 
 /**
  * Contains a map with the objects referenced by the conditions (and possibly consequents) of a rule/RLrule. In a rule, multiple references to object
@@ -34,7 +34,7 @@ public class Object2VariableBindingTable {
         if (rule instanceof RLRule) {
             addExpansionRefs(((RLRule) rule).getExpansions());
         }
-        for (ActionDef a : rule.getConsequences()) {
+        for (ActionDef a : rule.getConsequents()) {
             addParamRefs(a);
         }
     }

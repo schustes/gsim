@@ -6,11 +6,11 @@ import java.util.Set;
 
 import cern.jet.random.Uniform;
 import de.s2.gsim.api.sim.agent.impl.RuntimeAgent;
-import de.s2.gsim.def.objects.InstanceOLD;
-import de.s2.gsim.def.objects.behaviour.ConditionDef;
-import de.s2.gsim.def.objects.behaviour.DependencyTest;
-import de.s2.gsim.def.objects.behaviour.RLRule;
-import de.s2.gsim.def.objects.behaviour.UserRule;
+import de.s2.gsim.environment.ActionDef;
+import de.s2.gsim.environment.ConditionDef;
+import de.s2.gsim.environment.Instance;
+import de.s2.gsim.environment.RLRule;
+import de.s2.gsim.environment.UserRule;
 import de.s2.gsim.sim.GSimEngineException;
 import de.s2.gsim.sim.behaviour.Context;
 import de.s2.gsim.sim.behaviour.SimAction;
@@ -185,12 +185,11 @@ public class RLRulesBuilder {
         return res;
     }
 
-    private String buildExperimentationFunctions(String ruleIdentifier, de.s2.gsim.def.objects.behaviour.DependencyTest[] tests,
-            de.s2.gsim.def.objects.behaviour.ActionDef[] a, FUNCTION f, ConditionDef funct) {
+    private String buildExperimentationFunctions(String ruleIdentifier, ActionDef[] a, FUNCTION f, ConditionDef funct) {
 
         String s1 = createListActionQuery(ruleIdentifier, a, funct);
 
-        String s2 = createSelectBestActionFunction(ruleIdentifier, tests, f);
+        String s2 = createSelectBestActionFunction(ruleIdentifier, f);
 
         return s1 + "\n" + s2;
 
@@ -220,7 +219,7 @@ public class RLRulesBuilder {
 
             String helpRulesForRootRule = "\n";
             if (rule.getAttribute("equivalent-state") == null && rule.getAttribute("equivalent-actionset") == null) {
-                helpRulesForRootRule = buildExperimentationFunctions(createRuleIdentifier(rule), rule.getTests(), rule.getConsequences(), f,
+                helpRulesForRootRule = buildExperimentationFunctions(createRuleIdentifier(rule), rule.getConsequents(), f,
                         rule.getEvaluationFunction());
 
                 helpRulesForRootRule += "\n";
@@ -390,7 +389,7 @@ public class RLRulesBuilder {
         return s0 + s1;
     }
 
-    private String createListActionQuery(String ruleIdentifier, de.s2.gsim.def.objects.behaviour.ActionDef[] a, ConditionDef funct) {
+    private String createListActionQuery(String ruleIdentifier, ActionDef[] a, ConditionDef funct) {
         String query1 = "(defquery list-actions_" + ruleIdentifier + "\n";
         query1 += " (declare (variables ?ev))\n";
         String ss2 = "	";
@@ -414,7 +413,7 @@ public class RLRulesBuilder {
         return query1;
     }
 
-    private String createRuleIdentifier(InstanceOLD inst) {
+    private String createRuleIdentifier(Instance inst) {
         String x = inst.getName();
         x = x.replace(':', '_');
         x = x.replace(' ', '_');
@@ -425,21 +424,9 @@ public class RLRulesBuilder {
         return x;
     }
 
-    private String createSelectBestActionFunction(String ruleIdentifier, DependencyTest[] tests, FUNCTION f) {
+    private String createSelectBestActionFunction(String ruleIdentifier, FUNCTION f) {
         String func3 = "(deffunction selectBestAction_" + ruleIdentifier + " (?ev)\n";
         func3 += " (bind ?it (run-query list-actions_" + ruleIdentifier + " ?ev))\n";
-        if (tests.length > 0) {
-            func3 += " (bind ?list (new java.util.ArrayList))\n";
-            for (DependencyTest t : tests) {
-                String testName = ruleIdentifier + "-" + t.getName();
-                func3 += " (while (?it hasNext) (bind ?token (call ?it next))\n";
-                func3 += "  (bind ?it2 (run-query list-all-actions))\n";
-                func3 += "  (bind ?action (call ?token fact 1))\n";
-                func3 += "  (if (not-exist-" + testName + " ?action ?it2) then (call ?list add ?action)) )\n";
-                func3 += " (bind ?it (call ?list iterator))\n";
-            }
-        }
-
         func3 += " (bind ?action (simplesoftmax-action-selector ?it))\n";
         func3 += " (return ?action))\n";
 

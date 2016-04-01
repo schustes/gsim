@@ -4,7 +4,8 @@ import java.util.HashMap;
 import java.util.Set;
 
 import de.s2.gsim.api.sim.agent.impl.RuntimeAgent;
-import de.s2.gsim.def.objects.agent.BehaviourDef;
+import de.s2.gsim.environment.ActionDef;
+import de.s2.gsim.environment.BehaviourDef;
 
 public abstract class SimAction implements java.io.Serializable {
 
@@ -44,9 +45,9 @@ public abstract class SimAction implements java.io.Serializable {
 		this.ctx = ctx;
 		RuntimeAgent agent = ctx.getAgent();
 		BehaviourDef b = agent.getBehaviour();
-		de.s2.gsim.def.objects.behaviour.ActionDef[] cs = b.getAvailableActions();
+        ActionDef[] cs = b.getAvailableActions();
 		for (int i = 0; i < cs.length; i++) {
-			de.s2.gsim.def.objects.behaviour.ActionDef a = cs[i];
+            ActionDef a = cs[i];
 			String className = a.getClassName();
 			if (className.equals(this.getClass().getName())) {
 				name = a.getName();

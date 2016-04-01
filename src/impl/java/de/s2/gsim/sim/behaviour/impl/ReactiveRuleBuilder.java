@@ -1,15 +1,16 @@
 package de.s2.gsim.sim.behaviour.impl;
 
-import jess.JessException;
-import jess.Rete;
 import cern.jet.random.Uniform;
 import de.s2.gsim.api.sim.agent.impl.RuntimeAgent;
-import de.s2.gsim.def.objects.InstanceOLD;
-import de.s2.gsim.def.objects.behaviour.ConditionDef;
-import de.s2.gsim.def.objects.behaviour.UserRule;
+import de.s2.gsim.environment.ActionDef;
+import de.s2.gsim.environment.ConditionDef;
+import de.s2.gsim.environment.Instance;
+import de.s2.gsim.environment.UserRule;
 import de.s2.gsim.sim.GSimEngineException;
 import de.s2.gsim.sim.behaviour.Context;
 import de.s2.gsim.sim.behaviour.SimAction;
+import jess.JessException;
+import jess.Rete;
 
 public class ReactiveRuleBuilder {
 
@@ -27,7 +28,7 @@ public class ReactiveRuleBuilder {
 
         try {
 
-            InstanceOLD[] ruleInstances = agent.getBehaviour().getRules();
+            Instance[] ruleInstances = agent.getBehaviour().getRules();
 
             res = "";
 
@@ -54,7 +55,7 @@ public class ReactiveRuleBuilder {
 
     private String buildUserRules_PerActionName(UserRule rule) throws GSimEngineException {
 
-        de.s2.gsim.def.objects.behaviour.ActionDef[] consequences = rule.getConsequences();
+        ActionDef[] consequences = rule.getConsequents();
         String role = ParsingUtils.getDefiningRoleForRule(agent, rule.getName());
 
         String res = "";
@@ -64,7 +65,7 @@ public class ReactiveRuleBuilder {
             if (rule.isActivated()) {
                 for (int i = 0; i < consequences.length; i++) {
 
-                    de.s2.gsim.def.objects.behaviour.ActionDef c = consequences[i];
+                    ActionDef c = consequences[i];
 
                     String x = rule.getName() + "_" + i;
                     x = x.replace(' ', '_');
@@ -141,7 +142,7 @@ public class ReactiveRuleBuilder {
         return res;
     }
 
-    private String buildUserRules_PerActionName_P(String ruleIdent, String nRule, String[] objParams, de.s2.gsim.def.objects.behaviour.ActionDef consequence,
+    private String buildUserRules_PerActionName_P(String ruleIdent, String nRule, String[] objParams, ActionDef consequence,
             ConditionDef[] conditions, String role, UserRule rule) {
 
         try {

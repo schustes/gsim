@@ -12,7 +12,7 @@ import java.util.concurrent.Semaphore;
 
 import org.apache.log4j.Logger;
 
-import de.s2.gsim.def.Environment;
+import de.s2.gsim.environment.Environment;
 import de.s2.gsim.sim.GSimEngineException;
 import de.s2.gsim.sim.Simulation;
 import de.s2.gsim.sim.SimulationController;

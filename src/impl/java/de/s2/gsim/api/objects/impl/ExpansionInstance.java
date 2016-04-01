@@ -1,16 +1,11 @@
 package de.s2.gsim.api.objects.impl;
 
 import de.s2.gsim.GSimException;
-import de.s2.gsim.def.objects.UnitOLD;
-import de.s2.gsim.def.objects.behaviour.ExpansionDef;
+import de.s2.gsim.environment.ExpansionDef;
+import de.s2.gsim.environment.Unit;
 import de.s2.gsim.objects.Expansion;
 
 public class ExpansionInstance implements Expansion, UnitWrapper {
-
-    /**
-     *
-     */
-    private static final long serialVersionUID = 1L;
 
     private RuleInstance owner;
 
@@ -87,7 +82,7 @@ public class ExpansionInstance implements Expansion, UnitWrapper {
     }
 
     @Override
-    public UnitOLD toUnit() {
+    public Unit toUnit() {
         return real;
     }
 

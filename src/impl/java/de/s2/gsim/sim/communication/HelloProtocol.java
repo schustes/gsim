@@ -2,9 +2,6 @@ package de.s2.gsim.sim.communication;
 
 import org.apache.log4j.Logger;
 
-import de.s2.gsim.sim.communication.CommunicationProtocol;
-import de.s2.gsim.sim.communication.Message;
-
 public class HelloProtocol extends CommunicationProtocol {
 
     private static Logger logger = Logger.getLogger(HelloProtocol.class);

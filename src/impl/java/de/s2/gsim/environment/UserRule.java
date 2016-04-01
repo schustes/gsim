@@ -87,8 +87,8 @@ public class UserRule extends Instance {
 
         // all conditions were equal if we come to this point
 
-        ActionDef[] otherActions = other.getConsequences();
-        ActionDef[] myActions = getConsequences();
+        ActionDef[] otherActions = other.getConsequents();
+        ActionDef[] myActions = getConsequents();
 
         for (int i = 0; i < otherActions.length; i++) {
             boolean b = false;
@@ -122,7 +122,7 @@ public class UserRule extends Instance {
         return cond;
     }
 
-    public ActionDef[] getConsequences() {
+    public ActionDef[] getConsequents() {
         Instance[] inst = getChildInstances(UserRuleFrame.INST_LIST_CONS);
         ActionDef[] cons = new ActionDef[inst.length];
         for (int i = 0; i < cons.length; i++) {

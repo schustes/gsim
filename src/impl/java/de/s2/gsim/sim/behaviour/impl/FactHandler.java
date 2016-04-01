@@ -6,11 +6,11 @@ import java.util.Iterator;
 import java.util.List;
 
 import de.s2.gsim.api.sim.agent.impl.RuntimeAgent;
-import de.s2.gsim.def.objects.InstanceOLD;
-import de.s2.gsim.def.objects.agent.BehaviourDef;
-import de.s2.gsim.def.objects.behaviour.ActionDef;
-import de.s2.gsim.def.objects.behaviour.ExpansionDef;
-import de.s2.gsim.def.objects.behaviour.RLRule;
+import de.s2.gsim.environment.ActionDef;
+import de.s2.gsim.environment.BehaviourDef;
+import de.s2.gsim.environment.ExpansionDef;
+import de.s2.gsim.environment.Instance;
+import de.s2.gsim.environment.RLRule;
 import de.s2.gsim.sim.GSimEngineException;
 import de.s2.gsim.util.CombinationGenerator;
 import de.s2.gsim.util.Utils;
@@ -514,7 +514,7 @@ public class FactHandler {
 
         // String ruleName = "experimental_rule_"+r.getName() + "@"+sfn+"@";
 
-        for (de.s2.gsim.def.objects.behaviour.ActionDef action : r.getConsequences()) {
+        for (ActionDef action : r.getConsequents()) {
 
             String[] params = action.getObjectClassParams();
 
@@ -527,7 +527,7 @@ public class FactHandler {
                 int k = 0;
                 for (String param : params) {
                     starts[n] = k;
-                    for (InstanceOLD inst : Utils.getChildInstancesOfType(agent, param)) {
+                    for (Instance inst : Utils.getChildInstancesOfType(agent, param)) {
                         String filter = action.getFilterExpression(param);
                         if (inst.getName().matches(".*" + filter + ".*")) {
                             k++;
@@ -680,7 +680,7 @@ public class FactHandler {
      * return list; }
      */
 
-    private String createRuleIdentifier(InstanceOLD inst) {
+    private String createRuleIdentifier(Instance inst) {
         String x = inst.getName();
         x = x.replace(' ', '_');
         x = x.replace('/', '_');
@@ -715,7 +715,7 @@ public class FactHandler {
         BehaviourDef b = a.getBehaviour();
         RLRule[] r = b.getRLRules();
         for (int i = 0; i < r.length; i++) {
-            de.s2.gsim.def.objects.behaviour.ActionDef[] c = r[i].getConsequences();
+            ActionDef[] c = r[i].getConsequents();
             for (int j = 0; j < c.length; j++) {
                 set.add(r[i].getEvaluationFunction().getParameterName());
             }

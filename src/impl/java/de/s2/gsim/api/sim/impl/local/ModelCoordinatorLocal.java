@@ -14,10 +14,11 @@ import org.apache.log4j.Logger;
 import de.s2.gsim.api.impl.EnvironmentWrapper;
 import de.s2.gsim.api.sim.agent.impl.ApplicationAgentImpl;
 import de.s2.gsim.api.sim.agent.impl.RuntimeAgent;
-import de.s2.gsim.def.Environment;
 import de.s2.gsim.def.ModelDefinitionEnvironment;
-import de.s2.gsim.def.objects.InstanceOLD;
-import de.s2.gsim.def.objects.agent.GenericAgent;
+import de.s2.gsim.environment.Environment;
+import de.s2.gsim.environment.GSimDefException;
+import de.s2.gsim.environment.GenericAgent;
+import de.s2.gsim.environment.Instance;
 import de.s2.gsim.objects.AgentInstance;
 import de.s2.gsim.objects.AppAgent;
 import de.s2.gsim.objects.ObjectInstance;
@@ -110,7 +111,7 @@ public class ModelCoordinatorLocal implements Simulation, Steppable {
 				appAgents.put(app.getName(), app);
 			}
 			messenger = new LocalMessenger(r);
-		} catch (de.s2.gsim.def.GSimDefException e) {
+        } catch (GSimDefException e) {
 			logger.error("Def-exception", e);
 		} catch (Exception e2) {
 			logger.error("Exception", e2);
@@ -231,7 +232,7 @@ public class ModelCoordinatorLocal implements Simulation, Steppable {
 		return impl;
 	}
 
-	public de.s2.gsim.def.Environment getEnvironment() throws GSimEngineException, Exception {
+    public Environment getEnvironment() throws GSimEngineException, Exception {
 		return env;
 	}
 
@@ -301,7 +302,7 @@ public class ModelCoordinatorLocal implements Simulation, Steppable {
 		RuntimeAgent agent = agents.get(agentInstance.getName());
 		for (String list : agentInstance.getObjectListNames()) {
 			for (ObjectInstance inst : agentInstance.getObjects(list)) {
-				agent.setChildInstance(list, (InstanceOLD) inst);
+                agent.setChildInstance(list, (Instance) inst);
 			}
 		}
 		for (String list : agentInstance.getAttributeListNames()) {

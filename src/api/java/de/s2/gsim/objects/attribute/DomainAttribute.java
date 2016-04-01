@@ -3,6 +3,7 @@ package de.s2.gsim.objects.attribute;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * A DomainAttribute serves as the template or frame for concrete {@link Attribute}s. A DomainAttribute defines the type and the possible values or
@@ -48,20 +49,14 @@ public class DomainAttribute {
 
 
     @Override
-    public Object clone() {
+    public DomainAttribute clone() {
         DomainAttribute a = new DomainAttribute(getName(), getType());
-        String[] fillers = getFillers();
-        if (fillers != null) {
-            for (int i = 0; i < fillers.length; i++) {
-                a.addFiller(fillers[i]);
-            }
-        }
+        a.fillers = fillers.stream().collect(Collectors.toList());
         a.setDefault(getDefaultValue());
         a.setMutable(isMutable());
         a.setSystem(isSystem());
 
         return a;
-
     }
 
     @Override
@@ -90,11 +85,10 @@ public class DomainAttribute {
      * Gets the possible values of this domain attribute.
      * 
      * @return the fillers
+     * 
      */
-    public String[] getFillers() {
-        String[] ss = new String[fillers.size()];
-        fillers.toArray(ss);
-        return ss;
+    public List<String> getFillers() {
+        return fillers;
     }
 
     /**
@@ -169,13 +163,6 @@ public class DomainAttribute {
         defaultValue = val;
     }
 
-    public void setFillers(String[] fillers) {
-        this.fillers.clear();
-        for (int i = 0; i < fillers.length; i++) {
-            this.fillers.add(fillers[i]);
-        }
-    }
-
     public void setMutable(boolean b) {
         isMutable = b;
     }
@@ -198,6 +185,13 @@ public class DomainAttribute {
         } catch (NumberFormatException e) {
             return false;
         }
+    }
+
+    public void copyFrom(DomainAttribute newValue) {
+        this.fillers = fillers.stream().collect(Collectors.toList());
+        this.defaultValue = getDefaultValue();
+        this.isMutable = isMutable();
+        this.isSystem = isSystem();
     }
 
 }

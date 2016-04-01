@@ -63,7 +63,7 @@ public class BehaviourDef extends Instance {
     }
 
     @Override
-    public Object clone() {
+    public BehaviourDef clone() {
         BehaviourDef b = new BehaviourDef(this);
         return b;
     }

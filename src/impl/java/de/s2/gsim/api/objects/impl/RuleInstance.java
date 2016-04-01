@@ -1,13 +1,13 @@
 package de.s2.gsim.api.objects.impl;
 
 import de.s2.gsim.GSimException;
-import de.s2.gsim.def.objects.InstanceOLD;
-import de.s2.gsim.def.objects.UnitOLD;
-import de.s2.gsim.def.objects.behaviour.ActionDef;
-import de.s2.gsim.def.objects.behaviour.ConditionDef;
-import de.s2.gsim.def.objects.behaviour.ExpansionDef;
-import de.s2.gsim.def.objects.behaviour.RLRuleFrame;
-import de.s2.gsim.def.objects.behaviour.UserRule;
+import de.s2.gsim.environment.ActionDef;
+import de.s2.gsim.environment.ConditionDef;
+import de.s2.gsim.environment.ExpansionDef;
+import de.s2.gsim.environment.Instance;
+import de.s2.gsim.environment.RLRuleFrame;
+import de.s2.gsim.environment.Unit;
+import de.s2.gsim.environment.UserRule;
 import de.s2.gsim.objects.Condition;
 import de.s2.gsim.objects.Expansion;
 import de.s2.gsim.objects.Rule;
@@ -30,7 +30,7 @@ public class RuleInstance implements Rule, UnitWrapper {
 
     @Override
     public void addOrSetCondition(Condition cond) throws GSimException {
-        InstanceOLD inst = (InstanceOLD) ((UnitWrapper) cond).toUnit();
+        Instance inst = (Instance) ((UnitWrapper) cond).toUnit();
         ConditionDef c = new ConditionDef(inst);
         real.setCondition(c);
         owner.addOrSetRule(this);
@@ -38,13 +38,13 @@ public class RuleInstance implements Rule, UnitWrapper {
 
     @Override
     public void addOrSetConsequent(de.s2.gsim.objects.Action cons) throws GSimException {
-        ActionDef a = new ActionDef((InstanceOLD) ((UnitWrapper) cons).toUnit());
+        ActionDef a = new ActionDef((Instance) ((UnitWrapper) cons).toUnit());
         real.addConsequence(a);
         owner.addOrSetRule(this);
     }
 
     public void addOrSetExpansion(Expansion cond) throws GSimException {
-        InstanceOLD inst = (InstanceOLD) ((UnitWrapper) cond).toUnit();
+        Instance inst = (Instance) ((UnitWrapper) cond).toUnit();
         ExpansionDef c = new ExpansionDef(inst);
         real.addChildInstance(RLRuleFrame.INST_LIST_EXP, c);
         owner.addOrSetRule(this);
@@ -80,7 +80,7 @@ public class RuleInstance implements Rule, UnitWrapper {
     @Override
     public de.s2.gsim.objects.Action[] getConsequents() {
         ActionInstance[] ret = new ActionInstance[real.getConditions().length];
-        ActionDef[] c = real.getConsequences();
+        ActionDef[] c = real.getConsequents();
         for (int i = 0; i < ret.length; i++) {
             ret[i] = new ActionInstance(this, c[i]);
         }
@@ -99,7 +99,7 @@ public class RuleInstance implements Rule, UnitWrapper {
 
     @Override
     public void removeCondition(Condition cond) throws GSimException {
-        InstanceOLD inst = (InstanceOLD) ((UnitWrapper) cond).toUnit();
+        Instance inst = (Instance) ((UnitWrapper) cond).toUnit();
         ConditionDef c = new ConditionDef(inst);
         real.removeCondition(c);
         owner.addOrSetRule(this);
@@ -107,14 +107,14 @@ public class RuleInstance implements Rule, UnitWrapper {
 
     @Override
     public void removeConsequent(de.s2.gsim.objects.Action cons) throws GSimException {
-        InstanceOLD inst = (InstanceOLD) ((UnitWrapper) cons).toUnit();
+        Instance inst = (Instance) ((UnitWrapper) cons).toUnit();
         ActionDef c = new ActionDef(inst);
         real.removeConsequence(c);
         owner.addOrSetRule(this);
     }
 
     public void removeExpansion(Expansion cond) throws GSimException {
-        InstanceOLD inst = (InstanceOLD) ((UnitWrapper) cond).toUnit();
+        Instance inst = (Instance) ((UnitWrapper) cond).toUnit();
         real.removeChildInstance(RLRuleFrame.INST_LIST_EXP, inst.getName());
         owner.addOrSetRule(this);
     }
@@ -126,7 +126,7 @@ public class RuleInstance implements Rule, UnitWrapper {
     }
 
     @Override
-    public UnitOLD toUnit() {
+    public Unit toUnit() {
         return real;
     }
 

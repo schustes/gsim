@@ -1,14 +1,14 @@
 package de.s2.gsim.api.objects.impl;
 
 import de.s2.gsim.GSimException;
-import de.s2.gsim.def.objects.InstanceOLD;
-import de.s2.gsim.def.objects.behaviour.ActionDef;
-import de.s2.gsim.def.objects.behaviour.ConditionDef;
-import de.s2.gsim.def.objects.behaviour.ExpansionDef;
-import de.s2.gsim.def.objects.behaviour.RLRule;
-import de.s2.gsim.def.objects.behaviour.RLRuleFrame;
-import de.s2.gsim.def.objects.behaviour.UserRule;
-import de.s2.gsim.def.objects.behaviour.UserRuleFrame;
+import de.s2.gsim.environment.ActionDef;
+import de.s2.gsim.environment.ConditionDef;
+import de.s2.gsim.environment.ExpansionDef;
+import de.s2.gsim.environment.Instance;
+import de.s2.gsim.environment.RLRule;
+import de.s2.gsim.environment.RLRuleFrame;
+import de.s2.gsim.environment.UserRule;
+import de.s2.gsim.environment.UserRuleFrame;
 import de.s2.gsim.objects.Condition;
 import de.s2.gsim.objects.Expansion;
 import de.s2.gsim.objects.RLActionNode;
@@ -27,7 +27,7 @@ public class RLActionNodeInstance extends RuleInstance implements RLActionNode, 
 
     @Override
     public void addOrSetCondition(Condition cond) throws GSimException {
-        InstanceOLD inst = (InstanceOLD) ((UnitWrapper) cond).toUnit();
+        Instance inst = (Instance) ((UnitWrapper) cond).toUnit();
         ConditionDef c = new ConditionDef(inst);
         real.setCondition(c);
         owner.addOrSetRule(this);
@@ -35,7 +35,7 @@ public class RLActionNodeInstance extends RuleInstance implements RLActionNode, 
 
     @Override
     public void addOrSetConsequent(de.s2.gsim.objects.Action cons) throws GSimException {
-        ActionDef a = new ActionDef((InstanceOLD) ((UnitWrapper) cons).toUnit());
+        ActionDef a = new ActionDef((Instance) ((UnitWrapper) cons).toUnit());
         real.addConsequence(a);
         owner.addOrSetRLActionNode(this);
     }
@@ -185,8 +185,7 @@ public class RLActionNodeInstance extends RuleInstance implements RLActionNode, 
 
     @Override
     public void setExecutionRestrictionInterval(String t) throws GSimException {
-        ((RLRule) real).setRepeatedExecutionTest(t);
-        owner.addOrSetRLActionNode(this);
+        throw new UnsupportedOperationException("Method has been removed because it seemed to be never used.");
     }
 
     @Override

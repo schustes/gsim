@@ -9,11 +9,11 @@ import de.s2.gsim.api.objects.impl.ObjectClassDef;
 import de.s2.gsim.api.objects.impl.ObjectInstanceDef;
 import de.s2.gsim.api.objects.impl.UnitWrapper;
 import de.s2.gsim.def.ModelDefinitionEnvironment;
-import de.s2.gsim.def.objects.FrameOLD;
-import de.s2.gsim.def.objects.InstanceOLD;
 import de.s2.gsim.environment.Environment;
+import de.s2.gsim.environment.Frame;
 import de.s2.gsim.environment.GenericAgent;
 import de.s2.gsim.environment.GenericAgentClass;
+import de.s2.gsim.environment.Instance;
 import de.s2.gsim.objects.AgentClass;
 import de.s2.gsim.objects.AgentInstance;
 import de.s2.gsim.objects.ObjectClass;
@@ -64,13 +64,13 @@ public class EnvironmentWrapper implements ModelDefinitionEnvironment {
     @Override
     public ObjectClass createObjectClass(String name, String parent) throws GSimException {
         try {
-            FrameOLD parentFrame = parent != null ? env.getObjectSubClass(parent) : env.getObjectClass();
+            Frame parentFrame = parent != null ? env.getObjectSubClass(parent) : env.getObjectClass();
 
             if (parentFrame == null) {
             	throw new GSimException("No parent with name " + parent + " found!");
             }
 
-            FrameOLD newObjectClass = env.createObjectSubClass(name, parentFrame);
+            Frame newObjectClass = env.createObjectSubClass(name, parentFrame);
             return new ObjectClassDef(env, newObjectClass);
 
         } catch (Exception e) {
@@ -81,7 +81,7 @@ public class EnvironmentWrapper implements ModelDefinitionEnvironment {
     @Override
     public ObjectInstance createObjectInstance(String name, ObjectClass parent) throws GSimException {
         try {
-            FrameOLD f = (FrameOLD) ((UnitWrapper) parent).toUnit();
+            Frame f = (Frame) ((UnitWrapper) parent).toUnit();
             return new ObjectInstanceDef(env, env.instanciateFrame(f, name));
         } catch (Exception e) {
             throw new GSimException("Exception", e);
@@ -254,7 +254,7 @@ public class EnvironmentWrapper implements ModelDefinitionEnvironment {
     @Override
     public ObjectClass getObjectClass(String name) throws GSimException {
         try {
-            FrameOLD a = env.getObjectSubClass(name);
+            Frame a = env.getObjectSubClass(name);
 
             if (a == null) {
                 return null; // if proxy mode to prevent too massive
@@ -271,7 +271,7 @@ public class EnvironmentWrapper implements ModelDefinitionEnvironment {
     public ObjectClass[] getObjectClasses(String parent) throws GSimException {
         try {
             if (parent == null) {
-                FrameOLD[] f = env.getObjectSubClasses();
+                Frame[] f = env.getObjectSubClasses();
 
                 if (f == null) {
                     return null; // if proxy mode to prevent too massive
@@ -285,7 +285,7 @@ public class EnvironmentWrapper implements ModelDefinitionEnvironment {
                 }
                 return res;
             } else {
-                FrameOLD[] cls = env.getAllObjectSuccessors(parent);
+                Frame[] cls = env.getAllObjectSuccessors(parent);
                 ObjectClassDef[] res = new ObjectClassDef[cls.length];
                 for (int i = 0; i < cls.length; i++) {
                     res[i] = new ObjectClassDef(env, cls[i]);
@@ -302,7 +302,7 @@ public class EnvironmentWrapper implements ModelDefinitionEnvironment {
         try {
 
             ArrayList<ObjectInstanceDef> res = new ArrayList<ObjectInstanceDef>();
-            FrameOLD[] f;
+            Frame[] f;
             if (parent == null) {
                 f = env.getObjectSubClasses();
             } else {
@@ -311,9 +311,9 @@ public class EnvironmentWrapper implements ModelDefinitionEnvironment {
 
             for (int i = 0; i < f.length; i++) {
 
-                ArrayList<InstanceOLD> in = env.getInstancesOfClass(f[i]);
+                ArrayList<Instance> in = env.getInstancesOfClass(f[i]);
 
-                for (InstanceOLD t : in) {
+                for (Instance t : in) {
                     ObjectInstanceDef ac = new ObjectInstanceDef(env, t);
                     res.add(ac);
                 }
@@ -321,9 +321,9 @@ public class EnvironmentWrapper implements ModelDefinitionEnvironment {
             }
 
             if (parent != null) {
-                FrameOLD tf = env.getObjectSubClass(parent);
-                ArrayList<InstanceOLD> in = env.getInstancesOfClass(tf);
-                for (InstanceOLD t : in) {
+                Frame tf = env.getObjectSubClass(parent);
+                ArrayList<Instance> in = env.getInstancesOfClass(tf);
+                for (Instance t : in) {
                     ObjectInstanceDef ac = new ObjectInstanceDef(env, t);
                     res.add(ac);
                 }

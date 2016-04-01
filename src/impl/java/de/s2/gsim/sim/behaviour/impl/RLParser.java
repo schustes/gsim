@@ -5,14 +5,14 @@ import java.util.Iterator;
 import java.util.Map;
 
 import de.s2.gsim.api.sim.agent.impl.RuntimeAgent;
-import de.s2.gsim.def.objects.FrameOLD;
-import de.s2.gsim.def.objects.InstanceOLD;
-import de.s2.gsim.def.objects.UnitOLD;
-import de.s2.gsim.def.objects.agent.BehaviourDef;
-import de.s2.gsim.def.objects.agent.BehaviourFrame;
-import de.s2.gsim.def.objects.agent.GenericAgentClass;
-import de.s2.gsim.def.objects.behaviour.ExpansionDef;
-import de.s2.gsim.def.objects.behaviour.RLRule;
+import de.s2.gsim.environment.BehaviourDef;
+import de.s2.gsim.environment.BehaviourFrame;
+import de.s2.gsim.environment.ExpansionDef;
+import de.s2.gsim.environment.Frame;
+import de.s2.gsim.environment.GenericAgentClass;
+import de.s2.gsim.environment.Instance;
+import de.s2.gsim.environment.RLRule;
+import de.s2.gsim.environment.Unit;
 import de.s2.gsim.objects.attribute.AttributeConstants;
 import de.s2.gsim.objects.attribute.DomainAttribute;
 import de.s2.gsim.sim.GSimEngineException;
@@ -115,7 +115,7 @@ public class RLParser {
 
             }
 
-            Map<String, UnitOLD> expansionMap = new HashMap<String, UnitOLD>();
+            Map<String, Unit> expansionMap = new HashMap<String, Unit>();
 
             for (int i = 0; i < r.length; i++) {
 
@@ -135,9 +135,9 @@ public class RLParser {
                     // s += new ExpansionRulesBuilder().build(expandInterval,revisitCostFraction, revaluationProbability, roleName);
                     expansionMap.put(roleName, agent.getBehaviour());
 
-                    InstanceOLD inst = agent;
-                    FrameOLD[] frames = inst.getDefinition().getAncestors();
-                    for (FrameOLD f : frames) {
+                    Instance inst = agent;
+                    Frame[] frames = inst.getDefinition().getAncestors();
+                    for (Frame f : frames) {
                         if (f.getTypeName().equals(roleName)) {
                             GenericAgentClass a = (GenericAgentClass) f;
                             expansionMap.put(roleName, a.getBehaviour());
@@ -149,8 +149,8 @@ public class RLParser {
 
             ExpansionRulesBuilder erb = new ExpansionRulesBuilder();
             for (String n : expansionMap.keySet()) {
-                UnitOLD u = expansionMap.get(n);
-                if (u instanceof InstanceOLD) {
+                Unit u = expansionMap.get(n);
+                if (u instanceof Instance) {
                     BehaviourDef beh = (BehaviourDef) u;
                     int expandInterval = beh.getStateUpdateInterval();
                     double revisitCostFraction = beh.getRevisitCost();
@@ -201,7 +201,7 @@ public class RLParser {
             if (path.contains("::")) {
                 ConditionBuilder cb = new ConditionBuilder();
                 String obj = cb.resolveObjectClass(path);
-                FrameOLD f = (FrameOLD) agent.getDefinition().resolveName(obj.split("/"));
+                Frame f = (Frame) agent.getDefinition().resolveName(obj.split("/"));
                 if (f == null) {
                     String list = cb.resolveList(path);
                     f = agent.getDefinition().getListType(list);

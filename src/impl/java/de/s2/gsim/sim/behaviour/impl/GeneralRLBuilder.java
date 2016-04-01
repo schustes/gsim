@@ -4,13 +4,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import de.s2.gsim.api.sim.agent.impl.RuntimeAgent;
-import de.s2.gsim.def.objects.InstanceOLD;
-import de.s2.gsim.def.objects.behaviour.ConditionDef;
-import de.s2.gsim.def.objects.behaviour.DependencyTest;
-import de.s2.gsim.def.objects.behaviour.ExpansionDef;
-import de.s2.gsim.def.objects.behaviour.RLRule;
-import de.s2.gsim.def.objects.behaviour.UserRule;
-import de.s2.gsim.def.objects.behaviour.UserRuleFrame;
+import de.s2.gsim.environment.ActionDef;
+import de.s2.gsim.environment.ConditionDef;
+import de.s2.gsim.environment.ExpansionDef;
+import de.s2.gsim.environment.Instance;
+import de.s2.gsim.environment.RLRule;
+import de.s2.gsim.environment.UserRule;
+import de.s2.gsim.environment.UserRuleFrame;
 import de.s2.gsim.objects.attribute.StringAttribute;
 import de.s2.gsim.sim.GSimEngineException;
 
@@ -29,7 +29,7 @@ public class GeneralRLBuilder {
 
         String ownerRule = createRuleIdentifier(rule);
         String ruleName = "experimental_rule_" + ownerRule + "@" + stateName + "@";// +
-                                                                                   // createId();
+        // createId();
         String defaultIdentifier = ownerRule;
 
         String role = ParsingUtils.getDefiningRoleForRLRule(agent, ownerRule);
@@ -127,14 +127,14 @@ public class GeneralRLBuilder {
             n += " (" + owner.getName() + ")\n";
         }
 
-        HashMap<Integer, de.s2.gsim.def.objects.behaviour.ActionDef> actionRefs = new HashMap<Integer, de.s2.gsim.def.objects.behaviour.ActionDef>();
-        HashMap<de.s2.gsim.def.objects.behaviour.ActionDef, ArrayList<String>> objectRefs = new HashMap<de.s2.gsim.def.objects.behaviour.ActionDef, ArrayList<String>>();
+        HashMap<Integer, ActionDef> actionRefs = new HashMap<Integer, ActionDef>();
+        HashMap<ActionDef, ArrayList<String>> objectRefs = new HashMap<ActionDef, ArrayList<String>>();
 
-        HashMap<Integer, de.s2.gsim.def.objects.behaviour.ActionDef> actions = new HashMap<Integer, de.s2.gsim.def.objects.behaviour.ActionDef>();
-        HashMap<de.s2.gsim.def.objects.behaviour.ActionDef, ArrayList<String>> objects = new HashMap<de.s2.gsim.def.objects.behaviour.ActionDef, ArrayList<String>>();
+        HashMap<Integer, ActionDef> actions = new HashMap<Integer, ActionDef>();
+        HashMap<ActionDef, ArrayList<String>> objects = new HashMap<ActionDef, ArrayList<String>>();
 
         for (int i = 0; i < agent.getBehaviour().getAvailableActions().length; i++) {
-            de.s2.gsim.def.objects.behaviour.ActionDef action = agent.getBehaviour().getAvailableActions()[i];
+            ActionDef action = agent.getBehaviour().getAvailableActions()[i];
             int refPos = i;
             actions.put(refPos, action);
             if (action.hasObjectParameter()) {
@@ -158,7 +158,7 @@ public class GeneralRLBuilder {
 
                 String objRef = a.length > 2 ? a[2].trim() : null;
 
-                de.s2.gsim.def.objects.behaviour.ActionDef action = agent.getBehaviour().getAction(actionRef);
+                ActionDef action = agent.getBehaviour().getAction(actionRef);
                 actionRefs.put(i, action);
 
                 if (objRef != null) {
@@ -182,7 +182,7 @@ public class GeneralRLBuilder {
 
         HashMap<String, Integer> paramIndices = new HashMap<String, Integer>();
         for (int actionCtxNumber : actionRefs.keySet()) {
-            de.s2.gsim.def.objects.behaviour.ActionDef action = actionRefs.get(actionCtxNumber);
+            ActionDef action = actionRefs.get(actionCtxNumber);
             ArrayList<String> list = objectRefs.get(action);
             if (list != null) {
                 int number = 0;
@@ -204,7 +204,7 @@ public class GeneralRLBuilder {
 
         String prefix = "";
         String postFix = "";
-        HashMap<de.s2.gsim.def.objects.behaviour.ActionDef, ArrayList<String>> resolvedObjRefs = new HashMap<de.s2.gsim.def.objects.behaviour.ActionDef, ArrayList<String>>();
+        HashMap<ActionDef, ArrayList<String>> resolvedObjRefs = new HashMap<ActionDef, ArrayList<String>>();
 
         Object2VariableBindingTable scCond = new Object2VariableBindingTable();
 
@@ -220,7 +220,7 @@ public class GeneralRLBuilder {
 
                 String objRef = p1.length > 1 ? p1[0].split("\\$")[2] : null;
 
-                de.s2.gsim.def.objects.behaviour.ActionDef a = actionRefs.get(i);
+                ActionDef a = actionRefs.get(i);
 
                 prefix = objRef;
                 String[] pp = prefix.split("/");
@@ -267,7 +267,7 @@ public class GeneralRLBuilder {
 
         int actionFactRefs = 0;
         HashMap<Integer, String> map = new HashMap<Integer, String>();
-        for (de.s2.gsim.def.objects.behaviour.ActionDef a : actionRefs.values()) {
+        for (ActionDef a : actionRefs.values()) {
 
             ArrayList<String> objParams = resolvedObjRefs.get(a);
 
@@ -301,19 +301,8 @@ public class GeneralRLBuilder {
         // n+=" (printout t ************************** "+ruleName+" **** crlf
         // )\n";
         for (int i = 0; i < actionFactRefs; i++) {
-            if (owner.getTests().length > 0) {
-                for (DependencyTest t : owner.getTests()) {
-                    String testName = ownerRule + "-" + t.getName();
-                    n += " (bind ?it (run-query list-all-actions))\n";
-
-                    // n += " (bind ?it (run-query list-actions_" + ownerRule +
-                    // " ?ev"+i+"))\n";
-                    n += " (if (not-exist-" + testName + " ?action" + i + " ?it)" + " then (call ?list add ?action" + i + "))\n";
-                }
-            } else {
-                n += " (if (not (call ?list contains ?action" + i + ")) then \n";
-                n += " (call ?list add ?action" + i + "))";
-            }
+            n += " (if (not (call ?list contains ?action" + i + ")) then \n";
+            n += " (call ?list add ?action" + i + "))";
         }
         n += ")\n";
 
@@ -325,7 +314,7 @@ public class GeneralRLBuilder {
         return String.valueOf(cern.jet.random.Uniform.staticNextIntFromTo(0, 1000));
     }
 
-    private String createRuleIdentifier(InstanceOLD inst) {
+    private String createRuleIdentifier(Instance inst) {
         String x = inst.getName();
         x = x.replace(' ', '_');
         x = x.replace('/', '_');

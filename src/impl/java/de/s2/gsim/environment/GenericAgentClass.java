@@ -172,7 +172,7 @@ public class GenericAgentClass extends Frame {
 
     @Override
     public void setTypeName(String s) {
-        super.typeName = s;
+        super.name = s;
     }
 
     /**

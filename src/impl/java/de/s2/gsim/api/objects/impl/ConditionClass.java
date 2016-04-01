@@ -1,16 +1,11 @@
 package de.s2.gsim.api.objects.impl;
 
 import de.s2.gsim.GSimException;
-import de.s2.gsim.def.objects.UnitOLD;
-import de.s2.gsim.def.objects.behaviour.ConditionFrame;
+import de.s2.gsim.environment.ConditionFrame;
+import de.s2.gsim.environment.Unit;
 import de.s2.gsim.objects.Condition;
 
 public class ConditionClass implements Condition, UnitWrapper {
-
-    /**
-     *
-     */
-    private static final long serialVersionUID = 1L;
 
     private RuleClass owner;
 
@@ -55,7 +50,7 @@ public class ConditionClass implements Condition, UnitWrapper {
     }
 
     @Override
-    public UnitOLD toUnit() {
+    public Unit toUnit() {
         return real;
     }
 

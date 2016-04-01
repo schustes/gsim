@@ -1,9 +1,9 @@
 package de.s2.gsim.sim.behaviour.impl;
 
 import de.s2.gsim.api.sim.agent.impl.RuntimeAgent;
-import de.s2.gsim.def.objects.behaviour.ConditionDef;
-import de.s2.gsim.def.objects.behaviour.RLRule;
-import de.s2.gsim.def.objects.behaviour.UserRule;
+import de.s2.gsim.environment.ConditionDef;
+import de.s2.gsim.environment.RLRule;
+import de.s2.gsim.environment.UserRule;
 import de.s2.gsim.sim.GSimEngineException;
 
 public class TreeExpansionBuilder {

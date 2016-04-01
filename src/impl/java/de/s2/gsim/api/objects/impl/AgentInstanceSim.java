@@ -6,13 +6,13 @@ import java.util.Iterator;
 import java.util.List;
 
 import de.s2.gsim.GSimException;
-import de.s2.gsim.def.objects.FrameOLD;
-import de.s2.gsim.def.objects.InstanceOLD;
-import de.s2.gsim.def.objects.TypedListOLD;
-import de.s2.gsim.def.objects.UnitOLD;
-import de.s2.gsim.def.objects.UnitUtils;
-import de.s2.gsim.def.objects.agent.BehaviourDef;
-import de.s2.gsim.def.objects.agent.GenericAgent;
+import de.s2.gsim.environment.BehaviourDef;
+import de.s2.gsim.environment.Frame;
+import de.s2.gsim.environment.GenericAgent;
+import de.s2.gsim.environment.Instance;
+import de.s2.gsim.environment.TypedList;
+import de.s2.gsim.environment.Unit;
+import de.s2.gsim.environment.UnitOperations;
 import de.s2.gsim.objects.AgentInstance;
 import de.s2.gsim.objects.Behaviour;
 import de.s2.gsim.objects.ObjectInstance;
@@ -51,7 +51,7 @@ public class AgentInstanceSim implements AgentInstance, ObjectInstance, UnitWrap
 
         try {
             GenericAgent a = real;
-            a.addChildInstance(list, (InstanceOLD) object);
+            a.addChildInstance(list, (Instance) object);
         } catch (Exception e) {
             throw new GSimException(e);
         }
@@ -66,8 +66,8 @@ public class AgentInstanceSim implements AgentInstance, ObjectInstance, UnitWrap
 
     @Override
     public ObjectInstance createObjectFromListType(String objectName, String listName) {
-        FrameOLD f = real.getDefinition().getListType(listName);
-        InstanceOLD instance = new InstanceOLD(objectName, f);
+        Frame f = real.getDefinition().getListType(listName);
+        Instance instance = new Instance(objectName, f);
         return new ChildObjectInstance(this, listName, instance);
         // return new ObjectInstanceSim(instance);
     }
@@ -227,7 +227,7 @@ public class AgentInstanceSim implements AgentInstance, ObjectInstance, UnitWrap
 
     @Override
     public ObjectInstance getObject(String list, String objectName) throws GSimException {
-        InstanceOLD in = real.getChildInstance(list, objectName);
+        Instance in = real.getChildInstance(list, objectName);
         if (in != null) {
             return new ChildObjectInstance(this, list, in);
         } else {
@@ -268,7 +268,7 @@ public class AgentInstanceSim implements AgentInstance, ObjectInstance, UnitWrap
 
         try {
 
-            InstanceOLD[] f = real.getChildInstances(list);
+            Instance[] f = real.getChildInstances(list);
             ObjectInstance[] ret = new ObjectInstance[f.length];
             for (int i = 0; i < f.length; i++) {
                 ret[i] = new ChildObjectInstance(this, list, f[i]);
@@ -322,7 +322,7 @@ public class AgentInstanceSim implements AgentInstance, ObjectInstance, UnitWrap
 
     @Override
     public void removeAllObjects(String list) {
-        FrameOLD type = real.getDefinition().getListType(list);
+        Frame type = real.getDefinition().getListType(list);
         real.removeChildInstanceList(list);
         real.defineObjectList(list, type);
     }
@@ -340,7 +340,7 @@ public class AgentInstanceSim implements AgentInstance, ObjectInstance, UnitWrap
 
         try {
             GenericAgent a = real;
-            UnitUtils.getInstance().removeChildInstance(a, new String[] { list }, object.getName());
+            UnitOperations.removeChildInstance(a, new String[] { list }, object.getName());
         } catch (Exception e) {
             throw new GSimException(e);
         }
@@ -359,7 +359,7 @@ public class AgentInstanceSim implements AgentInstance, ObjectInstance, UnitWrap
         }
 
         try {
-            UnitUtils.getInstance().removeChildInstance(real, new String[] { list }, objectName);
+            UnitOperations.removeChildInstance(real, new String[] { list }, objectName);
         } catch (Exception e) {
             throw new GSimException(e);
         }
@@ -389,14 +389,14 @@ public class AgentInstanceSim implements AgentInstance, ObjectInstance, UnitWrap
 
             if (o instanceof Attribute) {
                 return o;
-            } else if (o instanceof InstanceOLD) {
-                return new ChildObjectInstance(this, p[0], (InstanceOLD) o);
-            } else if (o instanceof TypedListOLD) {
-                TypedListOLD list = (TypedListOLD) o;
+            } else if (o instanceof Instance) {
+                return new ChildObjectInstance(this, p[0], (Instance) o);
+            } else if (o instanceof TypedList) {
+                TypedList list = (TypedList) o;
                 ArrayList<ChildObjectInstance> ret = new ArrayList<ChildObjectInstance>();
                 Iterator iter = list.iterator();
                 while (iter.hasNext()) {
-                    InstanceOLD f = (InstanceOLD) iter.next();
+                    Instance f = (Instance) iter.next();
                     ChildObjectInstance c = new ChildObjectInstance(this, p[0], f);
                     ret.add(c);
                 }
@@ -525,7 +525,7 @@ public class AgentInstanceSim implements AgentInstance, ObjectInstance, UnitWrap
         try {
             SetAttribute a = (SetAttribute) real.getAttribute(list, attName);
             if (a == null) {
-                FrameOLD f = real.getDefinition();
+                Frame f = real.getDefinition();
                 DomainAttribute def = f.getAttribute(list, attName);
                 a = new SetAttribute(attName, def.getFillers());
             }
@@ -565,7 +565,7 @@ public class AgentInstanceSim implements AgentInstance, ObjectInstance, UnitWrap
     }
 
     @Override
-    public UnitOLD toUnit() {
+    public Unit toUnit() {
         return real;
     }
 

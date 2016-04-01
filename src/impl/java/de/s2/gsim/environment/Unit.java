@@ -3,8 +3,7 @@ package de.s2.gsim.environment;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-
-import de.s2.gsim.objects.attribute.Attribute;
+import java.util.Map;
 
 /**
  * Top level class for Frame and Instance. The common thing is that these objects have attribute and object lists, ids and so on. This stuff goes
@@ -17,7 +16,7 @@ public class Unit implements Cloneable {
 
     public static final long serialVersionUID = -5778191656497160894L;
 
-    protected HashMap<String, List<Attribute>> attributeLists = new HashMap<>();
+    protected Map<String, List<?>> attributeLists = new HashMap<>();
 
     protected boolean isDirty = true;
 
@@ -40,12 +39,12 @@ public class Unit implements Cloneable {
         u.isSystem = isSystem;
         u.isMutable = isMutable;
         u.objectLists = new TypedMap(objectLists);
-        u.attributeLists = new HashMap<String, List<Attribute>>();
+        u.attributeLists = new HashMap<>();
         return u;
     }
 
     public void defineAttributeList(String listname) {
-        attributeLists.put(listname, new ArrayList<Attribute>());
+        attributeLists.put(listname, new ArrayList<>());
     }
 
     public void defineObjectList(String listname, Frame type) {
@@ -53,7 +52,7 @@ public class Unit implements Cloneable {
         objectLists.put(listname, list);
     }
 
-    public HashMap<String, List<Attribute>> getAttributeLists() {
+    public Map<String, List<?>> getAttributeLists() {
         return attributeLists;
     }
 

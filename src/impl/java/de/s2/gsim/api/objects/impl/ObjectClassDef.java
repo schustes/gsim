@@ -3,9 +3,9 @@ package de.s2.gsim.api.objects.impl;
 import java.util.ArrayList;
 
 import de.s2.gsim.GSimException;
-import de.s2.gsim.def.Environment;
-import de.s2.gsim.def.objects.FrameOLD;
-import de.s2.gsim.def.objects.UnitOLD;
+import de.s2.gsim.environment.Environment;
+import de.s2.gsim.environment.Frame;
+import de.s2.gsim.environment.Unit;
 import de.s2.gsim.objects.ObjectClass;
 import de.s2.gsim.objects.attribute.Attribute;
 import de.s2.gsim.objects.attribute.DomainAttribute;
@@ -21,9 +21,9 @@ public class ObjectClassDef implements ObjectClass, UnitWrapper {
 
     protected Environment env;
 
-    protected FrameOLD real;
+    protected Frame real;
 
-    public ObjectClassDef(Environment env, FrameOLD real) {
+    public ObjectClassDef(Environment env, Frame real) {
         this.env = env;
         this.real = real;
     }
@@ -227,7 +227,7 @@ public class ObjectClassDef implements ObjectClass, UnitWrapper {
     }
 
     @Override
-    public UnitOLD toUnit() {
+    public Unit toUnit() {
         return real;
     }
 

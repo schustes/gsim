@@ -1,12 +1,12 @@
 package de.s2.gsim.api.objects.impl;
 
 import de.s2.gsim.GSimException;
-import de.s2.gsim.def.objects.FrameOLD;
-import de.s2.gsim.def.objects.behaviour.ActionFrame;
-import de.s2.gsim.def.objects.behaviour.ConditionFrame;
-import de.s2.gsim.def.objects.behaviour.ExpansionFrame;
-import de.s2.gsim.def.objects.behaviour.RLRuleFrame;
-import de.s2.gsim.def.objects.behaviour.UserRuleFrame;
+import de.s2.gsim.environment.ActionFrame;
+import de.s2.gsim.environment.ConditionFrame;
+import de.s2.gsim.environment.ExpansionFrame;
+import de.s2.gsim.environment.Frame;
+import de.s2.gsim.environment.RLRuleFrame;
+import de.s2.gsim.environment.UserRuleFrame;
 import de.s2.gsim.objects.Condition;
 import de.s2.gsim.objects.Expansion;
 import de.s2.gsim.objects.RLActionNode;
@@ -40,7 +40,7 @@ public class RLActionNodeClass extends RuleClass implements RLActionNode, UnitWr
 
     @Override
     public void addOrSetExpansion(Expansion cond) throws GSimException {
-        FrameOLD inst = (FrameOLD) ((UnitWrapper) cond).toUnit();
+        Frame inst = (Frame) ((UnitWrapper) cond).toUnit();
         real.addChildFrame(RLRuleFrame.INST_LIST_EXP, inst);
         owner.addOrSetRule(this);
     }
@@ -110,7 +110,7 @@ public class RLActionNodeClass extends RuleClass implements RLActionNode, UnitWr
 
     @Override
     public String getExecutionRestrictionInterval() throws GSimException {
-        return ((RLRuleFrame) real).getExecutionIntervalTest();
+        throw new UnsupportedOperationException("Method has been removed because it seemed never to be used.");
     }
 
     @Override
@@ -175,7 +175,7 @@ public class RLActionNodeClass extends RuleClass implements RLActionNode, UnitWr
 
     @Override
     public void removeExpansion(Expansion cond) throws GSimException {
-        FrameOLD inst = (FrameOLD) ((UnitWrapper) cond).toUnit();
+        Frame inst = (Frame) ((UnitWrapper) cond).toUnit();
         real.removeChildFrame(RLRuleFrame.INST_LIST_EXP, inst.getTypeName());
         owner.addOrSetRule(this);
     }
@@ -206,8 +206,7 @@ public class RLActionNodeClass extends RuleClass implements RLActionNode, UnitWr
 
     @Override
     public void setExecutionRestrictionInterval(String t) throws GSimException {
-        ((RLRuleFrame) real).setRepeatedExecutionTest(t);
-        owner.addOrSetRLActionNode(this);
+        throw new UnsupportedOperationException("Method has been removed because it seemed never to be used.");
     }
 
     @Override

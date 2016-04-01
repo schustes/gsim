@@ -387,12 +387,12 @@ public class BehaviourFrame extends Frame {
         return a.getDefaultValue().equals("1");
     }
 
-    public void removeRLRule(String name) throws de.s2.gsim.def.GSimDefException {
+    public void removeRLRule(String name) {
 
         if (super.getDeclaredFrame(RL_LIST, name) == null && getChildFrame(RL_LIST, name.trim()) != null) {
-            throw new de.s2.gsim.def.GSimDefException("This RLNode can't be removed, because it is defined in a parent of this frame.");
+            throw new GSimDefException("This RLNode can't be removed, because it is defined in a parent of this frame.");
         } else if (super.getDeclaredFrame(RL_LIST, name) == null && getChildFrame(RL_LIST, name) == null) {
-            throw new de.s2.gsim.def.GSimDefException("RLNode " + name + " could not be found.");
+            throw new GSimDefException("RLNode " + name + " could not be found.");
         }
 
         removed.add(name);
@@ -401,12 +401,12 @@ public class BehaviourFrame extends Frame {
 
     }
 
-    public void removeRule(String name) throws de.s2.gsim.def.GSimDefException {
+    public void removeRule(String name) {
 
         if (super.getDeclaredFrame(RULE_LIST, name) == null && getChildFrame(RL_LIST, name) != null) {
-            throw new de.s2.gsim.def.GSimDefException("This Rule can't be removed, because it is defined in a parent of this frame.");
+            throw new GSimDefException("This Rule can't be removed, because it is defined in a parent of this frame.");
         } else if (super.getDeclaredFrame(RULE_LIST, name) == null && getChildFrame(RL_LIST, name) == null) {
-            throw new de.s2.gsim.def.GSimDefException("Rule " + name + " could not be found.");
+            throw new GSimDefException("Rule " + name + " could not be found.");
         }
 
         removed.add(name);

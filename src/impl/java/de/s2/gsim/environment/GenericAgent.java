@@ -42,7 +42,7 @@ public class GenericAgent extends Instance {
     }
 
     @Override
-    public Object clone() {
+    public GenericAgent clone() {
         return new GenericAgent(this);
     }
 
