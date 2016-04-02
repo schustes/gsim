@@ -2,18 +2,18 @@ package de.s2.gsim.environment;
 
 import java.util.HashMap;
 
-public class TypedMap extends HashMap<String, TypedList> {
+public class TypedMap<U,A> extends HashMap<String, TypedList<U,A>> {
 
     private static final long serialVersionUID = 1L;
 
     public TypedMap() {
     }
 
-    public TypedMap(TypedMap map) {
+    public TypedMap(TypedMap<U,A> map) {
         super(map);
     }
 
-    public TypedList put(String name, TypedList list) {
+    public TypedList<U,A> put(String name, TypedList<U,A> list) {
         return super.put(name, list);
     }
 

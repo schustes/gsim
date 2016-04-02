@@ -12,35 +12,36 @@ import java.util.Map;
  * @author Stephan
  * @version 0.1
  */
-public class Unit implements Cloneable {
+public abstract class Unit<U,A> implements Cloneable {
 
-    public static final long serialVersionUID = -5778191656497160894L;
+    private boolean isDirty = true;
 
-    protected Map<String, List<?>> attributeLists = new HashMap<>();
+    private final boolean isMutable;
 
-    protected boolean isDirty = true;
+    private final boolean isSystem;
 
-    protected boolean isMutable = true;
+    private final String name;
 
-    protected boolean isSystem = false;
+    private final TypedMap<U,A> objectLists;
 
-    protected String name = "";
+    private final Map<String, List<A>> attributeLists;
 
-    protected TypedMap objectLists = new TypedMap();
-
-    @SuppressWarnings("unchecked")
-    public <K extends Unit> K copy() {
-        return (K) clone();
+    public Unit(String name, boolean isMutable, boolean isSystem) {
+    	this(name, isMutable, isSystem, new HashMap<>(), new TypedMap<>());
     }
 
-    @Override
-    public Unit clone() {
-        Unit u = new Unit();
-        u.isSystem = isSystem;
-        u.isMutable = isMutable;
-        u.objectLists = new TypedMap(objectLists);
-        u.attributeLists = new HashMap<>();
-        return u;
+    private Unit(String name, boolean isMutable, boolean isSystem, Map<String,List<A>> attributes, TypedMap<U,A> objects) {
+    	this.name = name;
+    	this.isMutable = isMutable;
+    	this.isSystem = isSystem;
+    	this.attributeLists = attributes;
+    	this.objectLists = objects;
+    }
+
+    public abstract Unit<U,A> clone();
+
+    public Unit<U,A> copy() {
+        return clone();
     }
 
     public void defineAttributeList(String listname) {
@@ -48,11 +49,11 @@ public class Unit implements Cloneable {
     }
 
     public void defineObjectList(String listname, Frame type) {
-        TypedList list = new TypedList(type);
+        TypedList<U,A> list = new TypedList<>(type);
         objectLists.put(listname, list);
     }
 
-    public Map<String, List<?>> getAttributeLists() {
+    public Map<String, List<A>> getAttributeLists() {
         return attributeLists;
     }
 
@@ -60,7 +61,7 @@ public class Unit implements Cloneable {
         return name;
     }
 
-    public TypedMap getObjectLists() {
+    public TypedMap<U,A> getObjectLists() {
         return objectLists;
     }
 
@@ -91,16 +92,6 @@ public class Unit implements Cloneable {
 
     public void setDirty(boolean b) {
         isDirty = b;
-    }
-
-    public void setMutable(boolean b) {
-        isMutable = b;
-        setDirty(true);
-    }
-
-    public void setSystem(boolean b) {
-        isSystem = b;
-        setDirty(true);
     }
 
 }
