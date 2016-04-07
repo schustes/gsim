@@ -2,7 +2,7 @@ package de.s2.gsim.environment;
 
 import java.util.ArrayList;
 
-public class TypedList<U,A> extends ArrayList<Unit<U,A>> {
+public class TypedList<U> extends ArrayList<U> {
 
     private static final long serialVersionUID = 1L;
 
@@ -12,7 +12,7 @@ public class TypedList<U,A> extends ArrayList<Unit<U,A>> {
         this.type = type;
     }
 
-    public TypedList(TypedList<U,A> c) {
+    public TypedList(TypedList<U> c) {
         super(c);
     }
 

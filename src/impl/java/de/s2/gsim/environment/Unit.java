@@ -22,7 +22,7 @@ public abstract class Unit<U,A> implements Cloneable {
 
     private final String name;
 
-    private final TypedMap<U,A> objectLists;
+    private final TypedMap<U> objectLists;
 
     private final Map<String, List<A>> attributeLists;
 
@@ -30,7 +30,7 @@ public abstract class Unit<U,A> implements Cloneable {
     	this(name, isMutable, isSystem, new HashMap<>(), new TypedMap<>());
     }
 
-    private Unit(String name, boolean isMutable, boolean isSystem, Map<String,List<A>> attributes, TypedMap<U,A> objects) {
+    private Unit(String name, boolean isMutable, boolean isSystem, Map<String,List<A>> attributes, TypedMap<U> objects) {
     	this.name = name;
     	this.isMutable = isMutable;
     	this.isSystem = isSystem;
@@ -49,7 +49,7 @@ public abstract class Unit<U,A> implements Cloneable {
     }
 
     public void defineObjectList(String listname, Frame type) {
-        TypedList<U,A> list = new TypedList<>(type);
+        TypedList<U> list = new TypedList<>(type);
         objectLists.put(listname, list);
     }
 
@@ -61,7 +61,7 @@ public abstract class Unit<U,A> implements Cloneable {
         return name;
     }
 
-    public TypedMap<U,A> getObjectLists() {
+    public TypedMap<U> getObjectLists() {
         return objectLists;
     }
 
@@ -82,12 +82,20 @@ public abstract class Unit<U,A> implements Cloneable {
         return isSystem;
     }
 
-    public void removeAttributeList(String listname) {
-        attributeLists.remove(listname);
+    public boolean removeDeclaredAttributeList(String listname) {
+		if (attributeLists.remove(listname) != null) {
+			setDirty(true);
+			return true;
+		}
+		return false;
     }
 
-    public void removeChildInstanceList(String listname) {
-        objectLists.remove(listname);
+    public boolean removeDeclaredChildInstanceList(String listname) {
+        if (objectLists.remove(listname) != null) {
+			setDirty(true);
+			return true;
+        }
+        return false;
     }
 
     public void setDirty(boolean b) {

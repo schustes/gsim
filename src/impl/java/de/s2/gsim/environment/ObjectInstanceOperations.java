@@ -59,7 +59,7 @@ public class ObjectInstanceOperations {
         while (iter.hasNext()) {
             Frame c = iter.next();
             if (c.isSuccessor(here.getTypeName())) {
-                c.setAncestor(here);
+                c.replaceAncestor(here);
                 iter.set(c);
                 members = getInstancesOfClass(c).iterator();
                 while (members.hasNext()) {

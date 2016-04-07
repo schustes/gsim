@@ -323,7 +323,7 @@ public class AgentInstanceSim implements AgentInstance, ObjectInstance, UnitWrap
     @Override
     public void removeAllObjects(String list) {
         Frame type = real.getDefinition().getListType(list);
-        real.removeChildInstanceList(list);
+        real.removeDeclaredChildInstanceList(list);
         real.defineObjectList(list, type);
     }
 

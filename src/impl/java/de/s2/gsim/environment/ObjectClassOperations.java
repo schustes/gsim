@@ -26,10 +26,10 @@ public class ObjectClassOperations {
         Frame here = findObjectClass(cls);
         Set<Frame> objectSubClasses = container.getObjectSubClasses();
 
-        here.setChildAttribute(path, newValue);
+        here.replaceChildAttribute(path, newValue);
         here.setDirty(true);
 
-        objectSubClasses.stream().filter(f -> f.isSuccessor(cls.getTypeName())).forEach(f -> f.setAncestor(here));
+        objectSubClasses.stream().filter(f -> f.isSuccessor(cls.getTypeName())).forEach(f -> f.replaceAncestor(here));
 
         this.addChildAttributeInReferringObjects(cls, path, newValue);
         agentClassOperations.addChildAttributeInReferringAgents(cls, path, newValue);
@@ -63,7 +63,7 @@ public class ObjectClassOperations {
 
         Frame[] c = getAllObjectSuccessors(cls.getTypeName());
         for (int i = 0; i < c.length; i++) {
-            c[i].setAncestor(here);
+            c[i].replaceAncestor(here);
             // c[i].setChildFrame(path, f);
         }
         Iterator iter = getInstancesOfClass(f).iterator();
@@ -135,7 +135,7 @@ public class ObjectClassOperations {
             Frame c = iter.next();
             c.setDirty(true);
             if (c.isSuccessor(cls.getTypeName())) {
-                c.setAncestor(here);
+                c.replaceAncestor(here);
                 UnitOperations.setChildAttribute(c, Utils.removeFromArray(path, a.getName()), (DomainAttribute) a.clone());
                 iter.set(c);
             }
@@ -146,14 +146,14 @@ public class ObjectClassOperations {
     public Frame removeAttributeList(Frame owner, String listName) throws GSimDefException {
         Frame here = findObjectClass(owner);
 
-        here.removeAttributeList(listName);
+        here.removeDeclaredAttributeList(listName);
         objectSubClasses.add(here);
 
         Iterator members = getInstancesOfClass(here).iterator();
         while (members.hasNext()) {
             Instance c = (Instance) members.next();
             c.setFrame(here);
-            c.removeAttributeList(listName);
+            c.removeDeclaredAttributeList(listName);
             agents.add((GenericAgent) c);
         }
 
@@ -162,14 +162,14 @@ public class ObjectClassOperations {
         while (iter.hasNext()) {
             Frame c = iter.next();
             if (c.isSuccessor(here.getTypeName())) {
-                c.setAncestor(here);
-                c.removeAttributeList(listName);
+                c.replaceAncestor(here);
+                c.removeDeclaredAttributeList(listName);
                 iter.set(c);
                 members = getInstancesOfClass(c).iterator();
                 while (members.hasNext()) {
                     Instance cc = (Instance) members.next();
                     cc.setFrame(c);
-                    cc.removeAttributeList(listName);
+                    cc.removeDeclaredAttributeList(listName);
                     agents.add((GenericAgent) cc);
                 }
             }
@@ -241,7 +241,7 @@ public class ObjectClassOperations {
             if (c.isSuccessor(cls.getTypeName())) {
                 c.setDirty(true);
                 UnitOperations.removeAttribute(c, path, a);
-                c.setAncestor(here);
+                c.replaceAncestor(here);
                 iter.set(c);
             }
         }
@@ -315,7 +315,7 @@ public class ObjectClassOperations {
     private void addChildAttributeInReferringObjects(Frame here, Path<DomainAttribute> path, DomainAttribute added) {
 
         
-        container.getObjectSubClasses().stream().flatMap(frame -> frame.getDeclaredFrameListNames().stream()).;
+        container.getObjectSubClasses().stream().flatMap(frame -> frame.replaceAncestor().stream()).;
         
         Frame[] objects = getObjectSubClasses();
         for (int i = 0; i < objects.length; i++) {

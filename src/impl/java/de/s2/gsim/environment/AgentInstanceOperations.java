@@ -71,7 +71,7 @@ public class AgentInstanceOperations {
         while (iter.hasNext()) {
             GenericAgentClass c = iter.next();
             if (c.isSuccessor(here.getTypeName())) {
-                c.setAncestor(here);
+                c.replaceAncestor(here);
                 iter.set(c);
                 members = getInstancesOfClass(c).iterator();
                 while (members.hasNext()) {
@@ -118,7 +118,7 @@ public class AgentInstanceOperations {
         while (iter.hasNext()) {
             GenericAgentClass c = iter.next();
             if (c.isSuccessor(here.getTypeName())) {
-                c.setAncestor(here);
+                c.replaceAncestor(here);
                 c.defineObjectList(listName, type);
                 iter.set(c);
                 members = getInstancesOfClass(c).iterator();
@@ -371,7 +371,7 @@ public class AgentInstanceOperations {
         while (members.hasNext()) {
             GenericAgent c = (GenericAgent) members.next();
             c.setFrame(here);
-            c.removeChildInstanceList(listName);
+            c.removeDeclaredChildInstanceList(listName);
             agents.add(c);
         }
 
@@ -380,14 +380,14 @@ public class AgentInstanceOperations {
         while (iter.hasNext()) {
             GenericAgentClass c = iter.next();
             if (c.isSuccessor(here.getTypeName())) {
-                c.setAncestor(here);
+                c.replaceAncestor(here);
                 c.removeChildFrameList(listName);
                 iter.set(c);
                 members = getInstancesOfClass(c).iterator();
                 while (members.hasNext()) {
                     GenericAgent cc = (GenericAgent) members.next();
                     cc.setFrame(c);
-                    cc.removeChildInstanceList(listName);
+                    cc.removeDeclaredChildInstanceList(listName);
                     agents.add(cc);
                 }
             }
@@ -515,7 +515,7 @@ public class AgentInstanceOperations {
         while (iter.hasNext()) {
             GenericAgentClass c = (GenericAgentClass) iter.next();
             BehaviourFrame f = new BehaviourFrame(c.getBehaviour(), EntityConstants.TYPE_BEHAVIOUR);
-            f.setAncestor(x);
+            f.replaceAncestor(x);
             behaviourClasses.add(f);
         }
 

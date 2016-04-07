@@ -633,7 +633,7 @@ public class Instance extends Unit {
         if (f.getTypeName().equals(parent.getTypeName())) {
             frame = n;
         } else {
-            f.setAncestor(n);
+            f.replaceAncestor(n);
         }
         modifyInheritanceByNewFrame(n);
         setDirty(true);

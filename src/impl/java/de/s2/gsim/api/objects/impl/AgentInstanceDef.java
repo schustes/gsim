@@ -158,7 +158,7 @@ public class AgentInstanceDef extends ObjectInstanceDef implements AgentInstance
 
     @Override
     public void removeAllObjects(String list) {
-        real.removeChildInstanceList(list);
+        real.removeDeclaredChildInstanceList(list);
         real.defineObjectList(list, real.getDefinition().getListType(list));
     }
 

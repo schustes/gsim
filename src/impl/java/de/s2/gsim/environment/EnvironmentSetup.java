@@ -113,7 +113,7 @@ public class EnvironmentSetup {
 
                             GenericAgentClass[] suc = getAllAgentClassSuccessors(c.getTypeName());
                             for (GenericAgentClass s : suc) {
-                                s.setAncestor(c);
+                                s.replaceAncestor(c);
                                 agentSubClasses.add(s);
                             }
 
