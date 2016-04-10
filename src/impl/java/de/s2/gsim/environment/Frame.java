@@ -34,9 +34,9 @@ public class Frame extends Unit<Frame, DomainAttribute> {
 
 
 	/**
-	 * Private base constructor.
+	 * Protected base constructor.
 	 */
-	private Frame(@NotNull String name) {
+	protected Frame(@NotNull String name) {
 		super(name, true, false);
 	}
 
@@ -48,9 +48,11 @@ public class Frame extends Unit<Frame, DomainAttribute> {
 	 * @param isMutable true if the object can be modified
 	 * @param isSystem true if system
 	 */
-	private Frame(@NotNull String name, Optional<String> category, boolean isMutable, boolean isSystem) {
+	protected Frame(@NotNull String name, Optional<String> category, boolean isMutable, boolean isSystem) {
 		super(name, isMutable, isSystem);
-		this.category = category.get();
+		if (category.isPresent()) {
+			this.category = category.get();
+		}
 		super.setDirty(true);
 	}
 
@@ -123,9 +125,9 @@ public class Frame extends Unit<Frame, DomainAttribute> {
 	 * @return the new frame
 	 */
 	public static Frame copy(@NotNull Frame from, @NotNull String newName) {
-		
+
 		Frame frame = Frame.inherit(from.getParentFrames(), newName, Optional.of(from.getCategory()), from.isMutable(), from.isSystem());
-		
+
 		return copyInternal(from, frame);
 	}
 
@@ -182,7 +184,7 @@ public class Frame extends Unit<Frame, DomainAttribute> {
 
 		TypedList<Frame> list;
 		TypedMap<Frame> objectLists = super.getObjectLists();
-		if (objectLists.containsKey(listName)) {
+		if (!objectLists.containsKey(listName)) {
 			list = new TypedList<>(frame.clone());
 			objectLists.put(listName, list);
 		} else {
@@ -565,16 +567,15 @@ public class Frame extends Unit<Frame, DomainAttribute> {
 	 * @param name the list name
 	 * @return a list with frames or empty list if the frame or the list does not exist
 	 */
-	public TypedList<Frame> getList(@NotNull String name) {
+	public TypedList<Frame> getChildFrameList(@NotNull String name) {
 
 		if (getObjectLists().containsKey(name)) {
 			return getObjectLists().get(name);
 		}
 
 		for (Frame ancestor: getAncestors()) {
-			return ancestor.getList(name);
+			return ancestor.getChildFrameList(name);
 		}
-
 		return null;
 	}
 
@@ -585,7 +586,7 @@ public class Frame extends Unit<Frame, DomainAttribute> {
 	 * @return the frame that the specified list must hold (or instances thereof)
 	 */
 	public Frame getListType(@NotNull String listName) {
-		TypedList<Frame> list = getList(listName);
+		TypedList<Frame> list = getChildFrameList(listName);
 
 		if (list==null) {
 			throw new IllegalArgumentException(String.format("To get a type for the given list, the list must exist in this frame or one of its ancestors, but list %s was not found", listName));
@@ -723,7 +724,7 @@ public class Frame extends Unit<Frame, DomainAttribute> {
 		for (Frame ancestor: getAncestors()) {
 			return ancestor.removeChildFrameList(listname);
 		}
-		
+
 		return false;
 
 	}
@@ -808,7 +809,7 @@ public class Frame extends Unit<Frame, DomainAttribute> {
 		for (Frame a: getAncestors()) {
 			return  a.replaceAncestor(ancestor);
 		}
-		
+
 		return false;
 	}
 

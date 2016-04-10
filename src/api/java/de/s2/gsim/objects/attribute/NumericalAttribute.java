@@ -22,7 +22,7 @@ public class NumericalAttribute extends Attribute {
     }
 
     @Override
-    public Object clone() {
+    public NumericalAttribute clone() {
         NumericalAttribute a = new NumericalAttribute(getName(), getValue());
         a.setSystem(isSystem());
         a.setMutable(isMutable());

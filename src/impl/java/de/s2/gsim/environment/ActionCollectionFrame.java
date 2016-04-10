@@ -1,6 +1,9 @@
 package de.s2.gsim.environment;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 
 
 public class ActionCollectionFrame extends Frame {
@@ -12,19 +15,18 @@ public class ActionCollectionFrame extends Frame {
     static final long serialVersionUID = 5049004885070737414L;
 
     public ActionCollectionFrame(Frame f) {
-        super(f);
+        super(f.getName(), Optional.of(f.getCategory()), f.isMutable(), f.isSystem());
+        inherit(Arrays.asList(f), getName(), Optional.of(getCategory()));
     }
 
     public ActionCollectionFrame(String name) {
-        super(name, CATEGORY);
-        Frame f1 = new Frame("{all actions}", "action");
-        f1.setSystem(true);
-        f1.setMutable(true);
+        super(name, Optional.of(CATEGORY), true, true);
+        Frame f1 = Frame.newFrame("{all actions}", Optional.of("action"));
         addChildFrame(INST_ACTION_LIST, f1);
     }
 
     public ActionCollectionFrame(String name, Frame[] allowedActions) {
-        super(name, CATEGORY);
+        super(name, Optional.of(CATEGORY), true, true);
         for (int i = 0; i < allowedActions.length; i++) {
             addChildFrame(INST_ACTION_LIST, allowedActions[i]);
         }
@@ -41,10 +43,10 @@ public class ActionCollectionFrame extends Frame {
     }
 
     public ActionFrame getAction(String name) {
-        Frame[] p = getChildFrames(INST_ACTION_LIST);
-        for (int i = 0; i < p.length; i++) {
-            if (p[i].getTypeName().equals(name)) {
-                return new ActionFrame(p[i]);
+        List<Frame> p = getChildFrames(INST_ACTION_LIST);
+        for (int i = 0; i < p.size(); i++) {
+            if (p.get(i).getName().equals(name)) {
+                return new ActionFrame(p.get(i));
             }
         }
         return null;
@@ -52,12 +54,12 @@ public class ActionCollectionFrame extends Frame {
     }
 
     public ActionFrame[] getActions() {
-        Frame[] p = getChildFrames(INST_ACTION_LIST);
-        ArrayList list = new ArrayList();
+        List<Frame> p = getChildFrames(INST_ACTION_LIST);
+        List<ActionFrame> list = new ArrayList<>();
 
-        for (int i = 0; i < p.length; i++) {
-            if (!p[i].getTypeName().startsWith("{")) {
-                list.add(new ActionFrame(p[i]));
+        for (int i = 0; i < p.size(); i++) {
+            if (!p.get(i).getName().startsWith("{")) {
+                list.add(new ActionFrame(p.get(i)));
             }
         }
         ActionFrame[] a = new ActionFrame[list.size()];

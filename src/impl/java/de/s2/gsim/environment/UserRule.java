@@ -22,7 +22,7 @@ public class UserRule extends Instance {
             for (int i = 0; i < a.getFillers().length; i++) {
                 set.addEntry(a.getFillers()[i]);
             }
-            this.setAttribute(UserRuleFrame.ATTR_LIST_ATTRS, set);
+            this.addOrSetAttribute(UserRuleFrame.ATTR_LIST_ATTRS, set);
         }
     }
 
@@ -34,7 +34,7 @@ public class UserRule extends Instance {
             getDefinition().addOrSetAttribute(UserRuleFrame.ATTR_LIST_ATTRS, a);
 
             StringAttribute sa = new StringAttribute("activated", "true");
-            this.setAttribute(UserRuleFrame.ATTR_LIST_ATTRS, sa);
+            this.addOrSetAttribute(UserRuleFrame.ATTR_LIST_ATTRS, sa);
         }
     }
 
@@ -175,7 +175,7 @@ public class UserRule extends Instance {
 
     public void setActivated(boolean b) {
         StringAttribute a = new StringAttribute("activated", String.valueOf(b));
-        this.setAttribute(UserRuleFrame.ATTR_LIST_ATTRS, a);
+        this.addOrSetAttribute(UserRuleFrame.ATTR_LIST_ATTRS, a);
     }
 
     public void setCondition(ConditionDef cond) {

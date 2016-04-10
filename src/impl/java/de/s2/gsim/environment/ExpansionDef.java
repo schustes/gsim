@@ -71,19 +71,19 @@ public class ExpansionDef extends Instance {
     public void setMax(double parameterValue) {
         NumericalAttribute a0 = (NumericalAttribute) this.getAttribute("max");
         a0.setValue(parameterValue);
-        this.setAttribute(ExpansionFrame.ATTR_LIST_ATTRS, a0);
+        this.addOrSetAttribute(ExpansionFrame.ATTR_LIST_ATTRS, a0);
     }
 
     public void setMin(double parameterValue) {
         NumericalAttribute a0 = (NumericalAttribute) this.getAttribute("min");
         a0.setValue(parameterValue);
-        this.setAttribute(ExpansionFrame.ATTR_LIST_ATTRS, a0);
+        this.addOrSetAttribute(ExpansionFrame.ATTR_LIST_ATTRS, a0);
     }
 
     public void setParameterName(String parameterName) {
         StringAttribute a0 = (StringAttribute) this.getAttribute("parameter-name");
         a0.setValue(parameterName);
-        this.setAttribute(ExpansionFrame.ATTR_LIST_ATTRS, a0);
+        this.addOrSetAttribute(ExpansionFrame.ATTR_LIST_ATTRS, a0);
     }
 
 }

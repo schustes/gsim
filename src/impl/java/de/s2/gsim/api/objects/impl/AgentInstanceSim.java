@@ -429,7 +429,7 @@ public class AgentInstanceSim implements AgentInstance, ObjectInstance, UnitWrap
         }
 
         try {
-            real.setAttribute(list, a);
+            real.addOrSetAttribute(list, a);
         } catch (Exception e) {
             throw new GSimException(e);
         }
@@ -480,7 +480,7 @@ public class AgentInstanceSim implements AgentInstance, ObjectInstance, UnitWrap
             }
             a.setFrom(from);
             a.setTo(to);
-            real.setAttribute(list, a);
+            real.addOrSetAttribute(list, a);
         } catch (Exception e) {
             throw new GSimException(e);
         }
@@ -504,7 +504,7 @@ public class AgentInstanceSim implements AgentInstance, ObjectInstance, UnitWrap
                 a = new NumericalAttribute(attName, value);
             }
             a.setValue(value);
-            real.setAttribute(list, a);
+            real.addOrSetAttribute(list, a);
         } catch (Exception e) {
             throw new GSimException(e);
         }
@@ -533,7 +533,7 @@ public class AgentInstanceSim implements AgentInstance, ObjectInstance, UnitWrap
             for (String v : values) {
                 a.addEntry(v);
             }
-            real.setAttribute(list, a);
+            real.addOrSetAttribute(list, a);
         } catch (Exception e) {
             throw new GSimException(e);
         }
@@ -557,7 +557,7 @@ public class AgentInstanceSim implements AgentInstance, ObjectInstance, UnitWrap
                 a = new StringAttribute(attName, value);
             }
             a.setValue(value);
-            real.setAttribute(list, a);
+            real.addOrSetAttribute(list, a);
         } catch (Exception e) {
             throw new GSimException(e);
         }

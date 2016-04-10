@@ -110,7 +110,7 @@ public class Generator {
                         double v = cern.jet.random.Uniform.staticNextDoubleFromTo(mean - mean, mean * 2);
                         att.setValue(v);
                     }
-                    obj.setAttribute(lists[j], atts[k]);
+                    obj.addOrSetAttribute(lists[j], atts[k]);
                 }
             }
         }
@@ -201,7 +201,7 @@ public class Generator {
                         }
                         att.setValue(v);
                     }
-                    obj.setAttribute(lists[j], atts[k]);
+                    obj.addOrSetAttribute(lists[j], atts[k]);
                 }
             }
         }

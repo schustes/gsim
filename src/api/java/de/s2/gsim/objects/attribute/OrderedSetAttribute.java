@@ -1,6 +1,7 @@
 package de.s2.gsim.objects.attribute;
 
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * An OrderedSetAttribute is a SetAttribute that defines an order on its components.
@@ -16,12 +17,12 @@ public class OrderedSetAttribute extends SetAttribute {
      * @param name the name of the attribute
      * @param fillers the values of the attribute
      */
-    public OrderedSetAttribute(String name, String[] fillers) {
+    public OrderedSetAttribute(String name, List<String> fillers) {
         super(name, fillers);
     }
 
     @Override
-    public Object clone() {
+    public OrderedSetAttribute clone() {
         OrderedSetAttribute a = new OrderedSetAttribute(getName(), fillers);
         Iterator<String> iter = getEntries().iterator();
         while (iter.hasNext()) {
@@ -41,13 +42,13 @@ public class OrderedSetAttribute extends SetAttribute {
     public String getFiller(double forOrder) {
 
         if (forOrder == 0) {
-            return fillers[0];
+            return fillers.get(0);
         }
 
-        double size = super.getFillers().length;
+        double size = super.getFillers().size();
         double stepSize = 1d / size;
         double index = forOrder / stepSize - 1;
-        return fillers[(int) index];
+        return fillers.get((int) index);
 
     }
 
@@ -59,7 +60,7 @@ public class OrderedSetAttribute extends SetAttribute {
      */
     public double getOrder(String entry) {
 
-        double size = super.getFillers().length;
+        double size = super.getFillers().size();
         double pos = getPos(entry);
 
         if (pos > -1) {
@@ -76,9 +77,9 @@ public class OrderedSetAttribute extends SetAttribute {
      * @return the position
      */
     private int getPos(String entry) {
-        String[] f = getFillers();
-        for (int i = 0; i < f.length; i++) {
-            if (f[i].equals(entry)) {
+        List<String> f = getFillers();
+        for (int i = 0; i < f.size(); i++) {
+            if (f.get(i).equals(entry)) {
                 return i;
             }
         }

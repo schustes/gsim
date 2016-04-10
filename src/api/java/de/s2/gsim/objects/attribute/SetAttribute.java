@@ -14,7 +14,7 @@ import java.util.Set;
  */
 public class SetAttribute extends Attribute {
 
-    protected String[] fillers;
+    protected List<String> fillers;
 
     private List<String> entries = new ArrayList<>();
 
@@ -24,7 +24,7 @@ public class SetAttribute extends Attribute {
      * @param name the attribute name
      * @param fillers the possible values the set can hold
      */
-    public SetAttribute(String name, String[] fillers) {
+    public SetAttribute(String name, List<String> fillers) {
         super(name);
         this.fillers = fillers;
     }
@@ -54,7 +54,7 @@ public class SetAttribute extends Attribute {
      * 
      * @return the fillers
      */
-    public String[] getFillers() {
+    public List<String> getFillers() {
         return fillers;
     }
 
@@ -66,7 +66,7 @@ public class SetAttribute extends Attribute {
     }
 
     @Override
-    public Object clone() {
+    public SetAttribute clone() {
         SetAttribute a = new SetAttribute(getName(), fillers);
         Iterator<String> iter = entries.iterator();
         while (iter.hasNext()) {

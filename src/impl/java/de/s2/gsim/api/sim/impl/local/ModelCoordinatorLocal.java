@@ -307,7 +307,7 @@ public class ModelCoordinatorLocal implements Simulation, Steppable {
 		}
 		for (String list : agentInstance.getAttributeListNames()) {
 			for (Attribute a : agentInstance.getAttributes(list)) {
-				agent.setAttribute(list, a);
+				agent.addOrSetAttribute(list, a);
 			}
 		}
 	}

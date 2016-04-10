@@ -24,7 +24,7 @@ public abstract class Attribute implements Cloneable {
     }
 
     @Override
-    public abstract Object clone();
+    public abstract Attribute clone();
 
     /**
      * Checks whether two attributes have the same value.

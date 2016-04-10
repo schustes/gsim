@@ -1,11 +1,13 @@
 package de.s2.gsim.environment;
 
+import java.util.List;
+
 public class ActionCollection extends Instance {
 
     static final long serialVersionUID = -9032868199755804359L;
 
     public ActionCollection(ActionCollectionFrame f) {
-        super(f.getTypeName(), f);
+        super(f.getName(), f);
     }
 
     public ActionCollection(Instance inst) {
@@ -21,13 +23,13 @@ public class ActionCollection extends Instance {
     }
 
     public ActionDef[] getActions() {
-        Instance[] inst = getChildInstances(ActionCollectionFrame.INST_ACTION_LIST);
+        List<Instance> inst = getChildInstances(ActionCollectionFrame.INST_ACTION_LIST);
         if (inst == null) {
             return new ActionDef[0];
         }
-        ActionDef[] a = new ActionDef[inst.length];
-        for (int i = 0; i < inst.length; i++) {
-            a[i] = new ActionDef(inst[i]);
+        ActionDef[] a = new ActionDef[inst.size()];
+        for (int i = 0; i < inst.size(); i++) {
+            a[i] = new ActionDef(inst.get(i));
         }
         return a;
     }

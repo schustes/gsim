@@ -19,5 +19,5 @@ public class TypedList<U> extends ArrayList<U> {
     public Frame getType() {
         return type;
     }
-
+    
 }

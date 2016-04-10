@@ -62,8 +62,8 @@ public class AttributeFactory {
                 y = (Double.valueOf(value)).doubleValue();
             }
 
-            x = Double.valueOf(domainAttribute.getFillers()[0]);
-            y = Double.valueOf(domainAttribute.getFillers()[1]);
+            x = Double.valueOf(domainAttribute.getFillers().get(0));
+            y = Double.valueOf(domainAttribute.getFillers().get(1));
             double z = value.equals("") ? 0 : Double.valueOf(value).doubleValue();
             a = new IntervalAttribute(attname, x, y, z);
         }

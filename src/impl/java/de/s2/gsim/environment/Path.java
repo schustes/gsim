@@ -68,7 +68,7 @@ public class Path<T> {
         return build(Type.ATTRIBUTE, path);
     }
 
-    public static <T extends Unit> Path<T> objectPath(String... path) {
+    public static <T extends Unit<?,?>> Path<T> objectPath(String... path) {
 
         if (path.length < 2) {
             throw new IllegalArgumentException("Path must not be empty");
@@ -78,7 +78,7 @@ public class Path<T> {
 
     }
 
-    public static <T extends TypedList> Path<T> objectListPath(String... path) {
+    public static <T extends TypedList<?>> Path<T> objectListPath(String... path) {
 
         if (path.length < 1) {
             throw new IllegalArgumentException("Path must not be empty");

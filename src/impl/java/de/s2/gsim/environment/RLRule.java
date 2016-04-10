@@ -34,7 +34,7 @@ public class RLRule extends UserRule {
     public void addStateVar(String path) {
         SetAttribute s = (SetAttribute) this.getAttribute("state-var");
         s.addEntry(path);
-        this.setAttribute(UserRuleFrame.ATTR_LIST_ATTRS, s);
+        this.addOrSetAttribute(UserRuleFrame.ATTR_LIST_ATTRS, s);
     }
 
     public double getAvgBeta() {
@@ -152,38 +152,38 @@ public class RLRule extends UserRule {
         StringAttribute a = (StringAttribute) super.getAttribute(UserRuleFrame.ATTR_LIST_ATTRS, "averaging");
         String bool = String.valueOf(b);
         a.setValue(bool);
-        super.setAttribute(UserRuleFrame.ATTR_LIST_ATTRS, a);
+        super.addOrSetAttribute(UserRuleFrame.ATTR_LIST_ATTRS, a);
     }
 
     public void setAvgBeta(double d) {
         NumericalAttribute a = (NumericalAttribute) super.getAttribute(UserRuleFrame.ATTR_LIST_ATTRS, "avg-beta");
         a.setValue(d);
-        super.setAttribute(UserRuleFrame.ATTR_LIST_ATTRS, a);
+        super.addOrSetAttribute(UserRuleFrame.ATTR_LIST_ATTRS, a);
     }
 
     public void setAvgStepSize(double d) {
         NumericalAttribute a = (NumericalAttribute) super.getAttribute(UserRuleFrame.ATTR_LIST_ATTRS, "avg-step-size");
         a.setValue(d);
-        super.setAttribute(UserRuleFrame.ATTR_LIST_ATTRS, a);
+        super.addOrSetAttribute(UserRuleFrame.ATTR_LIST_ATTRS, a);
     }
 
     public void setComparison(boolean b) {
         StringAttribute a = (StringAttribute) super.getAttribute(UserRuleFrame.ATTR_LIST_ATTRS, "comparison");
         String bool = String.valueOf(b);
         a.setValue(bool);
-        super.setAttribute(UserRuleFrame.ATTR_LIST_ATTRS, a);
+        super.addOrSetAttribute(UserRuleFrame.ATTR_LIST_ATTRS, a);
     }
 
     public void setDefaultReward(double d) {
         NumericalAttribute a = (NumericalAttribute) super.getAttribute(UserRuleFrame.ATTR_LIST_ATTRS, "defaultReward");
         a.setValue(d);
-        super.setAttribute(UserRuleFrame.ATTR_LIST_ATTRS, a);
+        super.addOrSetAttribute(UserRuleFrame.ATTR_LIST_ATTRS, a);
     }
 
     public void setDiscount(double d) {
         NumericalAttribute a = (NumericalAttribute) super.getAttribute(UserRuleFrame.ATTR_LIST_ATTRS, "discount");
         a.setValue(d);
-        super.setAttribute(UserRuleFrame.ATTR_LIST_ATTRS, a);
+        super.addOrSetAttribute(UserRuleFrame.ATTR_LIST_ATTRS, a);
     }
 
     public void setEvaluationFunction(ConditionDef f) {
@@ -196,7 +196,7 @@ public class RLRule extends UserRule {
     public void setMethod(String s) {
         StringAttribute a = (StringAttribute) this.getAttribute(UserRuleFrame.ATTR_LIST_ATTRS, "method");
         a.setValue(s);
-        this.setAttribute(UserRuleFrame.ATTR_LIST_ATTRS, a);
+        this.addOrSetAttribute(UserRuleFrame.ATTR_LIST_ATTRS, a);
     }
 
     public void setRetractObsolete(boolean b) {
@@ -205,7 +205,7 @@ public class RLRule extends UserRule {
             a = new StringAttribute("retract-osbolete-actions", Boolean.toString(b));
         }
         a.setValue(Boolean.toString(b));
-        super.setAttribute(UserRuleFrame.ATTR_LIST_ATTRS, a);
+        super.addOrSetAttribute(UserRuleFrame.ATTR_LIST_ATTRS, a);
     }
 
     public void setStateVarMax(double d) {
@@ -213,7 +213,7 @@ public class RLRule extends UserRule {
         if (s == null) {
             s = new NumericalAttribute("state-var-max", d);
         }
-        this.setAttribute(UserRuleFrame.ATTR_LIST_ATTRS, s);
+        this.addOrSetAttribute(UserRuleFrame.ATTR_LIST_ATTRS, s);
     }
 
 }

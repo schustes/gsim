@@ -287,7 +287,7 @@ public class ObjectInstanceSim implements ObjectInstance, UnitWrapper {
         }
 
         try {
-            real.setAttribute(list, a);
+            real.addOrSetAttribute(list, a);
         } catch (Exception e) {
             throw new GSimException(e);
         }
@@ -312,7 +312,7 @@ public class ObjectInstanceSim implements ObjectInstance, UnitWrapper {
             }
             a.setFrom(from);
             a.setTo(to);
-            real.setAttribute(list, a);
+            real.addOrSetAttribute(list, a);
         } catch (Exception e) {
             throw new GSimException(e);
         }
@@ -336,7 +336,7 @@ public class ObjectInstanceSim implements ObjectInstance, UnitWrapper {
                 a = new NumericalAttribute(attName, value);
             }
             a.setValue(value);
-            real.setAttribute(list, a);
+            real.addOrSetAttribute(list, a);
         } catch (Exception e) {
             throw new GSimException(e);
         }
@@ -367,7 +367,7 @@ public class ObjectInstanceSim implements ObjectInstance, UnitWrapper {
             for (String v : values) {
                 a.addEntry(v);
             }
-            real.setAttribute(list, a);
+            real.addOrSetAttribute(list, a);
         } catch (Exception e) {
             throw new GSimException(e);
         }
@@ -391,7 +391,7 @@ public class ObjectInstanceSim implements ObjectInstance, UnitWrapper {
                 a = new StringAttribute(attName, value);
             }
             a.setValue(value);
-            real.setAttribute(list, a);
+            real.addOrSetAttribute(list, a);
         } catch (Exception e) {
             throw new GSimException(e);
         }

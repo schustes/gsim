@@ -28,7 +28,7 @@ public abstract class UnitOperations {
 		for (int i = 0; i < attrListNames.length; i++) {
 			Attribute[] list = from.getAttributes(attrListNames[i]);
 			for (int j = 0; j < list.length; j++) {
-				to.setAttribute(attrListNames[i], (Attribute) list[j].clone());
+				to.addOrSetAttribute(attrListNames[i], (Attribute) list[j].clone());
 			}
 		}
 

@@ -52,10 +52,10 @@ public class ActionDef extends Instance {
         StringAttribute a = (StringAttribute) this.getAttribute(ActionFrame.ATTR_LIST_PARAMS, forParameter);
         if (a != null) {
             a.setValue(cls);
-            this.setAttribute(ActionFrame.ATTR_LIST_PARAMS, a);
+            this.addOrSetAttribute(ActionFrame.ATTR_LIST_PARAMS, a);
         } else {
             StringAttribute b = new StringAttribute(forParameter, cls);
-            this.setAttribute(ActionFrame.ATTR_LIST_PARAMS, b);
+            this.addOrSetAttribute(ActionFrame.ATTR_LIST_PARAMS, b);
         }
 
     }
@@ -85,7 +85,7 @@ public class ActionDef extends Instance {
     public void addValueToUserParameter(String name, String value) {
         SetAttribute a = (SetAttribute) this.getAttribute(ActionFrame.ATTR_LIST_PARAMS, name);
         a.addEntry(value);
-        this.setAttribute(ActionFrame.ATTR_LIST_PARAMS, a);
+        this.addOrSetAttribute(ActionFrame.ATTR_LIST_PARAMS, a);
     }
 
     /**
@@ -292,7 +292,7 @@ public class ActionDef extends Instance {
                 iter.remove();
             }
         }
-        this.setAttribute(ActionFrame.ATTR_LIST_PARAMS, a);
+        this.addOrSetAttribute(ActionFrame.ATTR_LIST_PARAMS, a);
     }
 
     /**
@@ -306,7 +306,7 @@ public class ActionDef extends Instance {
     public void removeValueFromUserParameter(String name, String value) {
         SetAttribute a = (SetAttribute) this.getAttribute(name);
         a.getEntries().remove(value);
-        this.setAttribute(ActionFrame.ATTR_LIST_PARAMS, a);
+        this.addOrSetAttribute(ActionFrame.ATTR_LIST_PARAMS, a);
     }
 
     /**

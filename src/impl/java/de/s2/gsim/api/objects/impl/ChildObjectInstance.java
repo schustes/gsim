@@ -301,7 +301,7 @@ public class ChildObjectInstance implements ObjectInstance, UnitWrapper {
         }
 
         try {
-            real.setAttribute(list, a);
+            real.addOrSetAttribute(list, a);
             env.addOrSetObject(this.list, this);
         } catch (Exception e) {
             throw new GSimException(e);
@@ -328,7 +328,7 @@ public class ChildObjectInstance implements ObjectInstance, UnitWrapper {
 
             a.setFrom(from);
             a.setTo(to);
-            real.setAttribute(list, a);
+            real.addOrSetAttribute(list, a);
             env.addOrSetObject(this.list, this);
         } catch (Exception e) {
             throw new GSimException(e);
@@ -354,7 +354,7 @@ public class ChildObjectInstance implements ObjectInstance, UnitWrapper {
             }
 
             a.setValue(value);
-            real.setAttribute(list, a);
+            real.addOrSetAttribute(list, a);
             env.addOrSetObject(this.list, this);
 
         } catch (Exception e) {
@@ -388,7 +388,7 @@ public class ChildObjectInstance implements ObjectInstance, UnitWrapper {
                 a.addEntry(v);
             }
 
-            real.setAttribute(list, a);
+            real.addOrSetAttribute(list, a);
             env.addOrSetObject(this.list, this);
 
         } catch (Exception e) {
@@ -415,7 +415,7 @@ public class ChildObjectInstance implements ObjectInstance, UnitWrapper {
             }
 
             a.setValue(value);
-            real.setAttribute(list, a);
+            real.addOrSetAttribute(list, a);
             env.addOrSetObject(this.list, this);
 
         } catch (Exception e) {

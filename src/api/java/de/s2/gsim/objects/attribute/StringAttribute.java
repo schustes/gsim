@@ -45,7 +45,7 @@ public class StringAttribute extends Attribute {
     }
 
     @Override
-    public Object clone() {
+    public StringAttribute clone() {
         StringAttribute a = new StringAttribute(getName(), getValue());
         a.setSystem(isSystem());
         a.setMutable(isMutable());

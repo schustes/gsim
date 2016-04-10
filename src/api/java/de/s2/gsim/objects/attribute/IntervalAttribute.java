@@ -40,7 +40,7 @@ public class IntervalAttribute extends NumericalAttribute {
     }
 
     @Override
-    public Object clone() {
+    public IntervalAttribute clone() {
         IntervalAttribute a = new IntervalAttribute(getName(), getFrom(), getTo(), getValue());
         a.setSystem(isSystem());
         a.setMutable(isMutable());
