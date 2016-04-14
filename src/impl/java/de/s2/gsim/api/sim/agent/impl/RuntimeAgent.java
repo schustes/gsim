@@ -37,9 +37,6 @@ public class RuntimeAgent extends GenericAgent implements AgentType, RtAgent {
 
     private AgentInstanceSim simInstance;
 
-    public RuntimeAgent() {
-    }
-
     /**
      * Fully initialises the agent.
      * 

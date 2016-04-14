@@ -1,6 +1,8 @@
 package de.s2.gsim.environment;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 import org.apache.log4j.Logger;
 
@@ -21,26 +23,36 @@ public class RLRuleFrame extends UserRuleFrame {
 
     private static Logger logger = Logger.getLogger(RLRuleFrame.class);
 
-    private static final long serialVersionUID = 1L;
-
-    public RLRuleFrame(Frame f) {
-        super(f);
-        // init();
+    private RLRuleFrame (Frame f) {
+    	super(f);
+    }
+    private RLRuleFrame(String name) {
+    	super(name);
+    }
+ 
+    public static RLRuleFrame inherit(Frame f) {
+    	RLRuleFrame rf = new RLRuleFrame(f);
+        return rf;
     }
 
-    public RLRuleFrame(Frame cloneFrom, String newName) {
-        super(cloneFrom);
-        super.setTypeName(newName);
+    public static RLRuleFrame copy(Frame cloneFrom, String newName) {
+    	Frame f = Frame.copy(cloneFrom, newName);
+    	RLRuleFrame rf = new RLRuleFrame(f);
+    	return rf;
+
     }
 
-    public RLRuleFrame(Frame[] parents, String name, String category) {
-        super(parents, name, category);
-        init();
+    public static RLRuleFrame inherit(List<Frame> parents, String name, String category) {
+        Frame f = Frame.inherit(parents, name, Optional.of(category));
+        RLRuleFrame ff = new RLRuleFrame(f);
+        ff.init();
+        return ff;
     }
 
-    public RLRuleFrame(String name) {
-        super(name);
-        init();
+    public static RLRuleFrame newRLRuleFrame(String name) {
+        RLRuleFrame f = new RLRuleFrame(name);
+        f.init();
+        return f;
     }
 
     public void addExpansion(ExpansionFrame cond) {
@@ -91,11 +103,10 @@ public class RLRuleFrame extends UserRuleFrame {
     }
 
     public ConditionFrame getEvaluationFunction() {
-        Frame[] inst = getChildFrames(INST_LIST_LEARNING);
-        ArrayList list = new ArrayList();
-        for (int i = 0; i < inst.length; i++) {
-            if (!inst[i].getTypeName().startsWith("{")) {
-                list.add(new ConditionFrame(inst[i]));
+        ArrayList<ConditionFrame> list = new ArrayList<>();
+        for (Frame f: getChildFrames(INST_LIST_LEARNING)) {
+            if (!f.getName().startsWith("{")) {
+                list.add(new ConditionFrame(f));
             }
         }
 
@@ -110,10 +121,10 @@ public class RLRuleFrame extends UserRuleFrame {
     }
 
     public ExpansionFrame[] getExpansions() {
-        Frame[] f = super.getChildFrames(INST_LIST_EXP);
-        ExpansionFrame[] e = new ExpansionFrame[f.length];
-        for (int i = 0; i < f.length; i++) {
-            e[i] = new ExpansionFrame(f[i]);
+        List<Frame> f = super.getChildFrames(INST_LIST_EXP);
+        ExpansionFrame[] e = new ExpansionFrame[f.size()];
+        for (int i = 0; i < f.size(); i++) {
+            e[i] = new ExpansionFrame(f.get(i));
         }
         return e;
     }
@@ -129,32 +140,30 @@ public class RLRuleFrame extends UserRuleFrame {
     }
 
     public UserRuleFrame[] getSelectionRules() {
-        Frame[] f = super.getChildFrames(INST_LIST_SHORTCUTS);
-        UserRuleFrame[] res = new UserRuleFrame[f.length];
-        for (int i = 0; i < f.length; i++) {
-            res[i] = new UserRuleFrame(f[i]);
+        List<Frame> f = getChildFrames(INST_LIST_SHORTCUTS);
+        UserRuleFrame[] res = new UserRuleFrame[f.size()];
+        for (int i = 0; i < f.size(); i++) {
+            res[i] = new UserRuleFrame(f.get(i));
         }
         return res;
     }
 
     public double getStateVarMax() {
-        DomainAttribute[] da = getAttributes(ATTR_LIST_ATTRS);
-        for (int i = 0; i < da.length; i++) {
-            if (da[i].getName().equals("state-var-max")) {
-                return Double.parseDouble(da[i].getDefaultValue());
+        for (DomainAttribute a: getAttributes(ATTR_LIST_ATTRS)) {
+            if (a.getName().equals("state-var-max")) {
+                return Double.parseDouble(a.getDefaultValue());
             }
         }
         return 10;
     }
 
-    public String[] getStateVars() {
-        DomainAttribute[] da = getAttributes(ATTR_LIST_ATTRS);
-        for (int i = 0; i < da.length; i++) {
-            if (da[i].getName().equals("state-var")) {
-                return da[i].getFillers();
+    public List<String> getStateVars() {
+        for (DomainAttribute a: getAttributes(ATTR_LIST_ATTRS)) {
+            if (a.getName().equals("state-var")) {
+                return a.getFillers();
             }
         }
-        return null;
+        throw new GSimDefException("The required attribute list " + ATTR_LIST_ATTRS + " is not defined for RLRuleFrame!");
     }
 
     public boolean isAveraging() {
@@ -168,7 +177,7 @@ public class RLRuleFrame extends UserRuleFrame {
     }
 
     public void removeSelectionRule(UserRuleFrame sc) {
-        super.removeChildFrame(INST_LIST_SHORTCUTS, sc.getTypeName());
+        super.removeChildFrame(INST_LIST_SHORTCUTS, sc.getName());
     }
 
     public void setAveraging(boolean b) {
@@ -215,7 +224,7 @@ public class RLRuleFrame extends UserRuleFrame {
 
     public void setEvaluationFunction(ConditionFrame f) {
         for (Frame a : super.getChildFrames(RLRuleFrame.INST_LIST_LEARNING)) {
-            super.removeChildFrame(RLRuleFrame.INST_LIST_LEARNING, a.getTypeName());
+            super.removeChildFrame(RLRuleFrame.INST_LIST_LEARNING, a.getName());
         }
 
         super.addChildFrame(INST_LIST_LEARNING, f);

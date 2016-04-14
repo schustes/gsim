@@ -1,5 +1,8 @@
 package de.s2.gsim.environment;
 
+import java.util.List;
+import java.util.Optional;
+
 import de.s2.gsim.objects.attribute.AttributeType;
 import de.s2.gsim.objects.attribute.DomainAttribute;
 
@@ -24,7 +27,7 @@ public class ConditionFrame extends Frame {
     }
 
     public ConditionFrame(String forParameter) {
-        super(forParameter + "-condition-" + cern.jet.random.Uniform.staticNextDouble(), "condition");
+        super(forParameter + "-condition-" + cern.jet.random.Uniform.staticNextDouble(), Optional.of("condition"), true, false);
         DomainAttribute a0 = new DomainAttribute("parameter-name", AttributeType.STRING);
         DomainAttribute a = new DomainAttribute("parameter-class", AttributeType.STRING);
         DomainAttribute b = new DomainAttribute("operator", AttributeType.STRING);
@@ -76,7 +79,7 @@ public class ConditionFrame extends Frame {
         return this.getAttribute("operator").getDefaultValue();
     }
 
-    public String[] getOperators() {
+    public List<String> getOperators() {
         return this.getAttribute("operator").getFillers();
     }
 

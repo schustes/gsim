@@ -99,7 +99,7 @@ public class SelectionNodeClass extends RuleClass implements SelectionNode {
 
     @Override
     public de.s2.gsim.objects.Action getConsequent(String name) {
-        ActionFrame[] c = real.getConsequences();
+        ActionFrame[] c = real.getConsequents();
         for (int i = 0; i < c.length; i++) {
             if (c[i].getTypeName().equals(name)) {
                 return new ActionClass(this, c[i]);
@@ -112,7 +112,7 @@ public class SelectionNodeClass extends RuleClass implements SelectionNode {
     public de.s2.gsim.objects.Action[] getConsequents() {
         ArrayList<ActionClass> list = new ArrayList<ActionClass>();
 
-        ActionFrame[] c = real.getConsequences();
+        ActionFrame[] c = real.getConsequents();
 
         for (int i = 0; i < c.length; i++) {
             if (!c[i].getTypeName().startsWith("{")) {

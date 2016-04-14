@@ -1,6 +1,7 @@
 package de.s2.gsim.environment;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 
@@ -12,8 +13,6 @@ import de.s2.gsim.objects.attribute.StringAttribute;
 public class RLRule extends UserRule {
 
     private static Logger logger = Logger.getLogger(RLRule.class);
-
-    private static final long serialVersionUID = 1L;
 
     public RLRule(Frame parent, String name) {
         super(parent, name);
@@ -58,11 +57,10 @@ public class RLRule extends UserRule {
     }
 
     public ConditionDef getEvaluationFunction() {
-        Instance[] inst = getChildInstances(RLRuleFrame.INST_LIST_LEARNING);
-        ArrayList list = new ArrayList();
-        for (int i = 0; i < inst.length; i++) {
-            if (!inst[i].getName().startsWith("{")) {
-                list.add(new ConditionDef(inst[i]));
+        ArrayList<ConditionDef> list = new ArrayList<>();
+        for (Instance inst: getChildInstances(RLRuleFrame.INST_LIST_LEARNING)) {
+            if (!inst.getName().startsWith("{")) {
+                list.add(new ConditionDef(inst));
             }
         }
 
@@ -71,17 +69,16 @@ public class RLRule extends UserRule {
             cond = (ConditionDef) list.get(0);
         } else if (list.size() > 1) {
             logger.warn("There was more than one learning evaluation function");
-            // cond = (Condition) list.get(0);
         }
         return cond;
 
     }
 
     public ExpansionDef[] getExpansions() {
-        Instance[] f = super.getChildInstances(RLRuleFrame.INST_LIST_EXP);
-        ExpansionDef[] e = new ExpansionDef[f.length];
-        for (int i = 0; i < f.length; i++) {
-            e[i] = new ExpansionDef(f[i]);
+        List<Instance> f = getChildInstances(RLRuleFrame.INST_LIST_EXP);
+        ExpansionDef[] e = new ExpansionDef[f.size()];
+        for (int i = 0; i < f.size(); i++) {
+            e[i] = new ExpansionDef(f.get(i));
         }
         return e;
     }
@@ -97,31 +94,30 @@ public class RLRule extends UserRule {
     }
 
     public UserRule[] getShortSelectionRules() {
-        Instance[] f = super.getChildInstances(RLRuleFrame.INST_LIST_SHORTCUTS);
-        UserRule[] res = new UserRule[f.length];
-        for (int i = 0; i < f.length; i++) {
-            res[i] = new UserRule(f[i]);
+        List<Instance> f = getChildInstances(RLRuleFrame.INST_LIST_SHORTCUTS);
+        UserRule[] res = new UserRule[f.size()];
+        for (int i = 0; i < f.size(); i++) {
+            res[i] = new UserRule(f.get(i));
         }
         return res;
     }
 
     public double getStateVarMax() {
-        Attribute[] da = getAttributes(UserRuleFrame.ATTR_LIST_ATTRS);
-        for (int i = 0; i < da.length; i++) {
-            if (da[i].getName().equals("state-var-max")) {
-                return ((NumericalAttribute) da[i]).getValue();
+        for (Attribute a:getAttributes(UserRuleFrame.ATTR_LIST_ATTRS)) {
+            if (a.getName().equals("state-var-max")) {
+                return ((NumericalAttribute) a).getValue();
             }
         }
         return 10;
     }
 
-    public String[] getStateVars() {
+    public List<String> getStateVars() {
         SetAttribute da = (SetAttribute) this.getAttribute(UserRuleFrame.ATTR_LIST_ATTRS, "state-var");
         return da.getFillers();
     }
 
     public boolean hasExpansions() {
-        return super.getChildInstances(RLRuleFrame.INST_LIST_EXP).length > 0;
+        return super.getChildInstances(RLRuleFrame.INST_LIST_EXP).size() > 0;
     }
 
     public boolean hasSelectors() {
@@ -140,12 +136,6 @@ public class RLRule extends UserRule {
 
     public void removeSelectionRule(UserRule sc) {
         super.removeChildInstance(RLRuleFrame.INST_LIST_SHORTCUTS, sc.getName());
-    }
-
-    public void removeTest(String testName) {
-        Object o = super.resolveName(new String[] { RLRuleFrame.INST_LIST_TESTS, "TestCollection", "list", testName });
-        logger.debug("o:" + o);
-        UnitOperations.removeChildInstance(this, new String[] { RLRuleFrame.INST_LIST_TESTS, "TestCollection", "list" }, testName);
     }
 
     public void setAveraging(boolean b) {

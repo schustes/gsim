@@ -25,8 +25,8 @@ public class HierarchyNode implements java.io.Serializable {
     }
 
     public void addChild(HierarchyNode f) {
-        if (!children.containsKey(f.getFrame().getTypeName())) {
-            children.put(f.getFrame().getTypeName(), f);
+        if (!children.containsKey(f.getFrame().getName())) {
+            children.put(f.getFrame().getName(), f);
         }
     }
 
@@ -80,11 +80,9 @@ public class HierarchyNode implements java.io.Serializable {
     }
 
     public boolean insert(Frame f) {
-        Frame[] pf = f.getParentFrames();
-
-        for (int i = 0; i < pf.length; i++) {
-            String s = pf[i].getTypeName();
-            this.insert(pf[i]);
+        for (Frame pf: f.getParentFrames()) {
+            String s = pf.getName();
+            this.insert(pf);
             this.insert(s, f);
         }
 
@@ -95,7 +93,7 @@ public class HierarchyNode implements java.io.Serializable {
 
         Frame p = object;
 
-        if (p.getTypeName().equals(parent)) {
+        if (p.getName().equals(parent)) {
             HierarchyNode h = new HierarchyNode(f);
             addChild(h);
             return true;

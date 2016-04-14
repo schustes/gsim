@@ -10,6 +10,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import de.s2.gsim.def.ModelDefinitionEnvironment;
+import de.s2.gsim.environment.Frame;
 import de.s2.gsim.objects.AgentClass;
 import de.s2.gsim.objects.ObjectClass;
 import de.s2.gsim.objects.attribute.AttributeType;
@@ -59,7 +60,7 @@ public class EnvTest {
 		env = core.create("test", new HashMap<>());
 
 	}
-	
+		
 	@Test
 	public void inherited_agent_attribute_should_not_overwrite_parent_attribute() throws Exception {
 

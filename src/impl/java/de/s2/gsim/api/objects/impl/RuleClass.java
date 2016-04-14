@@ -61,7 +61,7 @@ public class RuleClass implements Rule, UnitWrapper {
 
     @Override
     public de.s2.gsim.objects.Action getConsequent(String name) {
-        ActionFrame[] c = real.getConsequences();
+        ActionFrame[] c = real.getConsequents();
         for (int i = 0; i < c.length; i++) {
             if (c[i].getTypeName().equals(name)) {
                 return new ActionClass(this, c[i]);
@@ -74,7 +74,7 @@ public class RuleClass implements Rule, UnitWrapper {
     public de.s2.gsim.objects.Action[] getConsequents() {
         ArrayList<de.s2.gsim.objects.Action> list = new ArrayList<>();
 
-        ActionFrame[] c = real.getConsequences();
+        ActionFrame[] c = real.getConsequents();
         for (int i = 0; i < c.length; i++) {
             if (!c[i].getTypeName().startsWith("{")) {
                 list.add(new ActionClass(this, c[i]));

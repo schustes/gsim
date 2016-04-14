@@ -1,7 +1,6 @@
 package de.s2.gsim.environment;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -15,8 +14,7 @@ public class ActionCollectionFrame extends Frame {
     static final long serialVersionUID = 5049004885070737414L;
 
     public ActionCollectionFrame(Frame f) {
-        super(f.getName(), Optional.of(f.getCategory()), f.isMutable(), f.isSystem());
-        inherit(Arrays.asList(f), getName(), Optional.of(getCategory()));
+        super(f);
     }
 
     public ActionCollectionFrame(String name) {

@@ -1,5 +1,7 @@
 package de.s2.gsim.environment;
 
+import java.util.List;
+
 import de.s2.gsim.objects.attribute.Attribute;
 import de.s2.gsim.objects.attribute.AttributeType;
 import de.s2.gsim.objects.attribute.DomainAttribute;
@@ -19,8 +21,8 @@ public class UserRule extends Instance {
         DomainAttribute a = parent.getAttribute("state-var");
         SetAttribute set = (SetAttribute) this.getAttribute("state-var");
         if (a != null && set != null) {
-            for (int i = 0; i < a.getFillers().length; i++) {
-                set.addEntry(a.getFillers()[i]);
+            for (String filler: a.getFillers()) {
+                set.addEntry(filler);
             }
             this.addOrSetAttribute(UserRuleFrame.ATTR_LIST_ATTRS, set);
         }
@@ -108,34 +110,34 @@ public class UserRule extends Instance {
     }
 
     public ConditionDef[] getConditions() {
-        Instance[] inst = getChildInstances(UserRuleFrame.INST_LIST_COND);
+        List<Instance> inst = getChildInstances(UserRuleFrame.INST_LIST_COND);
 
         if (inst == null) {
             return new ConditionDef[0];
         }
 
-        ConditionDef[] cond = new ConditionDef[inst.length];
+        ConditionDef[] cond = new ConditionDef[inst.size()];
 
         for (int i = 0; i < cond.length; i++) {
-            cond[i] = new ConditionDef(inst[i]);
+            cond[i] = new ConditionDef(inst.get(i));
         }
         return cond;
     }
 
     public ActionDef[] getConsequents() {
-        Instance[] inst = getChildInstances(UserRuleFrame.INST_LIST_CONS);
-        ActionDef[] cons = new ActionDef[inst.length];
+        List<Instance> inst = getChildInstances(UserRuleFrame.INST_LIST_CONS);
+        ActionDef[] cons = new ActionDef[inst.size()];
         for (int i = 0; i < cons.length; i++) {
-            cons[i] = new ActionDef(inst[i]);
+            cons[i] = new ActionDef(inst.get(i));
         }
         return cons;
     }
 
     public ActionDef getConsequent(String name) {
-        Instance[] inst = getChildInstances(UserRuleFrame.INST_LIST_CONS);
-        for (int i = 0; i < inst.length; i++) {
-            if (inst[i].getName().equals(name)) {
-                return new ActionDef(inst[i]);
+        List<Instance> inst = getChildInstances(UserRuleFrame.INST_LIST_CONS);
+        for (int i = 0; i < inst.size(); i++) {
+            if (inst.get(i).getName().equals(name)) {
+                return new ActionDef(inst.get(i));
             }
         }
         return null;

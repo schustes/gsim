@@ -1,5 +1,7 @@
 package de.s2.gsim.environment;
 
+import java.util.List;
+
 import de.s2.gsim.objects.attribute.Attribute;
 
 /**
@@ -37,10 +39,6 @@ public class GenericAgent extends Instance {
         behaviour = new BehaviourDef(cls.getBehaviour());
     }
 
-    protected GenericAgent() {
-        super();
-    }
-
     @Override
     public GenericAgent clone() {
         return new GenericAgent(this);
@@ -50,7 +48,7 @@ public class GenericAgent extends Instance {
         return behaviour;
     }
 
-    public Attribute[] getProperties() {
+    public List<Attribute> getProperties() {
         return getAttributes("properties");
     }
 

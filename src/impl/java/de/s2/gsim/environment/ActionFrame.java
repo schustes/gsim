@@ -1,5 +1,8 @@
 package de.s2.gsim.environment;
 
+import java.util.List;
+import java.util.Optional;
+
 import de.s2.gsim.objects.attribute.AttributeType;
 import de.s2.gsim.objects.attribute.DomainAttribute;
 
@@ -44,7 +47,7 @@ public class ActionFrame extends Frame {
      *            int
      */
     public ActionFrame(String name, String defaultClass) {
-        super(name, CATEGORY);
+        super(name, Optional.of(CATEGORY), true, false);
         DomainAttribute a = new DomainAttribute("class-name", AttributeType.STRING);
         a.setDefault(defaultClass);
         addOrSetAttribute(ATTR_LIST_ATTRS, a);
@@ -148,9 +151,6 @@ public class ActionFrame extends Frame {
     public void clearObjectClassParams() {
         DomainAttribute a = this.getAttribute(ATTR_LIST_PARAMS, "object-types");
 
-        String[] f1 = new String[0];
-        a.setFillers(f1);
-
         String s = "";
         a.setDefault(s);
 
@@ -179,8 +179,8 @@ public class ActionFrame extends Frame {
 
     public String getFilterExpression(String objParam) {
         DomainAttribute a = this.getAttribute(ActionFrame.ATTR_LIST_PARAMS, "object-types");
-        for (int i = 0; i < a.getFillers().length; i++) {
-            String[] x = a.getFillers()[i].split(":");
+        for (String filler: a.getFillers()) {
+            String[] x = filler.split(":");
             String s = x[0].trim();
             if (s.equals(objParam) && x.length > 0) {
                 return x[1].trim();
@@ -193,17 +193,13 @@ public class ActionFrame extends Frame {
 
     public String[] getObjectClassParams() {
         DomainAttribute a = this.getAttribute(ATTR_LIST_PARAMS, "object-types");
-        String[] s = a.getFillers();
-        String[] s2 = new String[s.length];
-        // ArrayList list = new ArrayList();
-        for (int i = 0; i < s.length; i++) {
-            String[] x = s[i].split(":");
+        List<String> s = a.getFillers();
+        String[] s2 = new String[s.size()];
+        for (int i = 0; i < s.size(); i++) {
+            String[] x = s.get(i).split(":");
             s2[i] = x[0].trim();
         }
 
-        /*
-         * if (a!=null) { String[] s = a.getDefaultValue().split(":"); if (s.length>0) { return s[0]; } }
-         */
         if (s2.length == 0) {
             return null;
         }
@@ -239,10 +235,10 @@ public class ActionFrame extends Frame {
      * @return String[]
      */
     public String[] getUserParameterNames() {
-        DomainAttribute[] atts = getAttributes(ActionFrame.ATTR_LIST_PARAMS);
-        String[] s = new String[atts.length];
-        for (int i = 0; i < atts.length; i++) {
-            s[i] = atts[i].getName();
+        List<DomainAttribute> atts = getAttributes(ActionFrame.ATTR_LIST_PARAMS);
+        String[] s = new String[atts.size()];
+        for (int i = 0; i < atts.size(); i++) {
+            s[i] = atts.get(i).getName();
         }
         return s;
     }
@@ -274,11 +270,11 @@ public class ActionFrame extends Frame {
     public void removeObjectClassParam(String cat) {
         DomainAttribute a = this.getAttribute(ATTR_LIST_PARAMS, "object-types");
 
-        String[] f1 = new String[a.getFillers().length - 1];
+        String[] f1 = new String[a.getFillers().size() - 1];
         int j = 0;
-        for (int i = 0; i < a.getFillers().length; i++) {
-            if (!a.getFillers()[i].equals(cat)) {
-                f1[j] = a.getFillers()[i];
+        for (int i = 0; i < a.getFillers().size(); i++) {
+            if (!a.getFillers().get(i).equals(cat)) {
+                f1[j] = a.getFillers().get(i);
                 j++;
             }
         }

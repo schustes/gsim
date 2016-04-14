@@ -88,7 +88,14 @@ public class DomainAttribute {
      * 
      */
     public List<String> getFillers() {
-        return fillers;
+        return new ArrayList<>(fillers);
+    }
+    
+    /**
+     * Remove fillers.
+     */
+    public void clearFillers() {
+    	fillers.clear();
     }
 
     /**

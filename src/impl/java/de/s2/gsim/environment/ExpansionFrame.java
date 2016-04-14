@@ -1,5 +1,8 @@
 package de.s2.gsim.environment;
 
+import java.util.List;
+import java.util.Optional;
+
 import de.s2.gsim.objects.attribute.AttributeType;
 import de.s2.gsim.objects.attribute.DomainAttribute;
 
@@ -11,17 +14,12 @@ public class ExpansionFrame extends Frame {
 
     public static ExpansionFrame DEFINITION = new ExpansionFrame("Expansion-template");
 
-    /**
-     * 
-     */
-    private static final long serialVersionUID = 1L;
-
     public ExpansionFrame(Frame f) {
         super(f);
     }
 
     public ExpansionFrame(String forParameter) {
-        super(forParameter, "expansion");
+        super(forParameter, Optional.of("expansion"), true, false);
         DomainAttribute a = new DomainAttribute("parameter-name", AttributeType.STRING);
         DomainAttribute b = new DomainAttribute("min", AttributeType.NUMERICAL);
         DomainAttribute c = new DomainAttribute("max", AttributeType.NUMERICAL);
@@ -44,14 +42,14 @@ public class ExpansionFrame extends Frame {
 
     public void addFiller(String s) {
         DomainAttribute a = this.getAttribute("fillers");
-        String[] s0 = a.getFillers();
-        if (!de.s2.gsim.util.Utils.contains(s0, s)) {
+        List<String> s0 = a.getFillers();
+        if (!s0.contains(s)) {
             a.addFiller(s);
         }
         super.addOrSetAttribute("fillers", a);
     }
 
-    public String[] getFillers() {
+    public List<String> getFillers() {
         DomainAttribute a0 = this.getAttribute("fillers");
         return a0.getFillers();
     }
@@ -95,7 +93,10 @@ public class ExpansionFrame extends Frame {
 
     public void setFillers(String[] fillers) {
         DomainAttribute a0 = this.getAttribute("fillers");
-        a0.setFillers(fillers);
+        a0.clearFillers();
+        for (String f: fillers) {
+        	a0.addFiller(f);
+        }
         addOrSetAttribute(ATTR_LIST_ATTRS, a0);
     }
 

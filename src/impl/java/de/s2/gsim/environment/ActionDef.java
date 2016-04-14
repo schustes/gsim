@@ -3,6 +3,7 @@ package de.s2.gsim.environment;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 
 import de.s2.gsim.objects.attribute.Attribute;
 import de.s2.gsim.objects.attribute.NumericalAttribute;
@@ -26,7 +27,7 @@ public class ActionDef extends Instance {
      *            ActionFrame
      */
     public ActionDef(ActionFrame f) {
-        super(f.getTypeName(), f);
+        super(f.getName(), f);
     }
 
     /**
@@ -233,11 +234,11 @@ public class ActionDef extends Instance {
      * @return String[]
      */
     public String[] getUserParameterNames() {
-        Attribute[] atts = getAttributes(ActionFrame.ATTR_LIST_PARAMS);
+        List<Attribute> atts = getAttributes(ActionFrame.ATTR_LIST_PARAMS);
         if (atts != null) {
-            String[] s = new String[atts.length];
-            for (int i = 0; i < atts.length; i++) {
-                s[i] = atts[i].getName();
+            String[] s = new String[atts.size()];
+            for (int i = 0; i < atts.size(); i++) {
+                s[i] = atts.get(i).getName();
             }
             return s;
         }

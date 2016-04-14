@@ -1,5 +1,7 @@
 package de.s2.gsim.environment;
 
+import java.util.List;
+
 import de.s2.gsim.objects.attribute.NumericalAttribute;
 
 public class BehaviourDef extends Instance {
@@ -16,7 +18,7 @@ public class BehaviourDef extends Instance {
      *            int
      */
     public BehaviourDef(Frame f) {
-        super(f.getTypeName(), f);
+        super(f.getName(), f);
     }
 
     /**
@@ -30,11 +32,6 @@ public class BehaviourDef extends Instance {
     }
 
     public void addAction(ActionDef r) {
-        // ActionCollection c = this.getAvailableActions(listName);
-        // if (c==null) {
-        // c = new ActionCollection(new ActionCollectionFrame(listName, 123),123);
-        // }
-        // c.addChildInstance(ActionCollectionFrame.INST_ACTION_LIST, r);
         addChildInstance(BehaviourFrame.ACTION_LIST, r);
     }
 
@@ -93,12 +90,13 @@ public class BehaviourDef extends Instance {
 
         BehaviourFrame f = (BehaviourFrame) getDefinition();
         Frame r = f.getRule(name);
-        r = new RLRuleFrame(name);
+        r = RLRuleFrame.newFrame(name);
 
         Instance rule = new Instance(name, r);
 
         for (int i = 0; i < conditions.length; i++) {
-            conditions[i].changeName(conditions[i].getName() + cern.jet.random.Uniform.staticNextDoubleFromTo(Double.MIN_VALUE, Double.MAX_VALUE));
+        	//TODO why was the condition name changed
+            //conditions[i].changeName(conditions[i].getName() + cern.jet.random.Uniform.staticNextDoubleFromTo(Double.MIN_VALUE, Double.MAX_VALUE));
             rule.addChildInstance(UserRuleFrame.INST_LIST_COND, conditions[i]);
         }
         for (int i = 0; i < consequents.length; i++) {
@@ -129,20 +127,20 @@ public class BehaviourDef extends Instance {
     }
 
     public ActionDef getAction(String cat) {
-        Instance[] str = getChildInstances(BehaviourFrame.ACTION_LIST);
-        for (int i = 0; i < str.length; i++) {
-            if (str[i].getName().equals(cat)) {
-                return new ActionDef(str[i]);
+        List<Instance> str = getChildInstances(BehaviourFrame.ACTION_LIST);
+        for (int i = 0; i < str.size(); i++) {
+            if (str.get(i).getName().equals(cat)) {
+                return new ActionDef(str.get(i));
             }
         }
         return null;
     }
 
     public ActionDef[] getAvailableActions() {
-        Instance[] str = getChildInstances(BehaviourFrame.ACTION_LIST);
-        ActionDef[] ss = new ActionDef[str.length];
+    	List<Instance> str = getChildInstances(BehaviourFrame.ACTION_LIST);
+        ActionDef[] ss = new ActionDef[str.size()];
         for (int i = 0; i < ss.length; i++) {
-            ss[i] = new ActionDef(str[i]);
+            ss[i] = new ActionDef(str.get(i));
         }
         return ss;
     }
@@ -178,10 +176,10 @@ public class BehaviourDef extends Instance {
     }
 
     public RLRule[] getRLRules() {
-        Instance[] rules = getChildInstances(BehaviourFrame.RL_LIST);
-        RLRule[] userRules = new RLRule[rules.length];
-        for (int i = 0; i < rules.length; i++) {
-            userRules[i] = new RLRule(rules[i]);
+        List<Instance> rules = getChildInstances(BehaviourFrame.RL_LIST);
+        RLRule[] userRules = new RLRule[rules.size()];
+        for (int i = 0; i < rules.size(); i++) {
+            userRules[i] = new RLRule(rules.get(i));
         }
         return userRules;
     }
@@ -209,10 +207,10 @@ public class BehaviourDef extends Instance {
      * @return UserRule[]
      */
     public UserRule[] getRules() {
-        Instance[] rules = getChildInstances(BehaviourFrame.RULE_LIST);
-        UserRule[] userRules = new UserRule[rules.length];
-        for (int i = 0; i < rules.length; i++) {
-            userRules[i] = new UserRule(rules[i]);
+        List<Instance> rules = getChildInstances(BehaviourFrame.RULE_LIST);
+        UserRule[] userRules = new UserRule[rules.size()];
+        for (int i = 0; i < rules.size(); i++) {
+            userRules[i] = new UserRule(rules.get(i));
         }
         return userRules;
     }
@@ -232,9 +230,9 @@ public class BehaviourDef extends Instance {
     }
 
     public void removeAllRLRules() {
-        Instance[] classifiers = getChildInstances(BehaviourFrame.RL_LIST);
-        for (int i = 0; i < classifiers.length; i++) {
-            removeChildInstance(BehaviourFrame.RL_LIST, classifiers[i].getName());
+        List<Instance> classifiers = getChildInstances(BehaviourFrame.RL_LIST);
+        for (int i = 0; i < classifiers.size(); i++) {
+            removeChildInstance(BehaviourFrame.RL_LIST, classifiers.get(i).getName());
         }
     }
 

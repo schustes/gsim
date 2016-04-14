@@ -1,6 +1,8 @@
 package de.s2.gsim.environment;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 import de.s2.gsim.objects.attribute.AttributeType;
 import de.s2.gsim.objects.attribute.DomainAttribute;
@@ -11,7 +13,7 @@ public class UserRuleFrame extends Frame {
 
     public static final String CATEGORY = "rule";
 
-    public static UserRuleFrame DEFINITION = new UserRuleFrame("rule-definition");
+    public static UserRuleFrame DEFINITION = UserRuleFrame.newUserRuleFrame("rule-definition");
 
     public static final String INST_LIST_COND = "conditions";
 
@@ -19,48 +21,54 @@ public class UserRuleFrame extends Frame {
 
     static final long serialVersionUID = 4875468082081888178L;
 
-    public UserRuleFrame(Frame f) {
-        super(f);
+    protected UserRuleFrame(Frame f) {
+    	super(f);
+    }
+    
+    protected UserRuleFrame(String name) {
+    	super(name);
+    }
+    
+    public static UserRuleFrame copy(Frame f) {
+    	UserRuleFrame ufr = new UserRuleFrame(f);
         Frame f1 = new ConditionFrame("{all-conditions}", "=", "don't care");
-        f1.setSystem(true);
-        f1.setMutable(false);
         Frame f2 = new ActionFrame("{all-actions}", "action");
-        f2.setSystem(false);
-        f2.setMutable(false);
-        addChildFrame("conditions", f1);
-        addChildFrame("consequences", f2);
+        ufr.addChildFrame("conditions", f1);
+        ufr.addChildFrame("consequences", f2);
 
-        if (this.getAttribute(ATTR_LIST_ATTRS, "activated") == null) {
+        if (ufr.getAttribute(ATTR_LIST_ATTRS, "activated") == null) {
             DomainAttribute a = new DomainAttribute("activated", AttributeType.STRING);
             a.setDefault("true");
-            addOrSetAttribute(ATTR_LIST_ATTRS, a);
+            ufr.addOrSetAttribute(ATTR_LIST_ATTRS, a);
         }
+        
+        return ufr;
 
     }
 
     /**
      * Inheritance constructor
      */
-    public UserRuleFrame(Frame[] parents, String name, String category) {
-        super(parents, name, category);
+    public static UserRuleFrame inherit(List<Frame> parents, String name, String category) {
+    	Frame f = Frame.inherit(parents, name, Optional.of(category));
+    	return new UserRuleFrame(f);
     }
 
-    public UserRuleFrame(String name) {
+    public static UserRuleFrame newUserRuleFrame(String name) {
 
-        super(name, CATEGORY);
-
-        Frame f2 = new Frame("{all-actions}", "action");
-        f2.setSystem(false);
-        f2.setMutable(false);
-        addChildFrame("consequences", f2);
+    	Frame f = Frame.newFrame(name, Optional.of(CATEGORY));
+        Frame f2 = Frame.newFrame("{all-actions}", Optional.of("action"));
+        f.addChildFrame("consequences", f2);
 
         DomainAttribute a = new DomainAttribute("activated", AttributeType.STRING);
         a.setDefault("true");
-        addOrSetAttribute(ATTR_LIST_ATTRS, a);
+        f.addOrSetAttribute(ATTR_LIST_ATTRS, a);
 
         DomainAttribute c = new DomainAttribute("update-lag", AttributeType.STRING);
         c.setDefault("0");
-        addOrSetAttribute(ATTR_LIST_ATTRS, c);
+        f.addOrSetAttribute(ATTR_LIST_ATTRS, c);
+        
+        return new UserRuleFrame(f);
 
     }
 
@@ -82,11 +90,10 @@ public class UserRuleFrame extends Frame {
     }
 
     public ConditionFrame[] getConditions() {
-        Frame[] inst = getChildFrames(UserRuleFrame.INST_LIST_COND);
-        ArrayList list = new ArrayList();
-        for (int i = 0; i < inst.length; i++) {
-            if (!inst[i].getTypeName().startsWith("{")) {
-                list.add(new ConditionFrame(inst[i]));
+        ArrayList<ConditionFrame> list = new ArrayList<>();
+        for (Frame f: getChildFrames(UserRuleFrame.INST_LIST_COND)) {
+            if (!f.getName().startsWith("{")) {
+                list.add(new ConditionFrame(f));
             }
         }
         ConditionFrame[] cond = new ConditionFrame[list.size()];
@@ -94,11 +101,11 @@ public class UserRuleFrame extends Frame {
         return cond;
     }
 
-    public ActionFrame[] getConsequences() {
-        Frame[] inst = getChildFrames(UserRuleFrame.INST_LIST_CONS);
-        java.util.ArrayList list = new java.util.ArrayList();
-        for (int i = 0; i < inst.length; i++) {
-            list.add(new ActionFrame(inst[i]));
+    public ActionFrame[] getConsequents() {
+        ArrayList<ActionFrame> list = new ArrayList<>();
+        
+        for (Frame f: getChildFrames(UserRuleFrame.INST_LIST_CONS)) {
+            list.add(new ActionFrame(f));
         }
         ActionFrame[] cons = new ActionFrame[list.size()];
         list.toArray(cons);
@@ -124,11 +131,11 @@ public class UserRuleFrame extends Frame {
     }
 
     public void removeCondition(ConditionFrame cond) {
-        super.removeChildFrame(INST_LIST_COND, cond.getTypeName());
+        super.removeChildFrame(INST_LIST_COND, cond.getName());
     }
 
     public void removeConsequence(ActionFrame cons) {
-        super.removeChildFrame(INST_LIST_CONS, cons.getTypeName());
+        super.removeChildFrame(INST_LIST_CONS, cons.getName());
     }
 
     public void setActivated(boolean b) {

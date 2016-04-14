@@ -25,12 +25,12 @@ public class Frame extends Unit<Frame, DomainAttribute> {
 	/**
 	 * An optional classification.
 	 */
-	private String category = "";
+	protected String category = "";
 
 	/**
 	 * A map with parent names and the respective frames.
 	 */
-	private Map<String, Frame> parents = new HashMap<>();
+	protected Map<String, Frame> parents = new HashMap<>();
 
 
 	/**
@@ -55,6 +55,18 @@ public class Frame extends Unit<Frame, DomainAttribute> {
 		}
 		super.setDirty(true);
 	}
+	
+	/**
+	 * Constructor by inheritance.
+	 */
+	protected Frame(Frame f) {
+		super(f.getName(), f.isMutable(), f.isSystem());
+		this.category = f.getCategory();
+		for (Frame parent : f.getParentFrames()) {
+			this.parents.put(f.getName(), parent);
+		}
+		super.setDirty(true);
+	}
 
 	/**
 	 * Creates a frame that inherits from the given list of parent frames.
@@ -68,10 +80,10 @@ public class Frame extends Unit<Frame, DomainAttribute> {
 	 * @param category optional category
 	 * @return the new frame
 	 */
-	public static Frame inherit(@NotNull List<Frame> parents, @NotNull String name, Optional<String> category) {
+	public static Frame inherit(@NotNull List<? extends Frame> parents, @NotNull String name, Optional<String> category) {
 		Frame f = new Frame(name, category, true, false);
 		for (Frame parent : parents) {
-			f.parents.put(f.getName(), parent);
+			f.parents.put(parent.getName(), parent);
 		}
 		f.setDirty(true);
 		return f;

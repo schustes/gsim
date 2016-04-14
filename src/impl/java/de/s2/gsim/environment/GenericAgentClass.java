@@ -1,7 +1,11 @@
 package de.s2.gsim.environment;
 
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map.Entry;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import de.s2.gsim.objects.attribute.DomainAttribute;
 
@@ -17,138 +21,134 @@ public class GenericAgentClass extends Frame {
 
     /**
      * Constructor for a top-level generic agent.
-     * 
-     * @param id
-     *            int
      */
-    public GenericAgentClass() {
-        super(NAME, "generic");
-        init();
-    }
-
-    /**
-     * Copy constructor.
-     * 
-     * @param f
-     *            Frame
-     */
-    public GenericAgentClass(Frame f) {
-        super(f);
-        behaviour = new BehaviourFrame(f.getTypeName() + "-" + behaviour, EntityTypes.BEHAVIOUR.toString());
-    }
-
-    /**
-     * Copy constructor.
-     * 
-     * @param cloneFrom
-     *            GenericAgentClass
-     */
-    public GenericAgentClass(GenericAgentClass cloneFrom) {
-        super(cloneFrom);
-        // this.behaviour = new BehaviourFrame(cloneFrom.getBehaviour());
-        behaviour = (BehaviourFrame) cloneFrom.getBehaviour().clone();
-    }
-
-    public GenericAgentClass(GenericAgentClass top, GenericAgentClass otherRole, String name) {
-
-        super(new Frame[] { otherRole }, name, EntityTypes.GENERIC.toString());
-
-        Iterator iter = top.parents.values().iterator();
-        while (iter.hasNext()) {
-            Frame p = (Frame) iter.next();
-            parents.put(p.getTypeName(), p);
-        }
-        iter = top.attributeLists.keySet().iterator();
-        while (iter.hasNext()) {
-            String key = (String) iter.next();
-            attributeLists.put(key, top.attributeLists.get(key));
-        }
-        iter = top.objectLists.keySet().iterator();
-        while (iter.hasNext()) {
-            String key = (String) iter.next();
-            objectLists.put(key, top.objectLists.get(key));
-        }
-
-        String behaviourName = otherRole.getTypeName() + " & " + top.getTypeName() + "-behaviour";
-        BehaviourFrame old = top.getBehaviour();
-        Frame[] oldParents = top.getBehaviour().getParentFrames();
-        BehaviourFrame[] allParents = new BehaviourFrame[oldParents.length + 1];
-        for (int i = 0; i < oldParents.length; i++) {
-            allParents[i] = new BehaviourFrame(oldParents[i]);
-        }
-        allParents[allParents.length - 1] = otherRole.getBehaviour();
-
-        behaviour = (BehaviourFrame) new BehaviourFrame(behaviourName, allParents, "behaviour").clone();
-
-        behaviour.setDeleteUnusedAfter(old.getDeleteUnusedAfter());
-        behaviour.setMaxDepth(old.getMaxDepth());
-        behaviour.setMaxNodes(old.getMaxNodes());
-        behaviour.setStateUpdateInterval(old.getStateUpdateInterval());
-        behaviour.setTraversalMode(old.getTraversalMode());
-        for (ActionFrame a : old.getDeclaredAvailableActions()) {
-            behaviour.addAction(a);
-        }
-        for (RLRuleFrame r : old.getDeclaredRLRules()) {
-            behaviour.addRLRule(r);
-        }
-        for (UserRuleFrame r : old.getDeclaredRules()) {
-            behaviour.addRule(r);
-        }
-
-        // this.behaviour = new BehaviourFrame(behaviourName, new BehaviourFrame[] {
-        // top.getBehaviour(), otherRole.getBehaviour() }, "behaviour");
-
-    }
-
-    /**
-     * Inheritance constructor.
-     * 
-     * @param parent
-     *            GenericAgentClass
-     * @param name
-     *            String
-     * @param id
-     *            int
-     */
-    public GenericAgentClass(GenericAgentClass parent, String name) {
-        super(new Frame[] { parent }, name, "generic");
-        // String name, BehaviourFrame[] parents, String category
-        behaviour = (BehaviourFrame) new BehaviourFrame(getTypeName() + "-behaviour", new BehaviourFrame[] { parent.getBehaviour() },
-                BehaviourFrame.CATEGORY).clone();
-    }
-
-    /**
-     * Inheritance constructor.
-     * 
-     * @param parent
-     *            GenericAgentClass
-     * @param name
-     *            String
-     * @param id
-     *            int
-     */
-    public GenericAgentClass(GenericAgentClass[] parents, String name) {
-        super(parents, name, "generic");
-        BehaviourFrame[] behaviours = new BehaviourFrame[parents.length];
-
-        for (int i = 0; i < parents.length; i++) {
-            behaviours[i] = parents[i].getBehaviour();
-        }
-        // String name, BehaviourFrame[] parents, String category
-        behaviour = (BehaviourFrame) new BehaviourFrame(getTypeName() + "-behaviour", behaviours, "behaviour").clone();
-
+    private GenericAgentClass(String name) {
+    	super(name, Optional.of("generic"), true, false);
+        getAttributeLists().put(PROPERTIES_LIST, new ArrayList<>());
+        behaviour = BehaviourFrame.newBehaviour(getName() + "-behaviour", EntityTypes.BEHAVIOUR.toString());
     }
 
     /**
      * Constructor for a top-level generic agent.
-     * 
-     * @param id
-     *            int
      */
-    public GenericAgentClass(String name) {
-        super(name, "generic");
-        init();
+    public static GenericAgentClass baseGenericAgentClass() {
+        GenericAgentClass cls = new GenericAgentClass(NAME);
+        return cls;
     }
+
+    /**
+     * Constructor for a top-level generic agent.
+     */
+    public static GenericAgentClass baseGenericAgentClassWithName(String name) {
+        GenericAgentClass cls = new GenericAgentClass(name);
+        return cls;
+    }
+    
+    
+    /**
+     * Inherit.
+     */
+    public static GenericAgentClass inherit(GenericAgentClass parent, String name) {
+    	Frame f = Frame.inherit(Arrays.asList(parent), name, Optional.of("generic"));
+    	GenericAgentClass cls = new GenericAgentClass(f);
+    	BehaviourFrame bf = BehaviourFrame.inherit(name + "-behaviour", Arrays.asList(parent.getBehaviour()),BehaviourFrame.CATEGORY);
+    	cls.behaviour = bf.clone();
+    	return cls;
+    }
+
+    /**
+     * Inherit.
+     */
+    public static GenericAgentClass inherit(String name, GenericAgentClass... parents) {
+    	Frame f = Frame.inherit(Arrays.asList(parents), name, Optional.of("generic"));
+    	GenericAgentClass cls = new GenericAgentClass(f);
+    	
+    	List<BehaviourFrame> behaviours = Arrays.stream(parents).map(g->g.getBehaviour()).collect(Collectors.toList());
+    	BehaviourFrame bf = BehaviourFrame.inherit(name + "-behaviour", behaviours,BehaviourFrame.CATEGORY);
+    	cls.behaviour = bf.clone();
+    	
+    	return cls;
+
+    }
+
+    
+
+    public static GenericAgentClass copy(Frame f) {
+    	Frame c = Frame.copy(f);
+    	GenericAgentClass cls = new GenericAgentClass(c);
+    	cls.behaviour = BehaviourFrame.newBehaviour(f.getName() + "-behaviour", EntityTypes.BEHAVIOUR.toString());
+        return cls;
+    }
+
+    /**
+     * Copy constructor.
+     */
+    public static GenericAgentClass copy(GenericAgentClass cloneFrom) {
+    	Frame c = Frame.copy(cloneFrom);
+    	GenericAgentClass cls = new GenericAgentClass(c);
+        cls.behaviour = (BehaviourFrame) cloneFrom.getBehaviour().clone();
+        return cls;
+    }
+
+    private GenericAgentClass(Frame f) {
+    	super(f);
+    }
+
+    /**
+     * Creates an agent and extends it at the same time with the second. The difference to normal frame inheritance is that the new 
+     * agent class contains both behaviours.
+     * 
+     * @param top base agent
+     * @param otherRole agent with which to extend first one
+     * @param name name of the new agent class
+     * @return the agent class
+     */
+    public static GenericAgentClass copyFromAndExtendWith(GenericAgentClass top, GenericAgentClass otherRole, String name) {
+
+    	Frame f = Frame.inherit(Arrays.asList(otherRole), name, Optional.of(EntityTypes.GENERIC.toString()));
+    	GenericAgentClass cls = new GenericAgentClass(f);
+        
+    	for (Frame p: top.getParentFrames()) {
+    		cls.parents.put(p.getName(), p);
+    	}
+    	for (Entry<String, List<DomainAttribute>> atts: top.getAttributeLists().entrySet()) {
+    		cls.getAttributeLists().put(atts.getKey(), atts.getValue());
+    	}
+    	for (Entry<String, TypedList<Frame>> objs: top.getObjectLists().entrySet()) {
+    		cls.getObjectLists().put(objs.getKey(), objs.getValue());
+    	}
+    	
+
+        String behaviourName = otherRole.getName() + " & " + top.getName() + "-behaviour";
+        BehaviourFrame old = top.getBehaviour();
+        List<Frame> oldParents = top.getBehaviour().getParentFrames();
+        List<BehaviourFrame> allParents = new ArrayList<BehaviourFrame>();
+        for (Frame bf: oldParents) {
+        	allParents.add(BehaviourFrame.copy(bf));
+        }
+        allParents.add(otherRole.getBehaviour());
+
+        cls.behaviour = (BehaviourFrame) BehaviourFrame.inherit(behaviourName, allParents, "behaviour").clone();
+
+        cls.behaviour.setDeleteUnusedAfter(old.getDeleteUnusedAfter());
+        cls.behaviour.setMaxDepth(old.getMaxDepth());
+        cls.behaviour.setMaxNodes(old.getMaxNodes());
+        cls.behaviour.setStateUpdateInterval(old.getStateUpdateInterval());
+        cls.behaviour.setTraversalMode(old.getTraversalMode());
+        for (ActionFrame a : old.getDeclaredAvailableActions()) {
+        	cls.behaviour.addAction(a);
+        }
+        for (RLRuleFrame r : old.getDeclaredRLRules()) {
+        	cls.behaviour.addRLRule(r);
+        }
+        for (UserRuleFrame r : old.getDeclaredRules()) {
+        	cls.behaviour.addRule(r);
+        }
+        
+        return cls;
+
+    }
+
 
     @Override
     public GenericAgentClass clone() {
@@ -162,7 +162,7 @@ public class GenericAgentClass extends Frame {
         return behaviour;
     }
 
-    public DomainAttribute[] getProperties() {
+    public List<DomainAttribute> getProperties() {
         return getAttributes(PROPERTIES_LIST);
     }
 
@@ -170,18 +170,5 @@ public class GenericAgentClass extends Frame {
         behaviour = f;
     }
 
-    @Override
-    public void setTypeName(String s) {
-        super.name = s;
-    }
-
-    /**
-     * Sets some initial values for convenience.
-     */
-    private void init() {
-        attributeLists.put(PROPERTIES_LIST, new ArrayList());
-        behaviour = new BehaviourFrame(getTypeName() + "-behaviour", EntityTypes.BEHAVIOUR.toString());
-
-    }
 
 }

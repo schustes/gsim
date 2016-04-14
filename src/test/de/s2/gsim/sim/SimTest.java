@@ -136,7 +136,7 @@ public class SimTest {
 			RuntimeAgent agent = super.getContext().getAgent();
 			StringAttribute instanciated = (StringAttribute)agent.getAttribute(ATTR_NAME);
 			instanciated.setValue(newValue);
-			agent.setAttribute(ATTR_LIST, instanciated);
+			agent.addOrSetAttribute(ATTR_LIST, instanciated);
 			return null;			
 		}
 	}
