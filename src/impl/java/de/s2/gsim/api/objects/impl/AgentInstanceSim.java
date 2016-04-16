@@ -10,6 +10,7 @@ import de.s2.gsim.environment.BehaviourDef;
 import de.s2.gsim.environment.Frame;
 import de.s2.gsim.environment.GenericAgent;
 import de.s2.gsim.environment.Instance;
+import de.s2.gsim.environment.Path;
 import de.s2.gsim.environment.TypedList;
 import de.s2.gsim.environment.Unit;
 import de.s2.gsim.environment.UnitOperations;
@@ -67,9 +68,8 @@ public class AgentInstanceSim implements AgentInstance, ObjectInstance, UnitWrap
     @Override
     public ObjectInstance createObjectFromListType(String objectName, String listName) {
         Frame f = real.getDefinition().getListType(listName);
-        Instance instance = new Instance(objectName, f);
+        Instance instance = Instance.instanciate(objectName, f);
         return new ChildObjectInstance(this, listName, instance);
-        // return new ObjectInstanceSim(instance);
     }
 
     /**
@@ -121,9 +121,7 @@ public class AgentInstanceSim implements AgentInstance, ObjectInstance, UnitWrap
     public String[] getAttributeListNames() throws GSimException {
 
         try {
-
-            return real.getAttributesListNames();
-
+            return real.getAttributesListNames().toArray(new String[0]);
         } catch (Exception e) {
             throw new GSimException(e);
         }
@@ -138,7 +136,7 @@ public class AgentInstanceSim implements AgentInstance, ObjectInstance, UnitWrap
     public Attribute[] getAttributes(String list) throws GSimException {
 
         try {
-            return real.getAttributes(list);
+            return real.getAttributes(list).toArray(new Attribute[0]);
         } catch (Exception e) {
             throw new GSimException(e);
         }
@@ -248,7 +246,7 @@ public class AgentInstanceSim implements AgentInstance, ObjectInstance, UnitWrap
 
         try {
             GenericAgent a = real;
-            return a.getChildInstanceListNames();
+            return a.getChildInstanceListNames().toArray(new String[0]);
         } catch (Exception e) {
             throw new GSimException(e);
         }
@@ -268,10 +266,10 @@ public class AgentInstanceSim implements AgentInstance, ObjectInstance, UnitWrap
 
         try {
 
-            Instance[] f = real.getChildInstances(list);
-            ObjectInstance[] ret = new ObjectInstance[f.length];
-            for (int i = 0; i < f.length; i++) {
-                ret[i] = new ChildObjectInstance(this, list, f[i]);
+            List<Instance> f = real.getChildInstances(list);
+            ObjectInstance[] ret = new ObjectInstance[f.size()];
+            for (int i = 0; i < f.size(); i++) {
+                ret[i] = new ChildObjectInstance(this, list, f.get(i));
             }
             return ret;
 
@@ -381,11 +379,20 @@ public class AgentInstanceSim implements AgentInstance, ObjectInstance, UnitWrap
 
             String[] p = path.split("/");
 
-            Object o = real.resolveName(p);
+			Object o = real.resolvePath(Path.attributePath(path.split("/")));
+			if (o == null) {
+				o = real.resolvePath(Path.attributeListPath(path.split("/")));
+			} 
+			if (o == null) {
+				o = real.resolvePath(Path.objectPath(path.split("/")));
+			}
+			if (o == null) {
+				o = real.resolvePath(Path.objectListPath(path.split("/")));
+			}
 
-            if (o == null) {
-                return null;
-            }
+			if (o == null) {
+				return null;
+			}
 
             if (o instanceof Attribute) {
                 return o;

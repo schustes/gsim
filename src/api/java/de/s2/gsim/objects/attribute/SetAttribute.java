@@ -111,12 +111,12 @@ public class SetAttribute extends Attribute {
         return s;
     }
 
-    public String[] getFillersAndEntries() {
+    public List<String> getFillersAndEntries() {
         Set<String> all = new HashSet<>(this.entries);
         for (String filler : this.fillers) {
             all.add(filler);
         }
-        return all.toArray(new String[0]);
+        return new ArrayList<String>(all);
     }
 
 }

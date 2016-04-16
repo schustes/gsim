@@ -2,6 +2,7 @@ package de.s2.gsim.api.objects.impl;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 
@@ -11,6 +12,7 @@ import de.s2.gsim.environment.Environment;
 import de.s2.gsim.environment.Frame;
 import de.s2.gsim.environment.GenericAgent;
 import de.s2.gsim.environment.Instance;
+import de.s2.gsim.environment.Path;
 import de.s2.gsim.environment.TypedList;
 import de.s2.gsim.objects.AgentInstance;
 import de.s2.gsim.objects.Behaviour;
@@ -57,7 +59,7 @@ public class AgentInstanceDef extends ObjectInstanceDef implements AgentInstance
     @Override
     public ObjectInstance createObjectFromListType(String objectName, String listName) {
         Frame f = real.getDefinition().getListType(listName);
-        Instance instance = new Instance(objectName, f);
+        Instance instance = Instance.instanciate(objectName, f);
         return new ChildObjectInstance(this, listName, instance);
     }
 
@@ -118,7 +120,7 @@ public class AgentInstanceDef extends ObjectInstanceDef implements AgentInstance
 
         try {
             GenericAgent a = (GenericAgent) real;
-            return a.getChildInstanceListNames();
+            return a.getChildInstanceListNames().toArray(new String[0]);
         } catch (Exception e) {
             throw new GSimException(e);
         }
@@ -138,10 +140,10 @@ public class AgentInstanceDef extends ObjectInstanceDef implements AgentInstance
 
         try {
 
-            Instance[] f = real.getChildInstances(list);
-            ObjectInstance[] ret = new ObjectInstance[f.length];
-            for (int i = 0; i < f.length; i++) {
-                ret[i] = new ChildObjectInstance(this, list, f[i]);
+            List<Instance> f = real.getChildInstances(list);
+            ObjectInstance[] ret = new ObjectInstance[f.size()];
+            for (int i = 0; i < f.size(); i++) {
+                ret[i] = new ChildObjectInstance(this, list, f.get(i));
             }
             return ret;
 
@@ -215,11 +217,20 @@ public class AgentInstanceDef extends ObjectInstanceDef implements AgentInstance
 
         try {
 
-            Object o = real.resolveName(path.split("/"));
+			Object o = real.resolvePath(Path.attributePath(path.split("/")));
+			if (o == null) {
+				o = real.resolvePath(Path.attributeListPath(path.split("/")));
+			} 
+			if (o == null) {
+				o = real.resolvePath(Path.objectPath(path.split("/")));
+			}
+			if (o == null) {
+				o = real.resolvePath(Path.objectListPath(path.split("/")));
+			}
 
-            if (o == null) {
-                return null;
-            }
+			if (o == null) {
+				return null;
+			}
 
             if (o instanceof Attribute) {
                 return o;

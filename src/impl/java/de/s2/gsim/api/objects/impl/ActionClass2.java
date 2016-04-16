@@ -44,7 +44,7 @@ public class ActionClass2 implements de.s2.gsim.objects.Action, UnitWrapper {
 
     @Override
     public String getName() {
-        return real.getTypeName();
+        return real.getName();
     }
 
     @Override

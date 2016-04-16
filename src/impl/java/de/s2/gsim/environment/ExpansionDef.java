@@ -1,15 +1,12 @@
 package de.s2.gsim.environment;
 
+import java.util.List;
+
 import de.s2.gsim.objects.attribute.NumericalAttribute;
 import de.s2.gsim.objects.attribute.SetAttribute;
 import de.s2.gsim.objects.attribute.StringAttribute;
 
 public class ExpansionDef extends Instance {
-
-    /**
-     * 
-     */
-    private static final long serialVersionUID = 1L;
 
     public ExpansionDef(Instance in) {
         super(in);
@@ -25,7 +22,7 @@ public class ExpansionDef extends Instance {
         setMin(min);
     }
 
-    public String[] getFillers() {
+    public List<String> getFillers() {
         SetAttribute a0 = (SetAttribute) this.getAttribute("fillers");
         return a0.getFillersAndEntries();
     }
@@ -56,7 +53,7 @@ public class ExpansionDef extends Instance {
     }
 
     public boolean isNumerical() {
-        return getFillers().length == 0;
+        return getFillers().size() == 0;
     }
 
     public void setFillers(String[] fillers) {

@@ -2,15 +2,8 @@ package de.s2.gsim.sim.behaviour.impl.jessfunction;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
-import org.apache.log4j.Logger;
-
-import de.s2.gsim.api.sim.agent.impl.RuntimeAgent;
-import de.s2.gsim.environment.RLRule;
-import de.s2.gsim.objects.attribute.DomainAttribute;
-import de.s2.gsim.sim.behaviour.impl.Attribute2ValuesMap;
-import de.s2.gsim.sim.behaviour.impl.FactHandler;
-import de.s2.gsim.sim.behaviour.impl.TreeExpansionBuilder;
 import jess.Context;
 import jess.Fact;
 import jess.JessException;
@@ -18,6 +11,16 @@ import jess.RU;
 import jess.Rete;
 import jess.Value;
 import jess.ValueVector;
+
+import org.apache.log4j.Logger;
+
+import de.s2.gsim.api.sim.agent.impl.RuntimeAgent;
+import de.s2.gsim.environment.Path;
+import de.s2.gsim.environment.RLRule;
+import de.s2.gsim.objects.attribute.DomainAttribute;
+import de.s2.gsim.sim.behaviour.impl.Attribute2ValuesMap;
+import de.s2.gsim.sim.behaviour.impl.FactHandler;
+import de.s2.gsim.sim.behaviour.impl.TreeExpansionBuilder;
 
 public class DynamicRuleBuilder {
 
@@ -36,7 +39,7 @@ public class DynamicRuleBuilder {
             String s = statefactelems[i].getDeftemplate().getBaseName();
             String pm = statefactelems[i].getSlotValue("param-name").stringValue(context);
 
-            DomainAttribute attr = (DomainAttribute) a.getDefinition().resolveName(pm.split("/"));
+            DomainAttribute attr = (DomainAttribute) a.getDefinition().resolvePath(Path.attributePath(pm.split("/")));
             String simpleAttrName = attr.getName();
 
             if (s.equals("state-fact-element")) {
@@ -47,7 +50,7 @@ public class DynamicRuleBuilder {
             } else {
                 String c = statefactelems[i].getSlotValue("category").stringValue(context);
 
-                String[] f = consts.getFillers(pm);// getFillers(consts, c);
+                List<String> f = consts.getFillers(pm);
                 f = maybeAddFiller(f, c);
                 if (simpleAttrName.equals(domainAttr)) {
                     f = maybeAddFiller(f, newFiller);
@@ -115,7 +118,7 @@ public class DynamicRuleBuilder {
             } else {
                 String c = statefactelems[i].getSlotValue("category").stringValue(context);
 
-                String[] fillersNow = consts.getFillers(pm);// getFillers(consts, c);
+                List<String> fillersNow = consts.getFillers(pm);// getFillers(consts, c);
                 fillersNow = maybeAddFiller(fillersNow, c);// add filler to array
 
                 consts.setSetAttributes(pm, fillersNow);
@@ -133,7 +136,7 @@ public class DynamicRuleBuilder {
 
     }
 
-    protected String createNewExperimentalRuleCat(TreeExpansionBuilder b, RLRule r, String stateName, String paramToExpand, String[] fillersOfExpand,
+    protected String createNewExperimentalRuleCat(TreeExpansionBuilder b, RLRule r, String stateName, String paramToExpand, List<String> fillersOfExpand,
             Fact[] constants, Context context) throws JessException {
 
         Attribute2ValuesMap consts = new Attribute2ValuesMap();
@@ -150,7 +153,7 @@ public class DynamicRuleBuilder {
             } else {
                 String c = constants[i].getSlotValue("category").stringValue(context);
 
-                String[] f = consts.getFillers(pm);// getFillers(consts, c);
+                List<String> f = consts.getFillers(pm);// getFillers(consts, c);
                 f = maybeAddFiller(f, c);
 
                 consts.setSetAttributes(pm, f);
@@ -188,7 +191,7 @@ public class DynamicRuleBuilder {
                 consts.setIntervalAttributes(pm, m, x);
             } else {
                 String c = constants[i].getSlotValue("category").stringValue(context);
-                String[] f = consts.getFillers(pm);// getFillers(consts, c);
+                List<String> f = consts.getFillers(pm);
                 f = maybeAddFiller(f, c);
 
                 consts.setSetAttributes(pm, f);
@@ -201,13 +204,11 @@ public class DynamicRuleBuilder {
             e.printStackTrace();
         }
 
-        // //logger.debug(n);
-
         return n;
 
     }
 
-    protected String createNewSelectionNodesCat(TreeExpansionBuilder b, RLRule r, String stateName, String param, String[] fillers, Fact[] constants,
+    protected String createNewSelectionNodesCat(TreeExpansionBuilder b, RLRule r, String stateName, String param, List<String> fillers, Fact[] constants,
             int depth, Context context) throws JessException {
 
         String sfn = stateName;
@@ -225,15 +226,8 @@ public class DynamicRuleBuilder {
                 consts.setIntervalAttributes(pm, m, x);
             } else {
                 String c = constants[i].getSlotValue("category").stringValue(context);
-                String[] fill = consts.getFillers(c);
-                if (fill == null) {
-                    fill = new String[] { c };
-                } else {
-                    String[] y = new String[fill.length + 1];
-                    System.arraycopy(fill, 0, y, 0, fill.length);
-                    y[fill.length] = c;
-                    fill = y;
-                }
+                List<String> fill = consts.getFillers(c);
+                fill.add(c);
                 consts.setSetAttributes(c, fill);
             }
         }
@@ -243,9 +237,6 @@ public class DynamicRuleBuilder {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-        // //logger.debug(n);
-
         return n;
 
     }
@@ -305,16 +296,15 @@ public class DynamicRuleBuilder {
 
     }
 
-    private String[] maybeAddFiller(String[] oldFillers, String newFiller) {
+    private List<String> maybeAddFiller(List<String> oldFillers, String newFiller) {
         for (String s : oldFillers) {
             if (s.equals(newFiller)) {
                 return oldFillers;
             }
         }
 
-        String[] newFillers = new String[oldFillers.length + 1];
-        System.arraycopy(oldFillers, 0, newFillers, 0, oldFillers.length);
-        newFillers[newFillers.length - 1] = newFiller;
+        List<String> newFillers = new ArrayList<>();
+        newFillers.add(newFiller);
         return newFillers;
 
     }

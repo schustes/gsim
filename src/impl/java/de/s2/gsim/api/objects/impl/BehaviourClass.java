@@ -38,14 +38,8 @@ public class BehaviourClass implements Behaviour, UnitWrapper {
 
     @Override
     public void addOrSetRLActionNode(RLActionNode node) throws GSimException {
-        // try {
-        // real.removeRLRule(node.getName());
-        // } catch (gsim.def.GSimDefException e) {
-        // not defined here.
-        // }
         real.addRLRule((RLRuleFrame) ((UnitWrapper) node).toUnit());
         owner.setBehaviour(this);
-
     }
 
     @Override
@@ -55,11 +49,6 @@ public class BehaviourClass implements Behaviour, UnitWrapper {
             addOrSetRLActionNode((RLActionNode) rule);
             return;
         }
-
-        // try {
-        // real.removeRule(rule.getName());
-        // } catch (gsim.def.GSimDefException e) {
-        // }
 
         real.addRule((UserRuleFrame) ((UnitWrapper) rule).toUnit());
         owner.setBehaviour(this);
@@ -107,7 +96,7 @@ public class BehaviourClass implements Behaviour, UnitWrapper {
         ActionFrame[] f = real.getAvailableActions();
 
         for (int i = 0; i < f.length; i++) {
-            if (!f[i].getTypeName().startsWith("{")) {
+            if (!f[i].getName().startsWith("{")) {
                 actions.add(new ActionClass2(this, f[i]));
             }
         }
@@ -146,7 +135,7 @@ public class BehaviourClass implements Behaviour, UnitWrapper {
         RLRuleFrame[] f = real.getRLRule();
 
         for (int i = 0; i < f.length; i++) {
-            if (!f[i].getTypeName().startsWith("{")) {
+            if (!f[i].getName().startsWith("{")) {
                 rules.add(new RLActionNodeClass(this, f[i]));
             }
         }
@@ -169,7 +158,7 @@ public class BehaviourClass implements Behaviour, UnitWrapper {
 
         UserRuleFrame[] f = real.getRules();
         for (int i = 0; i < f.length; i++) {
-            if (!f[i].getTypeName().startsWith("{")) {
+            if (!f[i].getName().startsWith("{")) {
                 rules.add(new RuleClass(this, f[i]));
             }
         }
@@ -199,7 +188,7 @@ public class BehaviourClass implements Behaviour, UnitWrapper {
         ActionFrame[] x = real.getDeclaredAvailableActions();
         boolean check = false;
         for (ActionFrame a : x) {
-            if (a.getTypeName().equals(name)) {
+            if (a.getName().equals(name)) {
                 check = true;
             }
         }
@@ -210,7 +199,7 @@ public class BehaviourClass implements Behaviour, UnitWrapper {
         ActionFrame a = real.getAction(name);
 
         if (a != null) {
-            real.removeChildFrame(BehaviourFrame.ACTION_LIST, a.getTypeName());
+            real.removeChildFrame(BehaviourFrame.ACTION_LIST, a.getName());
         }
         owner.setBehaviour(this);
     }

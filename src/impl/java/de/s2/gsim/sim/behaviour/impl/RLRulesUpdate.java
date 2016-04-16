@@ -7,6 +7,7 @@ import java.util.List;
 
 import de.s2.gsim.api.sim.agent.impl.RuntimeAgent;
 import de.s2.gsim.environment.ExpansionDef;
+import de.s2.gsim.environment.Path;
 import de.s2.gsim.environment.RLRule;
 import de.s2.gsim.objects.attribute.Attribute;
 import de.s2.gsim.objects.attribute.DomainAttribute;
@@ -37,7 +38,7 @@ public class RLRulesUpdate {
                 // ok, because only attribute, not filler must be named in Expansion
                 // object
 
-                Attribute specified = (Attribute) agent.resolveName(ex.getParameterName().split("/"));
+                Attribute specified = (Attribute) agent.resolvePath(Path.attributePath(ex.getParameterName().split("/")));
 
                 if (specified.getName().equals(domainAttr.getName())) {
                     this.update(r.getName(), domainAttr, newFiller, ex.getParameterName(), ctx);

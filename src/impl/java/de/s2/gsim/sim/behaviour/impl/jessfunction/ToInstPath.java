@@ -2,6 +2,7 @@ package de.s2.gsim.sim.behaviour.impl.jessfunction;
 
 import de.s2.gsim.environment.Frame;
 import de.s2.gsim.environment.Instance;
+import de.s2.gsim.environment.Path;
 import jess.Context;
 import jess.JessException;
 import jess.RU;
@@ -46,13 +47,13 @@ public class ToInstPath implements Userfunction, java.io.Serializable {
             Instance owner = (Instance) v.externalAddressValue(context);
 
             String[] p = framePath.split("/");
-            Frame def = (Frame) owner.getDefinition().resolveName(p);
+            Frame def = (Frame) owner.getDefinition().resolvePath(Path.attributePath(p));
             if (def == null) {
                 def = owner.getDefinition().getListType(p[0]);
             }
             int pos = -1;
             for (int i = 0; i < p.length; i++) {
-                if (def.isSuccessor(p[i]) || p[i].equals(def.getTypeName())) {
+                if (def.isSuccessor(p[i]) || p[i].equals(def.getName())) {
                     pos = i - 1;
                 }
             }

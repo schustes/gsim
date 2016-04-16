@@ -3,6 +3,7 @@ package de.s2.gsim.sim.behaviour.impl;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class RLParameterRanges implements Serializable {
 
@@ -20,7 +21,7 @@ public class RLParameterRanges implements Serializable {
         categories = new HashMap<String, ArrayList<String>>();
     }
 
-    public ArrayList<String> getNewCategoricalParameterValues(String attName, String[] allFillers) {
+    public ArrayList<String> getNewCategoricalParameterValues(String attName, List<String> allFillers) {
         ArrayList<String> contained = categories.get(attName);
         ArrayList<String> result = new ArrayList<String>();
         if (contained == null) {
@@ -79,7 +80,7 @@ public class RLParameterRanges implements Serializable {
 
     }
 
-    public void initCategoricalParameters(String attName, String[] values) {
+    public void initCategoricalParameters(String attName, List<String> values) {
         ArrayList<String> list = new ArrayList<String>();
         for (String s : values) {
             list.add(s);

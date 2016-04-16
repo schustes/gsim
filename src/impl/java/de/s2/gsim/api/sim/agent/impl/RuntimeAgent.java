@@ -19,8 +19,6 @@ public class RuntimeAgent extends GenericAgent implements AgentType, RtAgent {
 
     private static Logger logger = Logger.getLogger(RuntimeAgent.class);
 
-    private static final long serialVersionUID = 1L;
-
     protected transient Communicator commInterface = null;
 
     private String[] currentStrategy = new String[0];
@@ -87,7 +85,7 @@ public class RuntimeAgent extends GenericAgent implements AgentType, RtAgent {
     public void addChildInstance(String list, Instance inst) {
         super.addChildInstance(list, inst);
         if (ruleBase != null) {
-            ruleBase.instanceChanged(list + "/" + inst.getDefinition().getTypeName());
+            ruleBase.instanceChanged(list + "/" + inst.getDefinition().getName());
         }
     }
 
@@ -138,7 +136,7 @@ public class RuntimeAgent extends GenericAgent implements AgentType, RtAgent {
             this.globals = globals;
             if (this.inheritsFrom(roleName)) {
                 GenericAgentClass c = (GenericAgentClass) getDefinition().getAncestor(roleName);
-                if (c == null && getDefinition().getTypeName().equals(roleName)) {
+                if (c == null && getDefinition().getName().equals(roleName)) {
                     c = (GenericAgentClass) getDefinition();
                 }
 
@@ -156,7 +154,7 @@ public class RuntimeAgent extends GenericAgent implements AgentType, RtAgent {
 
         if (role.equals("Seller-Action")) {
 
-            if (getChildInstances("queue").length == 0) {
+            if (getChildInstances("queue").size() == 0) {
                 return;
             }
 
@@ -227,10 +225,11 @@ public class RuntimeAgent extends GenericAgent implements AgentType, RtAgent {
     }
 
     @Override
-    public void removeChildInstance(String list, String instName) {
+    public boolean removeChildInstance(String list, String instName) {
         super.removeChildInstance(list, instName);
         ruleBase.retractConstant(list + "/" + instName);
         ruleBase.retractExecutedFact(list + "/" + instName);
+        return true;
     }
 
     public void setCurrentStrategy(String[] actions) {

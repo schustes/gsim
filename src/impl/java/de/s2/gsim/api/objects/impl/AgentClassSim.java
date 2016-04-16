@@ -2,11 +2,13 @@ package de.s2.gsim.api.objects.impl;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import de.s2.gsim.GSimException;
 import de.s2.gsim.environment.BehaviourFrame;
 import de.s2.gsim.environment.Frame;
 import de.s2.gsim.environment.GenericAgentClass;
+import de.s2.gsim.environment.Path;
 import de.s2.gsim.environment.TypedList;
 import de.s2.gsim.objects.AgentClass;
 import de.s2.gsim.objects.Behaviour;
@@ -79,7 +81,7 @@ public class AgentClassSim implements AgentClass, ObjectClass {
     @Override
     public String[] getAttributeListNames() throws GSimException {
         try {
-            return real.getAttributesListNames();
+            return real.getAttributesListNames().toArray(new String[0]);
         } catch (Exception e) {
             throw new GSimException(e);
         }
@@ -92,7 +94,7 @@ public class AgentClassSim implements AgentClass, ObjectClass {
     @Override
     public DomainAttribute[] getAttributes(String list) throws GSimException {
         try {
-            return real.getAttributes(list);
+            return real.getAttributes(list).toArray(new DomainAttribute[0]);
         } catch (Exception e) {
             throw new GSimException(e);
         }
@@ -136,7 +138,7 @@ public class AgentClassSim implements AgentClass, ObjectClass {
     public String getName() throws GSimException {
 
         try {
-            return real.getTypeName();
+            return real.getName();
         } catch (Exception e) {
             throw new GSimException(e);
         }
@@ -150,7 +152,7 @@ public class AgentClassSim implements AgentClass, ObjectClass {
     public String[] getObjectListNames() throws GSimException {
 
         try {
-            return real.getChildFrameListNames();
+            return real.getChildFrameListNames().toArray(new String[0]);
         } catch (Exception e) {
             throw new GSimException(e);
         }
@@ -178,10 +180,10 @@ public class AgentClassSim implements AgentClass, ObjectClass {
     public ObjectClass[] getObjects(String list) throws GSimException {
 
         try {
-            Frame[] f = real.getChildFrames(list);
-            ObjectClass[] ret = new ObjectClass[f.length];
-            for (int i = 0; i < f.length; i++) {
-                ret[i] = new ChildObjectClass(this, list, f[i]);
+            List<Frame> f = real.getChildFrames(list);
+            ObjectClass[] ret = new ObjectClass[f.size()];
+            for (int i = 0; i < f.size(); i++) {
+                ret[i] = new ChildObjectClass(this, list, f.get(i));
             }
             return ret;
         } catch (Exception e) {
@@ -236,11 +238,21 @@ public class AgentClassSim implements AgentClass, ObjectClass {
         try {
 
             String[] p = path.split("/");
-            Object o = real.resolveName(p);
 
-            if (o == null) {
-                return null;
-            }
+			Object o = real.resolvePath(Path.attributePath(path.split("/")));
+			if (o == null) {
+				o = real.resolvePath(Path.attributeListPath(path.split("/")));
+			} 
+			if (o == null) {
+				o = real.resolvePath(Path.objectPath(path.split("/")));
+			}
+			if (o == null) {
+				o = real.resolvePath(Path.objectListPath(path.split("/")));
+			}
+
+			if (o == null) {
+				return null;
+			}
 
             if (o instanceof Attribute) {
                 return o;

@@ -2,20 +2,16 @@ package de.s2.gsim.sim.behaviour.impl;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 
 public class Attribute2ValuesMap {
 
     private HashMap<String, double[]> intervalAttributes = new HashMap<String, double[]>();
 
-    private HashMap<String, String[]> setAttributes = new HashMap<String, String[]>();
+    private HashMap<String, List<String>> setAttributes = new HashMap<>();
 
-    public String[] getFillers(String setAttName) {
-        String[] s = setAttributes.get(setAttName);
-        // logger.debug("////"+s);
-        if (s == null) {
-            return new String[0];
-        }
-        return s;
+    public List<String> getFillers(String setAttName) {
+        return setAttributes.get(setAttName);
     }
 
     public double[] getInterval(String numAttName) {
@@ -34,7 +30,7 @@ public class Attribute2ValuesMap {
         intervalAttributes.put(name, new double[] { from, to });
     }
 
-    public void setSetAttributes(String name, String... fillers) {
+    public void setSetAttributes(String name, List<String> fillers) {
         setAttributes.put(name, fillers);
     }
 

@@ -14,11 +14,6 @@ import de.s2.gsim.objects.SelectionNode;
 
 public class RLActionNodeClass extends RuleClass implements RLActionNode, UnitWrapper {
 
-    /**
-     *
-     */
-    private static final long serialVersionUID = 1L;
-
     public RLActionNodeClass(BehaviourClass owner, RLRuleFrame c) {
         super(owner, c);
     }
@@ -83,7 +78,7 @@ public class RLActionNodeClass extends RuleClass implements RLActionNode, UnitWr
 
     @Override
     public SelectionNode createSelectionNode(String name) throws GSimException {
-        UserRuleFrame f = new UserRuleFrame(name);
+        UserRuleFrame f = UserRuleFrame.newUserRuleFrame(name);
         return new SelectionNodeClass(this, f);
     }
 
@@ -136,7 +131,7 @@ public class RLActionNodeClass extends RuleClass implements RLActionNode, UnitWr
 
     @Override
     public String getName() throws GSimException {
-        return real.getTypeName();
+        return real.getName();
     }
 
     @Override
@@ -176,7 +171,7 @@ public class RLActionNodeClass extends RuleClass implements RLActionNode, UnitWr
     @Override
     public void removeExpansion(Expansion cond) throws GSimException {
         Frame inst = (Frame) ((UnitWrapper) cond).toUnit();
-        real.removeChildFrame(RLRuleFrame.INST_LIST_EXP, inst.getTypeName());
+        real.removeChildFrame(RLRuleFrame.INST_LIST_EXP, inst.getName());
         owner.addOrSetRule(this);
     }
 

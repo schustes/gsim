@@ -2,6 +2,14 @@ package de.s2.gsim.sim.behaviour.impl;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Set;
+
+import jess.Deftemplate;
+import jess.Fact;
+import jess.JessException;
+import jess.RU;
+import jess.Rete;
+import jess.Value;
 
 import org.apache.log4j.Logger;
 
@@ -12,18 +20,13 @@ import de.s2.gsim.environment.BehaviourFrame;
 import de.s2.gsim.environment.ConditionDef;
 import de.s2.gsim.environment.ExpansionDef;
 import de.s2.gsim.environment.Instance;
+import de.s2.gsim.environment.Path;
 import de.s2.gsim.environment.RLRule;
 import de.s2.gsim.environment.RLRuleFrame;
 import de.s2.gsim.environment.UserRuleFrame;
 import de.s2.gsim.objects.attribute.Attribute;
 import de.s2.gsim.objects.attribute.IntervalAttribute;
 import de.s2.gsim.util.Utils;
-import jess.Deftemplate;
-import jess.Fact;
-import jess.JessException;
-import jess.RU;
-import jess.Rete;
-import jess.Value;
 
 public class JessHandlerUtils {
 
@@ -149,7 +152,7 @@ public class JessHandlerUtils {
             if (s.contains("::")) {
                 res.addAll(JessHandlerUtils.buildReplaceVariablesSC(rete, owner, s));
             }
-            HashSet l = JessHandlerUtils.buildReplaceConstants(rete, owner, s);
+            Set<String> l = JessHandlerUtils.buildReplaceConstants(rete, owner, s);
             res.addAll(l);
         }
 
@@ -176,14 +179,13 @@ public class JessHandlerUtils {
         }
         for (String s : params) {
             String list = s.split("/")[0].trim();
-            Instance[] objects = owner.getChildInstances(list);
-            for (Instance inst : objects) {
+            for (Instance inst : owner.getChildInstances(list)) {
                 assertObjectParam(rete, s, inst.getName());
             }
         }
     }
 
-    private static HashSet buildReplaceConstants(Rete rete, Instance owner, String n) {
+    private static Set<String> buildReplaceConstants(Rete rete, Instance owner, String n) {
 
         if (n.contains("::")) {
             return new HashSet(0);
@@ -211,18 +213,17 @@ public class JessHandlerUtils {
 
         if (n.contains("{")) {
             String attRef = n.substring(n.indexOf("{") + 1, n.lastIndexOf("}"));
-            Attribute ref = (Attribute) owner.resolveName(attRef.split("/"));
+            Attribute ref = (Attribute) owner.resolvePath(Path.attributePath(attRef.split("/")));
             if (ref instanceof IntervalAttribute) {
-                double val = ((IntervalAttribute) ref).getValue();// ( ((IntervalAttribute) ref).getFrom() + ((IntervalAttribute) ref).getTo()) / 2d;
+                double val = ((IntervalAttribute) ref).getValue();
                 assertParameter(rete, attRef, String.valueOf(val));
             } else {
                 assertParameter(rete, attRef, ref.toValueString());
             }
         } else {
-            Attribute ref = (Attribute) owner.resolveName(att.split("/"));
+            Attribute ref = (Attribute) owner.resolvePath(Path.attributePath(att.split("/")));
             if (ref instanceof IntervalAttribute) {
                 double val = ((IntervalAttribute) ref).getValue();
-                // double val = (((IntervalAttribute) ref).getFrom() + ((IntervalAttribute) ref).getTo() / 2d);
                 assertParameter(rete, att, String.valueOf(val));
             } else {
                 if (ref == null) {
@@ -235,33 +236,15 @@ public class JessHandlerUtils {
         return list;
     }
 
-    private static HashSet buildReplaceConstantsInstanceRef(Rete rete, Instance owner, String n) {
+    private static Set<String> buildReplaceConstantsInstanceRef(Rete rete, Instance owner, String n) {
 
-        HashSet list = new HashSet();
+        Set<String> list = new HashSet<>();
 
         String listName = ParsingUtils.resolveList(n);
         String object = ParsingUtils.resolveObjectClassNoList(n);
 
-        Instance[] insts = owner.getChildInstances(listName);
-        if (insts == null) {
-            return list;
-        }
-
-        for (Instance inst : insts) {
-
-            /*
-             * if (att!=null && n.contains("{")) { String attRef=n.substring(n.indexOf("{")+1, n.lastIndexOf("}")); Attribute ref =
-             * (Attribute)owner.resolveName(attRef.split("/")); String fullPath = listName + "/" + object + "/" + attRef; assertParameter(rete,
-             * fullPath, ref.toValueString()); // Constant pp = new Constant(fullPath, ref.toValueString()); // list.add(pp); } else if (att!=null) {
-             * Attribute ref = (Attribute) inst.resolveName(att.split("/")); String fullPath = listName + "/" + object + "/" + att; if (ref==null) {
-             * int a=0; } assertParameter(rete, fullPath, ref.toValueString()); // Constant pp = new Constant(fullPath, ref.toValueString()); //
-             * list.add(pp); }
-             */
+        for (Instance inst : owner.getChildInstances(listName)) {
             assertObjectParam(rete, listName + "/" + object, inst.getName());
-            // ObjectFactRepresentation t = new
-            // ObjectFactRepresentation(inst.getName(), list+"/"+object);
-            // list.add(t);
-
         }
 
         return list;
@@ -275,16 +258,11 @@ public class JessHandlerUtils {
         String att = ParsingUtils.resolveAttribute(n);
         String object = ParsingUtils.resolveObjectClassNoList(n);
 
-        Instance[] insts = owner.getChildInstances(listName);
-        if (insts == null) {
-            return list;
-        }
-
-        for (Instance inst : insts) {
+        for (Instance inst : owner.getChildInstances(listName)) {
 
             if (att.contains("{")) {
                 String attRef = att.substring(1, att.length() - 1);
-                Attribute a = (Attribute) owner.resolveName(attRef.split("/"));
+                Attribute a = (Attribute) owner.resolvePath(Path.attributePath(attRef.split("/")));
                 if (a instanceof IntervalAttribute) {
                     double val = (((IntervalAttribute) a).getFrom() + ((IntervalAttribute) a).getTo() / 2d);
                     assertParameter(rete, attRef, String.valueOf(val));
@@ -292,7 +270,7 @@ public class JessHandlerUtils {
                     assertParameter(rete, attRef, a.toValueString());
                 }
             } else {
-                Attribute ref = (Attribute) inst.resolveName(att.split("/"));
+                Attribute ref = (Attribute) inst.resolvePath(Path.attributePath(att.split("/")));
 
                 String fullPath = listName + "/" + inst.getName() + "/" + att;
 
@@ -307,15 +285,9 @@ public class JessHandlerUtils {
                         assertParameter(rete, fullPath, ref.toValueString());
                     }
                 }
-
-                // assertParameter(rete, fullPath, ref.toValueString());
             }
 
             assertObjectParam(rete, listName + "/" + object, inst.getName());
-
-            // ObjectFactRepresentation fact = new
-            // ObjectFactRepresentation(inst.getName(), listName+"/"+object);
-            // list.add(fact);
 
         }
 

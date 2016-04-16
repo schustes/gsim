@@ -5,6 +5,7 @@ import java.util.HashSet;
 
 import de.s2.gsim.environment.Frame;
 import de.s2.gsim.environment.Instance;
+import de.s2.gsim.environment.Path;
 import de.s2.gsim.objects.AgentInstance;
 import de.s2.gsim.objects.attribute.Attribute;
 import de.s2.gsim.objects.attribute.IntervalAttribute;
@@ -468,7 +469,7 @@ public class Utils {
     }
 
     public static boolean isNumericalAttribute(Instance obj, String pathToAtt) {
-        Attribute a = (Attribute) obj.resolveName(pathToAtt.split("/"));
+        Attribute a = (Attribute) obj.resolvePath(Path.attributePath(pathToAtt.split("/")));
         return (a instanceof NumericalAttribute);
     }
 
@@ -560,7 +561,7 @@ public class Utils {
             p[i] = p[i].trim();
         }
 
-        Frame def = (Frame) agent.getDefinition().resolveName(p);
+        Frame def = agent.getDefinition().resolvePath(Path.objectPath(p));
 
         if (def == null) {
             def = agent.getDefinition().getListType(p[0]);
@@ -568,7 +569,7 @@ public class Utils {
 
         int pos = -1;
         for (int i = 0; i < p.length; i++) {
-            if (def.isSuccessor(p[i]) || p[i].equals(def.getTypeName())) {
+            if (def.isSuccessor(p[i]) || p[i].equals(def.getName())) {
                 pos = i - 1;
             }
         }

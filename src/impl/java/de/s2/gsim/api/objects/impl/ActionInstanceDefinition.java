@@ -7,11 +7,6 @@ import de.s2.gsim.objects.Behaviour;
 
 public class ActionInstanceDefinition implements de.s2.gsim.objects.Action, UnitWrapper {
 
-    /**
-     *
-     */
-    private static final long serialVersionUID = 1L;
-
     private Behaviour owner;
 
     private ActionDef real;

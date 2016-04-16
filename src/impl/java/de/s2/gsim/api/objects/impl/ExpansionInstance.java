@@ -18,29 +18,17 @@ public class ExpansionInstance implements Expansion, UnitWrapper {
 
     @Override
     public void addFiller(String filler) throws GSimException {
-        String[] fillers = real.getFillers();
-        boolean b = false;
-        for (String s : fillers) {
-            if (s.equals(filler)) {
-                b = true;
-            }
-        }
-        if (!b) {
-            String[] nf = new String[fillers.length + 1];
-            for (int i = 0; i < fillers.length; i++) {
-                nf[i] = fillers[i];
-            }
-            nf[nf.length - 1] = filler;
-            real.setFillers(nf);
-        }
+    	
+    	if (!real.getFillers().contains(filler)) {
+    		real.getFillers().add(filler);
+    	}
+    	
         owner.addOrSetExpansion(this);
-
-        // throw new UnsupportedOperationException("Not valid here");
     }
 
     @Override
     public String[] getFillers() {
-        return real.getFillers();
+        return real.getFillers().toArray(new String[0]);
     }
 
     @Override

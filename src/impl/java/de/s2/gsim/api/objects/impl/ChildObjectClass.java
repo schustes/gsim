@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import de.s2.gsim.GSimException;
 import de.s2.gsim.environment.Frame;
+import de.s2.gsim.environment.Path;
 import de.s2.gsim.environment.Unit;
 import de.s2.gsim.objects.AgentClass;
 import de.s2.gsim.objects.ObjectClass;
@@ -93,7 +94,7 @@ public class ChildObjectClass implements ObjectClass, UnitWrapper {
         }
 
         try {
-            return real.getAttributesListNames();
+            return real.getAttributesListNames().toArray(new String[0]);
         } catch (Exception e) {
             throw new GSimException(e);
         }
@@ -111,7 +112,7 @@ public class ChildObjectClass implements ObjectClass, UnitWrapper {
         }
 
         try {
-            return real.getAttributes(list);
+            return real.getAttributes(list).toArray(new DomainAttribute[0]);
         } catch (Exception e) {
             throw new GSimException(e);
         }
@@ -148,7 +149,7 @@ public class ChildObjectClass implements ObjectClass, UnitWrapper {
         }
 
         try {
-            return real.getTypeName();
+            return real.getName();
         } catch (Exception e) {
             throw new GSimException(e);
         }
@@ -171,7 +172,12 @@ public class ChildObjectClass implements ObjectClass, UnitWrapper {
         }
 
         try {
-            Object o = real.resolveName(path.split("/"));
+
+        	Object o = real.resolvePath(Path.attributePath(path.split("/")));
+
+			if (o == null) {
+				o = real.resolvePath(Path.attributeListPath(path.split("/")));
+			} 
 
             if (o == null) {
                 return null;

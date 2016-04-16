@@ -7,6 +7,7 @@ import de.s2.gsim.GSimException;
 import de.s2.gsim.environment.Environment;
 import de.s2.gsim.environment.Frame;
 import de.s2.gsim.environment.Instance;
+import de.s2.gsim.environment.Path;
 import de.s2.gsim.environment.Unit;
 import de.s2.gsim.objects.ObjectInstance;
 import de.s2.gsim.objects.attribute.Attribute;
@@ -33,7 +34,7 @@ public class ObjectInstanceDef implements ObjectInstance, UnitWrapper {
 
     @Override
     public ObjectInstance copy() {
-        Instance copy = new Instance(real);
+        Instance copy = Instance.copy(real);
         return new ObjectInstanceDef(env, copy);
     }
 
@@ -110,7 +111,7 @@ public class ObjectInstanceDef implements ObjectInstance, UnitWrapper {
 
         try {
 
-            return real.getAttributesListNames();
+            return real.getAttributesListNames().toArray(new String[0]);
 
         } catch (Exception e) {
             throw new GSimException(e);
@@ -130,7 +131,7 @@ public class ObjectInstanceDef implements ObjectInstance, UnitWrapper {
         }
 
         try {
-            return real.getAttributes(list);
+            return real.getAttributes(list).toArray(new Attribute[0]);
         } catch (Exception e) {
             throw new GSimException(e);
         }
@@ -273,7 +274,11 @@ public class ObjectInstanceDef implements ObjectInstance, UnitWrapper {
 
         try {
 
-            Object o = real.resolveName(path.split("/"));
+        	Object o = real.resolvePath(Path.attributePath(path.split("/")));
+
+			if (o == null) {
+				o = real.resolvePath(Path.attributeListPath(path.split("/")));
+			} 
 
             if (o == null) {
                 return null;

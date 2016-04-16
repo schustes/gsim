@@ -1,14 +1,10 @@
 package de.s2.gsim.sim.behaviour.impl.jessfunction;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
 
-import org.apache.log4j.Logger;
-
-import de.s2.gsim.api.sim.agent.impl.RuntimeAgent;
-import de.s2.gsim.environment.RLRule;
-import de.s2.gsim.sim.behaviour.impl.FactHandler;
-import de.s2.gsim.sim.behaviour.impl.TreeExpansionBuilder;
 import jess.Context;
 import jess.Fact;
 import jess.JessException;
@@ -16,6 +12,13 @@ import jess.RU;
 import jess.Rete;
 import jess.Value;
 import jess.ValueVector;
+
+import org.apache.log4j.Logger;
+
+import de.s2.gsim.api.sim.agent.impl.RuntimeAgent;
+import de.s2.gsim.environment.RLRule;
+import de.s2.gsim.sim.behaviour.impl.FactHandler;
+import de.s2.gsim.sim.behaviour.impl.TreeExpansionBuilder;
 
 public class Expand0 extends DynamicRuleBuilder implements java.io.Serializable {
 
@@ -85,8 +88,8 @@ public class Expand0 extends DynamicRuleBuilder implements java.io.Serializable 
             // elem-fact)
             // String toExpandAttributeSpec =
             // toExpand.getSlotValue("param-name").stringValue(context);
-            String[] fillersOfExpandAttribute = new String[] { toExpandCategoryValue };
-            String[] fillersOfSiblingAttributes = unexpandedElemsSpec.fillers.toArray(new String[unexpandedElemsSpec.fillers.size()]);
+            List<String> fillersOfExpandAttribute = Arrays.asList(toExpandCategoryValue);
+            List<String> fillersOfSiblingAttributes = unexpandedElemsSpec.fillers;
 
             String cat1 = toExpand.getSlotValue("category").stringValue(context);
             // the state descriptor:

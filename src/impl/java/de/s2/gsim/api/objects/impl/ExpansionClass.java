@@ -24,7 +24,7 @@ public class ExpansionClass implements Expansion, UnitWrapper {
 
     @Override
     public String[] getFillers() {
-        return real.getFillers();
+        return real.getFillers().toArray(new String[0]);
     }
 
     @Override

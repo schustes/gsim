@@ -11,6 +11,7 @@ import de.s2.gsim.environment.ExpansionDef;
 import de.s2.gsim.environment.Frame;
 import de.s2.gsim.environment.GenericAgentClass;
 import de.s2.gsim.environment.Instance;
+import de.s2.gsim.environment.Path;
 import de.s2.gsim.environment.RLRule;
 import de.s2.gsim.environment.Unit;
 import de.s2.gsim.objects.attribute.AttributeConstants;
@@ -127,18 +128,12 @@ public class RLParser {
                 }
 
                 if (r[i].hasExpansions()) {
-                    // hasExpansion = true;
                     String roleName = ParsingUtils.getDefiningRoleForRLRule(agent, r[i].getName());
-                    // int expandInterval = this.agent.getBehaviour().getStateUpdateInterval();
-                    // double revisitCostFraction = this.agent.getBehaviour().getRevisitCost();
-                    // double revaluationProbability = this.agent.getBehaviour().getRevalProb();
-                    // s += new ExpansionRulesBuilder().build(expandInterval,revisitCostFraction, revaluationProbability, roleName);
                     expansionMap.put(roleName, agent.getBehaviour());
 
                     Instance inst = agent;
-                    Frame[] frames = inst.getDefinition().getAncestors();
-                    for (Frame f : frames) {
-                        if (f.getTypeName().equals(roleName)) {
+                    for (Frame f : inst.getDefinition().getAncestors()) {
+                        if (f.getName().equals(roleName)) {
                             GenericAgentClass a = (GenericAgentClass) f;
                             expansionMap.put(roleName, a.getBehaviour());
                         }
@@ -201,18 +196,18 @@ public class RLParser {
             if (path.contains("::")) {
                 ConditionBuilder cb = new ConditionBuilder();
                 String obj = cb.resolveObjectClass(path);
-                Frame f = (Frame) agent.getDefinition().resolveName(obj.split("/"));
+                Frame f = (Frame) agent.getDefinition().resolvePath(Path.attributePath(obj.split("/")));
                 if (f == null) {
                     String list = cb.resolveList(path);
                     f = agent.getDefinition().getListType(list);
                 }
                 String att = cb.resolveAttribute(path);
-                a = (DomainAttribute) f.resolveName(att.split("/"));
+                a = f.resolvePath(Path.attributePath(att.split("/")));
             } else {
-                a = (DomainAttribute) agent.getDefinition().resolveName(path.split("/"));
+                a = agent.getDefinition().resolvePath(Path.attributePath(path.split("/")));
             }
             if (a.getType().equals(AttributeConstants.INTERVAL)) {
-                exp.setIntervalAttributes(path, Double.parseDouble(e.getFillers()[0]), Double.parseDouble(e.getFillers()[1]));
+                exp.setIntervalAttributes(path, Double.parseDouble(e.getFillers().get(0)), Double.parseDouble(e.getFillers().get(1)));
             } else if (a.getType().equals(AttributeConstants.SET)) {
                 exp.setSetAttributes(path, e.getFillers());
             }

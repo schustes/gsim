@@ -12,11 +12,6 @@ import de.s2.gsim.objects.Rule;
 
 public class RuleClass implements Rule, UnitWrapper {
 
-    /**
-     *
-     */
-    private static final long serialVersionUID = 1L;
-
     protected BehaviourClass owner;
 
     protected UserRuleFrame real;
@@ -63,7 +58,7 @@ public class RuleClass implements Rule, UnitWrapper {
     public de.s2.gsim.objects.Action getConsequent(String name) {
         ActionFrame[] c = real.getConsequents();
         for (int i = 0; i < c.length; i++) {
-            if (c[i].getTypeName().equals(name)) {
+            if (c[i].getName().equals(name)) {
                 return new ActionClass(this, c[i]);
             }
         }
@@ -76,7 +71,7 @@ public class RuleClass implements Rule, UnitWrapper {
 
         ActionFrame[] c = real.getConsequents();
         for (int i = 0; i < c.length; i++) {
-            if (!c[i].getTypeName().startsWith("{")) {
+            if (!c[i].getName().startsWith("{")) {
                 list.add(new ActionClass(this, c[i]));
             }
         }
@@ -88,7 +83,7 @@ public class RuleClass implements Rule, UnitWrapper {
 
     @Override
     public String getName() throws GSimException {
-        return real.getTypeName();
+        return real.getName();
     }
 
     @Override

@@ -34,31 +34,14 @@ public class RuntimeAgentFactory {
 
         try {
             ArrayList<RuntimeAgent> agentList = new ArrayList<RuntimeAgent>();
-            // HashMap agentRtMappings=env.getRuntimeRoleMappings();
-            // HashMap agentMappings=env.getAgentMappings();
-
-            // GenericAgent[] a = env.getGenericAgents();
-
             props.put("AGENT_COUNT", String.valueOf(a.length));
 
             for (GenericAgent element : a) {
                 HashMap<String, String> map = new HashMap<String, String>();
                 Frame def = element.getDefinition();
-                Frame[] anc = def.getAncestors();
+                List<Frame> anc = def.getAncestors();
                 RuntimeAgent owner = new RuntimeAgent(element, ns + "/" + id);
 
-                /*
-                 * Iterator iter = agentMappings.keySet().iterator(); while (iter.hasNext()) { String agentClassName = (String) iter.next(); if
-                 * (def.isSuccessor(agentClassName)) { for (Frame element0 : anc) {
-                 * 
-                 * if (element0.getTypeName().equals(agentClassName)) { String[] roles = (String[]) agentMappings.get(agentClassName); for (String r :
-                 * roles) { String cls = (String) agentRtMappings.get(r.trim()) + "@" + new Random().nextInt(); map.put(cls, r + ":" +
-                 * agentClassName); } } } } else if (def.getTypeName().equals(agentClassName)) {
-                 * 
-                 * String[] roles = (String[]) agentMappings.get(agentClassName); if (roles != null) { for (String role : roles) { String roleName =
-                 * role.trim(); String cls = (String) agentRtMappings.get(roleName) + "@" + new Random().nextInt(); map.put(cls, roleName + ":" +
-                 * agentClassName); } } else { String cls = "gsim.sim.agent.RtExecutionContext"; map.put(cls, "default" + ":" + agentClassName); } } }
-                 */
                 if (map.size() > 0) {
 
                     Iterator it = map.keySet().iterator();
@@ -85,7 +68,7 @@ public class RuntimeAgentFactory {
                 } else {
                     try {
                         RtExecutionContextImpl rc = new RtExecutionContextImpl();
-                        rc.create("default", owner, def.getTypeName());
+                        rc.create("default", owner, def.getName());
                         owner.addOrSetExecutionContext("default", rc);
                     } catch (Exception e) {
                         logger.error("Exception", e);
@@ -102,31 +85,19 @@ public class RuntimeAgentFactory {
         }
     }
 
-    // public RuntimeAgent[] createAgentsWithoutRulebase(Environment env, String
-    // id, HashMap props) throws GSimEngineException {
-    // return this.createAgentsWithoutRulebase(env, id, props, 0);
-    // }
-
     @SuppressWarnings("unchecked")
     public RuntimeAgent[] createAgentsWithRulebase(Environment env, String id, Map props) throws GSimEngineException {
 
         try {
             ArrayList agentList = new ArrayList();
-            // HashMap agentRtMappings = env.getRuntimeRoleMappings();
-            // HashMap agentMappings = env.getAgentMappings();
+            List<GenericAgent> a = env.getGenericAgents();
 
-            /*
-             * if (agentMappings.size() == 0) { agentMappings.put(GenericAgentClass.NAME, "default"); //agentRtMappings.put("default",
-             * "gsim.sim.agent.RtExecutionContext"); HashMap order = env.getAgentOrdering(); order.put("default", 1); }
-             */
-            GenericAgent[] a = env.getGenericAgents();
-
-            props.put("AGENT_COUNT", String.valueOf(a.length));
+            props.put("AGENT_COUNT", String.valueOf(a.size()));
 
             for (GenericAgent element : a) {
                 HashMap map = new HashMap();
                 Frame def = element.getDefinition();
-                Frame[] anc = def.getAncestors();
+                List<Frame> anc = def.getAncestors();
                 RuntimeAgent owner = new RuntimeAgent(element, env.getNamespace() + "/" + id);
 
                 if (map.size() > 0) {
@@ -154,7 +125,7 @@ public class RuntimeAgentFactory {
                 } else {
                     try {
                         RtExecutionContextImpl rc = new RtExecutionContextImpl();
-                        rc.create("default", owner, def.getTypeName());
+                        rc.create("default", owner, def.getName());
                         owner.addOrSetExecutionContext("default", rc);
                     } catch (Exception e) {
                         logger.error("Exception", e);
@@ -186,7 +157,7 @@ public class RuntimeAgentFactory {
 
             HashMap<String, String> map = new HashMap<String, String>();
             Frame def = a.getDefinition();
-            Frame[] anc = def.getAncestors();
+            List<Frame> anc = def.getAncestors();
             RuntimeAgent owner = new RuntimeAgent(a, simId);
 
             if (map.size() > 0) {
@@ -215,7 +186,7 @@ public class RuntimeAgentFactory {
             } else {
                 try {
                     RtExecutionContextImpl rc = new RtExecutionContextImpl();
-                    rc.create("default", owner, def.getTypeName());
+                    rc.create("default", owner, def.getName());
                     owner.addOrSetExecutionContext("default", rc);
                 } catch (Exception e) {
                     logger.error("Exception", e);

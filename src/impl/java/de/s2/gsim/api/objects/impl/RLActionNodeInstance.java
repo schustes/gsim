@@ -16,11 +16,6 @@ import de.s2.gsim.objects.SelectionNode;
 
 public class RLActionNodeInstance extends RuleInstance implements RLActionNode, UnitWrapper {
 
-    /**
-     *
-     */
-    private static final long serialVersionUID = 1L;
-
     public RLActionNodeInstance(BehaviourInstance owner, RLRule c) {
         super(owner, c);
     }
@@ -73,7 +68,7 @@ public class RLActionNodeInstance extends RuleInstance implements RLActionNode, 
 
     @Override
     public SelectionNode createSelectionNode(String name) throws GSimException {
-        return new SelectionNodeInstance(this, new UserRule(new UserRuleFrame("shortcut-frame"), name));
+        return new SelectionNodeInstance(this, new UserRule(UserRuleFrame.newUserRuleFrame("shortcut-frame"), name));
     }
 
     public double getComparisonDiscount() {

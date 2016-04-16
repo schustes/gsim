@@ -19,6 +19,7 @@ import de.s2.gsim.environment.ExpansionDef;
 import de.s2.gsim.environment.Frame;
 import de.s2.gsim.environment.GenericAgentClass;
 import de.s2.gsim.environment.Instance;
+import de.s2.gsim.environment.Path;
 import de.s2.gsim.environment.RLRule;
 import de.s2.gsim.environment.UserRule;
 import de.s2.gsim.environment.UserRuleFrame;
@@ -120,7 +121,7 @@ public class JessHandler implements java.io.Serializable {
                     }
                 } else if (a.getType().equals(AttributeConstants.INTERVAL)) {
                     double[] modifiedRange = rlRanges.getNewIntervalParameterRange(path,
-                            new double[] { Double.parseDouble(a.getFillers()[0]), Double.parseDouble(a.getFillers()[1]) });
+                            new double[] { Double.parseDouble(a.getFillers().get(0)), Double.parseDouble(a.getFillers().get(1)) });
                     if (modifiedRange != null) {
                         logger.debug("modified interval att=" + path + ", new range=" + modifiedRange[0] + "-" + modifiedRange[1]);
                     }
@@ -288,7 +289,7 @@ public class JessHandler implements java.io.Serializable {
                                                                              // values...
                 } else if (a.getType().equals(AttributeConstants.INTERVAL)) {
                     rlRanges.initIntervalParameterRange(path,
-                            new double[] { Double.parseDouble(e.getFillers()[0]), Double.parseDouble(a.getFillers()[1]) });
+                            new double[] { Double.parseDouble(e.getFillers().get(0)), Double.parseDouble(a.getFillers().get(1)) });
                 }
             }
         }
@@ -298,12 +299,14 @@ public class JessHandler implements java.io.Serializable {
         for (RLRule r : owner.getBehaviour().getRLRules()) {
             for (ExpansionDef e : r.getExpansions()) {
                 String path = e.getParameterName();
-                DomainAttribute a = (DomainAttribute) owner.getDefinition().resolveName(path.split("/"));
+                Path<DomainAttribute> p = Path.attributePath(path.split("/"));
+                //DomainAttribute a = (DomainAttribute) owner.getDefinition().resolveName(path.split("/"));
+                DomainAttribute a = owner.getDefinition().resolvePath(p);
                 if (a.getType().equals(AttributeConstants.SET)) {
                     rlRanges.initCategoricalParameters(path, a.getFillers());
                 } else if (a.getType().equals(AttributeConstants.INTERVAL)) {
                     rlRanges.initIntervalParameterRange(path,
-                            new double[] { Double.parseDouble(a.getFillers()[0]), Double.parseDouble(a.getFillers()[1]) });
+                            new double[] { Double.parseDouble(a.getFillers().get(0)), Double.parseDouble(a.getFillers().get(1)) });
                 }
             }
         }
@@ -458,7 +461,9 @@ public class JessHandler implements java.io.Serializable {
             ConditionDef cond = c.getEvaluationFunction();
             if (cond != null) {
                 String attName = cond.getParameterName();
-                Attribute ref = (Attribute) owner.resolveName(attName.split("/"));
+                Path<Attribute> path = Path.attributePath(attName.split("/"));
+                Attribute ref = (Attribute) owner.resolvePath(path);
+                //Attribute ref = (Attribute) owner.resolveName(attName.split("/"));
                 if (ref != null) {
                     retractConstant(cond.getParameterName());
 
@@ -474,7 +479,7 @@ public class JessHandler implements java.io.Serializable {
                 } else {
                     logger.debug("Condition in RLRule node " + c.getName() + " refers to variable " + attName
                             + ", but that variable does at the moment not exist in agent " + owner.getName() + " of type "
-                            + owner.getDefinition().getTypeName() + ".");
+                            + owner.getDefinition().getName() + ".");
                 }
             }
         }
@@ -607,16 +612,16 @@ public class JessHandler implements java.io.Serializable {
         if (path.contains("::")) {
             ConditionBuilder cb = new ConditionBuilder();
             String obj = cb.resolveObjectClass(path);
-            Frame f = (Frame) owner.getDefinition().resolveName(obj.split("/"));
+            Frame f = (Frame) owner.getDefinition().resolvePath(Path.objectPath(obj.split("/")));
             if (f == null) {
                 String list = cb.resolveList(path);
                 f = owner.getDefinition().getListType(list);
 
             }
             String att = cb.resolveAttribute(path);
-            a = (DomainAttribute) f.resolveName(att.split("/"));
+            a = f.resolvePath(Path.attributePath(att.split("/")));
         } else {
-            a = (DomainAttribute) owner.getDefinition().resolveName(path.split("/"));
+            a =  owner.getDefinition().resolvePath(Path.attributePath(path.split("/")));
         }
         return a;
     }
@@ -686,13 +691,12 @@ public class JessHandler implements java.io.Serializable {
 
         GenericAgentClass def = (GenericAgentClass) owner.getDefinition();
 
-        if (def.getTypeName().equals(role)) {
+        if (def.getName().equals(role)) {
 
         } else {
-            Frame[] ancestors = def.getAncestors();
-            for (Frame f : ancestors) {
+            for (Frame f : def.getAncestors()) {
                 GenericAgentClass agentClass = (GenericAgentClass) f;
-                if (agentClass.getTypeName().equals(role)) {
+                if (agentClass.getName().equals(role)) {
 
                 }
             }
@@ -764,9 +768,7 @@ public class JessHandler implements java.io.Serializable {
                     for (String s : params) {
                         String[] path = s.split("/");
                         String list = path[0];
-                        Instance[] children = owner.getChildInstances(list);
-                        for (int i = 0; i < children.length; i++) {
-                            Instance object = children[i];
+                        for (Instance object: owner.getChildInstances(list)) {
                             String name = list + "/" + object.getName();
 
                             if (arg == null) {

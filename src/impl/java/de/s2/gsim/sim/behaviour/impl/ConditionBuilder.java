@@ -2,6 +2,7 @@ package de.s2.gsim.sim.behaviour.impl;
 
 import java.io.FileInputStream;
 import java.util.HashMap;
+import java.util.List;
 
 import cern.jet.random.Uniform;
 import de.s2.gsim.GSimCore;
@@ -10,6 +11,7 @@ import de.s2.gsim.def.ModelDefinitionEnvironment;
 import de.s2.gsim.environment.ConditionDef;
 import de.s2.gsim.environment.ExpansionDef;
 import de.s2.gsim.environment.Instance;
+import de.s2.gsim.environment.Path;
 import de.s2.gsim.objects.AgentClass;
 import de.s2.gsim.objects.attribute.Attribute;
 import de.s2.gsim.objects.attribute.NumericalAttribute;
@@ -98,13 +100,13 @@ public class ConditionBuilder {
 
     }
 
-    public String createCategoricalAtomCondition(String attName, String[] selectedFillers, Object2VariableBindingTable objRefs, String nRule_1)
+    public String createCategoricalAtomCondition(String attName, List<String> selectedFillers, Object2VariableBindingTable objRefs, String nRule_1)
             throws GSimEngineException {
 
         // if (true)return "";
 
-        if (selectedFillers.length == 1) {
-            return this.createCategoricalAtomCondition(attName, selectedFillers[0], objRefs, nRule_1);
+        if (selectedFillers.size() == 1) {
+            return this.createCategoricalAtomCondition(attName, selectedFillers.get(0), objRefs, nRule_1);
         }
 
         String nRule = "";
@@ -112,9 +114,9 @@ public class ConditionBuilder {
         int k = Uniform.staticNextIntFromTo(0, 1000);
 
         StringBuffer name = new StringBuffer();
-        for (int i = 0; i < selectedFillers.length; i++) {
-            name.append(selectedFillers[i]);
-            if (i < selectedFillers.length - 1) {
+        for (int i = 0; i < selectedFillers.size(); i++) {
+            name.append(selectedFillers.get(i));
+            if (i < selectedFillers.size() - 1) {
                 name.append(" OR");
             }
         }
@@ -124,17 +126,12 @@ public class ConditionBuilder {
 
         nRule += " (value ?value" + k + 1251 + "&:(or ";
 
-        for (int i = 0; i < selectedFillers.length; i++) {
-            if (!de.s2.gsim.util.Utils.isNumerical(selectedFillers[i])) {
+        for (int i = 0; i < selectedFillers.size(); i++) {
+            if (!de.s2.gsim.util.Utils.isNumerical(selectedFillers.get(i))) {
                 nRule += "(eq ?value" + k + 1251;
-                nRule += " \"" + selectedFillers[i] + "\"  )";
+                nRule += " \"" + selectedFillers.get(i) + "\"  )";
             } else {
-
-                nRule += " (and (numberp ?value" + k + 1251 + ")  (= ?value" + k + 1251 + " " + selectedFillers[i] + " ) )";
-
-                // nRule += " (value ?value" + k + 1251 + "&:(and (numberp ?value" + k
-                // + 1251 + ") (= ?value" + k + 1251 + " " + selectedFillers[i]
-                // + " ) )))";
+                nRule += " (and (numberp ?value" + k + 1251 + ")  (= ?value" + k + 1251 + " " + selectedFillers.get(i) + " ) )";
             }
 
         }
@@ -191,24 +188,24 @@ public class ConditionBuilder {
                     + " ))))\n";
 
         } else {
-            String[] cat = cond.getFillers();
-            c0 = new ConditionDef(cond.getParameterName(), "=", cat[0]);
+            List<String> cat = cond.getFillers();
+            c0 = new ConditionDef(cond.getParameterName(), "=", cat.get(0));
             nRule = createLHS(c0.getParameterName(), objRefs, k + 12001, nRule_1);
-            if (!de.s2.gsim.util.Utils.isNumerical(cat[0])) {
-                nRule += "(value ?value" + k + 1251 + "&:(or (eq ?value" + k + 1251 + " \"" + cat[0] + "\" ) ";
+            if (!de.s2.gsim.util.Utils.isNumerical(cat.get(0))) {
+                nRule += "(value ?value" + k + 1251 + "&:(or (eq ?value" + k + 1251 + " \"" + cat.get(0) + "\" ) ";
             } else {
-                nRule += "(value ?value" + k + 1251 + "&:(and (numberp ?value" + k + 1251 + ")  (or (= ?value" + k + 1251 + " " + cat[0] + " ) ";
+                nRule += "(value ?value" + k + 1251 + "&:(and (numberp ?value" + k + 1251 + ")  (or (= ?value" + k + 1251 + " " + cat.get(0) + " ) ";
             }
-            if (cat.length > 1) {
-                for (int i = 1; i < cat.length; i++) {
-                    if (!de.s2.gsim.util.Utils.isNumerical(cat[0])) {
-                        nRule += "(eq ?value" + k + 1251 + " \"" + cat[i] + "\" )";
+            if (cat.size() > 1) {
+                for (int i = 1; i < cat.size(); i++) {
+                    if (!de.s2.gsim.util.Utils.isNumerical(cat.get(0))) {
+                        nRule += "(eq ?value" + k + 1251 + " \"" + cat.get(i) + "\" )";
                     } else {
-                        nRule += "(eq ?value" + k + 1251 + " " + cat[i] + " )";
+                        nRule += "(eq ?value" + k + 1251 + " " + cat.get(i) + " )";
                     }
                 }
             }
-            if (!de.s2.gsim.util.Utils.isNumerical(cat[0])) {
+            if (!de.s2.gsim.util.Utils.isNumerical(cat.get(0))) {
                 nRule += ") ) )\n";
             } else {
                 nRule += ") ) ) )\n";
@@ -577,7 +574,9 @@ public class ConditionBuilder {
     }
 
     private boolean isNumericalAttribute(Instance obj, String pathToAtt) {
-        Attribute a = (Attribute) obj.resolveName(pathToAtt.split("/"));
+        //Attribute a = (Attribute) obj.resolveName(pathToAtt.split("/"));
+    	Path<Attribute> p = Path.attributePath(pathToAtt.split("/"));
+        Attribute a = (Attribute) obj.resolvePath(p);
         return (a instanceof NumericalAttribute);
     }
 
