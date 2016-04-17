@@ -38,10 +38,11 @@ public abstract class Unit<U,A> implements Cloneable {
     	this.objectLists = objects;
     }
 
-    public abstract Unit<U,A> clone();
+    public abstract Unit<U, A> clone();
 
-    public Unit<U,A> copy() {
-        return clone();
+    @SuppressWarnings("unchecked")
+    public <K extends Unit<?, ?>> K copy() {
+        return (K) clone();
     }
 
     public void defineAttributeList(String listname) {

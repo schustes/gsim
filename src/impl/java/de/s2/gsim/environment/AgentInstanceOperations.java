@@ -12,6 +12,12 @@ import de.s2.gsim.objects.attribute.Attribute;
 
 public class AgentInstanceOperations {
 
+    private EntitiesContainer container;
+
+    public AgentInstanceOperations(EntitiesContainer container) {
+        this.container = container;
+    }
+
     public BehaviourFrame activateBehaviourRule(BehaviourFrame fr, UserRuleFrame ur, boolean activated) {
         ListIterator<Frame> iter = behaviourClasses.listIterator();
         BehaviourFrame here = null;
@@ -530,6 +536,11 @@ public class AgentInstanceOperations {
                 return cls;
             }
         }
+        return null;
+    }
+
+    public List<String> getInstancesOfClass(GenericAgentClass c) {
+        // TODO Auto-generated method stub
         return null;
     }
 

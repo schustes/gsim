@@ -5,57 +5,56 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.ListIterator;
+import java.util.Set;
 
 import de.s2.gsim.objects.attribute.AttributeFactory;
 import de.s2.gsim.objects.attribute.DomainAttribute;
 import de.s2.gsim.util.Utils;
 
 public class AgentClassOperations {
-	
-	private EntitiesContainer container;
-	
-	AgentClassOperations(EntitiesContainer container) {
-		this.container = container;
-	}
 
-    public GenericAgentClass addAgentClassAttribute(GenericAgentClass cls, String[] path, DomainAttribute a) {
+    private EntitiesContainer container;
+
+    private AgentInstanceOperations agentInstanceOperations;
+
+    private ObjectInstanceOperations objectInstanceOperations;
+
+    private ObjectClassOperations objectClassOperations;
+
+    AgentClassOperations(EntitiesContainer container, AgentInstanceOperations agentInstanceOperations,
+            ObjectInstanceOperations objectInstanceOperations, ObjectClassOperations objectClassOperations) {
+        this.container = container;
+        this.agentInstanceOperations = agentInstanceOperations;
+        this.objectInstanceOperations = objectInstanceOperations;
+        this.objectClassOperations = objectClassOperations;
+    }
+
+    public GenericAgentClass addAgentClassAttribute(GenericAgentClass cls, Path<DomainAttribute> path, DomainAttribute a) {
 
         GenericAgentClass here = this.findGenericAgentClass(cls);
-        UnitOperations.setChildAttribute(here, Utils.removeFromArray(path, a.getName()), a);
+        container.replaceAgentSubClass(here, cls);
+        here.replaceChildAttribute(path, a);
         here.setDirty(true);
 
-        ListIterator<GenericAgentClass> iter = agentSubClasses.listIterator();
-
-        while (iter.hasNext()) {
-            GenericAgentClass c = iter.next();
-            if (c.isSuccessor(cls.getTypeName())) {
-                c.replaceAncestor(here);
-                c.setDirty(true);
-                iter.set(c);
-                ListIterator<Instance> successorMembers = getInstancesOfClass(c).listIterator();
-                while (successorMembers.hasNext()) {
-                    GenericAgent succ = (GenericAgent) successorMembers.next();
-                    succ.setFrame(c);
-                    UnitOperations.setChildAttribute(succ, path, AttributeFactory.createDefaultAttribute(a));
-                    agents.add(succ);
-                    succ.setDirty(true);
-                }
+        Set<GenericAgentClass> agentSubClasses = container.getAgentSubClasses();
+        for (GenericAgentClass subClass : agentSubClasses) {
+            if (subClass.isSuccessor(cls.getName())) {
+                subClass.replaceAncestor(here);
+                container.getAllInstancesOfClass(subClass, GenericAgent.class).parallelStream().forEach(succ -> {
+                    succ.setFrame(subClass);
+                    succ.replaceChildAttribute(Path.attributePath(path.toStringArray()), AttributeFactory.createDefaultAttribute(a));
+                });
             }
         }
 
-        ListIterator members = getInstancesOfClass(cls).listIterator();
-        while (members.hasNext()) {
-            GenericAgent c = (GenericAgent) members.next();
-            c.setFrame(cls);
-            c.setDirty(true);
-            UnitOperations.setChildAttribute(c, path, AttributeFactory.createDefaultAttribute(a));
-            agents.add(c);
-        }
+        container.getAllInstancesOfClass(cls, GenericAgent.class).parallelStream().forEach(succ -> {
+            succ.setFrame(cls);
+            succ.replaceChildAttribute(Path.attributePath(path.toStringArray()), AttributeFactory.createDefaultAttribute(a));
+        });
 
-        agentSubClasses.add(here);
 
-        addChildAttributeInReferringAgents(cls, path, a);
-        addChildAttributeInReferringObjects(cls, path, a);
+        this.addChildAttributeInReferringAgents(cls, path, a);
+        objectClassOperations.addChildAttributeInReferringObjects(cls, path, a);
 
         return (GenericAgentClass) here.clone();
     }
@@ -658,7 +657,7 @@ public class AgentClassOperations {
 
     }
 
-     public GenericAgentClass removeChildFrame(GenericAgentClass cls, String[] path, String name) {
+    public GenericAgentClass removeChildFrame(GenericAgentClass cls, String[] path, String name) {
 
         GenericAgentClass here = this.findGenericAgentClass(cls);
 
@@ -699,9 +698,9 @@ public class AgentClassOperations {
 
 
 
-     TimeOrderedSet getGenericAgentSubClassesRef() {
-         return agentSubClasses;
-     }
+    TimeOrderedSet getGenericAgentSubClassesRef() {
+        return agentSubClasses;
+    }
 
     void setAgentClass(GenericAgentClass c) {
         agentClass = c;
@@ -812,28 +811,18 @@ public class AgentClassOperations {
         }
     }
 
-    public void addChildAttributeInReferringAgents(Frame here, String[] path, DomainAttribute added) {
-        GenericAgentClass[] objects = getAgentSubClasses();
-        for (int i = 0; i < objects.length; i++) {
-            GenericAgentClass c = objects[i];
-            String[] s = c.getDeclaredFrameListNames();
-            for (int j = 0; j < s.length; j++) {
-                Frame[] ff = c.getChildFrames(s[j]);
-                for (int k = 0; k < ff.length; k++) {
-                    if (ff[k].isSuccessor(here.getTypeName()) || ff[k].getTypeName().equals(here.getTypeName())) {
-                        String[] newPath = new String[path.length + 2];
-                        newPath[0] = s[j];
-                        newPath[1] = ff[k].getTypeName();
-                        for (int m = 0; m < path.length; m++) {
-                            newPath[m + 2] = path[m];
-                        }
-                        addAgentClassAttribute(c, newPath, added);
+    public void addChildAttributeInReferringAgents(GenericAgentClass here, Path path, DomainAttribute added) {
+        for (GenericAgentClass agentClass : getAgentSubClasses()) {
+            for (String listname : agentClass.getDeclaredFrameListNames()) {
+                for (Frame f : agentClass.getChildFrames(listname)) {
+                    if (f.isSuccessor(here.getName())) {
+                        Path newPath = Path.attributePath(listname, f.getName(), path.toStringArray());
+                        addAgentClassAttribute(agentClass, newPath, added);
                     }
                 }
             }
         }
     }
-
 
 
 }

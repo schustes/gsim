@@ -1,7 +1,6 @@
 package de.s2.gsim.environment;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
@@ -123,11 +122,11 @@ public class Environment implements Cloneable {
 
         HashMap<String, HierarchyNode> nodes = new HashMap<String, HierarchyNode>();
         HierarchyNode node = new HierarchyNode(root.clone());
-        nodes.put(node.getFrame().getTypeName(), node);
+        nodes.put(node.getFrame().getName(), node);
 
         stream.forEach(frame -> {
             node.insert(frame.clone());
-            nodes.put(node.getFrame().getTypeName(), node);
+            nodes.put(node.getFrame().getName(), node);
         });
 
         HierarchyNode[] top = new HierarchyNode[nodes.values().size()];
@@ -202,13 +201,12 @@ public class Environment implements Cloneable {
         this.systemAgents.put(name, cls);
     }
 
-
     public EntitiesContainer getEntities() {
         return null;
     }
 
     public AgentClassOperations getAgentClassOperations() {
-        return new AgentClassOperations(this.container);
+        return new AgentClassOperations(this.container, new AgentInstanceOperations(this.container));
     }
 
     public void addOrSetAgentMapping(String agentName, String[] roleNames) {

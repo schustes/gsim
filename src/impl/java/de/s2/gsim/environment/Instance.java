@@ -505,6 +505,26 @@ public class Instance extends Unit<Instance, Attribute> {
 		setDirty(true);
 	}
 
+    /**
+     * Replaces the values of attribute identified by {@link Path} with the ones from the given.
+     * 
+     * @param path the path
+     * @param newValue the new attribute (values are copied)
+     * @return true if the attribute was replaced, false if this was not possible because it does not exist
+     */
+    public boolean replaceChildAttribute(Path<Attribute> path, Attribute newValue) {
+        Path<List<Attribute>> p = Path.removeTerminalAttribute(path, Path.Type.LIST, Attribute.class);
+        ListIterator<Attribute> attIter = this.resolvePath(p).listIterator();
+        while (attIter.hasNext()) {
+            if (attIter.next().getName().equals(newValue.getName())) {
+                attIter.set(newValue);
+                setDirty(true);
+                return true;
+            }
+        }
+        return false;
+    }
+
 	/**
 	 * Sets the frame to the new frame, and then checks if any attributes and frames have been added or removed and updates the instance accordingly.
 	 * Note: If a list in this instance is defined that the frame does not contain, this list is also removed.

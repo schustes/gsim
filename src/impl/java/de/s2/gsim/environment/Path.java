@@ -1,5 +1,6 @@
 package de.s2.gsim.environment;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Path<T> {
@@ -10,7 +11,7 @@ public class Path<T> {
 
     private final String name;
 
-    private Path<T> next;
+    private Path<?> next;
 
     private final Type type;
 
@@ -30,7 +31,7 @@ public class Path<T> {
         return name;
     }
     
-    public Path<T> next() {
+    public Path<?> next() {
         return next;
     }
     
@@ -38,7 +39,7 @@ public class Path<T> {
         return type;
     }
 
-    public void append(Path<T> p) {
+    public void append(Path<?> p) {
         this.next = p;
     }
 
@@ -57,6 +58,35 @@ public class Path<T> {
         if (p.next != null) {
             rek(p.next(), b);
         }
+    }
+
+    public String toStringArray() {
+        List<String> list = new ArrayList<>();
+        rekArray(this, list);
+        return null;
+    }
+
+    private void rekArray(Path<?> p, List<String> list) {
+        list.add(p.name);
+        if (p.next != null) {
+            rekArray(p.next, list);
+        }
+    }
+
+    public static <M extends List<V>, T, V> Path<M> removeTerminalAttribute(Path<T> path, Type type, Class<V> k) {
+
+        Path<?> p = path;
+        Path<M> p1 = new Path<>(path.getName(), type);
+
+        while (p != null) {
+            p = p.next();
+            if (p.next() != null) {
+                p1.append(p);
+            }
+        }
+
+        return p1;
+
     }
 
     public static <T> Path<T> attributePath(String... path) {
@@ -112,6 +142,7 @@ public class Path<T> {
         }
         return initial;
     }
+
 
 
 }

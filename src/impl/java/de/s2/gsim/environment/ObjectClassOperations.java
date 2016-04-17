@@ -312,10 +312,10 @@ public class ObjectClassOperations {
         }
     }
     
-    private void addChildAttributeInReferringObjects(Frame here, Path<DomainAttribute> path, DomainAttribute added) {
+    private void addChildAttributeInReferringObjectsOld(Frame here, Path<DomainAttribute> path, DomainAttribute added) {
 
         
-        container.getObjectSubClasses().stream().flatMap(frame -> frame.replaceAncestor().stream()).;
+        container.getObjectSubClasses().stream().flatMap(frame -> frame.replaceAncestor().stream());
         
         Frame[] objects = getObjectSubClasses();
         for (int i = 0; i < objects.length; i++) {
@@ -332,6 +332,19 @@ public class ObjectClassOperations {
                             newPath[m + 2] = path[m];
                         }
                         addObjectClassAttribute(c, newPath, added);
+                    }
+                }
+            }
+        }
+    }
+
+    public void addChildAttributeInReferringObjects(Frame here, Path<DomainAttribute> path, DomainAttribute added) {
+        for (Frame objectClass : getObjectSubClasses()) {
+            for (String listname : objectClass.getDeclaredFrameListNames()) {
+                for (Frame f : objectClass.getChildFrames(listname)) {
+                    if (f.isSuccessor(here.getName())) {
+                        Path<DomainAttribute> newPath = Path.attributePath(listname, f.getName(), path.toStringArray());
+                        addObjectClassAttribute(objectClass, newPath, added);
                     }
                 }
             }

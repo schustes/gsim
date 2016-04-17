@@ -1,7 +1,10 @@
 package de.s2.gsim.environment;
 
+import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -37,12 +40,12 @@ public class EntitiesContainer {
     /**
      * Set of agent instances.
      */
-    private final Set<GenericAgent> agents = new LinkedHashSet<GenericAgent>();
+    private final Map<String, GenericAgent> agents = new LinkedHashMap<>();
 
     /**
      * Set of agent classes.
      */
-    private final Set<GenericAgentClass> agentSubClasses = new LinkedHashSet<GenericAgentClass>();
+    private final Map<String, GenericAgentClass> agentSubClasses = new LinkedHashMap<>();
 
     /**
      * Set of behaviour classes.
@@ -62,7 +65,7 @@ public class EntitiesContainer {
     /**
      * Set of units waiting for removal.
      */
-    private final Set<Unit> removed = new LinkedHashSet<Unit>();
+    private final Set<Unit<?, ?>> removed = new LinkedHashSet<>();
 
     EntitiesContainer(String ns) {
         this.ns = ns;
@@ -75,8 +78,8 @@ public class EntitiesContainer {
      * @return a list of instances
      */
     public List<? extends Instance> getInstancesOfClass(Frame frame) {
-        Stream<? extends Instance> stream = (frame instanceof GenericAgentClass) ? agents.stream() : objects.stream();
-        return stream.filter(instance -> instance.getDefinition().getTypeName().equals(frame.getTypeName())).collect(Collectors.toList());
+        Stream<? extends Instance> stream = (frame instanceof GenericAgentClass) ? agents.values().stream() : objects.stream();
+        return stream.filter(instance -> instance.getDefinition().getName().equals(frame.getName())).collect(Collectors.toList());
     }
 
     /**
@@ -85,8 +88,9 @@ public class EntitiesContainer {
      * @param frame the frame
      * @return a list of instances
      */
-    public List<? extends Instance> getAllInstancesOfClass(Frame frame) {
-        Stream<? extends Instance> stream = (frame instanceof GenericAgentClass) ? agents.stream() : objects.stream();
+    @SuppressWarnings("unchecked")
+    public <F extends Instance> List<F> getAllInstancesOfClass(Frame frame, Class<F> c) {
+        Stream<F> stream = (Stream<F>) ((frame instanceof GenericAgentClass) ? agents.values().stream() : objects.stream());
         return stream.filter(instance -> instance.inheritsFrom(frame)).collect(Collectors.toList());
     }
 
@@ -112,9 +116,16 @@ public class EntitiesContainer {
             objectSubClasses.clear();
             objectSubClasses.addAll(clone(env.getObjectSubClasses()));
             agentSubClasses.clear();
-            agentSubClasses.addAll(clone(env.getAgentSubClasses()));
+
+            Set<GenericAgentClass> g = clone(env.getAgentSubClasses());
+            for (GenericAgentClass x : g) {
+                agentSubClasses.put(x.getName(), x);
+            }
             agents.clear();
-            agents.addAll(clone(env.getAgents()));
+            Set<GenericAgent> a = clone(env.getAgents());
+            for (GenericAgent x : a) {
+                agents.put(x.getName(), x);
+            }
 
         } catch (Exception e) {
             throw new GSimDefException("Error in copy env", e);
@@ -127,7 +138,7 @@ public class EntitiesContainer {
      * @param set the set to clone from
      * @return the newly created set
      */
-    private <K extends Unit> Set<K> clone(Set<K> set) {
+    private <K extends Unit<?, ?>> Set<K> clone(Collection<K> set) {
         return set.stream().map(e -> e.<K> copy()).collect(Collectors.toSet());
     }
 
@@ -140,19 +151,19 @@ public class EntitiesContainer {
     }
 
     public Set<GenericAgent> getAgents() {
-        return agents;
+        return new LinkedHashSet<>(agents.values());
     }
 
     public void addAgent(GenericAgent agent) {
-        this.agents.add(agent);
+        this.agents.put(agent.getName(), agent);
     }
 
-    public Set<? extends GenericAgentClass> getAgentSubClasses() {
-        return agentSubClasses;
+    public Set<GenericAgentClass> getAgentSubClasses() {
+        return new LinkedHashSet<>(agentSubClasses.values());
     }
 
     public void addAgentClass(GenericAgentClass agentClass) {
-        this.agentSubClasses.add(agentClass);
+        this.agentSubClasses.put(agentClass.getName(), agentClass);
     }
 
     public Frame getBehaviourClass() {
@@ -199,12 +210,19 @@ public class EntitiesContainer {
         this.objectSubClasses.add(objectSubClass);
     }
 
-    public Set<Unit> getRemoved() {
+    public Set<Unit<?, ?>> getRemoved() {
         return removed;
     }
 
-    public void remove(Unit removed) {
+    public void remove(Unit<?, ?> removed) {
         this.removed.add(removed);
+    }
+
+    public void replaceAgentSubClass(GenericAgentClass oldOne, GenericAgentClass newOne) {
+        if (!oldOne.getName().equals(newOne.getName())) {
+            throw new IllegalArgumentException("The agent to be replaced has not the same name as the one to replace with.");
+        }
+        this.agentSubClasses.put(oldOne.getName(), newOne);
     }
 
 }
