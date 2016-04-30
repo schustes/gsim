@@ -19,13 +19,13 @@ public class AgentInstanceOperations {
     }
 
     public BehaviourFrame activateBehaviourRule(BehaviourFrame fr, UserRuleFrame ur, boolean activated) {
-        ListIterator<Frame> iter = behaviourClasses.listIterator();
+        ListIterator<Frame> iter = container.getBehaviourClasses().listIterator();
         BehaviourFrame here = null;
         while (iter.hasNext()) {
             BehaviourFrame f = (BehaviourFrame) iter.next();
-            if (f.getTypeName().equals(fr.getTypeName())) {
+            if (f.getName().equals(fr.getName())) {
                 here = f;
-                UserRuleFrame g = f.getRule(ur.getTypeName());
+                UserRuleFrame g = f.getRule(ur.getName());
                 g.setActivated(activated);
                 f.addRule(g);
                 iter.set(f);
@@ -34,8 +34,8 @@ public class AgentInstanceOperations {
         iter = behaviourClasses.listIterator();
         while (iter.hasNext()) {
             BehaviourFrame f = (BehaviourFrame) iter.next();
-            if (f.isSuccessor(fr.getTypeName())) {
-                UserRuleFrame g = f.getRule(ur.getTypeName());
+            if (f.isSuccessor(fr.getName())) {
+                UserRuleFrame g = f.getRule(ur.getName());
                 g.setActivated(activated);
                 f.addRule(g);
                 iter.set(f);

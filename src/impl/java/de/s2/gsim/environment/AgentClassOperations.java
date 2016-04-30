@@ -1,6 +1,7 @@
 package de.s2.gsim.environment;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -21,9 +22,12 @@ public class AgentClassOperations {
 
     private ObjectClassOperations objectClassOperations;
 
-    AgentClassOperations(EntitiesContainer container, AgentInstanceOperations agentInstanceOperations,
-            ObjectInstanceOperations objectInstanceOperations, ObjectClassOperations objectClassOperations) {
+    AgentClassOperations(EntitiesContainer container
+    		, AgentInstanceOperations agentInstanceOperations
+    		, ObjectInstanceOperations objectInstanceOperations
+    		, ObjectClassOperations objectClassOperations) {
         this.container = container;
+
         this.agentInstanceOperations = agentInstanceOperations;
         this.objectInstanceOperations = objectInstanceOperations;
         this.objectClassOperations = objectClassOperations;
@@ -34,7 +38,6 @@ public class AgentClassOperations {
         GenericAgentClass here = this.findGenericAgentClass(cls);
         container.replaceAgentSubClass(here, cls);
         here.replaceChildAttribute(path, a);
-        here.setDirty(true);
 
         Set<GenericAgentClass> agentSubClasses = container.getAgentSubClasses();
         for (GenericAgentClass subClass : agentSubClasses) {
@@ -63,59 +66,47 @@ public class AgentClassOperations {
 
         GenericAgentClass here = this.findGenericAgentClass(cls);
         BehaviourFrame b = here.getBehaviour();
-
-        if (!(f instanceof RLRuleFrame)) {
-            b.addRule(f);
-        } else {
+        
+        if ((f instanceof RLRuleFrame)) {
             b.addRLRule((RLRuleFrame) f);
+        } else {
+            b.addRule(f);
         }
         here.setBehaviour(b);
-        agentSubClasses.add(here);
-        here.setDirty(true);
-        ListIterator<GenericAgentClass> iter = agentSubClasses.listIterator();
-        while (iter.hasNext()) {
-            GenericAgentClass p = iter.next();
-            p.setDirty(true);
-            if (p.isSuccessor(here.getTypeName())) {
-                BehaviourFrame beh = p.getBehaviour();
+
+        Set<GenericAgentClass> agentSubClasses = container.getAgentSubClasses();
+        for (GenericAgentClass subClass : agentSubClasses) {
+            if (subClass.isSuccessor(cls.getName())) {
+                BehaviourFrame beh = subClass.getBehaviour();
                 if (!(f instanceof RLRuleFrame)) {
-                    beh.addRule(new UserRuleFrame(new UserRuleFrame[] { f }, f.getTypeName(), f.getCategory()));
+                    beh.addRule(UserRuleFrame.inherit(Arrays.asList(f), f.getName(), f.getCategory()));
                 } else {
-                    beh.addRLRule(new RLRuleFrame(new RLRuleFrame[] { (RLRuleFrame) f }, f.getTypeName(), f.getCategory()));
+                    beh.addRLRule(RLRuleFrame.inherit(Arrays.asList(f), f.getName(), f.getCategory()));
                 }
-                iter.set(p);
-                ListIterator<Instance> successorMembers = getInstancesOfClass(p).listIterator();
-                while (successorMembers.hasNext()) {
-                    GenericAgent a = (GenericAgent) successorMembers.next();
-                    a.setDirty(true);
-                    if (!(f instanceof RLRuleFrame)) {
-                        UserRule urInst = new UserRule(f, f.getTypeName());
-                        a.getBehaviour().addRule(urInst);
-                    } else {
-                        RLRule cf = new RLRule(f, f.getTypeName());
-                        a.getBehaviour().addRLRule(cf);
-                    }
-                    successorMembers.set(a);
-                }
+            	
+                subClass.replaceAncestor(here);
+                container.getAllInstancesOfClass(subClass, GenericAgent.class).parallelStream().forEach(succ -> {
+                    instanciateAndSetRule(f, succ);
+                });
             }
         }
 
-        ListIterator<Instance> iter2 = getInstancesOfClass(here).listIterator();
-        while (iter.hasNext()) {
-            GenericAgent p = (GenericAgent) iter2.next();
-            if (!(f instanceof RLRuleFrame)) {
-                UserRule urInst = new UserRule(f, f.getTypeName());
-                p.getBehaviour().addRule(urInst);
-            } else {
-                RLRule cf = new RLRule(f, f.getTypeName());
-                p.getBehaviour().addRLRule(cf);
-            }
-            p.setDirty(true);
-            iter2.set(p);
-        }
+        container.getAllInstancesOfClass(cls, GenericAgent.class).parallelStream().forEach(succ -> {
+            instanciateAndSetRule(f, succ);
+        });
 
         return (GenericAgentClass) here.clone();
     }
+
+	private void instanciateAndSetRule(UserRuleFrame f, GenericAgent succ) {
+		if (!(f instanceof RLRuleFrame)) {
+		    UserRule urInst = UserRule.instanciate(f, f.getName());
+		    succ.getBehaviour().addRule(urInst);
+		} else {
+		    RLRule cf = RLRule.instanciate(f, f.getName());
+		    succ.getBehaviour().addRLRule(cf);
+		}
+	}
 
     public void addAgentSubClass(GenericAgentClass cls) {
         agentSubClasses.add(cls);

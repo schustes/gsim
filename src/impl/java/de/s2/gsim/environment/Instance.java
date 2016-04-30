@@ -88,11 +88,11 @@ public class Instance extends Unit<Instance, Attribute> {
 	}
 
 	/**
-	 * Instanciates an instnace. The instance is constructed using the frame and its default value as template.
+	 * Instanciates an instance. The instance is constructed using the frame and its default value as template.
 	 * 
 	 * @param frame the frame to instanciate from
 	 */
-	private  final void instanciate(@NotNull Frame frame) {
+	protected final void instanciate(@NotNull Frame frame) {
 
 		for (String attrListName: frame.getAttributesListNames()) {
 			List<Attribute> attrList = new ArrayList<>();

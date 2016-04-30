@@ -14,11 +14,19 @@ public class RLRule extends UserRule {
 
     private static Logger logger = Logger.getLogger(RLRule.class);
 
-    public RLRule(Frame parent, String name) {
+    public static RLRule instanciate(Frame parent, String name) {
+    	return new RLRule(parent, name);
+    }
+
+    public static RLRule fromInstance(Instance instance) {
+    	return new RLRule(instance);
+    }
+
+    private RLRule(Frame parent, String name) {
         super(parent, name);
     }
 
-    public RLRule(Instance inst) {
+    private RLRule(Instance inst) {
         super(inst);
     }
 

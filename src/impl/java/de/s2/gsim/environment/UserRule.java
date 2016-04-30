@@ -15,20 +15,35 @@ import de.s2.gsim.objects.attribute.StringAttribute;
 public class UserRule extends Instance {
 
     static final long serialVersionUID = 3338801064775642635L;
-
-    public UserRule(Frame parent, String name) {
-        super(name, parent);
+    
+    public static UserRule instanciate(Frame parent, String name) {
+    	Instance inst = Instance.instanciate(name, parent);
+    	UserRule r = new UserRule(inst);
         DomainAttribute a = parent.getAttribute("state-var");
-        SetAttribute set = (SetAttribute) this.getAttribute("state-var");
+        SetAttribute set = (SetAttribute) r.getAttribute("state-var");
         if (a != null && set != null) {
             for (String filler: a.getFillers()) {
                 set.addEntry(filler);
             }
-            this.addOrSetAttribute(UserRuleFrame.ATTR_LIST_ATTRS, set);
+            r.addOrSetAttribute(UserRuleFrame.ATTR_LIST_ATTRS, set);
         }
+    	
+    	return r;
+    	
     }
-
-    public UserRule(Instance inst) {
+    
+    public static UserRule fromInstance(Instance inst) {
+    	Instance newInst = Instance.copy(inst);
+    	UserRule r = new UserRule(newInst);
+    	return r;
+    }
+    
+    protected UserRule(Frame frame, String name) {
+    	super(name, frame);
+    	super.instanciate(frame);
+    }
+    
+    protected UserRule(Instance inst) {
         super(inst);
         if (this.getAttribute(UserRuleFrame.ATTR_LIST_ATTRS, "activated") == null) {
             DomainAttribute a = new DomainAttribute("activated", AttributeType.STRING);

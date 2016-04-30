@@ -206,7 +206,11 @@ public class Environment implements Cloneable {
     }
 
     public AgentClassOperations getAgentClassOperations() {
-        return new AgentClassOperations(this.container, new AgentInstanceOperations(this.container));
+    	AgentInstanceOperations agentInstanceOperations = new AgentInstanceOperations(this.container);
+    	ObjectInstanceOperations objectInstanceOperations = new ObjectInstanceOperations();
+    	ObjectClassOperations objectClassOperations = new ObjectClassOperations(container, null, objectInstanceOperations);
+    	AgentClassOperations agentClassOperations = new AgentClassOperations(container, agentInstanceOperations, objectInstanceOperations, objectClassOperations);
+    	return agentClassOperations;
     }
 
     public void addOrSetAgentMapping(String agentName, String[] roleNames) {

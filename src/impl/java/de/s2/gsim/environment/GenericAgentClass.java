@@ -168,6 +168,7 @@ public class GenericAgentClass extends Frame {
 
     public void setBehaviour(BehaviourFrame f) {
         behaviour = f;
+        this.setDirty(true);
     }
 
 

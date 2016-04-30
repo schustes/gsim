@@ -14,7 +14,7 @@ public class ObjectClassOperations {
     private AgentClassOperations agentClassOperations;
     private ObjectInstanceOperations objectInstanceOperations;
 
-    public ObjectClassOperations(EntitiesContainer container, AgentClassOperations agentClassOperations,
+    ObjectClassOperations(EntitiesContainer container, AgentClassOperations agentClassOperations,
             ObjectInstanceOperations objectInstanceOperations) {
         this.container = container;
         this.objectInstanceOperations = objectInstanceOperations;

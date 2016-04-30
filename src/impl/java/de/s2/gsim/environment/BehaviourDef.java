@@ -103,7 +103,7 @@ public class BehaviourDef extends Instance {
             rule.addChildInstance(UserRuleFrame.INST_LIST_CONS, consequents[i]);
         }
 
-        return new RLRule(rule);
+        return RLRule.fromInstance(rule);
 
     }
 
@@ -179,7 +179,7 @@ public class BehaviourDef extends Instance {
         List<Instance> rules = getChildInstances(BehaviourFrame.RL_LIST);
         RLRule[] userRules = new RLRule[rules.size()];
         for (int i = 0; i < rules.size(); i++) {
-            userRules[i] = new RLRule(rules.get(i));
+            userRules[i] = RLRule.fromInstance(rules.get(i));
         }
         return userRules;
     }
