@@ -50,7 +50,7 @@ public class EntitiesContainer {
     /**
      * Set of behaviour classes.
      */
-    private final Set<Frame> behaviourClasses = new LinkedHashSet<Frame>();
+    private final Set<BehaviourFrame> behaviourClasses = new LinkedHashSet<>();
 
     /**
      * Set of object instances.
@@ -174,11 +174,11 @@ public class EntitiesContainer {
         this.behaviourClass = behaviourClass;
     }
 
-    public Set<Frame> getBehaviourClasses() {
+    public Set<BehaviourFrame> getBehaviourClasses() {
         return behaviourClasses;
     }
 
-    public void addBehaviourClass(Frame behaviourClasse) {
+    public void addBehaviourClass(BehaviourFrame behaviourClass) {
         this.behaviourClasses.add(behaviourClass);
     }
 

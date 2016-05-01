@@ -70,14 +70,14 @@ public class BehaviourFrame extends Frame {
 	/**
 	 * Inheritance constructor.
 	 */
-	public static BehaviourFrame inherit(String name, List<BehaviourFrame> parents, String category) {
-		Frame ff = Frame.inherit(parents, name, Optional.of(category));
+	public static BehaviourFrame inherit(String name, List<BehaviourFrame> parents) {
+		Frame ff = Frame.inherit(parents, name, Optional.of(EntityTypes.BEHAVIOUR.toString()));
 		BehaviourFrame bf = new BehaviourFrame(ff);
 		return bf;
 	}
 
-	public static BehaviourFrame newBehaviour(String name, String category) {
-		Frame f = new Frame(name, Optional.of(category), false, true);
+	public static BehaviourFrame newBehaviour(String name) {
+		Frame f = new Frame(name, Optional.of(EntityTypes.BEHAVIOUR.toString()), false, true);
 		BehaviourFrame bf = new BehaviourFrame(f);
 		bf.init();
 		return bf;

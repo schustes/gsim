@@ -840,5 +840,5 @@ public class Frame extends Unit<Frame, DomainAttribute> {
 		}
 		return false;
 	}
-
+	
 }
