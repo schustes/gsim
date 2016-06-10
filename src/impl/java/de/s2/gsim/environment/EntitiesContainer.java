@@ -77,11 +77,16 @@ public class EntitiesContainer {
      * @param frame the frame
      * @return a list of instances
      */
-    public List<? extends Instance> getInstancesOfClass(Frame frame) {
+    public List<? extends Instance> getInstancesOfClass0(Frame frame) {
         Stream<? extends Instance> stream = (frame instanceof GenericAgentClass) ? agents.values().stream() : objects.stream();
         return stream.filter(instance -> instance.getDefinition().getName().equals(frame.getName())).collect(Collectors.toList());
     }
 
+    @SuppressWarnings("unchecked")
+    public <F extends Instance> List<F> getInstancesOfClass(Frame frame, Class<F> c) {
+        Stream<F> stream = (Stream<F>) ((frame instanceof GenericAgentClass) ? agents.values().stream() : objects.stream());
+        return stream.filter(instance -> instance.getDefinition().getName().equals(frame.getName())).collect(Collectors.toList());
+    }
     /**
      * Gets all instances (objects or agents) that inherit from the given frame.
      * 

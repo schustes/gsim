@@ -25,7 +25,7 @@ public class GenericAgentClass extends Frame {
     private GenericAgentClass(String name) {
     	super(name, Optional.of("generic"), true, false);
         getAttributeLists().put(PROPERTIES_LIST, new ArrayList<>());
-        behaviour = BehaviourFrame.newBehaviour(getName() + "-behaviour", EntityTypes.BEHAVIOUR.toString());
+        behaviour = BehaviourFrame.newBehaviour(getName() + "-behaviour");
     }
 
     /**
@@ -51,7 +51,7 @@ public class GenericAgentClass extends Frame {
     public static GenericAgentClass inherit(GenericAgentClass parent, String name) {
     	Frame f = Frame.inherit(Arrays.asList(parent), name, Optional.of("generic"));
     	GenericAgentClass cls = new GenericAgentClass(f);
-    	BehaviourFrame bf = BehaviourFrame.inherit(name + "-behaviour", Arrays.asList(parent.getBehaviour()),BehaviourFrame.CATEGORY);
+        BehaviourFrame bf = BehaviourFrame.inherit(name + "-behaviour", Arrays.asList(parent.getBehaviour()));
     	cls.behaviour = bf.clone();
     	return cls;
     }
@@ -64,7 +64,7 @@ public class GenericAgentClass extends Frame {
     	GenericAgentClass cls = new GenericAgentClass(f);
     	
     	List<BehaviourFrame> behaviours = Arrays.stream(parents).map(g->g.getBehaviour()).collect(Collectors.toList());
-    	BehaviourFrame bf = BehaviourFrame.inherit(name + "-behaviour", behaviours,BehaviourFrame.CATEGORY);
+        BehaviourFrame bf = BehaviourFrame.inherit(name + "-behaviour", behaviours);
     	cls.behaviour = bf.clone();
     	
     	return cls;
@@ -76,7 +76,7 @@ public class GenericAgentClass extends Frame {
     public static GenericAgentClass copy(Frame f) {
     	Frame c = Frame.copy(f);
     	GenericAgentClass cls = new GenericAgentClass(c);
-    	cls.behaviour = BehaviourFrame.newBehaviour(f.getName() + "-behaviour", EntityTypes.BEHAVIOUR.toString());
+        cls.behaviour = BehaviourFrame.newBehaviour(f.getName() + "-behaviour");
         return cls;
     }
 
@@ -128,7 +128,7 @@ public class GenericAgentClass extends Frame {
         }
         allParents.add(otherRole.getBehaviour());
 
-        cls.behaviour = (BehaviourFrame) BehaviourFrame.inherit(behaviourName, allParents, "behaviour").clone();
+        cls.behaviour = (BehaviourFrame) BehaviourFrame.inherit(behaviourName, allParents).clone();
 
         cls.behaviour.setDeleteUnusedAfter(old.getDeleteUnusedAfter());
         cls.behaviour.setMaxDepth(old.getMaxDepth());

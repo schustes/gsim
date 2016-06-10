@@ -113,8 +113,7 @@ public class BehaviourFrame extends Frame {
 	@Override
 	public BehaviourFrame clone() {
 		Frame a = (Frame) super.clone();
-		BehaviourFrame f = new BehaviourFrame(a);
-		return f;
+        return new BehaviourFrame(a);
 	}
 
 	/**

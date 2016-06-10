@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.NoSuchElementException;
 
 import javax.validation.constraints.NotNull;
 
@@ -175,7 +176,7 @@ public class Instance extends Unit<Instance, Attribute> {
 				.stream()
 				.flatMap(List::stream)
 				.filter(attr -> attr.getName().equals(attrName))
-				.findFirst().get();
+                .findFirst().get();
 	}
 
 	/**
@@ -188,7 +189,7 @@ public class Instance extends Unit<Instance, Attribute> {
 
 	public  Attribute getAttribute(@NotNull String listname, @NotNull String attrName) {
 		if (!getAttributeLists().containsKey(listname)) {
-			return null;
+            throw new NoSuchElementException("List name " + listname + " does not exist");
 		}
 
 		return getAttributeLists()
