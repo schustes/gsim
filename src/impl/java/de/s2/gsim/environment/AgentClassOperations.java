@@ -444,53 +444,31 @@ public class AgentClassOperations {
 
     public void removeAgentClass(GenericAgentClass cls) {
 
-        ListIterator iter = null;
         GenericAgentClass here = this.findGenericAgentClass(cls);
 
-        iter = agentSubClasses.listIterator();
-        while (iter.hasNext()) {
-            GenericAgentClass cc = (GenericAgentClass) iter.next();
-            if (cc.isSuccessor(cls.getTypeName())) {
+        for (Iterator<GenericAgentClass> iter = container.getAgentSubClasses().iterator(); iter.hasNext();) {
+            GenericAgentClass cc = iter.next();
+            if (cc.isSuccessor(cls.getName()) || cc.equals(here)) {
                 iter.remove();
-                removed.add(cc);
+                removeFrameInReferringAgents(cc);
             }
 
-            ListIterator iter2 = getInstancesOfClass(cc).listIterator();
-            while (iter2.hasNext()) {
-                GenericAgent c = (GenericAgent) iter2.next();
-                removed.add(c);
+            for (Iterator<GenericAgent> iter2 = container.getInstancesOfClass(cc, GenericAgent.class).iterator(); iter2.hasNext();) {
+                iter2.next();
                 iter2.remove();
-            }
-
-            if (cc.equals(here)) {
-                iter.remove();
-                removed.add(here);
             }
         }
 
-        iter = objectSubClasses.listIterator();
-        while (iter.hasNext()) {
+        for (Iterator<Frame> iter = container.getObjectSubClasses().iterator(); iter.hasNext();) {
             Frame cc = (Frame) iter.next();
-            if (cc.isSuccessor(cls.getTypeName())) {
+            if (cc.isSuccessor(cls.getName()) || cc.equals(here)) {
+                objectClassOperations.removeFrameInReferringObjectClasses(cc);
                 iter.remove();
-                removed.add(cc);
             }
-
-            ListIterator iter2 = getInstancesOfClass(cc).listIterator();
-            while (iter2.hasNext()) {
-                Instance c = (Instance) iter2.next();
-                removed.add(c);
+            for (Iterator<Instance> iter2 = container.getInstancesOfClass(cc, Instance.class).iterator(); iter2.hasNext();) {
                 iter2.remove();
             }
-
-            if (cc.equals(here)) {
-                iter.remove();
-                removed.add(here);
-            }
         }
-
-        removeFrameInReferringAgents(here, new String[0]);
-        removeFrameInReferringObjectClasses(here, new String[0]);
 
     }
 
@@ -696,10 +674,11 @@ public class AgentClassOperations {
         }
     }
 
-    protected void removeFrameInReferringAgents(Frame removed, String[] path) {
-        GenericAgentClass[] objects = getAgentSubClasses();
-        for (int i = 0; i < objects.length; i++) {
-            GenericAgentClass c = objects[i];
+    // implement!
+    protected void removeFrameInReferringAgents(Frame removed) {
+        List<GenericAgentClass> objects = container.getAgentSubClasses();
+        for (int i = 0; i < objects.size(); i++) {
+            GenericAgentClass c = objects.get(i);
             String[] s = c.getDeclaredFrameListNames();
             for (int j = 0; j < s.length; j++) {
                 Frame[] ff = c.getChildFrames(s[j]);

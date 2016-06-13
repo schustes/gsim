@@ -290,7 +290,8 @@ public class ObjectClassOperations {
         }
         return null;
     }
-    protected void removeFrameInReferringObjectClasses(Frame removed, String[] path) {
+
+    protected void removeFrameInReferringObjectClasses(Frame removed) {
         Frame[] objects = getObjectSubClasses();
         for (int i = 0; i < objects.length; i++) {
             Frame c = objects[i];
