@@ -1,8 +1,11 @@
 package de.s2.gsim.environment;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.ListIterator;
+import java.util.Optional;
 import java.util.Set;
 
 import de.s2.gsim.objects.attribute.DomainAttribute;
@@ -21,15 +24,15 @@ public class ObjectClassOperations {
         this.agentClassOperations = agentClassOperations;
     }
 
-    public Frame addObjectClassAttribute(Frame cls, Path<DomainAttribute> path, DomainAttribute newValue) {
+    public Frame addObjectClassAttribute(Frame cls, Path<List<DomainAttribute>> path, DomainAttribute newValue) {
 
         Frame here = findObjectClass(cls);
         Set<Frame> objectSubClasses = container.getObjectSubClasses();
 
-        here.replaceChildAttribute(path, newValue);
+        here.addChildAttribute(path, newValue);
         here.setDirty(true);
 
-        objectSubClasses.stream().filter(f -> f.isSuccessor(cls.getTypeName())).forEach(f -> f.replaceAncestor(here));
+        objectSubClasses.stream().filter(f -> f.isSuccessor(cls.getName())).forEach(f -> f.replaceAncestor(here));
 
         this.addChildAttributeInReferringObjects(cls, path, newValue);
         agentClassOperations.addChildAttributeInReferringAgents(cls, path, newValue);
@@ -38,21 +41,20 @@ public class ObjectClassOperations {
     }
 
     public void addObjectSubClass(Frame cls) {
-        objectSubClasses.add(cls);
+        container.addObjectClass(cls.clone());
     }
 
     public Frame createObjectSubClass(String name, Frame parent) {
+
+        Frame p;
         if (parent == null) {
-            Frame p = new Frame(name, EntityConstants.TYPE_OBJECT);
-            p.setSystem(false);
-            objectSubClasses.add(p);
-            return (Frame) p.clone();
+            p = Frame.inherit(Arrays.asList(container.getObjectClass()), name, Optional.empty());
         } else {
-            Frame p = new Frame(new Frame[] { parent }, name, EntityConstants.TYPE_OBJECT);
-            p.setSystem(false);
-            objectSubClasses.add(p);
-            return (Frame) p.clone();
+            p = Frame.inherit(Arrays.asList(this.findObjectClass(parent)), name, Optional.empty());
         }
+        container.addObjectClass(p);
+        return (Frame) p.clone();
+
     }
 
     public Frame addChildFrame(Frame cls, String[] path, Frame f) {
@@ -228,7 +230,8 @@ public class ObjectClassOperations {
 
     }
 
-    public Frame removeObjectClassAttribute(Frame cls, String[] path, String a) {
+    // implement analogously to AgentClassOperations
+    public Frame removeObjectClassAttribute(Frame cls, Path<DomainAttribute> path) {
         Frame here = findObjectClass(cls);
 
         UnitOperations.removeAttribute(here, path, a);
@@ -266,6 +269,7 @@ public class ObjectClassOperations {
 
     }
     
+
     protected Frame findObjectClass(Frame extern) {
         Iterator iter = objectSubClasses.listIterator();
         while (iter.hasNext()) {
@@ -339,7 +343,7 @@ public class ObjectClassOperations {
         }
     }
 
-    public void addChildAttributeInReferringObjects(Frame here, Path<DomainAttribute> path, DomainAttribute added) {
+    public void addChildAttributeInReferringObjects(Frame here, Path<List<DomainAttribute>> path, DomainAttribute added) {
         for (Frame objectClass : getObjectSubClasses()) {
             for (String listname : objectClass.getDeclaredFrameListNames()) {
                 for (Frame f : objectClass.getChildFrames(listname)) {

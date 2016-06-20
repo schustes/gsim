@@ -167,6 +167,26 @@ public class EntitiesContainer {
         return new LinkedHashSet<>(agentSubClasses.values());
     }
 
+    /**
+     * Returns all successors of the given agent class.
+     * 
+     * @param ofWhich the agent class to get the successors for
+     * @return a set of subclasses
+     */
+    public Set<GenericAgentClass> getAgentSubClasses(GenericAgentClass ofWhich) {
+        return agentSubClasses.values().parallelStream().filter(a -> a.isSuccessor(ofWhich.getName())).collect(Collectors.toSet());
+    }
+
+    /**
+     * Get the direct children (h+1) of the given agent class.
+     * 
+     * @param ofWhich the agent to get the children from
+     * @return a set of subclasses
+     */
+    public Set<GenericAgentClass> getAgentChildren(GenericAgentClass ofWhich) {
+        return agentSubClasses.values().parallelStream().filter(a -> a.getParentFrame(ofWhich.getName()) != null).collect(Collectors.toSet());
+    }
+
     public void addAgentClass(GenericAgentClass agentClass) {
         this.agentSubClasses.put(agentClass.getName(), agentClass);
     }

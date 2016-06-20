@@ -526,6 +526,50 @@ public class Instance extends Unit<Instance, Attribute> {
         return false;
     }
 
+    public boolean addChildAttribute(Path<List<Attribute>> path, Attribute newValue) {
+        List<Attribute> attr = this.resolvePath(path);
+        if (attr != null) {
+            attr.add(newValue.clone());
+            setDirty(true);
+        }
+        return false;
+    }
+
+    /**
+     * Removes the attribute identified by {@link Path} somewhere in the tree of attributes or child attributes.
+     * 
+     * @param path the path
+     * @return true if the attribute was removed, false if none with the given attribute path could be found and/or deleted
+     */
+    public boolean removeChildAttribute(Path<Attribute> path) {
+
+        Attribute attr = this.resolvePath(path);
+        if (attr != null) {
+            Path<List<Attribute>> attrListPath = Path.withoutLastAttributeOrObject(path, Path.Type.LIST, Attribute.class);
+            List<Attribute> attrList = this.resolvePath(attrListPath);
+            if (attrList != null) {
+                attrList.remove(attr);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean removeChildInstance(Path<Instance> instancePath) {
+        Instance inst = this.resolvePath(instancePath);
+        if (inst != null) {
+            Path<List<Instance>> childListPath = Path.withoutLastAttributeOrObject(instancePath, Path.Type.LIST, Instance.class);
+            if (childListPath != null) {
+                List<Instance> list = this.resolvePath(childListPath);
+                if (list != null) {
+                    list.remove(inst);
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
 	/**
 	 * Sets the frame to the new frame, and then checks if any attributes and frames have been added or removed and updates the instance accordingly.
 	 * Note: If a list in this instance is defined that the frame does not contain, this list is also removed.
