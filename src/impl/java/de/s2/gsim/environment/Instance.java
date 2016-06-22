@@ -535,6 +535,15 @@ public class Instance extends Unit<Instance, Attribute> {
         return false;
     }
 
+    public boolean addChildInstance(Path<TypedList<Instance>> path, Instance newValue) {
+        TypedList<Instance> instance = this.resolvePath(path);
+        if (instance != null) {
+            instance.add(newValue.clone());
+            setDirty(true);
+        }
+        return false;
+    }
+
     /**
      * Removes the attribute identified by {@link Path} somewhere in the tree of attributes or child attributes.
      * 

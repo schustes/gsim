@@ -231,6 +231,26 @@ public class EntitiesContainer {
         return objectSubClasses;
     }
 
+    /**
+     * Returns all successors in the inheritance tree.
+     * 
+     * @param parent
+     * @return
+     */
+    public Set<Frame> getObjectSubClasses(Frame parent) {
+        return objectSubClasses.parallelStream().filter(f -> f.isSuccessor(parent.getName())).collect(Collectors.toSet());
+    }
+
+    /**
+     * Returns only next level inheritance.
+     * 
+     * @param parent
+     * @return
+     */
+    public Set<Frame> getObjectChildren(Frame parent) {
+        return objectSubClasses.parallelStream().filter(f -> f.getParentFrame(parent.getName()) != null).collect(Collectors.toSet());
+    }
+
     public void addObjectClass(Frame objectSubClass) {
         this.objectSubClasses.add(objectSubClass);
     }

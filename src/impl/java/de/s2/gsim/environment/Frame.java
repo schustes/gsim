@@ -895,9 +895,20 @@ public class Frame extends Unit<Frame, DomainAttribute> {
                 List<Frame> list = this.resolvePath(childFrameListPath, false);
                 if (list != null) {
                     list.remove(f);
+                    setDirty(true);
                     return true;
                 }
             }
+        }
+        return false;
+    }
+
+    public boolean addChildFrame(Path<TypedList<Frame>> framePath, Frame frameToAdd) {
+        TypedList<Frame> list = this.resolvePath(framePath);
+        if (list != null) {
+            list.add(frameToAdd.clone());
+            setDirty(true);
+            return true;
         }
         return false;
     }

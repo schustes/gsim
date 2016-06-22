@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import de.s2.gsim.objects.attribute.DomainAttribute;
 import de.s2.gsim.util.Utils;
@@ -57,70 +58,41 @@ public class ObjectClassOperations {
 
     }
 
-    public Frame addChildFrame(Frame cls, String[] path, Frame f) {
+    public Frame addChildFrame(Frame cls, Path<TypedList<Frame>> path, Frame frameToAdd) {
         Frame here = findObjectClass(cls);
-        UnitOperations.setChildFrame(here, path, f);
-        here.setDirty(true);
-        objectSubClasses.add(here);
 
-        Frame[] c = getAllObjectSuccessors(cls.getTypeName());
-        for (int i = 0; i < c.length; i++) {
-            c[i].replaceAncestor(here);
-            // c[i].setChildFrame(path, f);
-        }
-        Iterator iter = getInstancesOfClass(f).iterator();
+        here.addChildFrame(path, frameToAdd);
 
-        while (iter.hasNext()) {
-            Instance inst = (Instance) iter.next();
-            Instance instance = new Instance(f.getTypeName(), f);
-            UnitOperations.setChildInstance(inst, path, instance);
+        for (Frame successor : container.getObjectSubClasses(here)) {
+            successor.replaceAncestor(here);
         }
 
-        addChildFrameInReferringObjects(cls, path, f);
+        for (Instance member : container.getInstancesOfClass(here, Instance.class)) {
+            Instance newInstance = new Instance(frameToAdd.getName(), frameToAdd);
+            Path<TypedList<Instance>> instPath = Path.objectListPath(path.toStringArray());
+            member.addChildInstance(instPath, newInstance);
+        }
+
+        addChildFrameInReferringObjects(cls, path, frameToAdd);
+
         return (Frame) here.clone();
 
     }
     
-    public Frame[] getImmediateObjectSuccessors(String frame) {
-        Frame f = findProductClass(frame);
-        HashSet<Frame> successors = new HashSet<Frame>();
-        Iterator iter = objectSubClasses.iterator();
-        while (iter.hasNext()) {
-            Frame p = (Frame) iter.next();
-            Frame fr = p.getParentFrame(f.getTypeName());
-            if (fr != null && fr.getTypeName().equals(frame)) {
-                successors.add(p);
-            }
-        }
-        Frame[] ff = new Frame[successors.size()];
-        successors.toArray(ff);
-        return ff;
-    }
-
     public Frame getObjectClass() {
-        return objectClass;
+        return container.getObjectClass().clone();
     }
 
     public Frame getObjectClassRef() {
-        return objectClass;
+        return container.getObjectClass();
     }
 
-    public Frame getObjectSubClass(String productName) {
-        Iterator iter = objectSubClasses.listIterator();
-        while (iter.hasNext()) {
-            Frame cls = (Frame) iter.next();
-            if (cls.getTypeName().equals(productName)) {
-                return (Frame) cls.clone();
-            }
-        }
-        return null;
-
+    public Frame getObjectSubClass(String objectName) {
+        return container.getObjectSubClasses().parallelStream().filter(o -> o.getName().equals(objectName)).findAny().get();
     }
 
-    public Frame[] getObjectSubClasses() {
-        Frame[] res = new Frame[objectSubClasses.size()];
-        objectSubClasses.toArray(res);
-        return res;
+    public List<Frame> getObjectSubClasses() {
+        return container.getObjectSubClasses().parallelStream().map(Frame::clone).collect(Collectors.toList());
     }
     
     public Frame modifyObjectClassAttribute(Frame cls, String[] path, DomainAttribute a) {
@@ -357,7 +329,7 @@ public class ObjectClassOperations {
     }
 
     // when a containing object of a frame was added or in any way modified
-    private void addChildFrameInReferringObjects(Frame here, String[] path, Frame added) {
+    private void addChildFrameInReferringObjects(Frame here, Path<TypedList<Frame>> path, Frame added) {
         Frame[] objects = getObjectSubClasses();
         for (int i = 0; i < objects.length; i++) {
             Frame c = objects[i];
