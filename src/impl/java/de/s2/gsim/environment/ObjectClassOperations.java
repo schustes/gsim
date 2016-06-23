@@ -10,7 +10,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import de.s2.gsim.objects.attribute.DomainAttribute;
-import de.s2.gsim.util.Utils;
 
 public class ObjectClassOperations {
 
@@ -95,25 +94,15 @@ public class ObjectClassOperations {
         return container.getObjectSubClasses().parallelStream().map(Frame::clone).collect(Collectors.toList());
     }
     
-    public Frame modifyObjectClassAttribute(Frame cls, String[] path, DomainAttribute a) {
+    public Frame modifyObjectClassAttribute(Frame cls, Path<DomainAttribute> path, DomainAttribute a) {
         Frame here = findObjectClass(cls);
 
-        UnitOperations.setChildAttribute(here, Utils.removeFromArray(path, a.getName()), a);
-        here.setDirty(true);
-
-        objectSubClasses.add(here);
-
-        ListIterator<Frame> iter = objectSubClasses.listIterator();
-
-        while (iter.hasNext()) {
-            Frame c = iter.next();
-            c.setDirty(true);
-            if (c.isSuccessor(cls.getTypeName())) {
-                c.replaceAncestor(here);
-                UnitOperations.setChildAttribute(c, Utils.removeFromArray(path, a.getName()), (DomainAttribute) a.clone());
-                iter.set(c);
-            }
+        here.replaceChildAttribute(path, a.clone());
+        for (Frame successor : container.getObjectSubClasses(here)) {
+            successor.replaceAncestor(here);
+            successor.replaceChildAttribute(path, a.clone());
         }
+
         return (Frame) here.clone();
     }
 
@@ -121,84 +110,52 @@ public class ObjectClassOperations {
         Frame here = findObjectClass(owner);
 
         here.removeDeclaredAttributeList(listName);
-        objectSubClasses.add(here);
+        container.getInstancesOfClass(owner, Instance.class).parallelStream().forEach((inst) -> {
+            inst.setFrame(here);
+            inst.removeDeclaredAttributeList(listName);
+        });
 
-        Iterator members = getInstancesOfClass(here).iterator();
-        while (members.hasNext()) {
-            Instance c = (Instance) members.next();
-            c.setFrame(here);
-            c.removeDeclaredAttributeList(listName);
-            agents.add((GenericAgent) c);
-        }
-
-        ListIterator<Frame> iter = objectSubClasses.listIterator();
-
-        while (iter.hasNext()) {
-            Frame c = iter.next();
-            if (c.isSuccessor(here.getTypeName())) {
-                c.replaceAncestor(here);
-                c.removeDeclaredAttributeList(listName);
-                iter.set(c);
-                members = getInstancesOfClass(c).iterator();
-                while (members.hasNext()) {
-                    Instance cc = (Instance) members.next();
-                    cc.setFrame(c);
-                    cc.removeDeclaredAttributeList(listName);
-                    agents.add((GenericAgent) cc);
-                }
+        container.getObjectSubClasses(here).parallelStream().forEach(succ -> {
+            succ.replaceAncestor(here);
+            succ.removeDeclaredAttributeList(listName);
+            for (Instance member : container.getInstancesOfClass(succ, Instance.class)) {
+                member.setFrame(succ);
+                member.removeDeclaredAttributeList(listName);
             }
-        }
+        });
 
         return (Frame) here.clone();
 
     }
 
-    public Frame removeChildFrame(Frame cls, String[] path, Frame f) {
+    public Frame removeChildFrame(Frame cls, Path<Frame> path) {
         Frame here = findObjectClass(cls);
-        UnitOperations.removeChildFrame(here, path, f.getTypeName());
-        here.setDirty(true);
-        objectSubClasses.add(here);
+        here.removeChildFrame(path);
 
-        Frame[] c = getAllObjectSuccessors(cls.getTypeName());
-        for (int i = 0; i < c.length; i++) {
-            UnitOperations.removeChildFrame(c[i], path, f.getTypeName());
-        }
-
-        Iterator iter = getInstancesOfClass(f).iterator();
-        while (iter.hasNext()) {
-            Instance inst = (Instance) iter.next();
-
-            Instance[] list = (Instance[]) inst.resolveName(path);
-            if (list != null) {
-                for (int i = 0; i < list.length; i++) {
-                    if (list[i].inheritsFrom(f)) {
-                        UnitOperations.removeChildInstance(inst, path, list[i].getName());
-                    }
+        container.getObjectSubClasses(here).parallelStream().forEach(sub -> {
+            sub.removeChildFrame(path);
+            Path<TypedList<Instance>> instList = Path.objectListPath(Path.withoutLastAttributeOrObject(path, Path.Type.LIST).toStringArray());
+            for (Instance member : container.getInstancesOfClass(sub, Instance.class)) {
+                TypedList<Instance> list = member.resolvePath(instList);
+                if (list != null) {
+                    list.clear();
                 }
             }
-        }
-        // this.removeFrameInReferringObjects(f, path);
-        // this.removeFrameInReferringAgents(f, path);
+        });
 
         return (Frame) here.clone();
     }
     
     public void removeObjectClass(Frame cls) {
-        ListIterator<Frame> iter = null;
-        Frame here = findObjectClass(cls);
 
-        iter = objectSubClasses.listIterator();
+        Frame here = findObjectClass(cls);
+        Iterator<Frame> iter = container.getObjectSubClasses(here).iterator();
         while (iter.hasNext()) {
-            Frame c = iter.next();
-            if (c.isSuccessor(here.getTypeName())) {
-                removed.add(c);
-                iter.remove();
-            }
+            iter.remove();
         }
 
-        objectSubClasses.remove(here);
-
-        removeFrameInReferringAgents(cls, new String[0]);
+        container.getObjectSubClasses().remove(here);
+        agentClassOperations.removeFrameInReferringAgents(here);
 
     }
 

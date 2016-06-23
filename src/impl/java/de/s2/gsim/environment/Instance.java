@@ -514,7 +514,7 @@ public class Instance extends Unit<Instance, Attribute> {
      * @return true if the attribute was replaced, false if this was not possible because it does not exist
      */
     public boolean replaceChildAttribute(Path<Attribute> path, Attribute newValue) {
-        Path<List<Attribute>> p = Path.withoutLastAttributeOrObject(path, Path.Type.LIST, Attribute.class);
+        Path<List<Attribute>> p = Path.withoutLastAttributeOrObject(path, Path.Type.LIST);
         ListIterator<Attribute> attIter = this.resolvePath(p).listIterator();
         while (attIter.hasNext()) {
             if (attIter.next().getName().equals(newValue.getName())) {
@@ -554,7 +554,7 @@ public class Instance extends Unit<Instance, Attribute> {
 
         Attribute attr = this.resolvePath(path);
         if (attr != null) {
-            Path<List<Attribute>> attrListPath = Path.withoutLastAttributeOrObject(path, Path.Type.LIST, Attribute.class);
+            Path<List<Attribute>> attrListPath = Path.withoutLastAttributeOrObject(path, Path.Type.LIST);
             List<Attribute> attrList = this.resolvePath(attrListPath);
             if (attrList != null) {
                 attrList.remove(attr);
@@ -567,7 +567,7 @@ public class Instance extends Unit<Instance, Attribute> {
     public boolean removeChildInstance(Path<Instance> instancePath) {
         Instance inst = this.resolvePath(instancePath);
         if (inst != null) {
-            Path<List<Instance>> childListPath = Path.withoutLastAttributeOrObject(instancePath, Path.Type.LIST, Instance.class);
+            Path<List<Instance>> childListPath = Path.withoutLastAttributeOrObject(instancePath, Path.Type.LIST);
             if (childListPath != null) {
                 List<Instance> list = this.resolvePath(childListPath);
                 if (list != null) {

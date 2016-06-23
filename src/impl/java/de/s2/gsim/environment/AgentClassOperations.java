@@ -150,7 +150,7 @@ public class AgentClassOperations {
 
         GenericAgentClass here = findGenericAgentClass(cls);
 
-        Path<TypedList<Frame>> frameList = Path.withoutLastAttributeOrObject(path, Path.Type.OBJECT, Frame.class);
+        Path<TypedList<Frame>> frameList = Path.withoutLastAttributeOrObject(path, Path.Type.OBJECT);
         TypedList<Frame> list = here.resolvePath(frameList);
         list.add(f);
         here.setDirty(true);
@@ -160,7 +160,7 @@ public class AgentClassOperations {
             subClass.replaceAncestor(here);
             container.getAllInstancesOfClass(subClass, GenericAgent.class).parallelStream().forEach(succ -> {
                 succ.setFrame(subClass);
-                Path<TypedList<Instance>> instListPath = Path.withoutLastAttributeOrObject(path, Path.Type.OBJECT, Instance.class);
+                Path<TypedList<Instance>> instListPath = Path.withoutLastAttributeOrObject(path, Path.Type.OBJECT);
                 TypedList<Instance> instList = succ.resolvePath(instListPath);
                 instList.add( new Instance(f.getName(), f));
             });        	
@@ -168,7 +168,7 @@ public class AgentClassOperations {
 
         container.getAllInstancesOfClass(cls, GenericAgent.class).parallelStream().forEach(succ -> {
             succ.setFrame(cls);
-            Path<TypedList<Instance>> instListPath = Path.withoutLastAttributeOrObject(path, Path.Type.OBJECT, Instance.class);
+            Path<TypedList<Instance>> instListPath = Path.withoutLastAttributeOrObject(path, Path.Type.OBJECT);
             TypedList<Instance> instList = succ.resolvePath(instListPath);
             instList.add( new Instance(f.getName(), f));
         });
@@ -579,9 +579,9 @@ public class AgentClassOperations {
         });
     }
 
-    protected void removeFrameInReferringAgents(GenericAgentClass removed) {
-        container.getAgentSubClasses(removed).stream().forEach(a -> {
-            for (String list : removed.getListNamesWithDeclaredChildFrame(removed.getName())) {
+    protected void removeFrameInReferringAgents(Frame removed) {
+        container.getAgentSubClasses().stream().filter(a -> a.hasDeclaredChildFrame(removed.getName())).forEach(a -> {
+            for (String list : a.getListNamesWithDeclaredChildFrame(removed.getName())) {
                 Path<Frame> path = Path.objectPath(list, removed.getName());
                 this.removeChildFrame(a, path);
 

@@ -73,7 +73,7 @@ public class Path<T> {
         }
     }
 
-    public static <M extends List<V>, T, V> Path<M> withoutLastAttributeOrObject(Path<T> path, Type type, Class<V> k) {
+    public static <M extends List<V>, T, V> Path<M> withoutLastAttributeOrObject(Path<T> path, Type type) {
 
         Path<?> p = path;
         Path<M> p1 = new Path<>(path.getName(), type);
