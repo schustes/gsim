@@ -9,6 +9,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import de.s2.gsim.objects.attribute.Attribute;
 import de.s2.gsim.objects.attribute.DomainAttribute;
 
 public class ObjectClassOperations {
@@ -77,7 +78,7 @@ public class ObjectClassOperations {
         return (Frame) here.clone();
 
     }
-    
+
     public Frame getObjectClass() {
         return container.getObjectClass().clone();
     }
@@ -93,7 +94,7 @@ public class ObjectClassOperations {
     public List<Frame> getObjectSubClasses() {
         return container.getObjectSubClasses().parallelStream().map(Frame::clone).collect(Collectors.toList());
     }
-    
+
     public Frame modifyObjectClassAttribute(Frame cls, Path<DomainAttribute> path, DomainAttribute a) {
         Frame here = findObjectClass(cls);
 
@@ -145,7 +146,7 @@ public class ObjectClassOperations {
 
         return (Frame) here.clone();
     }
-    
+
     public void removeObjectClass(Frame cls) {
 
         Frame here = findObjectClass(cls);
@@ -159,69 +160,49 @@ public class ObjectClassOperations {
 
     }
 
-    // implement analogously to AgentClassOperations
-    public Frame removeObjectClassAttribute(Frame cls, Path<DomainAttribute> path) {
-        Frame here = findObjectClass(cls);
+    public GenericAgentClass removeObjectClassAttribute(Frame cls, Path<DomainAttribute> path) {
+        Frame here = this.findObjectClass(cls);
+        container.getObjectSubClasses(here).parallelStream().forEach(objectClass -> {
+            objectClass.replaceAncestor(here);
+            container.getInstancesOfClass(objectClass, Instance.class).forEach(inst -> {
+                inst.setFrame(objectClass);
+            });
+        });
 
-        UnitOperations.removeAttribute(here, path, a);
-        here.setDirty(true);
+        container.getInstancesOfClass(here, Instance.class).forEach(member -> {
+            Path<Attribute> instancePath = Path.attributePath(path.toStringArray());
+            member.removeChildAttribute(instancePath);
+        });
 
-        ListIterator<Frame> iter = objectSubClasses.listIterator();
+        here.removeChildAttribute(path);
 
-        while (iter.hasNext()) {
-            Frame c = iter.next();
-            if (c.isSuccessor(cls.getTypeName())) {
-                c.setDirty(true);
-                UnitOperations.removeAttribute(c, path, a);
-                c.replaceAncestor(here);
-                iter.set(c);
-            }
-        }
+        removeDeletedAttributeInReferringObjects(here, path);
+        removeDeletedAttributeInReferringAgents(here, path);
 
-        ListIterator<Instance> iter2 = objects.listIterator();
-        while (iter2.hasNext()) {
-            Instance c = iter2.next();
-            if (c.inheritsFrom(cls)) {
-                c.setDirty(true);
-                UnitOperations.removeAttribute(c, path, a);
-                c.setFrame(here);
-                iter2.set(c);
-            }
-        }
-
-        objectSubClasses.add(here);
-
-        removeDeletedAttributeInReferringObjects(here, path, a);
-        removeDeletedAttributeInReferringAgents(here, path, a);
-
-        return (Frame) here.clone();
+        return (GenericAgentClass) here.clone();
 
     }
-    
 
-    protected Frame findObjectClass(Frame extern) {
-        Iterator iter = objectSubClasses.listIterator();
-        while (iter.hasNext()) {
-            Frame cls = (Frame) iter.next();
-            if (cls.getTypeName().equals(extern.getTypeName())) {
-                return cls;
-            }
-        }
-        if (extern.getTypeName().equals(objectClass.getTypeName())) {
-            return objectClass;
-        }
-        return null;
+    private void removeDeletedAttributeInReferringAgents(Frame here, Path<DomainAttribute> path) {
+        container.modifyChildFrame((cls, attributePath) -> {
+                agentClassOperations.removeAgentClassAttribute((GenericAgentClass) cls, attributePath);
+        }, here, path);
     }
 
-    protected Frame findObjectClass(String extern) {
-        Iterator iter = objectSubClasses.listIterator();
-        while (iter.hasNext()) {
-            Frame cls = (Frame) iter.next();
-            if (cls.getTypeName().equals(extern)) {
-                return cls;
-            }
+    private void removeDeletedAttributeInReferringObjects(Frame here, Path<DomainAttribute> path) {
+        container.modifyChildFrame((cls, attributePath) -> {
+            removeObjectClassAttribute(cls, path);
+        }, here, path);
+    }
+
+    private Frame findObjectClass(Frame extern) {
+
+        if (extern.getName().equals(container.getObjectClass().getName())) {
+            return container.getObjectClass();
         }
-        return null;
+
+        return container.getObjectSubClasses().parallelStream().filter(a -> a.getName().equals(extern.getName())).findAny().get();
+
     }
 
     protected void removeFrameInReferringObjectClasses(Frame removed) {
@@ -245,12 +226,12 @@ public class ObjectClassOperations {
             }
         }
     }
-    
+
     private void addChildAttributeInReferringObjectsOld(Frame here, Path<DomainAttribute> path, DomainAttribute added) {
 
-        
+
         container.getObjectSubClasses().stream().flatMap(frame -> frame.replaceAncestor().stream());
-        
+
         Frame[] objects = getObjectSubClasses();
         for (int i = 0; i < objects.length; i++) {
             Frame c = objects[i];
@@ -307,7 +288,7 @@ public class ObjectClassOperations {
             }
         }
     }
-    
+
 
     public Frame[] getAllObjectSuccessors(String x) {
         ListIterator iter = objectSubClasses.listIterator();
@@ -322,7 +303,7 @@ public class ObjectClassOperations {
         set.toArray(res);
         return res;
     }
-    
+
 
     TimeOrderedSet getObjectSubClassesRef() {
         return objectSubClasses;

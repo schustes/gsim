@@ -6,8 +6,11 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import de.s2.gsim.objects.attribute.DomainAttribute;
 
 /**
  * EntitesContainer holds all components of an {@link Environment}. An environment is the simulation and setup specific object system that manages agents, objects and their relations to each other.
@@ -87,6 +90,17 @@ public class EntitiesContainer {
         Stream<F> stream = (Stream<F>) ((frame instanceof GenericAgentClass) ? agents.values().stream() : objects.stream());
         return stream.filter(instance -> instance.getDefinition().getName().equals(frame.getName())).collect(Collectors.toList());
     }
+
+    public void modifyChildFrame(BiConsumer<Frame, Path<DomainAttribute>> func, Frame classToRemoveAttributeFrom, Path<DomainAttribute> pathToChildFrame) {
+        Collection<? extends Frame> set = classToRemoveAttributeFrom.isSuccessor(agentClass.getName()) ? agentSubClasses.values() : objectSubClasses;
+        set.stream().filter(ac -> ac.hasDeclaredChildFrame(classToRemoveAttributeFrom.getName())).forEach(frame -> {
+            for (String list : classToRemoveAttributeFrom.getListNamesWithDeclaredChildFrame(classToRemoveAttributeFrom.getName())) {
+                Path<DomainAttribute> newPath = Path.attributePath(pathToChildFrame.toStringArray(), list, classToRemoveAttributeFrom.getName());
+                func.accept(frame, newPath);
+            }
+        });
+    }
+
     /**
      * Gets all instances (objects or agents) that inherit from the given frame.
      * 

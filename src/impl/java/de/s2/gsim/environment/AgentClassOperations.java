@@ -561,23 +561,35 @@ public class AgentClassOperations {
 
     }
 
-    private void removeDeletedAttributeInReferringAgents(GenericAgentClass here, Path<DomainAttribute> path) {
-        container.getAgentSubClasses().stream().filter(ac -> ac.hasDeclaredChildFrame(here.getName())).forEach(cls -> {
-            for (String list : cls.getListNamesWithDeclaredChildFrame(here.getName())) {
-                Path<DomainAttribute> newPath = Path.attributePath(path.toStringArray(), list, here.getName());
-                removeAgentClassAttribute(cls, newPath);
-            }
-        });
+    private void removeDeletedAttributeInReferringAgents(Frame here, Path<DomainAttribute> path) {
+        container.modifyChildFrame((cls, attributePath) -> {
+            this.removeAgentClassAttribute((GenericAgentClass) cls, attributePath);
+        }, here, path);
     }
 
     private void removeDeletedAttributeInReferringObjects(Frame here, Path<DomainAttribute> path) {
-        container.getObjectSubClasses().stream().filter(ac -> ac.hasDeclaredChildFrame(here.getName())).forEach(cls -> {
-            for (String list : cls.getListNamesWithDeclaredChildFrame(here.getName())) {
-                Path<DomainAttribute> newPath = Path.attributePath(path.toStringArray(), list, here.getName());
-                objectClassOperations.removeObjectClassAttribute(cls, newPath);
-            }
-        });
+        container.modifyChildFrame((cls, attributePath) -> {
+            objectClassOperations.removeObjectClassAttribute(cls, path);
+        }, here, path);
     }
+
+    // private void removeDeletedAttributeInReferringAgents(GenericAgentClass here, Path<DomainAttribute> path) {
+    // container.getAgentSubClasses().stream().filter(ac -> ac.hasDeclaredChildFrame(here.getName())).forEach(cls -> {
+    // for (String list : cls.getListNamesWithDeclaredChildFrame(here.getName())) {
+    // Path<DomainAttribute> newPath = Path.attributePath(path.toStringArray(), list, here.getName());
+    // removeAgentClassAttribute(cls, newPath);
+    // }
+    // });
+    // }
+    //
+    // private void removeDeletedAttributeInReferringObjects(Frame here, Path<DomainAttribute> path) {
+    // container.getObjectSubClasses().stream().filter(ac -> ac.hasDeclaredChildFrame(here.getName())).forEach(cls -> {
+    // for (String list : cls.getListNamesWithDeclaredChildFrame(here.getName())) {
+    // Path<DomainAttribute> newPath = Path.attributePath(path.toStringArray(), list, here.getName());
+    // objectClassOperations.removeObjectClassAttribute(cls, newPath);
+    // }
+    // });
+    // }
 
     protected void removeFrameInReferringAgents(Frame removed) {
         container.getAgentSubClasses().stream().filter(a -> a.hasDeclaredChildFrame(removed.getName())).forEach(a -> {
