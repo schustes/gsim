@@ -101,6 +101,16 @@ public class EntitiesContainer {
         });
     }
 
+    public void removeFrameInReferringFrames(BiConsumer<Frame, Path<Frame>> func, Frame removed) {
+        Collection<? extends Frame> set = removed.isSuccessor(agentClass.getName()) ? agentSubClasses.values() : objectSubClasses;
+        set.stream().filter(a -> a.hasDeclaredChildFrame(removed.getName())).forEach(frame -> {
+            for (String list : frame.getListNamesWithDeclaredChildFrame(removed.getName())) {
+                Path<Frame> path = Path.objectPath(list, removed.getName());
+                func.accept(frame, path);
+            }
+        });
+    }
+
     /**
      * Gets all instances (objects or agents) that inherit from the given frame.
      * 

@@ -862,7 +862,7 @@ public class Frame extends Unit<Frame, DomainAttribute> {
 
         DomainAttribute attr = this.resolvePath(path);
         if (attr != null) {
-            Path<List<DomainAttribute>> attrListPath = Path.withoutLastAttributeOrObject(path, Path.Type.LIST, DomainAttribute.class);
+            Path<List<DomainAttribute>> attrListPath = Path.withoutLastAttributeOrObject(path, Path.Type.LIST);
             List<DomainAttribute> attrList = this.resolvePath(attrListPath, false);
             if (attrList != null) {
                 attrList.remove(attr);
@@ -890,7 +890,7 @@ public class Frame extends Unit<Frame, DomainAttribute> {
     public boolean removeChildFrame(Path<Frame> framePath) {
         Frame f = this.resolvePath(framePath);
         if (f != null) {
-            Path<List<Frame>> childFrameListPath = Path.withoutLastAttributeOrObject(framePath, Path.Type.LIST, Frame.class);
+            Path<List<Frame>> childFrameListPath = Path.withoutLastAttributeOrObject(framePath, Path.Type.LIST);
             if (childFrameListPath != null) {
                 List<Frame> list = this.resolvePath(childFrameListPath, false);
                 if (list != null) {

@@ -133,20 +133,20 @@ public class AgentClassOperations {
      * @param path the path in the modified frame that was added
      * @param addedObject the object that is added in path
      */
-    public void addChildFrameInReferringAgents(Frame here, Path<Frame> path, Frame addedObject) {
+    public void addChildFrameInReferringAgents(Frame here, Path<TypedList<Frame>> path, Frame addedObject) {
         container.getAgentSubClasses().parallelStream().forEach(agent -> {
             for (String listName: agent.getDeclaredFrameListNames()) {
                 agent.getChildFrames(listName).stream()
                 .filter(child -> child.isSuccessor(here.getName()) || child.getName().equals(here.getName()))
                 .forEach(child -> {
-                    Path<Frame> p = Path.objectPath(listName, child.getName(), path.toStringArray());
+                            Path<TypedList<Frame>> p = Path.objectListPath(listName, child.getName(), path.toStringArray());
                     addChildObject(agent, p, addedObject);
                 });
             }
         });
     }
 
-    public GenericAgentClass addChildObject(GenericAgentClass cls, Path<Frame> path, Frame f) {
+    public GenericAgentClass addChildObject(GenericAgentClass cls, Path<TypedList<Frame>> path, Frame f) {
 
         GenericAgentClass here = findGenericAgentClass(cls);
 
@@ -473,7 +473,7 @@ public class AgentClassOperations {
         for (Iterator<Frame> iter = container.getObjectSubClasses().iterator(); iter.hasNext();) {
             Frame cc = (Frame) iter.next();
             if (cc.isSuccessor(cls.getName()) || cc.equals(here)) {
-                objectClassOperations.removeFrameInReferringObjectClasses(cc);
+                this.removeFrameInReferringObjectClasses(cc);
                 iter.remove();
             }
             for (Iterator<Instance> iter2 = container.getInstancesOfClass(cc, Instance.class).iterator(); iter2.hasNext();) {
@@ -481,6 +481,12 @@ public class AgentClassOperations {
             }
         }
 
+    }
+
+    private void removeFrameInReferringObjectClasses(Frame removed) {
+        container.removeFrameInReferringFrames((frame, subPath) -> {
+            objectClassOperations.removeChildFrame(frame, subPath);
+        }, removed);
     }
 
     public GenericAgentClass removeAgentClassAttribute(GenericAgentClass cls, Path<DomainAttribute> path) {
@@ -596,7 +602,6 @@ public class AgentClassOperations {
             for (String list : a.getListNamesWithDeclaredChildFrame(removed.getName())) {
                 Path<Frame> path = Path.objectPath(list, removed.getName());
                 this.removeChildFrame(a, path);
-
             }
         });
     }
@@ -606,7 +611,7 @@ public class AgentClassOperations {
             for (String listname : agentClass.getDeclaredFrameListNames()) {
                 for (Frame f : agentClass.getChildFrames(listname)) {
                     if (f.isSuccessor(here.getName())) {
-                        Path<List<DomainAttribute>> newPath = Path.attributePath(listname, f.getName(), path.toStringArray());
+                        Path<List<DomainAttribute>> newPath = Path.attributeListPath(listname, f.getName(), path.toStringArray());
                         addAgentClassAttribute(agentClass, newPath, added);
                     }
                 }
