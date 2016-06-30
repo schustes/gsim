@@ -363,7 +363,7 @@ public abstract class UnitOperations {
 				list.remove(a);
 				list.add(a);
 			} else {
-				x.addChildFrame(pathToChild[0], a);
+				x.addOrSetChildFrame(pathToChild[0], a);
 			}
 			x.setDirty(true);
 		} else if (pathToChild.length > 1) {

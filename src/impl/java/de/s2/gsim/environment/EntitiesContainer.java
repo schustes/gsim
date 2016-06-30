@@ -38,7 +38,7 @@ public class EntitiesContainer {
     /**
      * Top level behaviour class.
      */
-    private Frame behaviourClass;
+    private BehaviourFrame behaviourClass;
 
     /**
      * Set of agent instances.
@@ -215,11 +215,11 @@ public class EntitiesContainer {
         this.agentSubClasses.put(agentClass.getName(), agentClass);
     }
 
-    public Frame getBehaviourClass() {
+    public BehaviourFrame getBehaviourClass() {
         return behaviourClass;
     }
 
-    public void setBehaviourClass(Frame behaviourClass) {
+    public void setBehaviourClass(BehaviourFrame behaviourClass) {
         this.behaviourClass = behaviourClass;
     }
 

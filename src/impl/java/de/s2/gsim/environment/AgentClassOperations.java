@@ -42,6 +42,40 @@ public class AgentClassOperations {
         this.objectClassOperations = objectClassOperations;
     }
 
+    public BehaviourFrame activateBehaviourRule(BehaviourFrame fr, UserRuleFrame ur, boolean activated) {
+
+        container.getBehaviourClasses().parallelStream().filter(bf -> bf.getName().equals(fr.getName()) || bf.isSuccessor(fr.getName()))
+                .forEach(bf -> {
+            UserRuleFrame g = bf.getRule(ur.getName());
+            g.setActivated(activated);
+            bf.addOrSetRule(g);
+        });
+
+        return this.findBehaviourClass(fr).clone();
+
+    }
+
+    public GenericAgentClass addAttributeList(GenericAgentClass owner, String listName) throws GSimDefException {
+        GenericAgentClass here = this.findGenericAgentClass(owner);
+
+        here.defineAttributeList(listName);
+
+        Set<GenericAgentClass> agentSubClasses = container.getAgentSubClasses(owner);
+        for (GenericAgentClass subClass : agentSubClasses) {
+            subClass.replaceAncestor(here);
+            container.getInstancesOfClass(subClass, GenericAgent.class).parallelStream().forEach(succ -> {
+                succ.setFrame(subClass);
+            });
+        }
+
+        container.getInstancesOfClass(here, GenericAgent.class).parallelStream().forEach(member -> {
+            member.setFrame(here);
+        });
+
+        return (GenericAgentClass) here.clone();
+
+    }
+
     public GenericAgentClass addAgentClassAttribute(GenericAgentClass cls, Path<List<DomainAttribute>> path, DomainAttribute a) {
 
         GenericAgentClass here = this.findGenericAgentClass(cls);
@@ -79,7 +113,7 @@ public class AgentClassOperations {
         if ((f instanceof RLRuleFrame)) {
             b.addRLRule((RLRuleFrame) f);
         } else {
-            b.addRule(f);
+            b.addOrSetRule(f);
         }
         here.setBehaviour(b);
 
@@ -88,7 +122,7 @@ public class AgentClassOperations {
             if (subClass.isSuccessor(cls.getName())) {
                 BehaviourFrame beh = subClass.getBehaviour();
                 if (!(f instanceof RLRuleFrame)) {
-                    beh.addRule(UserRuleFrame.inherit(Arrays.asList(f), f.getName(), f.getCategory()));
+                    beh.addOrSetRule(UserRuleFrame.inherit(Arrays.asList(f), f.getName(), f.getCategory()));
                 } else {
                     beh.addRLRule(RLRuleFrame.inherit(Arrays.asList(f), f.getName(), f.getCategory()));
                 }
@@ -182,13 +216,13 @@ public class AgentClassOperations {
         BehaviourFrame here = null;
         for (BehaviourFrame f: container.getBehaviourClasses()) {
             if (f.getName().equals(fr.getName())) {
-                f.addRule(ur);
+                f.addOrSetRule(ur);
                 here = f;
             }
         }
         for (BehaviourFrame f: container.getBehaviourClasses()) {
             if (f.isSuccessor(fr.getName())) {
-                f.addRule(ur);
+                f.addOrSetRule(ur);
                 f.replaceAncestor(here);
             }
         }
@@ -220,12 +254,12 @@ public class AgentClassOperations {
 
                 for (UserRuleFrame f : behaviourFrame.getRules()) {
                     if (f.isDirty() && sb.getDeclaredRule(f.getName()) != null) {
-                        sb.addRule(f);
+                        sb.addOrSetRule(f);
                     }
                 }
                 for (RLRuleFrame f : behaviourFrame.getRLRule()) {
                     if (f.isDirty() && sb.getDeclaredRLRule(f.getName()) != null) {
-                        sb.addRule(f);
+                        sb.addOrSetRule(f);
                     }
                 }
                 for (ActionFrame f : behaviourFrame.getAvailableActions()) {
@@ -558,13 +592,17 @@ public class AgentClassOperations {
     }
 
     private GenericAgentClass findGenericAgentClass(GenericAgentClass extern) {
-
         if (extern.getName().equals(GenericAgentClass.NAME)) {
             return container.getAgentClass();
         }
-
         return container.getAgentSubClasses().parallelStream().filter(a -> a.getName().equals(extern.getName())).findAny().get();
+    }
 
+    private BehaviourFrame findBehaviourClass(BehaviourFrame extern) {
+        if (extern.getName().equals(GenericAgentClass.NAME)) {
+            return container.getBehaviourClass();
+        }
+        return container.getBehaviourClasses().parallelStream().filter(a -> a.getName().equals(extern.getName())).findAny().get();
     }
 
     private void removeDeletedAttributeInReferringAgents(Frame here, Path<DomainAttribute> path) {
@@ -578,24 +616,6 @@ public class AgentClassOperations {
             objectClassOperations.removeObjectClassAttribute(cls, path);
         }, here, path);
     }
-
-    // private void removeDeletedAttributeInReferringAgents(GenericAgentClass here, Path<DomainAttribute> path) {
-    // container.getAgentSubClasses().stream().filter(ac -> ac.hasDeclaredChildFrame(here.getName())).forEach(cls -> {
-    // for (String list : cls.getListNamesWithDeclaredChildFrame(here.getName())) {
-    // Path<DomainAttribute> newPath = Path.attributePath(path.toStringArray(), list, here.getName());
-    // removeAgentClassAttribute(cls, newPath);
-    // }
-    // });
-    // }
-    //
-    // private void removeDeletedAttributeInReferringObjects(Frame here, Path<DomainAttribute> path) {
-    // container.getObjectSubClasses().stream().filter(ac -> ac.hasDeclaredChildFrame(here.getName())).forEach(cls -> {
-    // for (String list : cls.getListNamesWithDeclaredChildFrame(here.getName())) {
-    // Path<DomainAttribute> newPath = Path.attributePath(path.toStringArray(), list, here.getName());
-    // objectClassOperations.removeObjectClassAttribute(cls, newPath);
-    // }
-    // });
-    // }
 
     protected void removeFrameInReferringAgents(Frame removed) {
         container.getAgentSubClasses().stream().filter(a -> a.hasDeclaredChildFrame(removed.getName())).forEach(a -> {

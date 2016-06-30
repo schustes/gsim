@@ -51,7 +51,6 @@ public class Generator {
                     agent.setChildInstance(lists[i], obj);
                 }
             }
-
         }
         return agent;
     }

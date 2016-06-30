@@ -79,10 +79,10 @@ public class Instance extends Unit<Instance, Attribute> {
 	}
 
 	/**
-	 * Constructs a new instance by copying the given one.
-	 * 
-	 * @param inst the instance to copy from
-	 */
+     * Constructs a new instance by using frame and name of the given instance (no copy!).
+     * 
+     * @param inst the instance to create the new instance from
+     */
 	protected Instance(@NotNull Instance inst) {
 		super(inst.getName(), inst.isMutable(), inst.isSystem());
 		this.frame = inst.getDefinition();

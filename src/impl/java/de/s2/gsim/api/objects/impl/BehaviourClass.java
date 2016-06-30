@@ -50,7 +50,7 @@ public class BehaviourClass implements Behaviour, UnitWrapper {
             return;
         }
 
-        real.addRule((UserRuleFrame) ((UnitWrapper) rule).toUnit());
+        real.addOrSetRule((UserRuleFrame) ((UnitWrapper) rule).toUnit());
         owner.setBehaviour(this);
 
     }
@@ -74,7 +74,7 @@ public class BehaviourClass implements Behaviour, UnitWrapper {
     @Override
     public Rule createRule(String name) throws GSimException {
         UserRuleFrame r = real.createRule(name);
-        real.addRule(r);
+        real.addOrSetRule(r);
         RuleClass c = new RuleClass(this, r);
         owner.setBehaviour(this);
         return c;

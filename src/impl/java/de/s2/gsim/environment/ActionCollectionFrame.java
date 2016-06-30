@@ -20,18 +20,18 @@ public class ActionCollectionFrame extends Frame {
     public ActionCollectionFrame(String name) {
         super(name, Optional.of(CATEGORY), true, true);
         Frame f1 = Frame.newFrame("{all actions}", Optional.of("action"));
-        addChildFrame(INST_ACTION_LIST, f1);
+        addOrSetChildFrame(INST_ACTION_LIST, f1);
     }
 
     public ActionCollectionFrame(String name, Frame[] allowedActions) {
         super(name, Optional.of(CATEGORY), true, true);
         for (int i = 0; i < allowedActions.length; i++) {
-            addChildFrame(INST_ACTION_LIST, allowedActions[i]);
+            addOrSetChildFrame(INST_ACTION_LIST, allowedActions[i]);
         }
     }
 
     public void addAction(Frame action) {
-        super.addChildFrame(INST_ACTION_LIST, action);
+        super.addOrSetChildFrame(INST_ACTION_LIST, action);
     }
 
     @Override

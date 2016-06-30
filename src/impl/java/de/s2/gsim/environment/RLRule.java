@@ -19,7 +19,12 @@ public class RLRule extends UserRule {
     }
 
     public static RLRule fromInstance(Instance instance) {
-    	return new RLRule(instance);
+        Instance inst = Instance.copy(instance);
+        return new RLRule(inst);
+    }
+
+    public RLRule clone() {
+        return fromInstance(this);
     }
 
     private RLRule(Frame parent, String name) {

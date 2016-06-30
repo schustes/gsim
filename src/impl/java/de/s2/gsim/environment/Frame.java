@@ -174,7 +174,7 @@ public class Frame extends Unit<Frame, DomainAttribute> {
             Frame fr = list.getType();
             to.getObjectLists().put(frameList, new TypedList<>(fr));
             from.getDeclaredChildFrames(frameList).forEach(child -> {
-                to.addChildFrame(frameList, child.clone());
+                to.addOrSetChildFrame(frameList, child.clone());
             });
 
         });
@@ -191,7 +191,7 @@ public class Frame extends Unit<Frame, DomainAttribute> {
      * @param listName name of the list where this object is to be placed
      * @param frame the frame to add
      */
-    public void addChildFrame(@NotNull String listName, @NotNull Frame frame) {
+    public void addOrSetChildFrame(@NotNull String listName, @NotNull Frame frame) {
 
         TypedList<Frame> list;
         TypedMap<Frame> objectLists = super.getObjectLists();
@@ -246,7 +246,7 @@ public class Frame extends Unit<Frame, DomainAttribute> {
             TypedList<Frame> list = this.getObjectLists().get(frameList);
             f.getObjectLists().put(frameList, new TypedList<>(list.getType()));
             this.getDeclaredChildFrames(frameList).forEach(child -> {
-                f.addChildFrame(frameList, child.clone());
+                f.addOrSetChildFrame(frameList, child.clone());
             });
 
         });

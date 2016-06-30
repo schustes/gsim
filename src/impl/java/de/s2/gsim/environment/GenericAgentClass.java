@@ -142,7 +142,7 @@ public class GenericAgentClass extends Frame {
         	cls.behaviour.addRLRule(r);
         }
         for (UserRuleFrame r : old.getDeclaredRules()) {
-        	cls.behaviour.addRule(r);
+        	cls.behaviour.addOrSetRule(r);
         }
         
         return cls;

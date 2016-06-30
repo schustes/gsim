@@ -56,11 +56,11 @@ public class RLRuleFrame extends UserRuleFrame {
     }
 
     public void addExpansion(ExpansionFrame cond) {
-        super.addChildFrame(INST_LIST_EXP, cond);
+        super.addOrSetChildFrame(INST_LIST_EXP, cond);
     }
 
     public void addSelectionRule(UserRuleFrame sc) {
-        super.addChildFrame(INST_LIST_SHORTCUTS, sc);
+        super.addOrSetChildFrame(INST_LIST_SHORTCUTS, sc);
     }
 
     public void addStateVar(String path) {
@@ -227,7 +227,7 @@ public class RLRuleFrame extends UserRuleFrame {
             super.removeChildFrame(RLRuleFrame.INST_LIST_LEARNING, a.getName());
         }
 
-        super.addChildFrame(INST_LIST_LEARNING, f);
+        super.addOrSetChildFrame(INST_LIST_LEARNING, f);
     }
 
     public void setMethod(String s) {

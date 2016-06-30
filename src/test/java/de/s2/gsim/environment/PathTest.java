@@ -39,8 +39,8 @@ public class PathTest {
         DomainAttribute a1 = new DomainAttribute("attr", AttributeType.STRING);
         a1.setDefault("default-value");
         c2.addOrSetAttribute("attr-list", a1);
-        c1.addChildFrame("list-2", c2);
-        f.addChildFrame("list-1", c1);
+        c1.addOrSetChildFrame("list-2", c2);
+        f.addOrSetChildFrame("list-1", c1);
         
         Instance instance = Instance.instanciate("Test", f);
 
@@ -60,7 +60,7 @@ public class PathTest {
 
         Frame f = Frame.newFrame("Test");
         Frame c1 = Frame.newFrame(objectName);
-        f.addChildFrame(listName, c1);
+        f.addOrSetChildFrame(listName, c1);
         
         Instance instance = Instance.instanciate("test", f);
         
@@ -83,8 +83,8 @@ public class PathTest {
         DomainAttribute a1 = new DomainAttribute("attr", AttributeType.STRING);
         a1.setDefault("default-value");
         c2.addOrSetAttribute("attr-list", a1);
-        c1.addChildFrame("list-2", c2);
-        f.addChildFrame("list-1", c1);
+        c1.addOrSetChildFrame("list-2", c2);
+        f.addOrSetChildFrame("list-1", c1);
 
         DomainAttribute k = f.resolvePath(path);
 
@@ -104,7 +104,7 @@ public class PathTest {
         DomainAttribute a1 = new DomainAttribute("attr", AttributeType.STRING);
         a1.setDefault("default-value");
         c2.addOrSetAttribute("attr-list", a1);
-        f.addChildFrame("list-2", c2);
+        f.addOrSetChildFrame("list-2", c2);
 
         DomainAttribute k = c1.resolvePath(path);
 
@@ -127,7 +127,7 @@ public class PathTest {
         a1.setDefault("default-value");
         c1.addOrSetAttribute(listName, a1);
         c1.addOrSetAttribute(listName, a2);
-        f.addChildFrame("list-1", c1);
+        f.addOrSetChildFrame("list-1", c1);
 
         List<DomainAttribute> list = f.resolvePath(path);
 
@@ -145,7 +145,7 @@ public class PathTest {
 
         Frame f = Frame.newFrame("Test");
         Frame c1 = Frame.newFrame(objectName);
-        f.addChildFrame(listName, c1);
+        f.addOrSetChildFrame(listName, c1);
 
         TypedList<Frame> list = f.resolvePath(path);
 
@@ -163,7 +163,7 @@ public class PathTest {
 
         Frame f = Frame.newFrame("Test");
         Frame c1 = Frame.newFrame(objectName);
-        f.addChildFrame(listName, c1);
+        f.addOrSetChildFrame(listName, c1);
 
         Frame child = f.resolvePath(path);
 
@@ -179,7 +179,7 @@ public class PathTest {
 
         Frame f = Frame.newFrame("Test");
         Frame c1 = Frame.newFrame("C1");
-        f.addChildFrame("list-1", c1);
+        f.addOrSetChildFrame("list-1", c1);
 
         List<DomainAttribute> list = f.resolvePath(path);
 

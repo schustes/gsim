@@ -18,90 +18,21 @@ public class AgentInstanceOperations {
         this.container = container;
     }
 
-    public BehaviourFrame activateBehaviourRule(BehaviourFrame fr, UserRuleFrame ur, boolean activated) {
-        ListIterator<Frame> iter = container.getBehaviourClasses().listIterator();
-        BehaviourFrame here = null;
-        while (iter.hasNext()) {
-            BehaviourFrame f = (BehaviourFrame) iter.next();
-            if (f.getName().equals(fr.getName())) {
-                here = f;
-                UserRuleFrame g = f.getRule(ur.getName());
-                g.setActivated(activated);
-                f.addRule(g);
-                iter.set(f);
-            }
-        }
-        iter = behaviourClasses.listIterator();
-        while (iter.hasNext()) {
-            BehaviourFrame f = (BehaviourFrame) iter.next();
-            if (f.isSuccessor(fr.getName())) {
-                UserRuleFrame g = f.getRule(ur.getName());
-                g.setActivated(activated);
-                f.addRule(g);
-                iter.set(f);
-            }
-        }
-        return here;
-    }
-
-    public GenericAgent addAgentRule(GenericAgent p, UserRule f) {
-        GenericAgent here = (GenericAgent) p.clone();
+    public GenericAgent addAgentRule(GenericAgent agent, UserRule f) {
+        GenericAgent here = this.findGenericAgent(agent.getName());
 
         if (!(f instanceof RLRule)) {
-            here.getBehaviour().addRule(f);
+            here.getBehaviour().addRule(f.clone());
         } else {
-            here.getBehaviour().addRLRule((RLRule) f);
+            here.getBehaviour().addRLRule((RLRule) f.clone());
         }
-        here.setDirty(true);
-        here.setDirty(true);
-        agents.add(here);
+
         return (GenericAgent) here.clone();
     }
 
-    public GenericAgentClass addAttributeList(GenericAgentClass owner, String listName) throws GSimDefException {
-        GenericAgentClass here = this.findGenericAgentClass(owner);
-
-        here.defineAttributeList(listName);
-        agentSubClasses.add(here);
-
-        Iterator members = getInstancesOfClass(here).iterator();
-        while (members.hasNext()) {
-            GenericAgent c = (GenericAgent) members.next();
-            c.setFrame(here);
-            c.defineAttributeList(listName);
-            agents.add(c);
-        }
-
-        ListIterator<GenericAgentClass> iter = agentSubClasses.listIterator();
-
-        while (iter.hasNext()) {
-            GenericAgentClass c = iter.next();
-            if (c.isSuccessor(here.getTypeName())) {
-                c.replaceAncestor(here);
-                iter.set(c);
-                members = getInstancesOfClass(c).iterator();
-                while (members.hasNext()) {
-                    GenericAgent cc = (GenericAgent) members.next();
-                    cc.setFrame(c);
-                    c.defineAttributeList(listName);
-                    agents.add(cc);
-                }
-            }
-        }
-
-        return (GenericAgentClass) here.clone();
-
-    }
-
-    public GenericAgent addChildInstance(GenericAgent a, String[] path, Instance child) {
+    public GenericAgent addChildInstance(GenericAgent a, Path<TypedList<Instance>> path, Instance child) {
         GenericAgent here = findGenericAgent(a.getName());
-        UnitOperations.setChildInstance(here, path, child);
-        UserRule[] rules = here.getBehaviour().getRules();
-        for (int i = 0; i < rules.length; i++) {
-            here.getBehaviour().addRule(rules[i]);
-        }
-        here.setDirty(true);
-        agents.add(here);
+        here.addChildInstance(path, child);
         return (GenericAgent) here.clone();
     }
 
@@ -427,7 +358,7 @@ public class AgentInstanceOperations {
             pb1.addRLRule((RLRuleFrame) ur1);
         } else {
             ur1.setActivated(status);
-            pb1.addRule(ur1);
+            pb1.addOrSetRule(ur1);
         }
         here.setBehaviour(pb1);
         here.setDirty(true);
@@ -466,7 +397,7 @@ public class AgentInstanceOperations {
                     pb.addRLRule((RLRuleFrame) ur);
                 } else {
                     ur.setActivated(status);
-                    pb.addRule(ur);
+                    pb.addOrSetRule(ur);
                 }
                 p.setBehaviour(pb);
                 iter2.set(p);
@@ -529,19 +460,7 @@ public class AgentInstanceOperations {
 
 
     protected GenericAgent findGenericAgent(String extern) {
-        Iterator iter = agents.iterator();
-        while (iter.hasNext()) {
-            GenericAgent cls = (GenericAgent) iter.next();
-            if (cls.getName().equals(extern)) {
-                return cls;
-            }
-        }
-        return null;
-    }
-
-    public List<String> getInstancesOfClass(GenericAgentClass c) {
-        // TODO Auto-generated method stub
-        return null;
+        return container.getAgents().parallelStream().filter(a -> a.getName().equals(extern)).findAny().get();
     }
 
 }

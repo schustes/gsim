@@ -453,7 +453,7 @@ public class EnvironmentSetup {
                 f.setSalience(Double.parseDouble(sal.getValue()));
             }
             rf.addConsequence(f);
-            agent.getBehaviour().addRule(rf);
+            agent.getBehaviour().addOrSetRule(rf);
         }
     }
 
