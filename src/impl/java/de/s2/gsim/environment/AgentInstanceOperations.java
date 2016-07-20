@@ -1,18 +1,22 @@
 package de.s2.gsim.environment;
 
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import de.s2.gsim.objects.attribute.Attribute;
 
 public class AgentInstanceOperations {
 
     private EntitiesContainer container;
+
+    private AgentClassOperations agentClassOperations;
 
     public AgentInstanceOperations(EntitiesContainer container) {
         this.container = container;
@@ -36,119 +40,11 @@ public class AgentInstanceOperations {
         return (GenericAgent) here.clone();
     }
 
-    public GenericAgentClass addChildObjectList(GenericAgentClass owner, String listName, Frame type) throws GSimDefException {
-        GenericAgentClass here = this.findGenericAgentClass(owner);
-
-        here.defineObjectList(listName, type);
-        agentSubClasses.add(here);
-
-        Iterator members = getInstancesOfClass(here).iterator();
-        while (members.hasNext()) {
-            GenericAgent c = (GenericAgent) members.next();
-            c.setFrame(here);
-            c.defineObjectList(listName, type);
-            agents.add(c);
-        }
-
-        ListIterator<GenericAgentClass> iter = agentSubClasses.listIterator();
-
-        while (iter.hasNext()) {
-            GenericAgentClass c = iter.next();
-            if (c.isSuccessor(here.getTypeName())) {
-                c.replaceAncestor(here);
-                c.defineObjectList(listName, type);
-                iter.set(c);
-                members = getInstancesOfClass(c).iterator();
-                while (members.hasNext()) {
-                    GenericAgent cc = (GenericAgent) members.next();
-                    cc.setFrame(c);
-                    cc.defineObjectList(listName, type);
-                    agents.add(cc);
-                }
-            }
-        }
-
-        return (GenericAgentClass) here.clone();
-
-    }
-
     public GenericAgent changeAgentBehaviour(GenericAgent c, BehaviourDef b) {
         GenericAgent here = findGenericAgent(c.getName());
         here.setBehaviour(b);
-        here.setDirty(true);
-        agents.add(here);
         return (GenericAgent) here.clone();
     }
-
-    public GenericAgent changeAgentName(GenericAgent inst, String newName) {
-        GenericAgent old = findGenericAgent(inst.getName());
-        GenericAgent here = (GenericAgent) old.clone();
-        removeGenericAgent(old);
-        here.changeName(newName);
-        here.setDirty(true);
-        agents.add(here);
-        return (GenericAgent) here.clone();
-    }
-
-    public GenericAgent changeChildInstanceName(GenericAgentClass owner, String[] pathToChild, String newName) {
-        GenericAgent old = findGenericAgent(owner.getName());
-        Object o = old.resolveName(pathToChild);
-        if (o instanceof Instance) {
-            Instance in = (Instance) o;
-            in.changeName(newName);
-            UnitOperations.setChildInstance(old, pathToChild, in);
-        }
-        old.setDirty(true);
-        agents.add(old);
-        return old;
-    }
-
-
-
-    public InheritanceHierarchy[] exportAgentHierarchy() {
-
-        HashMap<String, InheritanceHierarchy> nodes = new HashMap<String, InheritanceHierarchy>();
-        ListIterator iter = agentSubClasses.listIterator();
-
-        Frame root = agentClass;
-        InheritanceHierarchy node = new InheritanceHierarchy((Frame) root.clone());
-        nodes.put(node.getFrame().getTypeName(), node);
-
-        while (iter.hasNext()) {
-            Frame c = (Frame) iter.next();
-            Frame cc = (Frame) c.clone();
-            node.insert(cc);
-            nodes.put(node.getFrame().getTypeName(), node);
-        }
-
-        InheritanceHierarchy[] top = new InheritanceHierarchy[nodes.values().size()];
-        nodes.values().toArray(top);
-
-        return top;
-
-    }
-
-    public InheritanceHierarchy[] exportBehaviourHierarchy() {
-
-        HashMap<String, InheritanceHierarchy> nodes = new HashMap<String, InheritanceHierarchy>();
-        ListIterator iter = behaviourClasses.listIterator();
-        Frame root = behaviourClass;
-        InheritanceHierarchy node = new InheritanceHierarchy((Frame) root.clone());
-        node.insert((Frame) root.clone());
-
-        while (iter.hasNext()) {
-            BehaviourFrame c = (BehaviourFrame) iter.next();
-            node.insert((Frame) c.clone());
-            nodes.put(node.getFrame().getTypeName(), node);
-        }
-
-        InheritanceHierarchy[] top = new InheritanceHierarchy[nodes.values().size()];
-        nodes.values().toArray(top);
-
-        return top;
-
-    }
-
 
     public GenericAgent getAgent(String name) {
         GenericAgent a = findGenericAgent(name);
@@ -158,122 +54,89 @@ public class AgentInstanceOperations {
         return (GenericAgent) a.clone();
     }
 
-    public GenericAgentClass getAgentClass() throws GSimDefException {
-        return (GenericAgentClass) agentClass.clone();
+    public List<String> getAgentNames() {
+        return container.getAgents().parallelStream().map(a -> a.getName()).collect(Collectors.toList());
     }
 
-    public String[] getAgentNames() {
-        HashSet<String> set = new HashSet<String>();
-        Iterator iter = agents.iterator();
-        while (iter.hasNext()) {
-            set.add(((GenericAgent) iter.next()).getName());
-        }
-        String[] res = new String[set.size()];
-        set.toArray(res);
-        return res;
+    public List<GenericAgent> getAgents(String parent, int offset, int count) {
+        return this.container.getAgents().stream().skip(offset).limit(count).map(a -> a.clone()).collect(Collectors.toList());
     }
 
-    public GenericAgent[] getAgents(String parent, int offset, int count) throws GSimDefException {
-        GenericAgent[] a = this.getAgents(parent);
-        List<GenericAgent> ret = new ArrayList<GenericAgent>();
-
-        int currentOff = 0;
-        for (int i = offset; i < a.length; i++) {
-            ret.add((GenericAgent) a[i].clone());
-        }
-        GenericAgent[] retArray = new GenericAgent[ret.size()];
-        ret.toArray(retArray);
-        return retArray;
-    }
-
-    public GenericAgent[] getGenericAgents() {
-        GenericAgent[] res = new GenericAgent[agents.size()];
-        agents.toArray(res);
-        return res;
-    }
-
-    public String getNamespace() {
-        return ns;
-    }
-
-    public Instance getObject(String name) {
-        Instance here = findObject(name);
-        if (here == null) {
-            return null;
-        }
-        return (Instance) here.clone();
+    public List<GenericAgent> getGenericAgents() {
+        return this.container.getAgents().parallelStream().map(a -> a.clone()).collect(Collectors.toList());
     }
 
     public int getTotalAgentCount() {
-        logger.debug("getTotalAgentCount() delegate: " + agents.size() + ", this=" + this);
-        return agents.size();
+        return this.container.getAgents().size();
     }
 
-    public GenericAgent instanciateAgent(GenericAgentClass cls, String name, int method, double svar) {
+    public GenericAgent instanciateAgentWithNormalDistributedAttributes(GenericAgentClass cls, String name, double svar) {
         GenericAgent a = new GenericAgent(name, cls);
-
-        if (method != Environment.RAND_NONE) {
-            Generator gen = new Generator();
-            if (method == Environment.RAND_ATT_ONLY) {
-                a = gen.randomiseAttributeValues(a, svar, Generator.Method.Normal);
-            } else if (method == Environment.RAND_ATT_ONLY_UNIFORM) {
-                a = gen.randomiseAttributeValues(a, svar, Generator.Method.Uniform);
-            }
-        }
-        agents.add(a);
+        a = Generator.randomiseAttributeValues(a, svar, Generator.Method.Uniform);
+        container.getAgents().add(a);
         return (GenericAgent) a.clone();
     }
 
-    public GenericAgent[] instanciateAgents(GenericAgentClass parent, String prefix, int method, double svar, int count) {
-
-        logger.debug("Instanciate agents(" + this + "): " + count + " of " + parent.getTypeName());
-
-        GenericAgent[] a = new GenericAgent[count];
-
-        // double id = this.hashCode() * idNo;
-        for (int i = 0; i < count; i++) {
-            // int id = Uniform.staticNextIntFromTo(0, 10000);
-            counter++;
-            String name;
-            try {
-                name = prefix + "-" + counter + "(" + java.net.InetAddress.getLocalHost().getCanonicalHostName() + ")";
-            } catch (Exception e) {
-                name = prefix + "-" + counter;
-            }
-            logger.debug("agent:" + name);
-            a[i] = instanciateAgent(parent, name, method, svar);
-        }
-
-        Collections.shuffle(agents);
-
-        return a;
+    public GenericAgent instanciateAgentWithUniformDistributedAttributes(GenericAgentClass cls, String name) {
+        GenericAgent a = new GenericAgent(name, cls);
+        a = Generator.randomiseAttributeValues(a, 0, Generator.Method.Normal);
+        container.getAgents().add(a);
+        return (GenericAgent) a.clone();
     }
 
-    public void instanciateAgents2(GenericAgentClass parent, String prefix, int method, double svar, int count) {
+    public List<GenericAgent> instanciateAgentsWithUniformDistributedAttributes(GenericAgentClass parent, Optional<String> prefix, int method,
+            double svar,
+            int count) {
 
-        logger.debug("Instanciate agents(" + this + "): " + count + " of " + parent.getTypeName());
+        List<GenericAgent> result = instanciateAgents(parent, prefix, count,
+                (name) -> instanciateAgentWithUniformDistributedAttributes(parent, name));
 
-        for (int i = 0; i < count; i++) {
-            // int id = Uniform.staticNextIntFromTo(0, 10000);
-            counter++;
-            String name;
-            try {
-                name = prefix + "-" + counter + "(" + java.net.InetAddress.getLocalHost().getCanonicalHostName() + ")";
-            } catch (Exception e) {
-                name = prefix + "-" + counter;
-            }
-            logger.debug("agent:" + name);
-            instanciateAgent(parent, name, method, svar);
-        }
+        Collections.shuffle(result);
 
-        Collections.shuffle(agents);
+        return result;
 
     }
 
-    public Instance instanciateFrame(Frame cls, String name) {
-        Instance inst = new Instance(name, cls);
-        objects.add(inst);
-        return (Instance) inst.clone();
+    public List<GenericAgent> instanciateAgentsWithNormalDistributedAttributes(GenericAgentClass parent, Optional<String> prefix, int method,
+            double svar,
+            int count) {
+
+        List<GenericAgent> result = instanciateAgents(parent, prefix, count,
+                (name) -> instanciateAgentWithNormalDistributedAttributes(parent, name, svar));
+
+        Collections.shuffle(result);
+
+        return result;
+    }
+
+    /**
+     * Creates an agent using a function for generating agents (e.g. using generator methods for specific attribute value distributions).
+     * 
+     * @param template the agent class to generate the instance from
+     * @param prefix optional name prefix
+     * @param count
+     * @param func a function that generates a new agent with the passed name
+     * @return
+     */
+    private List<GenericAgent> instanciateAgents(GenericAgentClass template, Optional<String> prefix, int count,
+            Function<String, GenericAgent> func) {
+
+        List<GenericAgent> result = new ArrayList<>();
+        int counter = 0;
+        while (counter < count) {
+            counter++;
+            String name;
+            try {
+                name = prefix.orElse("agent") + "-" + counter + "(" + java.net.InetAddress.getLocalHost().getCanonicalHostName() + ")";
+            } catch (UnknownHostException e) {
+                name = prefix.orElse("agent") + "-" + counter;
+            }
+            result.add(func.apply(name));
+        }
+
+        Collections.shuffle(result);
+
+        return result;
     }
 
     public GenericAgent modifyAgentAttribute(GenericAgent inst, String[] path, Attribute att) {

@@ -1,6 +1,7 @@
 package de.s2.gsim.environment;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -294,4 +295,42 @@ public class EntitiesContainer {
         this.agentSubClasses.put(oldOne.getName(), newOne);
     }
 
+    public HierarchyNode[] exportAgentHierarchy() {
+
+        Map<String, HierarchyNode> nodes = new HashMap<>();
+
+        Frame root = agentClass;
+        HierarchyNode node = new HierarchyNode((Frame) root.clone());
+        nodes.put(node.getFrame().getName(), node);
+
+        for (GenericAgentClass f : agentSubClasses.values()) {
+            node.insert(f.clone());
+            nodes.put(node.getFrame().getName(), node);
+        }
+
+        HierarchyNode[] top = new HierarchyNode[nodes.values().size()];
+        nodes.values().toArray(top);
+
+        return top;
+
+    }
+
+    public HierarchyNode[] exportBehaviourHierarchy() {
+
+        Map<String, HierarchyNode> nodes = new HashMap<>();
+        Frame root = behaviourClass;
+        HierarchyNode node = new HierarchyNode((Frame) root.clone());
+        node.insert((Frame) root.clone());
+
+        for (BehaviourFrame c : this.behaviourClasses) {
+            node.insert(c.clone());
+            nodes.put(node.getFrame().getName(), node);
+        }
+
+        HierarchyNode[] top = new HierarchyNode[nodes.values().size()];
+        nodes.values().toArray(top);
+
+        return top;
+
+    }
 }

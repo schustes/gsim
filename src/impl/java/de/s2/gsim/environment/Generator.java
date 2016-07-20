@@ -10,26 +10,26 @@ import de.s2.gsim.objects.attribute.NumericalAttribute;
 import de.s2.gsim.objects.attribute.OrderedSetAttribute;
 import de.s2.gsim.objects.attribute.SetAttribute;
 
-public class Generator {
+public abstract class Generator {
 
     public enum Method {
         Normal, Uniform
     }
-
-    private Method method = Method.Normal;
 
     public Generator() {
         super();
     }
 
     /**
+     * TODO split in two mehtods.
+     * 
      * Randomises attribute values of agent itself and all contained objects, for attributes that are declared as 'mutable'.
      * 
      * @param a GenericAgent
      * @param svar double
      * @return GenericAgent
      */
-    public GenericAgent randomiseAttributeValues(GenericAgent a, double svar, Method method) {
+    public static GenericAgent randomiseAttributeValues(GenericAgent a, double svar, Method method) {
         GenericAgent agent = null;
         if (method.equals(Method.Normal)) {
             agent = (GenericAgent) this.randomiseAttributeValues(a, svar);
