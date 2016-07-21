@@ -60,4 +60,5 @@ public class GenericAgent extends Instance {
         behaviour.setFrame(null);
     }
 
+
 }

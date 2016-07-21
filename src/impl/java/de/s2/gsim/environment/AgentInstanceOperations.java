@@ -3,9 +3,7 @@ package de.s2.gsim.environment;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -72,14 +70,14 @@ public class AgentInstanceOperations {
 
     public GenericAgent instanciateAgentWithNormalDistributedAttributes(GenericAgentClass cls, String name, double svar) {
         GenericAgent a = new GenericAgent(name, cls);
-        a = Generator.randomiseAttributeValues(a, svar, Generator.Method.Uniform);
+        a = Generator.randomiseNormalDistributedAttributeValues(a, svar);
         container.getAgents().add(a);
         return (GenericAgent) a.clone();
     }
 
     public GenericAgent instanciateAgentWithUniformDistributedAttributes(GenericAgentClass cls, String name) {
         GenericAgent a = new GenericAgent(name, cls);
-        a = Generator.randomiseAttributeValues(a, 0, Generator.Method.Normal);
+        a = Generator.randomiseUniformAttributeValues(a);
         container.getAgents().add(a);
         return (GenericAgent) a.clone();
     }
@@ -139,189 +137,42 @@ public class AgentInstanceOperations {
         return result;
     }
 
-    public GenericAgent modifyAgentAttribute(GenericAgent inst, String[] path, Attribute att) {
+    public GenericAgent modifyAgentAttribute(GenericAgent inst, Path<List<Attribute>> attributeListPath, Attribute att) {
 
         GenericAgent agent = findGenericAgent(inst.getName());
 
-        if (agent.resolveName(path) == null) {
-            agent.setAttribute(att);
+        if (agent.resolvePath(attributeListPath) == null) {
+            throw new GSimDefException(
+                    "The attribute list path " + attributeListPath + " could not be resolved. Add path first in corresponding frame.");
         }
 
-        UnitOperations.setChildAttribute(agent, path, att);
-        agent.setDirty(true);
-        agents.add(agent);
+        agent.addChildAttribute(attributeListPath, att);
+
         return (GenericAgent) agent.clone();
     }
 
 
-    public GenericAgent removeChildInstance(GenericAgent owner, String[] path, String child) {
+    public GenericAgent removeChildObject(GenericAgent owner, Path<Instance> instancePath) {
         GenericAgent here = findGenericAgent(owner.getName());
-        UnitOperations.removeChildInstance(here, path, child);
-        agents.add(here);
+        here.removeChildInstance(instancePath);
         return (GenericAgent) here.clone();
     }
 
-    public GenericAgentClass removeChildObjectList(GenericAgentClass cls, String listName) throws GSimDefException {
-        GenericAgentClass here = this.findGenericAgentClass(cls);
-
-        here.removeChildFrameList(listName);
-        agentSubClasses.add(here);
-
-        Iterator members = getInstancesOfClass(here).iterator();
-        while (members.hasNext()) {
-            GenericAgent c = (GenericAgent) members.next();
-            c.setFrame(here);
-            c.removeDeclaredChildInstanceList(listName);
-            agents.add(c);
-        }
-
-        ListIterator<GenericAgentClass> iter = agentSubClasses.listIterator();
-
-        while (iter.hasNext()) {
-            GenericAgentClass c = iter.next();
-            if (c.isSuccessor(here.getTypeName())) {
-                c.replaceAncestor(here);
-                c.removeChildFrameList(listName);
-                iter.set(c);
-                members = getInstancesOfClass(c).iterator();
-                while (members.hasNext()) {
-                    GenericAgent cc = (GenericAgent) members.next();
-                    cc.setFrame(c);
-                    cc.removeDeclaredChildInstanceList(listName);
-                    agents.add(cc);
-                }
-            }
-        }
-
-        return (GenericAgentClass) here.clone();
-
-    }
-
     public void removeGenericAgent(GenericAgent agent) {
-        Iterator iter = agents.iterator();
-        while (iter.hasNext()) {
-            GenericAgent a = (GenericAgent) iter.next();
-            if (agent.getName().equals(a.getName())) {
-                iter.remove();
-                removed.add(a);
-            }
-        }
+        container.remove(agent);
     }
 
-
-
-    public GenericAgentClass setActivatedStatus(GenericAgentClass cls, String ruleName, boolean status) {
-
-        GenericAgentClass here = this.findGenericAgentClass(cls);
-        BehaviourFrame pb1 = here.getBehaviour();
-        UserRuleFrame ur1 = pb1.getRule(ruleName);
-        if (ur1 == null) {
-            ur1 = pb1.getRLRule(ruleName);
-            ur1.setActivated(status);
-            pb1.addRLRule((RLRuleFrame) ur1);
-        } else {
-            ur1.setActivated(status);
-            pb1.addOrSetRule(ur1);
-        }
-        here.setBehaviour(pb1);
-        here.setDirty(true);
-
-        agentSubClasses.add(here);
-
-        ListIterator<Instance> iter = getInstancesOfClass(here).listIterator();
-        while (iter.hasNext()) {
-            GenericAgent p = (GenericAgent) iter.next();
-            p.setDirty(true);
-            BehaviourDef pb = p.getBehaviour();
-            UserRule ur = pb.getRule(ruleName);
-            if (ur == null) {
-                ur = pb.getRLRule(ruleName);
-                ur.setActivated(status);
-                pb.addRLRule((RLRule) ur);
-            } else {
-                ur.setActivated(status);
-                pb.addRule(ur);
-            }
-            p.setBehaviour(pb);
-            iter.set(p);
-        }
-
-        ListIterator<GenericAgentClass> iter2 = agentSubClasses.listIterator();
-        while (iter.hasNext()) {
-
-            GenericAgentClass p = iter2.next();
-            p.setDirty(true);
-            if (p.isSuccessor(here.getTypeName())) {
-                BehaviourFrame pb = p.getBehaviour();
-                UserRuleFrame ur = pb.getRule(ruleName);
-                if (ur == null) {
-                    ur = pb.getRLRule(ruleName);
-                    ur.setActivated(status);
-                    pb.addRLRule((RLRuleFrame) ur);
-                } else {
-                    ur.setActivated(status);
-                    pb.addOrSetRule(ur);
-                }
-                p.setBehaviour(pb);
-                iter2.set(p);
-                ListIterator<Instance> successorMembers = getInstancesOfClass(p).listIterator();
-                while (successorMembers.hasNext()) {
-                    GenericAgent a = (GenericAgent) iter.next();
-                    p.setDirty(true);
-                    BehaviourDef beh = a.getBehaviour();
-                    UserRule ur2 = beh.getRule(ruleName);
-                    if (ur2 == null) {
-                        ur2 = beh.getRLRule(ruleName);
-                        ur2.setActivated(status);
-                        beh.addRule(ur2);
-                    } else {
-                        ur2.setActivated(status);
-                        beh.addRule(ur2);
-                    }
-                    a.setBehaviour(beh);
-                    successorMembers.set(a);
-                }
-            }
-        }
-        return (GenericAgentClass) here.clone();
+    public void replaceAgent(GenericAgent inst) {
+        GenericAgent here = this.findGenericAgent(inst.getName());
+        container.replaceAgent(here, inst);
     }
 
-    public void setAgent(GenericAgent inst) throws GSimDefException {
-
-        ListIterator<GenericAgent> iter = agents.listIterator();
-        while (iter.hasNext()) {
-            GenericAgent agent = iter.next();
-            if (inst.getName().equals(agent.getName())) {
-                if (!agent.getDefinition().getTypeName().equals(inst.getDefinition().getTypeName())) {
-                    throw new GSimDefException("Agent " + inst.getName() + " must be of type " + agent.getDefinition().getTypeName() + ".");
-                }
-                iter.set(inst);
-            }
-
-        }
-
-    }
-
-    protected void createBehaviourClasses() {
-
-        BehaviourFrame x = new BehaviourFrame("Behaviour", agentClass.getBehaviour(), de.s2.gsim.def.EntityConstants.TYPE_BEHAVIOUR);
-        behaviourClass = x;
-        behaviourClasses.add(x);
-
-        x.setMutable(true);
-        x.setSystem(false);
-
-        Iterator iter = agentSubClasses.iterator();
-        while (iter.hasNext()) {
-            GenericAgentClass c = (GenericAgentClass) iter.next();
-            BehaviourFrame f = new BehaviourFrame(c.getBehaviour(), EntityConstants.TYPE_BEHAVIOUR);
-            f.replaceAncestor(x);
-            behaviourClasses.add(f);
-        }
-
-    }
-
-
+    /**
+     * Throws NoSuchElementException if not existing.
+     * 
+     * @param extern the agent copy
+     * @return the actual agent reference in the environment
+     */
     protected GenericAgent findGenericAgent(String extern) {
         return container.getAgents().parallelStream().filter(a -> a.getName().equals(extern)).findAny().get();
     }

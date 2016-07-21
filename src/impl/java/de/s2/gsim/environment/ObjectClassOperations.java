@@ -23,6 +23,29 @@ public class ObjectClassOperations {
         this.agentClassOperations = agentClassOperations;
     }
 
+    public Frame addAttributeList(Frame owner, String listName) throws GSimDefException {
+        Frame here = findObjectClass(owner);
+        here.defineAttributeList(listName);
+        container.getObjectSubClasses().add(here);
+
+        defineAttributeListInInstancesOfFrame(listName, here);
+
+        for (Frame sub : container.getObjectSubClasses(here)) {
+            sub.replaceAncestor(here);
+            defineAttributeListInInstancesOfFrame(listName, sub);
+        }
+
+        return (Frame) here.clone();
+
+    }
+
+    private void defineAttributeListInInstancesOfFrame(String listName, Frame here) {
+        for (Instance member : container.getInstancesOfClass(here, Instance.class)) {
+            member.setFrame(here);
+            member.defineAttributeList(listName);
+        }
+    }
+
     public Frame addObjectClassAttribute(Frame cls, Path<List<DomainAttribute>> path, DomainAttribute newValue) {
 
         Frame here = findObjectClass(cls);

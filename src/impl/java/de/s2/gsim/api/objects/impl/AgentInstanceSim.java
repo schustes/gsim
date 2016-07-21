@@ -13,7 +13,6 @@ import de.s2.gsim.environment.Instance;
 import de.s2.gsim.environment.Path;
 import de.s2.gsim.environment.TypedList;
 import de.s2.gsim.environment.Unit;
-import de.s2.gsim.environment.UnitOperations;
 import de.s2.gsim.objects.AgentInstance;
 import de.s2.gsim.objects.Behaviour;
 import de.s2.gsim.objects.ObjectInstance;
@@ -337,8 +336,7 @@ public class AgentInstanceSim implements AgentInstance, ObjectInstance, UnitWrap
         }
 
         try {
-            GenericAgent a = real;
-            UnitOperations.removeChildInstance(a, new String[] { list }, object.getName());
+            real.removeChildInstance(list, object.getName());
         } catch (Exception e) {
             throw new GSimException(e);
         }
@@ -357,7 +355,7 @@ public class AgentInstanceSim implements AgentInstance, ObjectInstance, UnitWrap
         }
 
         try {
-            UnitOperations.removeChildInstance(real, new String[] { list }, objectName);
+            real.removeChildInstance(list, objectName);
         } catch (Exception e) {
             throw new GSimException(e);
         }

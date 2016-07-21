@@ -66,11 +66,6 @@ public class EntitiesContainer {
      */
     private final Set<Frame> objectSubClasses = new LinkedHashSet<Frame>();
 
-    /**
-     * Set of units waiting for removal.
-     */
-    private final Set<Unit<?, ?>> removed = new LinkedHashSet<>();
-
     EntitiesContainer(String ns) {
         this.ns = ns;
     }
@@ -280,19 +275,33 @@ public class EntitiesContainer {
         this.objectSubClasses.add(objectSubClass);
     }
 
-    public Set<Unit<?, ?>> getRemoved() {
-        return removed;
-    }
-
     public void remove(Unit<?, ?> removed) {
-        this.removed.add(removed);
+        if (removed instanceof GenericAgent) {
+            this.agents.remove(removed.getName());
+        } else if (removed instanceof GenericAgentClass) {
+            this.agentSubClasses.remove(removed.getName());
+        } else if (removed instanceof Frame) {
+            this.objectSubClasses.remove(removed.getName());
+        } else if (removed instanceof Instance) {
+            this.objects.remove(removed.getName());
+        } else {
+            throw new GSimDefException("No unit with name " + removed.getName() + " was removed. Does it exist and is it not a root agent/object?");
+        }
+        
     }
 
     public void replaceAgentSubClass(GenericAgentClass oldOne, GenericAgentClass newOne) {
         if (!oldOne.getName().equals(newOne.getName())) {
-            throw new IllegalArgumentException("The agent to be replaced has not the same name as the one to replace with.");
+            throw new IllegalArgumentException("The agent class to be replaced has not the same name as the one to replace with.");
         }
         this.agentSubClasses.put(oldOne.getName(), newOne);
+    }
+
+    public void replaceAgent(GenericAgent oldOne, GenericAgent newOne) {
+        if (!oldOne.getName().equals(newOne.getName())) {
+            throw new IllegalArgumentException("The agent to be replaced has not the same name as the one to replace with.");
+        }
+        this.agents.put(oldOne.getName(), newOne);
     }
 
     public HierarchyNode[] exportAgentHierarchy() {

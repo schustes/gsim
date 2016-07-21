@@ -42,6 +42,108 @@ public class AgentClassOperations {
         this.objectClassOperations = objectClassOperations;
     }
 
+    public GenericAgentClass removeChildObjectList(GenericAgentClass cls, Path<TypedList<Frame>> path) {
+        GenericAgentClass here = this.findGenericAgentClass(cls);
+        here.removeChildFrameList(path);
+
+        removeChildListFromInstancesOfClass(path, here);
+
+        for (GenericAgentClass successor : container.getAgentSubClasses(here)) {
+            successor.replaceAncestor(here);
+            successor.removeChildFrameList(path);
+            removeChildListFromInstancesOfClass(path, successor);
+        }
+
+        return (GenericAgentClass) here.clone();
+
+    }
+
+    private void removeChildListFromInstancesOfClass(Path<TypedList<Frame>> path, GenericAgentClass here) {
+        for (GenericAgent member : container.getAllInstancesOfClass(here, GenericAgent.class)) {
+            member.setFrame(here);
+            member.removeChildInstanceList(Path.objectListPath(path.toStringArray()));
+        }
+    }
+
+    public GenericAgentClass setActivatedStatus(GenericAgentClass cls, String ruleName, boolean status) {
+
+        GenericAgentClass here = this.findGenericAgentClass(cls);
+        BehaviourFrame pb1 = here.getBehaviour();
+        UserRuleFrame ur1 = pb1.getRule(ruleName);
+        if (ur1 == null) {
+            ur1 = pb1.getRLRule(ruleName);
+            ur1.setActivated(status);
+            pb1.addRLRule((RLRuleFrame) ur1);
+        } else {
+            ur1.setActivated(status);
+            pb1.addOrSetRule(ur1);
+        }
+        here.setBehaviour(pb1);
+        here.setDirty(true);
+
+        for (GenericAgent p : container.getInstancesOfClass(here, GenericAgent.class)) {
+            BehaviourDef pb = p.getBehaviour();
+            UserRule ur = pb.getRule(ruleName);
+            if (ur == null) {
+                ur = pb.getRLRule(ruleName);
+                ur.setActivated(status);
+                pb.addRLRule((RLRule) ur);
+            } else {
+                ur.setActivated(status);
+                pb.addRule(ur);
+            }
+            p.setBehaviour(pb);
+            p.setDirty(true);
+        }
+
+        for (GenericAgentClass p : container.getAgentSubClasses(here)) {
+            p.setDirty(true);
+            BehaviourFrame pb = p.getBehaviour();
+            UserRuleFrame ur = pb.getRule(ruleName);
+            if (ur == null) {
+                ur = pb.getRLRule(ruleName);
+                ur.setActivated(status);
+                pb.addRLRule((RLRuleFrame) ur);
+            } else {
+                ur.setActivated(status);
+                pb.addOrSetRule(ur);
+            }
+            p.setBehaviour(pb);
+            p.setDirty(true);
+            for (GenericAgent a : container.getInstancesOfClass(p, GenericAgent.class)) {
+                BehaviourDef beh = a.getBehaviour();
+                UserRule ur2 = beh.getRule(ruleName);
+                if (ur2 == null) {
+                    ur2 = beh.getRLRule(ruleName);
+                    ur2.setActivated(status);
+                    beh.addRule(ur2);
+                } else {
+                    ur2.setActivated(status);
+                    beh.addRule(ur2);
+                }
+                a.setBehaviour(beh);
+                a.setDirty(true);
+            }
+
+        }
+
+        return (GenericAgentClass) here.clone();
+    }
+
+    /**
+     * Unclear helper method that extracts all agent behaviour classes and adds a copy of them, without being attached to specific agent classes, to a
+     * list of behaviours in the environment.
+     */
+    protected void createBehaviourClasses() {
+        BehaviourFrame behaviourClass = BehaviourFrame.newBehaviour("Behaviour");
+        container.getBehaviourClasses().add(behaviourClass);
+        for (GenericAgentClass c : container.getAgentSubClasses()) {
+            BehaviourFrame f = new BehaviourFrame(c.getBehaviour(), BehaviourFrame.CATEGORY);
+            f.replaceAncestor(behaviourClass);
+            container.getBehaviourClasses().add(f);
+        }
+    }
+
     public BehaviourFrame activateBehaviourRule(BehaviourFrame fr, UserRuleFrame ur, boolean activated) {
 
         container.getBehaviourClasses().parallelStream().filter(bf -> bf.getName().equals(fr.getName()) || bf.isSuccessor(fr.getName()))

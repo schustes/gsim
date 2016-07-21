@@ -1,5 +1,7 @@
 package de.s2.gsim.environment;
 
+import java.util.List;
+
 import javax.management.ObjectInstance;
 
 import de.s2.gsim.api.objects.impl.UnitWrapper;
@@ -10,6 +12,12 @@ import de.s2.gsim.objects.attribute.NumericalAttribute;
 import de.s2.gsim.objects.attribute.OrderedSetAttribute;
 import de.s2.gsim.objects.attribute.SetAttribute;
 
+/**
+ * TODO use list / stream operations.
+ * 
+ * @author stephan
+ *
+ */
 public abstract class Generator {
 
     public enum Method {
@@ -21,69 +29,69 @@ public abstract class Generator {
     }
 
     /**
-     * TODO split in two mehtods.
-     * 
      * Randomises attribute values of agent itself and all contained objects, for attributes that are declared as 'mutable'.
      * 
      * @param a GenericAgent
      * @param svar double
      * @return GenericAgent
      */
-    public static GenericAgent randomiseAttributeValues(GenericAgent a, double svar, Method method) {
+    public static GenericAgent randomiseNormalDistributedAttributeValues(GenericAgent a, double svar) {
         GenericAgent agent = null;
-        if (method.equals(Method.Normal)) {
-            agent = (GenericAgent) this.randomiseAttributeValues(a, svar);
-            String[] lists = a.getChildInstanceListNames();
-            for (int i = 0; i < lists.length; i++) {
-                Instance[] inst = agent.getChildInstances(lists[i]);
-                for (int j = 0; j < inst.length; j++) {
-                    Instance obj = this.randomiseAttributeValues(inst[j], svar);
-                    agent.setChildInstance(lists[i], obj);
-                }
-            }
-        } else {
-            agent = (GenericAgent) this.randomiseAttributeValues(a);
-            String[] lists = a.getChildInstanceListNames();
-            for (int i = 0; i < lists.length; i++) {
-                Instance[] inst = agent.getChildInstances(lists[i]);
-                for (int j = 0; j < inst.length; j++) {
-                    Instance obj = this.randomiseAttributeValues(inst[j]);
-                    agent.setChildInstance(lists[i], obj);
-                }
+        agent = (GenericAgent) randomiseNormallyDistributedAttributeValues(a, svar);
+        List<String> lists = a.getChildInstanceListNames();
+        for (String listname: lists) {
+            List<Instance> containedObjects = agent.getChildInstances(listname);
+            for (Instance in: containedObjects) {
+                randomiseNormallyDistributedAttributeValues(in, svar);
+                agent.setChildInstance(listname, in);
             }
         }
         return agent;
     }
 
-    public ObjectInstance randomiseAttributeValues(ObjectInstance a, double svar, Method method) {
-        if (method.equals(Method.Normal)) {
-            Instance b = (Instance) ((UnitWrapper) a).toUnit();
-            b = this.randomiseAttributeValues(b, svar);
-            return a;
-        } else {
-            Instance b = (Instance) ((UnitWrapper) a).toUnit();
-            b = this.randomiseAttributeValues(b);
-            return a;
+    public static GenericAgent randomiseUniformAttributeValues(GenericAgent a) {
+        GenericAgent agent = null;
+        agent = (GenericAgent) randomiseUniformDistributedAttributeValues(a);
+        List<String> lists = a.getChildInstanceListNames();
+        for (String listname : lists) {
+            List<Instance> containedObjects = agent.getChildInstances(listname);
+            for (Instance in : containedObjects) {
+                randomiseUniformDistributedAttributeValues(in);
+                agent.setChildInstance(listname, in);
+            }
         }
+        return agent;
     }
 
-    private Instance randomiseAttributeValues(Instance obj) {
+    public static ObjectInstance randomiseNormalAttributeValues(ObjectInstance a, double svar) {
+        Instance b = (Instance) ((UnitWrapper) a).toUnit();
+        b = randomiseNormallyDistributedAttributeValues(b, svar);
+        return a;
+    }
 
-        String[] lists = obj.getAttributesListNames();
+    public static ObjectInstance randomiseUniformAttributeValues(ObjectInstance a) {
+        Instance b = (Instance) ((UnitWrapper) a).toUnit();
+        b = randomiseUniformDistributedAttributeValues(b);
+        return a;
+    }
 
-        for (int j = 0; j < lists.length; j++) {
-            Attribute[] atts = obj.getAttributes(lists[j]);
-            for (int k = 0; k < atts.length; k++) {
-                DomainAttribute da = obj.getDefinition().getAttribute(lists[j], atts[k].getName());
+    private static Instance randomiseUniformDistributedAttributeValues(Instance obj) {
+
+        List<String> lists = obj.getAttributesListNames();
+
+        for (int j = 0; j < lists.size(); j++) {
+            List<Attribute> atts = obj.getAttributes(lists.get(j));
+            for (int k = 0; k < atts.size(); k++) {
+                DomainAttribute da = obj.getDefinition().getAttribute(lists.get(j), atts.get(k).getName());
                 if (da.isMutable()) {
-                    if (atts[k] instanceof SetAttribute) {
-                        SetAttribute set = (SetAttribute) atts[k];
-                        if (set.getFillers().length > 0) {
-                            int v = cern.jet.random.Uniform.staticNextIntFromTo(0, da.getFillers().length - 1);
+                    if (atts.get(k) instanceof SetAttribute) {
+                        SetAttribute set = (SetAttribute) atts.get(k);
+                        if (set.getFillers().size() > 0) {
+                            int v = cern.jet.random.Uniform.staticNextIntFromTo(0, da.getFillers().size() - 1);
                             set.removeAllEntries();
-                            set.addEntry(set.getFillers()[v]);
+                            set.addEntry(set.getFillers().get(v));
                         }
-                    } else if (atts[k] instanceof IntervalAttribute) {
+                    } else if (atts.get(k) instanceof IntervalAttribute) {
                         String value = da.getDefaultValue();
                         double x = 0;
                         double y = 0;
@@ -100,16 +108,16 @@ public abstract class Generator {
                             y = x + 2;
                         }
                         double v = cern.jet.random.Uniform.staticNextDoubleFromTo(x, y);
-                        IntervalAttribute att = (IntervalAttribute) atts[k];
+                        IntervalAttribute att = (IntervalAttribute) atts.get(k);
                         att.setFrom(v);
                         att.setTo(v);
-                    } else if (atts[k] instanceof NumericalAttribute) {
-                        NumericalAttribute att = (NumericalAttribute) atts[k];
+                    } else if (atts.get(k) instanceof NumericalAttribute) {
+                        NumericalAttribute att = (NumericalAttribute) atts.get(k);
                         double mean = Double.parseDouble(da.getDefaultValue());
                         double v = cern.jet.random.Uniform.staticNextDoubleFromTo(mean - mean, mean * 2);
                         att.setValue(v);
                     }
-                    obj.addOrSetAttribute(lists[j], atts[k]);
+                    obj.addOrSetAttribute(lists.get(j), atts.get(k));
                 }
             }
         }
@@ -125,29 +133,29 @@ public abstract class Generator {
      * @param svar double
      * @return Instance
      */
-    private Instance randomiseAttributeValues(Instance obj, double svar) {
+    private static Instance randomiseNormallyDistributedAttributeValues(Instance obj, double svar) {
 
-        String[] lists = obj.getAttributesListNames();
+        List<String> lists = obj.getAttributesListNames();
 
-        for (int j = 0; j < lists.length; j++) {
-            Attribute[] atts = obj.getAttributes(lists[j]);
-            for (int k = 0; k < atts.length; k++) {
-                DomainAttribute da = obj.getDefinition().getAttribute(lists[j], atts[k].getName());
+        for (int j = 0; j < lists.size(); j++) {
+            List<Attribute> atts = obj.getAttributes(lists.get(j));
+            for (int k = 0; k < atts.size(); k++) {
+                DomainAttribute da = obj.getDefinition().getAttribute(lists.get(j), atts.get(k).getName());
                 if (da.isMutable()) {
-                    if (atts[k] instanceof OrderedSetAttribute) {
-                        OrderedSetAttribute set = (OrderedSetAttribute) atts[k];
+                    if (atts.get(k) instanceof OrderedSetAttribute) {
+                        OrderedSetAttribute set = (OrderedSetAttribute) atts.get(k);
                         double mean = set.getOrder(da.getDefaultValue());
                         double v = cern.jet.random.Normal.staticNextDouble(mean, svar);
-                        if (set.getFillers().length <= v) {
-                            v = set.getFillers().length - 1;
+                        if (set.getFillers().size() <= v) {
+                            v = set.getFillers().size() - 1;
                         } else if (v < 0) {
                             v = 0;
                         }
-                        String[] f = set.getFillers();
+                        List<String> f = set.getFillers();
                         double minDiff = 1000;
                         double order = 0;
-                        for (int i = 0; i < f.length; i++) {
-                            double o = set.getOrder(f[i]);
+                        for (int i = 0; i < f.size(); i++) {
+                            double o = set.getOrder(f.get(i));
                             if (Math.abs(o - v) < minDiff) {
                                 order = o;
                                 minDiff = Math.abs(o - v);
@@ -155,15 +163,14 @@ public abstract class Generator {
                         }
                         set.removeAllEntries();
                         set.addEntry(set.getFiller(order));
-                    } else if (atts[k] instanceof SetAttribute) {
-                        SetAttribute set = (SetAttribute) atts[k];
-                        if (set.getFillers().length > 0) {
-                            // int v = cern.jet.random.Uniform.staticNextIntFromTo(0,
-                            // da.getFillers().length - 1);
-                            // set.removeAllEntries();
-                            // set.addEntry(set.getFillers()[v]);
+                    } else if (atts.get(k) instanceof SetAttribute) {
+                        SetAttribute set = (SetAttribute) atts.get(k);
+                        if (set.getFillers().size() > 0) {
+                            int v = cern.jet.random.Uniform.staticNextIntFromTo(0, da.getFillers().size() - 1);
+                            set.removeAllEntries();
+                            set.addEntry(set.getFillers().get(v));
                         }
-                    } else if (atts[k] instanceof IntervalAttribute) {
+                    } else if (atts.get(k) instanceof IntervalAttribute) {
                         String value = da.getDefaultValue();
                         double x = 0;
                         double y = 0;
@@ -186,21 +193,20 @@ public abstract class Generator {
                             if (mean > 0 && v < 0) {
                                 v = 0;
                             }
-                            IntervalAttribute att = (IntervalAttribute) atts[k];
+                            IntervalAttribute att = (IntervalAttribute) atts.get(k);
                             att.setFrom(v);
                             att.setTo(v);
                         }
-                    } else if (atts[k] instanceof NumericalAttribute) {
-                        NumericalAttribute att = (NumericalAttribute) atts[k];
+                    } else if (atts.get(k) instanceof NumericalAttribute) {
+                        NumericalAttribute att = (NumericalAttribute) atts.get(k);
                         double mean = Double.parseDouble(da.getDefaultValue());
-                        // double variance = mean*svar;
                         double v = cern.jet.random.Normal.staticNextDouble(mean, svar);
                         if (mean > 0 && v < 0) {
                             v = 0;
                         }
                         att.setValue(v);
                     }
-                    obj.addOrSetAttribute(lists[j], atts[k]);
+                    obj.addOrSetAttribute(lists.get(j), atts.get(k));
                 }
             }
         }
