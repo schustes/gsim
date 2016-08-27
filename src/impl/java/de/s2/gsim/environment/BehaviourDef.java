@@ -237,11 +237,11 @@ public class BehaviourDef extends Instance {
     }
 
     public void removeRLRules(String name) {
-    	UnitOperations.removeChildInstance(this, new String[] { BehaviourFrame.RL_LIST }, name);
+        this.removeChildInstance(BehaviourFrame.RL_LIST, name);
     }
 
     public void removeRule(String name) {
-        UnitOperations.removeChildInstance(this, new String[] { BehaviourFrame.RULE_LIST }, name);
+        this.removeChildInstance(BehaviourFrame.RULE_LIST, name);
     }
 
     public void setDeleteUnusedAfter(int n) {

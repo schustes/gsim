@@ -624,4 +624,20 @@ public class Instance extends Unit<Instance, Attribute> {
 
 	}
 
+    public boolean removeChildInstanceList(Path<TypedList<Instance>> objectListPath) {
+        Path<Instance> containingInstancePath = Path.withoutLastList(objectListPath);
+
+        TypedList<Instance> list = this.resolvePath(objectListPath);
+        Instance containingInstance = this.resolvePath(containingInstancePath);
+
+        if (containingInstance != null && list != null) {
+            containingInstance.removeDeclaredChildInstanceList(objectListPath.last());
+            setDirty(true);
+            return true;
+        }
+
+        return false;
+
+    }
+
 }

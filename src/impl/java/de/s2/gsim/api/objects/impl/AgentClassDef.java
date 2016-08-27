@@ -48,7 +48,7 @@ public class AgentClassDef extends ObjectClassDef implements AgentClass, UnitWra
 		}
 
 		try {
-			real = env.addAgentClassAttribute((GenericAgentClass) real, new String[] { list }, a);
+            real = env.getAgentClassOperations().addAgentClassAttribute((GenericAgentClass) real, Path.attributeListPath(list), a);
 		} catch (Exception e) {
 			throw new GSimException(e);
 		}
@@ -66,7 +66,8 @@ public class AgentClassDef extends ObjectClassDef implements AgentClass, UnitWra
 		}
 
 		try {
-			real = env.addChildObject((GenericAgentClass) real, new String[] { list }, (Frame) ((UnitWrapper) object).toUnit());
+            real = env.getAgentClassOperations().addChildObject((GenericAgentClass) real, Path.objectListPath(list),
+                    (Frame) ((UnitWrapper) object).toUnit());
 		} catch (Exception e) {
 			throw new GSimException(e);
 		}
@@ -83,7 +84,7 @@ public class AgentClassDef extends ObjectClassDef implements AgentClass, UnitWra
 		}
 
 		try {
-			env.removeAgentClass((GenericAgentClass) real);
+            env.getAgentClassOperations().removeAgentClass((GenericAgentClass) real);
 		} catch (Exception e) {
 			throw new GSimException(e);
 		}
@@ -190,7 +191,7 @@ public class AgentClassDef extends ObjectClassDef implements AgentClass, UnitWra
 		}
 
 		try {
-			real = env.removeChildFrame((GenericAgentClass) real, new String[] { list }, object.getName());
+            real = env.getAgentClassOperations().removeChildFrame((GenericAgentClass) real, Path.objectPath(list, object.getName()));
 		} catch (Exception e) {
 			throw new GSimException(e);
 		}
@@ -209,7 +210,7 @@ public class AgentClassDef extends ObjectClassDef implements AgentClass, UnitWra
 		}
 
 		try {
-			real = env.removeChildFrame((GenericAgentClass) real, new String[] { list }, objectName);
+            real = env.getAgentClassOperations().removeChildFrame((GenericAgentClass) real, Path.objectPath(list, objectName));
 		} catch (Exception e) {
 			throw new GSimException(e);
 		}
@@ -244,9 +245,9 @@ public class AgentClassDef extends ObjectClassDef implements AgentClass, UnitWra
 			} else if (o instanceof Frame) {
 				return new ObjectClassDef(env, (Frame) o);
 			} else if (o instanceof TypedList) {
-				TypedList list = (TypedList) o;
+                TypedList<?> list = (TypedList<?>) o;
 				ArrayList<ObjectClassDef> ret = new ArrayList<ObjectClassDef>();
-				Iterator iter = list.iterator();
+                Iterator<?> iter = list.iterator();
 				while (iter.hasNext()) {
 					Frame f = (Frame) iter.next();
 					ObjectClassDef c = new ObjectClassDef(env, f);
@@ -272,9 +273,7 @@ public class AgentClassDef extends ObjectClassDef implements AgentClass, UnitWra
 		}
 
 		try {
-			lock();
-			real = env.modifyAgentClassAttribute((GenericAgentClass) real, new String[] { list }, a);
-			unlock();
+            real = env.getAgentClassOperations().modifyAgentClassAttribute((GenericAgentClass) real, Path.attributePath(list, a.getName()), a);
 		} catch (Exception e) {
 			throw new GSimException(e);
 		}
@@ -298,7 +297,7 @@ public class AgentClassDef extends ObjectClassDef implements AgentClass, UnitWra
 			if (!(b instanceof BehaviourClass)) {
 				throw new GSimException("Passed Behaviour interface " + b + " is not a valid class for Frame-type objects!");
 			}
-			real = env.changeAgentClassBehaviour((GenericAgentClass) real, (BehaviourFrame) ((UnitWrapper) b).toUnit());
+            real = env.getAgentClassOperations().changeAgentClassBehaviour((GenericAgentClass) real, (BehaviourFrame) ((UnitWrapper) b).toUnit());
 		} catch (Exception e) {
 			throw new GSimException(e);
 		}
@@ -312,11 +311,9 @@ public class AgentClassDef extends ObjectClassDef implements AgentClass, UnitWra
 		}
 
 		try {
-			lock();
 			DomainAttribute a = real.getAttribute(list, attName);
 			a.setDefault(value);
-			real = env.modifyAgentClassAttribute((GenericAgentClass) real, new String[] { list }, a);
-			unlock();
+            real = env.getAgentClassOperations().modifyAgentClassAttribute((GenericAgentClass) real, Path.attributePath(list, a.getName()), a);
 		} catch (Exception e) {
 			throw new GSimException(e);
 		}
@@ -328,16 +325,8 @@ public class AgentClassDef extends ObjectClassDef implements AgentClass, UnitWra
 	 * @link gsim.objects.ObjectClassIF
 	 */
 	@Override
-	public Unit toUnit() {
+    public Unit<Frame, DomainAttribute> toUnit() {
 		return real;
-	}
-
-	private void lock() {
-
-	}
-
-	private void unlock() {
-
 	}
 
 }

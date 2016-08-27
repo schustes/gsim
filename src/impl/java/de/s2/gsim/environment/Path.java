@@ -30,11 +30,11 @@ public class Path<T> {
     public String getName() {
         return name;
     }
-    
+
     public Path<?> next() {
         return next;
     }
-    
+
     public Type getType() {
         return type;
     }
@@ -46,13 +46,13 @@ public class Path<T> {
     public boolean isTerminal() {
         return next == null;
     }
-    
+
     public String toString() {
         StringBuilder b = new StringBuilder();
         rek(this, b);
         return b.toString();
     }
-    
+
     private void rek(Path<?> p, StringBuilder b) {
         b.append('/').append(p.name);
         if (p.next != null) {
@@ -73,10 +73,26 @@ public class Path<T> {
         }
     }
 
-    public static <M extends List<V>, T, V> Path<M> withoutLastAttributeOrObject(Path<T> path, Type type) {
+    public static <M extends List<V>, T, V> Path<M> withoutLastAttributeOrObject(Path<T> path, Type typeBeforeLast) {
 
         Path<?> p = path;
-        Path<M> p1 = new Path<>(path.getName(), type);
+        Path<M> p1 = new Path<>(path.getName(), typeBeforeLast);
+
+        while (p != null) {
+            p = p.next();
+            if (p.next() != null) {
+                p1.append(p);
+            }
+        }
+
+        return p1;
+
+    }
+
+    public static <M extends V, T, V> Path<M> withoutLastList(Path<T> path) {
+
+        Path<?> p = path;
+        Path<M> p1 = new Path<>(path.getName(), Type.OBJECT);
 
         while (p != null) {
             p = p.next();
@@ -90,7 +106,7 @@ public class Path<T> {
     }
 
     public static <T> Path<T> attributePath(String... path) {
-        
+
         if (path.length < 2) {
             throw new IllegalArgumentException("Path must not be empty");
         }
@@ -143,6 +159,18 @@ public class Path<T> {
         return initial;
     }
 
+    public String last() {
+        Path<?> p = next;
+        String ret = "";
+        do {
+            if (p == null) {
+                ret = this.name;
+            } else {
+                p = p.next;
+            }
+        } while (p != null);
+        return ret;
+    }
 
 
 }

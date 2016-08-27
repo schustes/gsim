@@ -903,6 +903,21 @@ public class Frame extends Unit<Frame, DomainAttribute> {
         return false;
     }
 
+    public boolean removeChildFrameList(Path<TypedList<Frame>> frameListPath) {
+        Path<Frame> containingFramePath = Path.withoutLastList(frameListPath);
+
+        TypedList<Frame> list = this.resolvePath(frameListPath);
+        Frame containingFrame = this.resolvePath(containingFramePath);
+
+        if (containingFrame != null && list != null) {
+            containingFrame.removeDeclaredChildInstanceList(frameListPath.last());
+            setDirty(true);
+            return true;
+        }
+
+        return false;
+    }
+
     public boolean addChildFrame(Path<TypedList<Frame>> framePath, Frame frameToAdd) {
         TypedList<Frame> list = this.resolvePath(framePath);
         if (list != null) {
