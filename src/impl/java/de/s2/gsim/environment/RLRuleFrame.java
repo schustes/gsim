@@ -1,7 +1,9 @@
 package de.s2.gsim.environment;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import org.apache.log4j.Logger;
@@ -33,6 +35,14 @@ public class RLRuleFrame extends UserRuleFrame {
     public static RLRuleFrame inherit(Frame f) {
     	RLRuleFrame rf = new RLRuleFrame(f);
         return rf;
+    }
+
+    public static RLRuleFrame inherit(String name, Frame... parents) {
+    	Objects.requireNonNull(parents);
+    	Frame f = inherit(Arrays.asList(parents), name, Optional.empty());
+        RLRuleFrame ff = new RLRuleFrame(f);
+        ff.init();
+    	return ff;
     }
 
     public static RLRuleFrame copy(Frame cloneFrom, String newName) {

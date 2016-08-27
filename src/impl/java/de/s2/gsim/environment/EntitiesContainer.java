@@ -170,6 +170,15 @@ public class EntitiesContainer {
     public GenericAgentClass getAgentClass() {
         return agentClass;
     }
+    
+	public GenericAgentClass getAgentSubClass(String name) {
+		return this.getAgentSubClasses().stream().filter(a -> a.getName().equals(name)).findAny().get();
+	}
+
+	public Frame getObjectSubClass(String name) {
+		return this.getObjectSubClasses().stream().filter(a -> a.getName().equals(name)).findAny().get();
+	}
+
 
     public void setAgentClass(GenericAgentClass agentClass) {
         this.agentClass = agentClass;
@@ -342,4 +351,6 @@ public class EntitiesContainer {
         return top;
 
     }
+
+
 }

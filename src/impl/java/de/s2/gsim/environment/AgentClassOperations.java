@@ -22,6 +22,8 @@ import de.s2.gsim.objects.attribute.DomainAttribute;
 public class AgentClassOperations {
 
     private EntitiesContainer container;
+    
+    private Environment env;
 
     private AgentInstanceOperations agentInstanceOperations;
 
@@ -254,7 +256,7 @@ public class AgentClassOperations {
     public void addAgentSubClass(GenericAgentClass cls) {
         container.getAgentSubClasses().add(GenericAgentClass.copy(cls));
         if (!env.getAgentOrder().containsKey(cls.getName())) {
-            env.addAgentOrder(cls.getName(), -1);
+        	env.addAgentOrder(cls.getName(), -1);
         }
     }
 

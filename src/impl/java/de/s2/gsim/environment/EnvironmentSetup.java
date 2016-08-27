@@ -2,10 +2,15 @@ package de.s2.gsim.environment;
 
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.jdom.DataConversionException;
@@ -16,8 +21,14 @@ import org.jdom.input.SAXBuilder;
 import de.s2.gsim.objects.attribute.AttributeConstants;
 import de.s2.gsim.objects.attribute.AttributeType;
 import de.s2.gsim.objects.attribute.DomainAttribute;
-import de.s2.gsim.util.Utils;
 
+/**
+ * Legacy class to read the XML definition file - needs replacement.
+ * 
+ * @author Stephan
+ *
+ */
+@SuppressWarnings("rawtypes")
 public class EnvironmentSetup {
 
     private HashMap<String, ActionFrame> actionCollections = new HashMap<String, ActionFrame>();
@@ -36,6 +47,12 @@ public class EnvironmentSetup {
 
     private Environment env;
     
+    private EntitiesContainer container;
+    
+    private ObjectClassOperations objectClassOperations;
+    
+    private AgentClassOperations agentClassOperations;
+    
     public EnvironmentSetup(Environment env) {
     	this.env = env;
     }
@@ -53,7 +70,11 @@ public class EnvironmentSetup {
         }
     }
 
-    public void runSetup() throws GSimDefException {
+    private Map<String, String> agentRtClassMappings = new HashMap<>();
+    private Map<String, String> systemAgents = new HashMap<>();
+    private Map<String, Integer> agentOrder = new HashMap<>();
+    
+	public void runSetup() throws GSimDefException {
         try {
             if (doc == null) {
                 return;
@@ -71,11 +92,11 @@ public class EnvironmentSetup {
                         topLevelObjects.putAll(rek.topLevelObjects);
                         inheritingAgents.putAll(rek.inheritingAgents);
                         inheritingObjects.putAll(rek.inheritingObjects);
-                        agentRtClassMappings.putAll(rek.agentRtClassMappings);
-                        systemAgents.putAll(rek.systemAgents);
-                        agentRtClassMappings.putAll(rek.agentRtClassMappings);
-                        agentOrder.putAll(rek.agentOrder);
-                        systemAgents.putAll(rek.systemAgents);
+                        env.getAgentRtClassMappings().putAll(rek.agentRtClassMappings);
+                        env.getSystemAgents().putAll(rek.systemAgents);
+                        env.getAgentRtClassMappings().putAll(rek.agentRtClassMappings);
+                        env.getAgentOrder().putAll(rek.agentOrder);
+                        env.getSystemAgents().putAll(rek.systemAgents);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -84,7 +105,6 @@ public class EnvironmentSetup {
             loadPossiblyNewActions();
             readSystemAgents();
             buildExecutionOrder(doc);
-            readDataHandlers(doc);
             putAgentsToLists(doc);
             putObjectsToLists(doc);
             createAgentSkeletons();
@@ -96,7 +116,7 @@ public class EnvironmentSetup {
                 Element e = (Element) iter.next();
                 String name = e.getAttributeValue("name");
 
-                GenericAgentClass frame = getAgentSubClass(name);
+                GenericAgentClass frame = container.getAgentSubClass(name);
                 if (frame != null) {// other wise not resolvable
                     GenericAgentClass c = frame;
 
@@ -106,15 +126,15 @@ public class EnvironmentSetup {
                         while (it.hasNext()) {
                             Element list = (Element) it.next();
 
-                            Frame object = getObjectSubClass(list.getAttributeValue("type"));
+                            Frame object = container.getObjectSubClass(list.getAttributeValue("type"));
 
                             c.defineObjectList(list.getAttributeValue("name"), object);
-                            agentSubClasses.add(c);
+                            container.getAgentSubClasses().add(c);
 
-                            GenericAgentClass[] suc = getAllAgentClassSuccessors(c.getTypeName());
+                            Set<GenericAgentClass> suc = container.getAgentSubClasses(c);
                             for (GenericAgentClass s : suc) {
                                 s.replaceAncestor(c);
-                                agentSubClasses.add(s);
+                                container.getAgentSubClasses().add(s);
                             }
 
                             if (list.hasChildren()) {
@@ -122,9 +142,8 @@ public class EnvironmentSetup {
                                 Iterator it2 = list.getChildren("object").iterator();
                                 while (it2.hasNext()) {
                                     Element o = (Element) it2.next();
-                                    String nName = o.getAttribute("name") == null ? object.getTypeName() : o.getAttributeValue("name");
-                                    Frame child = new Frame(new Frame[] { object }, nName, object.getCategory());// new Frame(nName, object,
-                                    // this.getUniqueId());
+                                    String nName = o.getAttribute("name") == null ? object.getName() : o.getAttributeValue("name");
+                                    Frame child = Frame.inherit(Arrays.asList(new Frame[]{ object }), nName, Optional.of(object.getCategory()));
 
                                     if (o.hasChildren()) {
                                         Iterator it3 = o.getChildren().iterator();// list elem of object
@@ -148,7 +167,7 @@ public class EnvironmentSetup {
                                             }
                                         }
                                     }
-                                    addChildObject(c, new String[] { list.getAttributeValue("name") }, child);
+                                    objectClassOperations.addChildFrame(c, Path.objectListPath(list.getAttributeValue("name")), child);
                                 }
                             }
                         }
@@ -220,11 +239,6 @@ public class EnvironmentSetup {
 
                 String ruleName = nodeElem.getAttribute("name").getValue();
                 RLRuleFrame rf = agent.getBehaviour().createRLRule(ruleName);
-
-                if (nodeElem.getAttribute("restrict-repeat-interval") != null) {
-                    String repeat = nodeElem.getAttributeValue("restrict-repeat-interval");
-                    rf.setRepeatedExecutionTest(repeat);
-                }
 
                 if (nodeElem.getAttribute("retract-osbolete-actions") != null) {
                     String doRetract = nodeElem.getAttributeValue("retract-osbolete-actions");
@@ -386,35 +400,6 @@ public class EnvironmentSetup {
                     }
                 }
 
-                Iterator it = nodeElem.getChildren("dependency-test").iterator();
-                while (it.hasNext()) {
-
-                    Element elem = (Element) it.next();
-
-                    String testName = elem.getAttributeValue("name");
-
-                    Element forElem = elem.getChild("for-each");
-                    String fat = forElem.getAttributeValue("action-type");
-                    String fot = forElem.getAttributeValue("object-types");
-                    String ft = forElem.getAttributeValue("time");
-
-                    Element notExistsElem = forElem.getChild("not-exists");
-
-                    Element actionType = notExistsElem.getChild("action-type");
-                    Element objectType = notExistsElem.getChild("object-types");
-                    Element time = notExistsElem.getChild("time");
-                    String at = actionType.getAttributeValue("binding");
-                    String ot = objectType.getAttributeValue("binding");
-                    String t = time.getAttributeValue("binding");
-
-                    Element test = notExistsElem.getChild("test-expression");
-                    String testExpr = replace(test.getAttributeValue("jess"));
-
-                    DependencyTestFrame dtf = new DependencyTestFrame(testName, at, ot, t, testExpr, fat, fot, ft);
-                    rf.addDependcyTestFrame(dtf);
-
-                }
-
                 agent.getBehaviour().addRLRule(rf);
 
             }
@@ -482,7 +467,7 @@ public class EnvironmentSetup {
                 String refName = unresolved.get(name);
                 RLRuleFrame a = agent.getBehaviour().getRLRule(refName);
                 if (a != null) {
-                    RLRuleFrame rf = new RLRuleFrame(name);
+                    RLRuleFrame rf = RLRuleFrame.newRLRuleFrame(name);
                     Element e = nodes.get(name);
                     if (e.getChild("condition-nodes") != null) {
                         Iterator cIter = e.getChild("condition-nodes").getChildren("condition-node").iterator();
@@ -551,7 +536,7 @@ public class EnvironmentSetup {
                 String refName = unresolved.get(name);
                 RLRuleFrame a = agent.getBehaviour().getRLRule(refName);
                 if (a != null) {
-                    RLRuleFrame rf = new RLRuleFrame(a, name);
+                	RLRuleFrame rf = RLRuleFrame.inherit(name, a);
                     for (ConditionFrame c : rf.getConditions()) {
                         rf.removeCondition(c);
                     }
@@ -603,9 +588,9 @@ public class EnvironmentSetup {
                 String roleName = e.getAttributeValue("ref");
                 String pause = e.getAttributeValue("exec-interval");
                 if (pause != null) {
-                    agentPauses.put(roleName, pause);
+                    env.getAgentPauses().put(roleName, pause);
                 } else {
-                    agentPauses.put(roleName, "1");
+                	env.getAgentPauses().put(roleName, "1");
                 }
                 int order = Integer.parseInt(e.getAttributeValue("order"));
                 if (order > maxOrder && !roleName.equals("default")) {
@@ -631,13 +616,14 @@ public class EnvironmentSetup {
 
                 DomainAttribute att = null;
                 if (!attRef.contains("::")) {
-                    att = (DomainAttribute) agent.resolveName(attRef.split("/"));
+                	Path<DomainAttribute> p = Path.attributePath(attRef.split("/"));
+                    att = (DomainAttribute) agent.resolvePath(p);
                 } else {
                     String[] ref0 = attRef.split("::")[0].split("/");
                     String[] ref1 = attRef.split("::")[1].split("/");
-                    Frame object = getObjectSubClass(ref0[1].trim());
+                    Frame object = container.getObjectSubClass(ref0[1].trim());
                     if (object != null) {
-                        att = (DomainAttribute) object.resolveName(ref1);
+                        att = (DomainAttribute) object.resolvePath(Path.attributePath(ref1));
                     }
                 }
                 if (att == null) {
@@ -648,14 +634,14 @@ public class EnvironmentSetup {
                         throw new GSimDefException("Attribute " + attRef + " is numerical, but no boundaries were specified.");
                     }
                 } else if (att.getType().equals(AttributeConstants.SET)) {
-                    String[] fillers = att.getFillers();
+                    String[] fillers = (String[])att.getFillers().toArray();
                     f.setFillers(fillers);
                     n.addExpansion(f);
                     agent.getBehaviour().addRLRule(n);
                 } else if (att.getType().equals(AttributeConstants.INTERVAL)) {
-                    f.setFillers(att.getFillers());
-                    f.setMin(att.getFillers()[0]);
-                    f.setMax(att.getFillers()[1]);
+                    f.setFillers((String[])att.getFillers().toArray());
+                    f.setMin(att.getFillers().get(0));
+                    f.setMax(att.getFillers().get(1));
                     n.addExpansion(f);
                     agent.getBehaviour().addRLRule(n);
                 } else {
@@ -802,9 +788,9 @@ public class EnvironmentSetup {
 
     private void createObjects() throws GSimDefException {
         HashMap<String, Frame> top = createTopLevelObjects(topLevelObjects);
-        GenericAgentClass[] c = getAgentSubClasses();
-        for (int i = 0; i < c.length; i++) {
-            top.put(c[i].getTypeName(), c[i]);
+        Set<GenericAgentClass> agentClasses = container.getAgentSubClasses();
+        for (GenericAgentClass c: agentClasses) {
+            top.put(c.getName(), c);
         }
         HashMap<String, Element> ind = new HashMap<String, Element>();
         Iterator iter = inheritingObjects.values().iterator();
@@ -819,7 +805,7 @@ public class EnvironmentSetup {
         while (iter.hasNext()) {
             Frame cls = (Frame) iter.next();
             if (!(cls instanceof GenericAgentClass)) {
-                addObjectSubClass(cls);
+                container.addObjectClass(cls);
             }
         }
 
@@ -852,20 +838,21 @@ public class EnvironmentSetup {
                     iter.remove();
                     for (int i = 0; i < parentArray.length && goes; i++) {
                         GenericAgentClass parentClass = ind.get(parentArray[i].trim());
-                        if (getAgentSubClass(parentArray[i].trim()) == null) {
-                            addAgentSubClass(parentClass);
+                        if (container.getAgentSubClass(parentArray[i].trim()) == null) {
+                            container.addAgentClass(parentClass);
                         }
-                        ps[i] = parentClass;
+                        ps[i] = parentClass;                    
                     }
-                    GenericAgentClass sub = new GenericAgentClass(new GenericAgentClass[] { ps[0] }, name);
+                    GenericAgentClass sub = GenericAgentClass.inherit(ps[0], name);
 
                     createAgentFromXMLElement(e, sub);
-                    addAgentSubClass(sub);
+                    container.addAgentClass(sub);
                     for (int i = 1; i < ps.length; i++) {
-                        sub = extendAgentClassRole(sub, ps[i]);
+                    	agentClassOperations.extendAgentClassRole(sub, ps[i]);
+                        sub = agentClassOperations.extendAgentClassRole(sub, ps[i]);
                     }
-                    ind.put(sub.getTypeName(), sub);
-                    addAgentSubClass(sub);
+                    ind.put(sub.getName(), sub);
+                    container.addAgentClass(sub);
 
                 }
             }
@@ -905,25 +892,23 @@ public class EnvironmentSetup {
                 }
                 if (goes) {
                     iter.remove();
-                    Frame[] fs = new Frame[parentArray.length];
+                    List<Frame> fs = new ArrayList<>();
                     boolean hasObjectParent = false;
                     for (int i = 0; i < parentArray.length; i++) {
                         Frame parentClass = ind.get(parentArray[i]);
                         if (!(parentClass instanceof GenericAgentClass)) {
                             hasObjectParent = true;
-                            resolved.put(parentClass.getTypeName(), parentClass);
+                            resolved.put(parentClass.getName(), parentClass);
                         }
-                        fs[i] = parentClass;
+                        fs.add(parentClass);
                     }
                     if (!hasObjectParent) {
-                        Frame[] nn = new Frame[fs.length + 1];
-                        Utils.addToArray(fs, nn, getObjectClass());
-                        fs = nn;
+                    	fs.add(container.getObjectClass());
                     }
-                    Frame sub = new Frame(fs, name, "object");
+                    Frame sub = Frame.inherit(fs, name, Optional.of("Object"));
                     createObjectFromXML(e, sub);
-                    ind.put(sub.getTypeName(), sub);
-                    resolved.put(sub.getTypeName(), sub);
+                    ind.put(sub.getName(), sub);
+                    resolved.put(sub.getName(), sub);
                 }
             }
 
@@ -947,17 +932,17 @@ public class EnvironmentSetup {
         Iterator iter = o.values().iterator();
         while (iter.hasNext()) {
             Element sub = (Element) iter.next();
-            GenericAgentClass top = getAgentClassRef();
+            GenericAgentClass top = container.getAgentClass();
 
-            if (!sub.getAttributeValue("name").equals(top.getTypeName())) {
-                GenericAgentClass agent = new GenericAgentClass(new GenericAgentClass[] { top }, sub.getAttributeValue("name"));
+            if (!sub.getAttributeValue("name").equals(top.getName())) {
+                GenericAgentClass agent = GenericAgentClass.inherit(top, sub.getAttributeValue("name"));
 
-                if (getAgentSubClass(agent.getTypeName()) == null) {
-                    addAgentSubClass(agent);
+                if (container.getAgentSubClass(agent.getName()) == null) {
+                    container.addAgentClass(agent);
                 }
 
                 createAgentFromXMLElement(sub, agent);
-                ind.put(agent.getTypeName(), agent);
+                ind.put(agent.getName(), agent);
             }
         }
         return ind;
@@ -970,11 +955,11 @@ public class EnvironmentSetup {
         Iterator iter = o.values().iterator();
         while (iter.hasNext()) {
             Element e = (Element) iter.next();
-            Frame top = getObjectClassRef();
-            if (!e.getAttributeValue("name").equals(top.getTypeName())) {
-                Frame f = new Frame(new Frame[] { top }, e.getAttributeValue("name"), "object");
+            Frame top = container.getObjectClass();
+            if (!e.getAttributeValue("name").equals(top.getName())) {
+            	Frame f = Frame.inherit(e.getAttributeValue("name"), top);
                 createObjectFromXML(e, f);
-                ind.put(f.getTypeName(), f);
+                ind.put(f.getName(), f);
             }
         }
         return ind;
@@ -987,7 +972,7 @@ public class EnvironmentSetup {
         }
 
         String role = null;
-        String[] roles = agentMappings.get(agentName);
+        String[] roles = env.getAgentMappings().get(agentName);
 
         if (roles == null) {
             roles = searchDoc(agentName);
@@ -1027,7 +1012,6 @@ public class EnvironmentSetup {
      *            String
      * @return Frame[]
      */
-    @SuppressWarnings("unchecked")
     private Frame[] loadPossiblyNewActions() {
 
         HashSet<Frame> frames = new HashSet<Frame>();
@@ -1053,8 +1037,8 @@ public class EnvironmentSetup {
                 ActionFrame f = new ActionFrame(name, cls);
                 frames.add(f);
 
-                actionCollections.put(f.getTypeName(), f);
-                getActionMappings().put(name, cls);
+                actionCollections.put(f.getName(), f);
+                env.getActionMappings().put(name, cls);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -1070,22 +1054,22 @@ public class EnvironmentSetup {
         Iterator iter = o.values().iterator();
         while (iter.hasNext()) {
             Element e = (Element) iter.next();
-            Frame top = getObjectClassRef();
-            if (e.getAttributeValue("name").equals(top.getTypeName())) {
+            Frame top = container.getObjectClass();
+            if (e.getAttributeValue("name").equals(top.getName())) {
                 createObjectFromXML(e, top);
-                setObjectClass(top);
+                container.setObjectClass(top);
             }
         }
     }
 
     private void maybeSetTopAgentClass(HashMap<String, Element> o) throws GSimDefException {
         Iterator iter = o.values().iterator();
-        GenericAgentClass top = getAgentClassRef();
+        GenericAgentClass top = container.getAgentClass();
         while (iter.hasNext()) {
             Element sub = (Element) iter.next();
-            if (sub.getAttributeValue("name").equals(top.getTypeName())) {
+            if (sub.getAttributeValue("name").equals(top.getName())) {
                 createAgentFromXMLElement(sub, top);
-                setAgentClass(top);
+                container.setAgentClass(top);
             }
         }
     }
@@ -1107,7 +1091,7 @@ public class EnvironmentSetup {
                 if (elem.getAttribute("execution-context") != null) {
                     String rolename = elem.getAttributeValue("execution-context");
                     if (rolename != null) {
-                        String[] r = agentMappings.get(name);
+                        String[] r = env.getAgentMappings().get(name);
                         String[] roles;
                         if (r != null) {
                             roles = new String[r.length + 1];
@@ -1116,16 +1100,16 @@ public class EnvironmentSetup {
                         } else {
                             roles = r;
                         }
-                        agentMappings.put(name, roles);
+                        env.getAgentMappings().put(name, roles);
                     } else {
-                        agentMappings.put(name, new String[] { "default" });
+                    	env.getAgentMappings().put(name, new String[] { "default" });
                     }
                 } else {
                     String role = findContextRek(name);
                     if (role == null) {
-                        agentMappings.put(name, new String[] { "default" });
+                    	env.getAgentMappings().put(name, new String[] { "default" });
                     } else {
-                        String[] r = agentMappings.get(name);
+                        String[] r = env.getAgentMappings().get(name);
                         String[] roles;
                         if (r != null) {
                             roles = new String[r.length + 1];
@@ -1134,7 +1118,7 @@ public class EnvironmentSetup {
                         } else {
                             roles = r;
                         }
-                        agentMappings.put(name, roles);
+                        env.getAgentMappings().put(name, roles);
                     }
                 }
             }
@@ -1159,21 +1143,6 @@ public class EnvironmentSetup {
         }
     }
 
-    private void readDataHandlers(Document doc) {
-        HashMap<String, String> list = new HashMap<String, String>();
-        if (doc.getRootElement().getChild("data-handlers") != null) {
-            Element root = doc.getRootElement().getChild("data-handlers");
-            Iterator iter = root.getChildren("handler").iterator();
-            while (iter.hasNext()) {
-                Element e = (Element) iter.next();
-                String forType = e.getAttributeValue("type");
-                String clsName = e.getAttributeValue("class");
-                list.put(forType, clsName);
-            }
-        }
-        dataHandlers = list;
-    }
-
     private void readSystemAgents() {
         if (doc == null) {
             return;
@@ -1188,15 +1157,6 @@ public class EnvironmentSetup {
                 systemAgents.put(name, clsName);
             }
         }
-    }
-
-    private String replace(String test) {
-        String s = test.replace("LT", "<");
-        s = s.replace("LE", "<=");
-        s = s.replace("GT", ">");
-        s = s.replace("GE", ">=");
-        s = s.replace("EQ", "=");
-        return s;
     }
 
     private String[] searchDoc(String agent) {

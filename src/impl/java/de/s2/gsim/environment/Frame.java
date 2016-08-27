@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -81,6 +82,27 @@ public class Frame extends Unit<Frame, DomainAttribute> {
      */
     public static Frame inherit(@NotNull List<? extends Frame> parents, @NotNull String name, Optional<String> category) {
         Frame f = new Frame(name, category, true, false);
+        for (Frame parent : parents) {
+            f.parents.put(parent.getName(), parent);
+        }
+        f.setDirty(true);
+        return f;
+    }
+
+    /**
+     * Creates a frame that inherits from at least one parent.
+     *  
+     * @param name name of the new frame 
+     * @param parents list of frames
+     * @return
+     */
+    public static Frame inherit(@NotNull String name, @NotNull Frame... parents) {
+    	Objects.requireNonNull(name);
+    	Objects.requireNonNull(parents);
+    	if (parents.length ==0 ) {
+    		throw new GSimDefException("Must inherit from at least on parent");
+    	}
+        Frame f = new Frame(name, Optional.empty(), true, false);
         for (Frame parent : parents) {
             f.parents.put(parent.getName(), parent);
         }
