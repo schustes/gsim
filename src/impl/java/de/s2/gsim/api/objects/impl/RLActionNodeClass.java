@@ -36,7 +36,7 @@ public class RLActionNodeClass extends RuleClass implements RLActionNode, UnitWr
     @Override
     public void addOrSetExpansion(Expansion cond) throws GSimException {
         Frame inst = (Frame) ((UnitWrapper) cond).toUnit();
-        real.addChildFrame(RLRuleFrame.INST_LIST_EXP, inst);
+        real.addOrSetChildFrame(RLRuleFrame.INST_LIST_EXP, inst);
         owner.addOrSetRule(this);
     }
 
@@ -62,7 +62,7 @@ public class RLActionNodeClass extends RuleClass implements RLActionNode, UnitWr
 
         f = new ExpansionFrame(param, min, max);
 
-        real.addChildFrame(RLRuleFrame.INST_LIST_EXP, f);
+        real.addOrSetChildFrame(RLRuleFrame.INST_LIST_EXP, f);
         owner.addOrSetRule(this);
         return new ExpansionClass(this, f);
     }
@@ -71,7 +71,7 @@ public class RLActionNodeClass extends RuleClass implements RLActionNode, UnitWr
     public Expansion createExpansion(String param, String[] fillers) throws GSimException {
         ExpansionFrame f = new ExpansionFrame(param);
         f.setFillers(fillers);
-        real.addChildFrame(RLRuleFrame.INST_LIST_EXP, f);
+        real.addOrSetChildFrame(RLRuleFrame.INST_LIST_EXP, f);
         owner.addOrSetRule(this);
         return new ExpansionClass(this, f);
     }

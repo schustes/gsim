@@ -33,8 +33,8 @@ public class UserRuleFrame extends Frame {
     	UserRuleFrame ufr = new UserRuleFrame(f);
         Frame f1 = new ConditionFrame("{all-conditions}", "=", "don't care");
         Frame f2 = new ActionFrame("{all-actions}", "action");
-        ufr.addChildFrame("conditions", f1);
-        ufr.addChildFrame("consequences", f2);
+        ufr.addOrSetChildFrame("conditions", f1);
+        ufr.addOrSetChildFrame("consequences", f2);
 
         if (ufr.getAttribute(ATTR_LIST_ATTRS, "activated") == null) {
             DomainAttribute a = new DomainAttribute("activated", AttributeType.STRING);
@@ -58,7 +58,7 @@ public class UserRuleFrame extends Frame {
 
     	Frame f = Frame.newFrame(name, Optional.of(CATEGORY));
         Frame f2 = Frame.newFrame("{all-actions}", Optional.of("action"));
-        f.addChildFrame("consequences", f2);
+        f.addOrSetChildFrame("consequences", f2);
 
         DomainAttribute a = new DomainAttribute("activated", AttributeType.STRING);
         a.setDefault("true");
@@ -76,12 +76,12 @@ public class UserRuleFrame extends Frame {
 
         // resolve possible frame-references to $'s:
 
-        super.addChildFrame(INST_LIST_COND, cond);
+        super.addOrSetChildFrame(INST_LIST_COND, cond);
 
     }
 
     public void addConsequence(ActionFrame cons) {
-        super.addChildFrame(INST_LIST_CONS, cons);
+        super.addOrSetChildFrame(INST_LIST_CONS, cons);
     }
 
     public ConditionFrame createCondition(String var, String op, String val) {
@@ -145,11 +145,11 @@ public class UserRuleFrame extends Frame {
     }
 
     public void setConditionFrame(ConditionFrame cond) {
-        super.addChildFrame(UserRuleFrame.INST_LIST_COND, cond);
+        super.addOrSetChildFrame(UserRuleFrame.INST_LIST_COND, cond);
     }
 
     public void setConsequence(ActionFrame cons) {
-        super.addChildFrame(UserRuleFrame.INST_LIST_CONS, cons);
+        super.addOrSetChildFrame(UserRuleFrame.INST_LIST_CONS, cons);
     }
 
     public void setUpdateLag(String s) {

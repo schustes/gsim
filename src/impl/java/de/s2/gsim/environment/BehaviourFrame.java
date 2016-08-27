@@ -90,11 +90,11 @@ public class BehaviourFrame extends Frame {
 	 *            ActionCollectionFrame
 	 */
 	public void addAction(ActionFrame r) {
-		addChildFrame(ACTION_LIST, r);
+		addOrSetChildFrame(ACTION_LIST, r);
 	}
 
 	public void addRLRule(RLRuleFrame r) {
-		addChildFrame(RL_LIST, r);
+		addOrSetChildFrame(RL_LIST, r);
 	}
 
 	/**
@@ -103,8 +103,8 @@ public class BehaviourFrame extends Frame {
 	 * @param r
 	 *            UserRuleFrame
 	 */
-	public void addRule(UserRuleFrame r) {
-		addChildFrame(RULE_LIST, r);
+	public void addOrSetRule(UserRuleFrame r) {
+		addOrSetChildFrame(RULE_LIST, r);
 	}
 
 	/**
@@ -113,8 +113,7 @@ public class BehaviourFrame extends Frame {
 	@Override
 	public BehaviourFrame clone() {
 		Frame a = (Frame) super.clone();
-		BehaviourFrame f = new BehaviourFrame(a);
-		return f;
+        return new BehaviourFrame(a);
 	}
 
 	/**
@@ -433,8 +432,8 @@ public class BehaviourFrame extends Frame {
 	 private void init() {
 
 		 ActionFrame f = new ActionFrame("{}", "");
-		 addChildFrame(ACTION_LIST, f);
-		 addChildFrame(RULE_LIST, new UserRuleFrame("{all-rules}"));
+		 addOrSetChildFrame(ACTION_LIST, f);
+		 addOrSetChildFrame(RULE_LIST, new UserRuleFrame("{all-rules}"));
 
 		 super.defineAttributeList(ATTR_LIST);
 

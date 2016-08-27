@@ -6,8 +6,11 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import de.s2.gsim.objects.attribute.DomainAttribute;
 
 /**
  * EntitesContainer holds all components of an {@link Environment}. An environment is the simulation and setup specific object system that manages agents, objects and their relations to each other.
@@ -35,7 +38,7 @@ public class EntitiesContainer {
     /**
      * Top level behaviour class.
      */
-    private Frame behaviourClass;
+    private BehaviourFrame behaviourClass;
 
     /**
      * Set of agent instances.
@@ -77,9 +80,35 @@ public class EntitiesContainer {
      * @param frame the frame
      * @return a list of instances
      */
-    public List<? extends Instance> getInstancesOfClass(Frame frame) {
+    public List<? extends Instance> getInstancesOfClass0(Frame frame) {
         Stream<? extends Instance> stream = (frame instanceof GenericAgentClass) ? agents.values().stream() : objects.stream();
         return stream.filter(instance -> instance.getDefinition().getName().equals(frame.getName())).collect(Collectors.toList());
+    }
+
+    @SuppressWarnings("unchecked")
+    public <F extends Instance> List<F> getInstancesOfClass(Frame frame, Class<F> c) {
+        Stream<F> stream = (Stream<F>) ((frame instanceof GenericAgentClass) ? agents.values().stream() : objects.stream());
+        return stream.filter(instance -> instance.getDefinition().getName().equals(frame.getName())).collect(Collectors.toList());
+    }
+
+    public void modifyChildFrame(BiConsumer<Frame, Path<DomainAttribute>> func, Frame classToRemoveAttributeFrom, Path<DomainAttribute> pathToChildFrame) {
+        Collection<? extends Frame> set = classToRemoveAttributeFrom.isSuccessor(agentClass.getName()) ? agentSubClasses.values() : objectSubClasses;
+        set.stream().filter(ac -> ac.hasDeclaredChildFrame(classToRemoveAttributeFrom.getName())).forEach(frame -> {
+            for (String list : classToRemoveAttributeFrom.getListNamesWithDeclaredChildFrame(classToRemoveAttributeFrom.getName())) {
+                Path<DomainAttribute> newPath = Path.attributePath(pathToChildFrame.toStringArray(), list, classToRemoveAttributeFrom.getName());
+                func.accept(frame, newPath);
+            }
+        });
+    }
+
+    public void removeFrameInReferringFrames(BiConsumer<Frame, Path<Frame>> func, Frame removed) {
+        Collection<? extends Frame> set = removed.isSuccessor(agentClass.getName()) ? agentSubClasses.values() : objectSubClasses;
+        set.stream().filter(a -> a.hasDeclaredChildFrame(removed.getName())).forEach(frame -> {
+            for (String list : frame.getListNamesWithDeclaredChildFrame(removed.getName())) {
+                Path<Frame> path = Path.objectPath(list, removed.getName());
+                func.accept(frame, path);
+            }
+        });
     }
 
     /**
@@ -162,15 +191,35 @@ public class EntitiesContainer {
         return new LinkedHashSet<>(agentSubClasses.values());
     }
 
+    /**
+     * Returns all successors of the given agent class.
+     * 
+     * @param ofWhich the agent class to get the successors for
+     * @return a set of subclasses
+     */
+    public Set<GenericAgentClass> getAgentSubClasses(GenericAgentClass ofWhich) {
+        return agentSubClasses.values().parallelStream().filter(a -> a.isSuccessor(ofWhich.getName())).collect(Collectors.toSet());
+    }
+
+    /**
+     * Get the direct children (h+1) of the given agent class.
+     * 
+     * @param ofWhich the agent to get the children from
+     * @return a set of subclasses
+     */
+    public Set<GenericAgentClass> getAgentChildren(GenericAgentClass ofWhich) {
+        return agentSubClasses.values().parallelStream().filter(a -> a.getParentFrame(ofWhich.getName()) != null).collect(Collectors.toSet());
+    }
+
     public void addAgentClass(GenericAgentClass agentClass) {
         this.agentSubClasses.put(agentClass.getName(), agentClass);
     }
 
-    public Frame getBehaviourClass() {
+    public BehaviourFrame getBehaviourClass() {
         return behaviourClass;
     }
 
-    public void setBehaviourClass(Frame behaviourClass) {
+    public void setBehaviourClass(BehaviourFrame behaviourClass) {
         this.behaviourClass = behaviourClass;
     }
 
@@ -204,6 +253,26 @@ public class EntitiesContainer {
 
     public Set<Frame> getObjectSubClasses() {
         return objectSubClasses;
+    }
+
+    /**
+     * Returns all successors in the inheritance tree.
+     * 
+     * @param parent
+     * @return
+     */
+    public Set<Frame> getObjectSubClasses(Frame parent) {
+        return objectSubClasses.parallelStream().filter(f -> f.isSuccessor(parent.getName())).collect(Collectors.toSet());
+    }
+
+    /**
+     * Returns only next level inheritance.
+     * 
+     * @param parent
+     * @return
+     */
+    public Set<Frame> getObjectChildren(Frame parent) {
+        return objectSubClasses.parallelStream().filter(f -> f.getParentFrame(parent.getName()) != null).collect(Collectors.toSet());
     }
 
     public void addObjectClass(Frame objectSubClass) {

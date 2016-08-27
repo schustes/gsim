@@ -32,6 +32,10 @@ public class UserRule extends Instance {
     	
     }
     
+    public UserRule clone() {
+        return fromInstance(this);
+    }
+
     public static UserRule fromInstance(Instance inst) {
     	Instance newInst = Instance.copy(inst);
     	UserRule r = new UserRule(newInst);

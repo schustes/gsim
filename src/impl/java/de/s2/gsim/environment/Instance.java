@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.NoSuchElementException;
 
 import javax.validation.constraints.NotNull;
 
@@ -78,10 +79,10 @@ public class Instance extends Unit<Instance, Attribute> {
 	}
 
 	/**
-	 * Constructs a new instance by copying the given one.
-	 * 
-	 * @param inst the instance to copy from
-	 */
+     * Constructs a new instance by using frame and name of the given instance (no copy!).
+     * 
+     * @param inst the instance to create the new instance from
+     */
 	protected Instance(@NotNull Instance inst) {
 		super(inst.getName(), inst.isMutable(), inst.isSystem());
 		this.frame = inst.getDefinition();
@@ -175,7 +176,7 @@ public class Instance extends Unit<Instance, Attribute> {
 				.stream()
 				.flatMap(List::stream)
 				.filter(attr -> attr.getName().equals(attrName))
-				.findFirst().get();
+                .findFirst().get();
 	}
 
 	/**
@@ -188,7 +189,7 @@ public class Instance extends Unit<Instance, Attribute> {
 
 	public  Attribute getAttribute(@NotNull String listname, @NotNull String attrName) {
 		if (!getAttributeLists().containsKey(listname)) {
-			return null;
+            throw new NoSuchElementException("List name " + listname + " does not exist");
 		}
 
 		return getAttributeLists()
@@ -513,13 +514,66 @@ public class Instance extends Unit<Instance, Attribute> {
      * @return true if the attribute was replaced, false if this was not possible because it does not exist
      */
     public boolean replaceChildAttribute(Path<Attribute> path, Attribute newValue) {
-        Path<List<Attribute>> p = Path.withoutLastAttributeOrObject(path, Path.Type.LIST, Attribute.class);
+        Path<List<Attribute>> p = Path.withoutLastAttributeOrObject(path, Path.Type.LIST);
         ListIterator<Attribute> attIter = this.resolvePath(p).listIterator();
         while (attIter.hasNext()) {
             if (attIter.next().getName().equals(newValue.getName())) {
                 attIter.set(newValue);
                 setDirty(true);
                 return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean addChildAttribute(Path<List<Attribute>> path, Attribute newValue) {
+        List<Attribute> attr = this.resolvePath(path);
+        if (attr != null) {
+            attr.add(newValue.clone());
+            setDirty(true);
+        }
+        return false;
+    }
+
+    public boolean addChildInstance(Path<TypedList<Instance>> path, Instance newValue) {
+        TypedList<Instance> instance = this.resolvePath(path);
+        if (instance != null) {
+            instance.add(newValue.clone());
+            setDirty(true);
+        }
+        return false;
+    }
+
+    /**
+     * Removes the attribute identified by {@link Path} somewhere in the tree of attributes or child attributes.
+     * 
+     * @param path the path
+     * @return true if the attribute was removed, false if none with the given attribute path could be found and/or deleted
+     */
+    public boolean removeChildAttribute(Path<Attribute> path) {
+
+        Attribute attr = this.resolvePath(path);
+        if (attr != null) {
+            Path<List<Attribute>> attrListPath = Path.withoutLastAttributeOrObject(path, Path.Type.LIST);
+            List<Attribute> attrList = this.resolvePath(attrListPath);
+            if (attrList != null) {
+                attrList.remove(attr);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean removeChildInstance(Path<Instance> instancePath) {
+        Instance inst = this.resolvePath(instancePath);
+        if (inst != null) {
+            Path<List<Instance>> childListPath = Path.withoutLastAttributeOrObject(instancePath, Path.Type.LIST);
+            if (childListPath != null) {
+                List<Instance> list = this.resolvePath(childListPath);
+                if (list != null) {
+                    list.remove(inst);
+                    return true;
+                }
             }
         }
         return false;

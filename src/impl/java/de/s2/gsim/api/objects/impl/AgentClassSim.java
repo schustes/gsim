@@ -45,7 +45,7 @@ public class AgentClassSim implements AgentClass, ObjectClass {
     public void addOrSetObject(String list, ObjectClass object) throws GSimException {
 
         try {
-            real.addChildFrame(list, (Frame) ((UnitWrapper) object).toUnit());
+            real.addOrSetChildFrame(list, (Frame) ((UnitWrapper) object).toUnit());
         } catch (Exception e) {
             throw new GSimException(e);
         }
