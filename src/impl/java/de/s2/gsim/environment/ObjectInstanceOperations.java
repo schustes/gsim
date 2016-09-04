@@ -1,6 +1,7 @@
 package de.s2.gsim.environment;
 
 import java.util.Iterator;
+import java.util.List;
 
 import de.s2.gsim.objects.attribute.Attribute;
 
@@ -19,6 +20,11 @@ public class ObjectInstanceOperations {
     protected Instance findObject(String name) {
         return container.getObjects().parallelStream().filter(o -> o.getName().equals(name)).findAny().get();
     }
+    
+    public List<Instance> getInstancesOfClass(Frame parent) {
+    	return container.getAllInstancesOfClass(parent, Instance.class);
+    }
+    
 
     public Instance modifyObjectAttribute(Instance inst, Path<Attribute> attrPath, Attribute att) {
         Instance here = findObject(inst.getName());
@@ -36,6 +42,12 @@ public class ObjectInstanceOperations {
         }
     }
 
+
+	public Instance instanciateObject(Frame f, String name) {
+		Instance newInstance = Instance.instanciate(name, f);
+		container.addObject(newInstance);
+		return newInstance.clone();
+	}
 
 
 }

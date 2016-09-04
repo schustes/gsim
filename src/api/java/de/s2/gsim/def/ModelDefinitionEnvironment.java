@@ -217,21 +217,22 @@ public interface ModelDefinitionEnvironment {
      * @return List of AgentInstanceIF
      * @throws GSimException
      */
-    public AgentInstance[] instanciateAgents(AgentClass parent, String prefix, int method, double standardVariation, int count)
+    public AgentInstance[] instanciateAgentsNormallyDistributed(AgentClass parent, String prefix, double standardVariation, int count)
             throws GSimException;
 
     /**
-     * Creates a list of agents, but does not return them to the caller. This method should be used when large numbers are created (typically in
-     * distributed mode), which can be too much for a single node.
+     * Creates a list of agents.
      * 
      * @param parent the frame from which the agent is created
      * @param prefix common name prefix, to which a running number will be appended
      * @param method method constant defining what to do with the attributes (e.g. vary randomly)
-     * @param svar standard variation (only needed if method is based on normal distribution)
+     * @param standardVariation standard variation (only needed if method is based on normal distribution)
      * @param count number of agents to instanciate
+     * @return List of AgentInstanceIF
      * @throws GSimException
      */
-    public void instanciateAgents2(AgentClass parent, String prefix, int method, double svar, int count) throws GSimException;
+    public AgentInstance[] instanciateAgentsUniformDistributed(AgentClass parent, String prefix, int count)
+            throws GSimException;
 
     /**
      * Clears the environment from agents.

@@ -1,6 +1,8 @@
 package de.s2.gsim.api.impl;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 import de.s2.gsim.GSimException;
 import de.s2.gsim.api.objects.impl.AgentClassDef;
@@ -13,6 +15,7 @@ import de.s2.gsim.environment.Environment;
 import de.s2.gsim.environment.Frame;
 import de.s2.gsim.environment.GenericAgent;
 import de.s2.gsim.environment.GenericAgentClass;
+import de.s2.gsim.environment.HierarchyTree;
 import de.s2.gsim.environment.Instance;
 import de.s2.gsim.objects.AgentClass;
 import de.s2.gsim.objects.AgentInstance;
@@ -36,17 +39,17 @@ public class EnvironmentWrapper implements ModelDefinitionEnvironment {
     @Override
     public AgentClass createAgentClass(String name, String parent) throws GSimException {
         try {
-            GenericAgentClass g = parent != null ? env.getAgentSubClass(parent) : env.getGenericAgentClass();
+            GenericAgentClass g = parent != null ? env.getContainer().getAgentSubClass(parent) : env.getContainer().getAgentClass();
 
             if (g == null) {
-                g = env.getAgentClass();
+                g = env.getContainer().getAgentClass();
             }
 
             if (g == null) {
                 throw new GSimException("No parent with name " + parent + " found.");
             }
 
-            GenericAgentClass newAgentClass = env.createAgentSubclass(name, g);
+            GenericAgentClass newAgentClass = env.getAgentClassOperations().createAgentSubclass(name, g);
             return new AgentClassDef(env, newAgentClass);
 
         } catch (Exception e) {
@@ -64,13 +67,13 @@ public class EnvironmentWrapper implements ModelDefinitionEnvironment {
     @Override
     public ObjectClass createObjectClass(String name, String parent) throws GSimException {
         try {
-            Frame parentFrame = parent != null ? env.getObjectSubClass(parent) : env.getObjectClass();
+            Frame parentFrame = parent != null ? env.getContainer().getObjectSubClass(parent) : env.getContainer().getObjectClass();
 
             if (parentFrame == null) {
             	throw new GSimException("No parent with name " + parent + " found!");
             }
 
-            Frame newObjectClass = env.createObjectSubClass(name, parentFrame);
+            Frame newObjectClass = env.getObjectClassOperations().createObjectSubClass(name, parentFrame);
             return new ObjectClassDef(env, newObjectClass);
 
         } catch (Exception e) {
@@ -82,13 +85,14 @@ public class EnvironmentWrapper implements ModelDefinitionEnvironment {
     public ObjectInstance createObjectInstance(String name, ObjectClass parent) throws GSimException {
         try {
             Frame f = (Frame) ((UnitWrapper) parent).toUnit();
-            return new ObjectInstanceDef(env, env.instanciateFrame(f, name));
+            return new ObjectInstanceDef(env, env.getObjectInstanceOperations().instanciateObject(f, name));
         } catch (Exception e) {
             throw new GSimException("Exception", e);
         }
     }
 
-    public InheritanceHierarchy[] exportAgentHierarchy() throws GSimException {
+    //TODO either make HierachyTree to API object or delete this method
+    public HierarchyTree exportAgentHierarchy() throws GSimException {
         try {
             return env.exportAgentHierarchy();
         } catch (Exception e) {
@@ -96,7 +100,8 @@ public class EnvironmentWrapper implements ModelDefinitionEnvironment {
         }
     }
 
-    public InheritanceHierarchy[] exportObjectHierarchy() throws GSimException {
+    //TODO either make HierachyTree to API object or delete this method
+    public HierarchyTree exportObjectHierarchy() throws GSimException {
         try {
             return env.exportObjectHierarchy();
         } catch (Exception e) {
@@ -108,7 +113,7 @@ public class EnvironmentWrapper implements ModelDefinitionEnvironment {
     @Override
     public AgentInstance getAgent(String name) throws GSimException {
         try {
-            GenericAgent a = env.getAgent(name);
+            GenericAgent a = env.getAgentInstanceOperations().getAgent(name);
 
             if (a == null) {
             	throw new GSimException("No agent with name " + name + " found!");
@@ -127,7 +132,7 @@ public class EnvironmentWrapper implements ModelDefinitionEnvironment {
     public AgentClass getAgentClass(String name) throws GSimException {
         try {
 
-            GenericAgentClass a = env.getAgentSubClass(name);
+            GenericAgentClass a = env.getAgentClassOperations().getAgentSubClass(name);
 
             if (a == null) {
             	throw new GSimException("No agent with name " + name + " found!");
@@ -143,23 +148,19 @@ public class EnvironmentWrapper implements ModelDefinitionEnvironment {
     public AgentClass[] getAgentClasses(String parent) throws GSimException {
         try {
             if (parent == null) {
-                GenericAgentClass[] gc = env.getAgentSubClasses();
-                AgentClassDef[] res = new AgentClassDef[gc.length];
+                List<GenericAgentClass> gc = env.getAgentClassOperations().getAgentSubClasses();
+                AgentClassDef[] res = new AgentClassDef[gc.size()];
                 
-//                List<GenericAgentClass> list = new ArrayList<>();
-//                List<AgentClassDef> defList = new ArrayList<>();
-//                list.stream().parallel().forEach(real -> defList.add(new AgentClassDef(env, real)));
-                
-                for (int i = 0; i < gc.length; i++) {
-                    AgentClassDef ac = new AgentClassDef(env, gc[i]);
+                for (int i = 0; i < gc.size(); i++) {
+                    AgentClassDef ac = new AgentClassDef(env, gc.get(i));
                     res[i] = ac;
                 }
                 return res;
             } else {
-                GenericAgentClass[] cls = env.getAllAgentClassSuccessors(parent);
-                AgentClassDef[] res = new AgentClassDef[cls.length];
-                for (int i = 0; i < cls.length; i++) {
-                    res[i] = new AgentClassDef(env, cls[i]);
+                List<GenericAgentClass> cls = env.getAgentClassOperations().getAllAgentClassSuccessors(parent);
+                AgentClassDef[] res = new AgentClassDef[cls.size()];
+                for (int i = 0; i < cls.size(); i++) {
+                    res[i] = new AgentClassDef(env, cls.get(i));
                 }
                 return res;
             }
@@ -172,7 +173,7 @@ public class EnvironmentWrapper implements ModelDefinitionEnvironment {
     @Override
     public String[] getAgentNames(String parent) throws GSimException {
         try {
-            return env.getAgentNames(parent);
+            return env.getAgentClassOperations().getAgentNames(parent).toArray(new String[0]);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -182,12 +183,7 @@ public class EnvironmentWrapper implements ModelDefinitionEnvironment {
     @Override
     public AgentInstance[] getAgents(String parent) throws GSimException {
         try {
-            GenericAgent[] f = env.getAgents(parent);
-
-            if (f == null) {
-                return null; // if proxy mode to prevent too massive
-                             // serialisation!
-            }
+            GenericAgent[] f = env.getAgentClassOperations().getAgents(parent).toArray(new GenericAgent[0]);
 
             if (parent == null) {
                 AgentInstanceDef[] res = new AgentInstanceDef[f.length];
@@ -217,7 +213,7 @@ public class EnvironmentWrapper implements ModelDefinitionEnvironment {
     public AgentInstance[] getAgents(String parent, int offset, int count) throws GSimException {
         try {
 
-            GenericAgent[] f = env.getAgents(parent, offset, count);
+            GenericAgent[] f = env.getAgentInstanceOperations().getAgents(parent, offset, count).toArray(new GenericAgent[0]);
 
             if (f == null) {
                 return null;
@@ -254,7 +250,7 @@ public class EnvironmentWrapper implements ModelDefinitionEnvironment {
     @Override
     public ObjectClass getObjectClass(String name) throws GSimException {
         try {
-            Frame a = env.getObjectSubClass(name);
+            Frame a = env.getObjectClassOperations().getObjectSubClass(name);
 
             if (a == null) {
                 return null; // if proxy mode to prevent too massive
@@ -271,7 +267,7 @@ public class EnvironmentWrapper implements ModelDefinitionEnvironment {
     public ObjectClass[] getObjectClasses(String parent) throws GSimException {
         try {
             if (parent == null) {
-                Frame[] f = env.getObjectSubClasses();
+                Frame[] f = env.getObjectClassOperations().getObjectSubClasses().toArray(new Frame[0]);
 
                 if (f == null) {
                     return null; // if proxy mode to prevent too massive
@@ -285,7 +281,7 @@ public class EnvironmentWrapper implements ModelDefinitionEnvironment {
                 }
                 return res;
             } else {
-                Frame[] cls = env.getAllObjectSuccessors(parent);
+                Frame[] cls = env.getObjectClassOperations().getAllSuccessors(parent).toArray(new Frame[0]);
                 ObjectClassDef[] res = new ObjectClassDef[cls.length];
                 for (int i = 0; i < cls.length; i++) {
                     res[i] = new ObjectClassDef(env, cls[i]);
@@ -304,14 +300,14 @@ public class EnvironmentWrapper implements ModelDefinitionEnvironment {
             ArrayList<ObjectInstanceDef> res = new ArrayList<ObjectInstanceDef>();
             Frame[] f;
             if (parent == null) {
-                f = env.getObjectSubClasses();
+                f = env.getObjectClassOperations().getObjectSubClasses().toArray(new Frame[0]);
             } else {
-                f = env.getAllObjectSuccessors(parent);
+                f = env.getObjectClassOperations().getAllSuccessors(parent).toArray(new Frame[0]);
             }
 
             for (int i = 0; i < f.length; i++) {
 
-                ArrayList<Instance> in = env.getInstancesOfClass(f[i]);
+                List<Instance> in = env.getObjectInstanceOperations().getInstancesOfClass(f[i]);
 
                 for (Instance t : in) {
                     ObjectInstanceDef ac = new ObjectInstanceDef(env, t);
@@ -321,8 +317,8 @@ public class EnvironmentWrapper implements ModelDefinitionEnvironment {
             }
 
             if (parent != null) {
-                Frame tf = env.getObjectSubClass(parent);
-                ArrayList<Instance> in = env.getInstancesOfClass(tf);
+                Frame tf = env.getObjectClassOperations().getObjectSubClass(parent);
+                List<Instance> in = env.getObjectInstanceOperations().getInstancesOfClass(tf);
                 for (Instance t : in) {
                     ObjectInstanceDef ac = new ObjectInstanceDef(env, t);
                     res.add(ac);
@@ -343,7 +339,7 @@ public class EnvironmentWrapper implements ModelDefinitionEnvironment {
     public AgentClass getTopAgentClass() throws GSimException {
         try {
 
-            GenericAgentClass g = env.getGenericAgentClass();
+            GenericAgentClass g = env.getAgentClassOperations().getGenericAgentClass();
 
             if (g == null) {
                 return null; // if proxy mode to prevent too massive
@@ -359,7 +355,7 @@ public class EnvironmentWrapper implements ModelDefinitionEnvironment {
     @Override
     public ObjectClass getTopObjectClass() throws GSimException {
         try {
-            return new ObjectClassDef(env, env.getObjectClass());
+            return new ObjectClassDef(env, env.getObjectClassOperations().getObjectClass());
         } catch (Exception e) {
             throw new GSimException("Exception", e);
         }
@@ -368,11 +364,7 @@ public class EnvironmentWrapper implements ModelDefinitionEnvironment {
     @Override
     public AgentInstance instanciateAgent(AgentClass parent, String name) throws GSimException {
         try {
-            GenericAgent a = env.instanciateAgent((GenericAgentClass) ((UnitWrapper) parent).toUnit(), name, Environment.RAND_NONE, 0);
-            if (a == null) {
-                return null; // if proxy mode to prevent too massive
-            }
-            // serialisation!
+            GenericAgent a = env.getAgentInstanceOperations().instanciateAgentWithUniformDistributedAttributes((GenericAgentClass) ((UnitWrapper) parent).toUnit(), name);
             AgentInstanceDef agent = new AgentInstanceDef(env, a);
             return agent;
         } catch (Exception e) {
@@ -381,14 +373,10 @@ public class EnvironmentWrapper implements ModelDefinitionEnvironment {
     }
 
     @Override
-    public AgentInstance[] instanciateAgents(AgentClass parent, String prefix, int method, double svar, int count) throws GSimException {
+    public AgentInstance[] instanciateAgentsNormallyDistributed(AgentClass parent, String prefix, double svar, int count) throws GSimException {
         try {
-            GenericAgent[] a = env.instanciateAgents((GenericAgentClass) ((UnitWrapper) parent).toUnit(), prefix, method, svar, count);
-
-            if (a == null) {
-                return null; // if proxy mode to prevent too massive
-                             // serialisation!
-            }
+            GenericAgent[] a = env.getAgentInstanceOperations().instanciateAgentsWithNormalDistributedAttributes((GenericAgentClass) ((UnitWrapper) parent).toUnit(), Optional.of(prefix), svar, count).toArray(new GenericAgent[0]);
+            		
 
             AgentInstanceDef[] agents = new AgentInstanceDef[a.length];
             for (int i = 0; i < a.length; i++) {
@@ -402,10 +390,17 @@ public class EnvironmentWrapper implements ModelDefinitionEnvironment {
     }
 
     @Override
-    public void instanciateAgents2(AgentClass parent, String prefix, int method, double svar, int count) throws GSimException {
+    public AgentInstance[] instanciateAgentsUniformDistributed(AgentClass parent, String prefix, int count) throws GSimException {
         try {
-            env.instanciateAgents2((GenericAgentClass) ((UnitWrapper) parent).toUnit(), prefix, method, svar, count);
+            GenericAgent[] a = env.getAgentInstanceOperations()
+            		.instanciateAgentsWithUniformDistributedAttributes((GenericAgentClass) ((UnitWrapper) parent).toUnit(), Optional.of(prefix), count).toArray(new GenericAgent[0]);
+            		
 
+            AgentInstanceDef[] agents = new AgentInstanceDef[a.length];
+            for (int i = 0; i < a.length; i++) {
+                agents[i] = new AgentInstanceDef(env, a[i]);
+            }
+            return agents;
         } catch (Exception e) {
             throw new GSimException("Exception", e);
         }
@@ -415,8 +410,8 @@ public class EnvironmentWrapper implements ModelDefinitionEnvironment {
     @Override
     public void removeAgentInstances() {
         try {
-            for (String a : env.getAgentNames()) {
-                env.removeGenericAgent(env.getAgent(a));
+            for (String a : env.getAgentInstanceOperations().getAgentNames()) {
+                env.getAgentInstanceOperations().removeGenericAgent(env.getAgentInstanceOperations().getAgent(a));
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -425,8 +420,8 @@ public class EnvironmentWrapper implements ModelDefinitionEnvironment {
 
     @Override
     public void destroy() {
-        // TODO Auto-generated method stub
-
+    	this.env = null;
     }
+
 
 }

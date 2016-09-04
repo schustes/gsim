@@ -66,7 +66,7 @@ public class Environment implements Cloneable {
         newEnvironment.copyFromEnvironment(this);
         return newEnvironment;
     }
-
+    
     /**
      * Removes all entities in this instance and all entities from the other Environment.
      * 
@@ -228,5 +228,17 @@ public class Environment implements Cloneable {
     public void addOrSetSystemAgent(String name, String cls) {
         systemAgents.put(name, cls);
     }
+
+	public ObjectClassOperations getObjectClassOperations() {
+		return new ObjectClassOperations(null, null,null);
+	}
+	
+	public ObjectInstanceOperations getObjectInstanceOperations() {
+		return new ObjectInstanceOperations();
+	}
+	
+	public AgentInstanceOperations getAgentInstanceOperations() {
+		return new AgentInstanceOperations(this.container);
+	}
 
 }

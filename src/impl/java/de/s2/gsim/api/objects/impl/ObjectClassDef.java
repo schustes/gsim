@@ -36,7 +36,7 @@ public class ObjectClassDef implements ObjectClass, UnitWrapper {
         }
 
         try {
-            real = env.addObjectClassAttribute(real, new String[] { list }, a);
+            real = env.getObjectClassOperations().addObjectClassAttribute(real, Path.attributeListPath(list), a);
         } catch (Exception e) {
             throw new GSimException(e);
         }
@@ -53,7 +53,7 @@ public class ObjectClassDef implements ObjectClass, UnitWrapper {
         }
 
         try {
-            env.removeObjectClass(real);
+            env.getObjectClassOperations().removeObjectClass(real);
             real = null;
         } catch (Exception e) {
             throw new GSimException(e);
@@ -203,7 +203,7 @@ public class ObjectClassDef implements ObjectClass, UnitWrapper {
         }
 
         try {
-            real = env.modifyObjectClassAttribute(real, new String[] { list }, a);
+            real = env.getObjectClassOperations().modifyObjectClassAttribute(real, Path.attributePath(list, a.getName()), a);
         } catch (Exception e) {
             throw new GSimException(e);
         }
@@ -224,7 +224,7 @@ public class ObjectClassDef implements ObjectClass, UnitWrapper {
         try {
             DomainAttribute a = real.getAttribute(list, attName);
             a.setDefault(value);
-            real = env.modifyObjectClassAttribute(real, new String[] { list }, a);
+            real = env.getObjectClassOperations().modifyObjectClassAttribute(real, Path.attributePath(list, a.getName()), a);
         } catch (Exception e) {
             throw new GSimException(e);
         }

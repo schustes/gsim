@@ -82,8 +82,7 @@ public class AgentInstanceOperations {
         return (GenericAgent) a.clone();
     }
 
-    public List<GenericAgent> instanciateAgentsWithUniformDistributedAttributes(GenericAgentClass parent, Optional<String> prefix, int method,
-            double svar,
+    public List<GenericAgent> instanciateAgentsWithUniformDistributedAttributes(GenericAgentClass parent, Optional<String> prefix,
             int count) {
 
         List<GenericAgent> result = instanciateAgents(parent, prefix, count,
@@ -95,7 +94,7 @@ public class AgentInstanceOperations {
 
     }
 
-    public List<GenericAgent> instanciateAgentsWithNormalDistributedAttributes(GenericAgentClass parent, Optional<String> prefix, int method,
+    public List<GenericAgent> instanciateAgentsWithNormalDistributedAttributes(GenericAgentClass parent, Optional<String> prefix,
             double svar,
             int count) {
 

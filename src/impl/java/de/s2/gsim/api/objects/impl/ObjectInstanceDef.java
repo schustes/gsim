@@ -50,7 +50,7 @@ public class ObjectInstanceDef implements ObjectInstance, UnitWrapper {
         }
 
         try {
-            env.removeObject(real);
+            env.getObjectInstanceOperations().removeObject(real);
             real = null;
         } catch (Exception e) {
             throw new GSimException(e);
@@ -307,7 +307,7 @@ public class ObjectInstanceDef implements ObjectInstance, UnitWrapper {
         }
 
         try {
-            real = env.modifyObjectAttribute(real, new String[] { list }, a);
+            real = env.getObjectInstanceOperations().modifyObjectAttribute(real, Path.attributePath(list, a.getName()), a);
         } catch (Exception e) {
             throw new GSimException(e);
         }
@@ -332,7 +332,7 @@ public class ObjectInstanceDef implements ObjectInstance, UnitWrapper {
             }
             a.setFrom(from);
             a.setTo(to);
-            real = env.modifyObjectAttribute(real, new String[] { list }, a);
+            real = env.getObjectInstanceOperations().modifyObjectAttribute(real, Path.attributePath(list, a.getName()), a);
         } catch (Exception e) {
             throw new GSimException(e);
         }
@@ -356,7 +356,7 @@ public class ObjectInstanceDef implements ObjectInstance, UnitWrapper {
                 a = new NumericalAttribute(attName, value);
             }
             a.setValue(value);
-            real = env.modifyObjectAttribute(real, new String[] { list }, a);
+            real = env.getObjectInstanceOperations().modifyObjectAttribute(real, Path.attributePath(list, a.getName()), a);
         } catch (Exception e) {
             throw new GSimException(e);
         }
@@ -387,7 +387,7 @@ public class ObjectInstanceDef implements ObjectInstance, UnitWrapper {
             for (String v : values) {
                 a.addEntry(v);
             }
-            real = env.modifyObjectAttribute(real, new String[] { list }, a);
+            real = env.getObjectInstanceOperations().modifyObjectAttribute(real, Path.attributePath(list,a.getName()), a);
         } catch (Exception e) {
             throw new GSimException(e);
         }
@@ -411,7 +411,7 @@ public class ObjectInstanceDef implements ObjectInstance, UnitWrapper {
                 a = new StringAttribute(attName, value);
             }
             a.setValue(value);
-            real = env.modifyObjectAttribute(real, new String[] { list }, a);
+            real = env.getObjectInstanceOperations().modifyObjectAttribute(real, Path.attributePath(list, a.getName()), a);
         } catch (Exception e) {
             throw new GSimException(e);
         }
@@ -423,7 +423,7 @@ public class ObjectInstanceDef implements ObjectInstance, UnitWrapper {
      * @link gsim.objects.ObjectInstanceIF
      */
     @Override
-    public Unit toUnit() {
+    public Unit<?, ?> toUnit() {
         return real;
     }
 

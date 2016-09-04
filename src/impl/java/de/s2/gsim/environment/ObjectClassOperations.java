@@ -1,5 +1,6 @@
 package de.s2.gsim.environment;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
@@ -115,6 +116,15 @@ public class ObjectClassOperations {
     public List<Frame> getObjectSubClasses() {
         return container.getObjectSubClasses().parallelStream().map(Frame::clone).collect(Collectors.toList());
     }
+    
+    public List<Frame> getAllSuccessors(String parent) {
+    	return new ArrayList<>(container.getObjectSubClasses(parent));
+    }
+    
+    public List<Frame> getAllChildren(String parent) {
+    	return new ArrayList<>(container.getObjectChildren(parent));
+    }
+
 
     public Frame modifyObjectClassAttribute(Frame cls, Path<DomainAttribute> path, DomainAttribute a) {
         Frame here = findObjectClass(cls);
