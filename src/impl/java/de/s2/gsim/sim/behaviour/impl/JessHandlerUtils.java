@@ -141,7 +141,7 @@ public class JessHandlerUtils {
 
             long h = System.currentTimeMillis();
             String sfn = r.getName() + "_0" + 0;
-            FactHandler.getInstance().insertNonExistentExecutedFinalFacts(rete, owner, new RLRule(r), sfn);
+            FactHandler.getInstance().insertNonExistentExecutedFinalFacts(rete, owner, RLRule.fromInstance(r), sfn);
             double g = (System.currentTimeMillis() - h) / 1000d;
 
             logger.debug("NEW FINAL FACTS: " + (g));

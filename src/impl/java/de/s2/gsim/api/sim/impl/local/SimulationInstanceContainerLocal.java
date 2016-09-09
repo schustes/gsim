@@ -62,7 +62,7 @@ public class SimulationInstanceContainerLocal implements SimulationController {
 			this.runs = runs;
 			this.props = props;
 			this.ns = ns;
-			this.env = (Environment) env.cloneEnvironment();
+			this.env = (Environment) env.clone();
 			instances.put(this.ns, this);
 			init();
 		} catch (Exception e) {

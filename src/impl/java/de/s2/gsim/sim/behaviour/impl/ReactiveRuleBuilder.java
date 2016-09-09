@@ -36,13 +36,11 @@ public class ReactiveRuleBuilder {
                 if (i > 0) {
                     res += "\n";
                 }
-                UserRule rule = new UserRule(ruleInstances[i]);
+                UserRule rule = UserRule.fromInstance(ruleInstances[i]);
                 if (rule.isActivated()) {
                     res += buildUserRules_PerActionName(rule);
                 }
             }
-
-            // logger.debug(res);
 
             rete.executeCommand(res);
             return res;

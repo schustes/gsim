@@ -72,7 +72,7 @@ public class ModelCoordinatorLocal implements Simulation, Steppable {
 		this.env = env;
 
 		try {
-			pauseIntervals = env.getAgentIntervals();
+			pauseIntervals = env.getAgentPauses();
 			id = new SimulationId(env.getNamespace());
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -136,29 +136,52 @@ public class ModelCoordinatorLocal implements Simulation, Steppable {
 	}
 
 	@Override
-	public String addNewAgentToRunningModel(String agentClass, String name, int method, double svar) throws GSimEngineException {
+	public String addNormallyDistributedNewAgentToRunningModel(String agentClass, String name, double svar) throws GSimEngineException {
 		try {
 			GenericAgent a = null;
 			if (name == null) {
-				env.instanciateAgent(env.getAgentSubClass(agentClass), "new-" + agentClass + "-" + new Random().nextInt(), method, svar);
+				a = env.getAgentInstanceOperations()
+						.instanciateAgentWithNormalDistributedAttributes(env.getAgentClassOperations().getAgentSubClass(agentClass), "new-" + agentClass + "-" + new Random().nextInt(), svar);
 			} else {
-				a = env.instanciateAgent(env.getAgentSubClass(agentClass), name, method, svar);
+				a= env.getAgentInstanceOperations()
+						.instanciateAgentWithNormalDistributedAttributes(env.getAgentClassOperations().getAgentSubClass(agentClass),name, svar);
 			}
 
-			String[] path = (String[]) props.get("jars");
-			SimpleClassLoader cl = new SimpleClassLoader(path);
-			RuntimeAgentFactory f = new RuntimeAgentFactory(cl);
-			// HashMap agentRtMappings = this.env.getRuntimeRoleMappings();
-			// HashMap agentMappings = this.env.getAgentMappings();
-			String simId = env.getNamespace() + "/" + id;
-			RuntimeAgent ra = f.createAgentWithRulebase(a, /* agentRtMappings, agentMappings, */ agents.size(), simId, props);
-			messenger.addAgentToHandle(ra);
-			ra.setMessagingComponent(messenger);
-			agents.put(ra.getName(), ra);
-			return ra.getName();
+			return addToRuntime(a);
 		} catch (Exception e) {
 			throw new GSimEngineException(e);
 		}
+	}
+
+	private String addToRuntime(GenericAgent a) {
+		String[] path = (String[]) props.get("jars");
+		SimpleClassLoader cl = new SimpleClassLoader(path);
+		RuntimeAgentFactory f = new RuntimeAgentFactory(cl);
+		String simId = env.getNamespace() + "/" + id;
+		RuntimeAgent ra = f.createAgentWithRulebase(a, agents.size(), simId, props);
+		messenger.addAgentToHandle(ra);
+		ra.setMessagingComponent(messenger);
+		agents.put(ra.getName(), ra);
+		return ra.getName();
+	}
+	
+	@Override
+	public String addUniformDistributedNewAgentToRunningModel(String agentClass, String name) {
+		try {
+			GenericAgent a = null;
+			if (name == null) {
+				a = env.getAgentInstanceOperations()
+						.instanciateAgentWithUniformDistributedAttributes(env.getAgentClassOperations().getAgentSubClass(agentClass), "new-" + agentClass + "-" + new Random().nextInt());
+			} else {
+				a= env.getAgentInstanceOperations()
+						.instanciateAgentWithUniformDistributedAttributes(env.getAgentClassOperations().getGenericAgentClass(), name);
+			}
+
+			return addToRuntime(a);
+		} catch (Exception e) {
+			throw new GSimEngineException(e);
+		}
+		
 	}
 
 	@Override
@@ -469,7 +492,7 @@ public class ModelCoordinatorLocal implements Simulation, Steppable {
 		ArrayList<String> ordered = new ArrayList<String>();
 		ArrayList<String> allAgents = new ArrayList<String>();
 		try {
-			HashMap<String, Integer> defined = env.getAgentOrdering();
+			Map<String, Integer> defined = env.getAgentOrder();
 			ArrayList<Integer> al = new ArrayList<Integer>(defined.values());
 			Collections.sort(al);
 			for (int o : al) {

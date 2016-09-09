@@ -504,7 +504,7 @@ public class JessHandler implements java.io.Serializable {
     private void addNewActions() throws JessException {
         for (Instance r : owner.getBehaviour().getChildInstances(BehaviourFrame.RL_LIST)) {
             String sfn = r.getName() + "_0" + 0;
-            FactHandler.getInstance().insertNonExistentExecutedFinalFacts(rete, owner, new RLRule(r), sfn);
+            FactHandler.getInstance().insertNonExistentExecutedFinalFacts(rete, owner, RLRule.fromInstance(r), sfn);
         }
 
     }

@@ -580,30 +580,4 @@ public class ConditionBuilder {
         return (a instanceof NumericalAttribute);
     }
 
-    public static void main(String[] args) throws Exception {
-
-        GSimCore core = GSimCoreFactory.defaultFactory().createCore();
-
-        ModelDefinitionEnvironment env = core.create("test", new FileInputStream("/projects/phd/sim/main/dist/gsim/repos/models/nhs.definition"),
-                new HashMap());
-        AgentClass a0 = env.getAgentClass("Traditional");
-        @SuppressWarnings("unused")
-        AgentClass a1 = env.getAgentClass("Forward_looking_trust");
-        @SuppressWarnings("unused")
-        AgentClass a2 = env.getAgentClass("Independent-Competitor");
-        AgentClass c1 = env.getAgentClass("Type A patient");
-        @SuppressWarnings("unused")
-        AgentClass c2 = env.getAgentClass("Type C patient");
-
-        env.instanciateAgents(a0, "traditional", 1, 0, ModelDefinitionEnvironment.RAND_ATT_ONLY);
-        // env.instanciateAgents(a1, "trust", 1, 0, Env.RAND_ATT_ONLY);
-        // env.instanciateAgents(a2, "indie", 1, 0, Env.RAND_ATT_ONLY);
-        env.instanciateAgents(c1, "A", 1, 0, ModelDefinitionEnvironment.RAND_ATT_ONLY);
-        // env.instanciateAgents(c2, "C", 1, 0, Env.RAND_ATT_ONLY);
-
-        SimulationController m = core.createScenarioManager(env, new HashMap(), 53, 1);
-        m.start();
-
-    }
-
 }

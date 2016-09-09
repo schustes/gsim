@@ -90,7 +90,7 @@ public class RuntimeAgentFactory {
 
         try {
             ArrayList agentList = new ArrayList();
-            List<GenericAgent> a = env.getGenericAgents();
+            List<GenericAgent> a = env.getAgentInstanceOperations().getGenericAgents();
 
             props.put("AGENT_COUNT", String.valueOf(a.size()));
 

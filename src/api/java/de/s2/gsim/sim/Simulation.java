@@ -27,7 +27,9 @@ public interface Simulation {
      * @param svar standard variation used for initialising the agent's properties
      * @return some sort of id
      */
-    String addNewAgentToRunningModel(String agentClass, String name, int method, double svar);
+    String addNormallyDistributedNewAgentToRunningModel(String agentClass, String name, double svar);
+    
+    String addUniformDistributedNewAgentToRunningModel(String agentClass, String name);
 
     /**
      * Gets the current number of agents in the simulation.
