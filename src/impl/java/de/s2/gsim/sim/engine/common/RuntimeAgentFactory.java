@@ -205,7 +205,7 @@ public class RuntimeAgentFactory {
 
     public List<ApplicationAgentImpl> createAppAgents(Environment env) throws GSimDefException {
         try {
-            Map<String, String> m = env.getSystemAgents();
+            Map<String, String> m = env.getAgentRuntimeConfig().getSystemAgents();
             Iterator iter = m.keySet().iterator();
             ArrayList<ApplicationAgentImpl> agentList = new ArrayList<ApplicationAgentImpl>();
             while (iter.hasNext()) {
@@ -240,7 +240,7 @@ public class RuntimeAgentFactory {
 
     public Map<String, DataHandler> createDataHandlers(Environment env) throws GSimDefException {
         try {
-            Map<String, String> m = env.getSystemAgents();
+            Map<String, String> m = env.getAgentRuntimeConfig().getSystemAgents();
             Iterator iter = m.keySet().iterator();
             HashMap<String, DataHandler> agentList = new HashMap<String, DataHandler>();
             while (iter.hasNext()) {

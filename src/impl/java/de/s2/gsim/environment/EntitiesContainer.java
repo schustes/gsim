@@ -68,6 +68,9 @@ public class EntitiesContainer {
 
     EntitiesContainer(String ns) {
         this.ns = ns;
+        this.agentClass = GenericAgentClass.baseGenericAgentClass();
+        this.objectClass = Frame.newFrame("Base object");
+        this.behaviourClass = BehaviourFrame.newBehaviour("Base behaviour");
     }
 
     /**

@@ -92,11 +92,11 @@ public class EnvironmentSetup {
                         topLevelObjects.putAll(rek.topLevelObjects);
                         inheritingAgents.putAll(rek.inheritingAgents);
                         inheritingObjects.putAll(rek.inheritingObjects);
-                        env.getAgentRtClassMappings().putAll(rek.agentRtClassMappings);
-                        env.getSystemAgents().putAll(rek.systemAgents);
-                        env.getAgentRtClassMappings().putAll(rek.agentRtClassMappings);
-                        env.getAgentOrder().putAll(rek.agentOrder);
-                        env.getSystemAgents().putAll(rek.systemAgents);
+                        env.getAgentRuntimeConfig().getAgentRtClassMappings().putAll(rek.agentRtClassMappings);
+                        env.getAgentRuntimeConfig().getSystemAgents().putAll(rek.systemAgents);
+                        env.getAgentRuntimeConfig().getAgentRtClassMappings().putAll(rek.agentRtClassMappings);
+                        env.getAgentRuntimeConfig().getAgentOrder().putAll(rek.agentOrder);
+                        env.getAgentRuntimeConfig().getSystemAgents().putAll(rek.systemAgents);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -588,9 +588,9 @@ public class EnvironmentSetup {
                 String roleName = e.getAttributeValue("ref");
                 String pause = e.getAttributeValue("exec-interval");
                 if (pause != null) {
-                    env.getAgentPauses().put(roleName, pause);
+                    env.getAgentRuntimeConfig().getAgentPauses().put(roleName, pause);
                 } else {
-                	env.getAgentPauses().put(roleName, "1");
+                	env.getAgentRuntimeConfig().getAgentPauses().put(roleName, "1");
                 }
                 int order = Integer.parseInt(e.getAttributeValue("order"));
                 if (order > maxOrder && !roleName.equals("default")) {
@@ -972,7 +972,7 @@ public class EnvironmentSetup {
         }
 
         String role = null;
-        String[] roles = env.getAgentMappings().get(agentName);
+        String[] roles = env.getAgentRuntimeConfig().getAgentMappings().get(agentName);
 
         if (roles == null) {
             roles = searchDoc(agentName);
@@ -1038,7 +1038,7 @@ public class EnvironmentSetup {
                 frames.add(f);
 
                 actionCollections.put(f.getName(), f);
-                env.getActionMappings().put(name, cls);
+                env.getAgentRuntimeConfig().getActionMappings().put(name, cls);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -1091,7 +1091,7 @@ public class EnvironmentSetup {
                 if (elem.getAttribute("execution-context") != null) {
                     String rolename = elem.getAttributeValue("execution-context");
                     if (rolename != null) {
-                        String[] r = env.getAgentMappings().get(name);
+                        String[] r = env.getAgentRuntimeConfig().getAgentMappings().get(name);
                         String[] roles;
                         if (r != null) {
                             roles = new String[r.length + 1];
@@ -1100,16 +1100,16 @@ public class EnvironmentSetup {
                         } else {
                             roles = r;
                         }
-                        env.getAgentMappings().put(name, roles);
+                        env.getAgentRuntimeConfig().getAgentMappings().put(name, roles);
                     } else {
-                    	env.getAgentMappings().put(name, new String[] { "default" });
+                    	env.getAgentRuntimeConfig().getAgentMappings().put(name, new String[] { "default" });
                     }
                 } else {
                     String role = findContextRek(name);
                     if (role == null) {
-                    	env.getAgentMappings().put(name, new String[] { "default" });
+                    	env.getAgentRuntimeConfig().getAgentMappings().put(name, new String[] { "default" });
                     } else {
-                        String[] r = env.getAgentMappings().get(name);
+                        String[] r = env.getAgentRuntimeConfig().getAgentMappings().get(name);
                         String[] roles;
                         if (r != null) {
                             roles = new String[r.length + 1];
@@ -1118,7 +1118,7 @@ public class EnvironmentSetup {
                         } else {
                             roles = r;
                         }
-                        env.getAgentMappings().put(name, roles);
+                        env.getAgentRuntimeConfig().getAgentMappings().put(name, roles);
                     }
                 }
             }

@@ -60,7 +60,7 @@ public class EnvironmentWrapper implements ModelDefinitionEnvironment {
     @Override
     public AgentClass createAgentClass(String name, String parentName, int order) throws GSimException {
         AgentClass retVal = this.createAgentClass(name, parentName);
-        env.addOrSetAgentOrdering(order, name);
+        env.getAgentRuntimeConfig().addOrSetAgentOrdering(order, name);
         return retVal;
     }
 

@@ -23,23 +23,17 @@ public class AgentClassOperations {
 
     private EntitiesContainer container;
     
-    private Environment env;
-
-    private AgentInstanceOperations agentInstanceOperations;
-
-    private ObjectInstanceOperations objectInstanceOperations;
+    private AgentRuntimeConfig runtimeConfig;
 
     private ObjectClassOperations objectClassOperations;
 
-    AgentClassOperations(EntitiesContainer container
-            , AgentInstanceOperations agentInstanceOperations
-            , ObjectInstanceOperations objectInstanceOperations
-            , ObjectClassOperations objectClassOperations) {
+    AgentClassOperations(EntitiesContainer container, AgentRuntimeConfig runtimeConfig) {
         this.container = container;
-
-        this.agentInstanceOperations = agentInstanceOperations;
-        this.objectInstanceOperations = objectInstanceOperations;
-        this.objectClassOperations = objectClassOperations;
+        this.runtimeConfig = runtimeConfig;
+    }
+    
+    void setObjectClassOperations(ObjectClassOperations objectClassOperations) {
+    	this.objectClassOperations = objectClassOperations;
     }
 
     public GenericAgentClass removeChildObjectList(GenericAgentClass cls, Path<TypedList<Frame>> path) {
@@ -255,8 +249,8 @@ public class AgentClassOperations {
 
     public void addAgentSubClass(GenericAgentClass cls) {
         container.getAgentSubClasses().add(GenericAgentClass.copy(cls));
-        if (!env.getAgentOrder().containsKey(cls.getName())) {
-        	env.addAgentOrder(cls.getName(), -1);
+        if (!this.runtimeConfig.getAgentOrder().containsKey(cls.getName())) {
+        	runtimeConfig.addAgentOrder(cls.getName(), -1);
         }
     }
 
@@ -423,8 +417,8 @@ public class AgentClassOperations {
 
         container.addAgentClass(successor);
 
-        if (!env.getAgentOrder().containsKey(name)) {
-            env.addAgentOrder(name, -1);
+        if (!runtimeConfig.getAgentOrder().containsKey(name)) {
+            runtimeConfig.addAgentOrder(name, -1);
         }
 
         return (GenericAgentClass) successor.clone();
@@ -476,7 +470,7 @@ public class AgentClassOperations {
     }
 
     public Map<String, Integer> getAgentOrdering() {
-        return env.getAgentOrder();
+        return runtimeConfig.getAgentOrder();
     }
 
     public List<GenericAgent> getAgents(String ofClass) {
@@ -491,7 +485,7 @@ public class AgentClassOperations {
     public GenericAgentClass getAgentSubClass(String className) {
         return container
                 .getAgentSubClasses()
-                .parallelStream()
+				.stream()
                 .filter(sub -> sub.getName().equals(className))
                 .map(GenericAgentClass::clone)
                 .findAny()

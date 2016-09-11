@@ -15,13 +15,13 @@ public class ObjectClassOperations {
 
     private EntitiesContainer container;
     private AgentClassOperations agentClassOperations;
-    private ObjectInstanceOperations objectInstanceOperations;
 
-    ObjectClassOperations(EntitiesContainer container, AgentClassOperations agentClassOperations,
-            ObjectInstanceOperations objectInstanceOperations) {
+    ObjectClassOperations(EntitiesContainer container) {
         this.container = container;
-        this.objectInstanceOperations = objectInstanceOperations;
-        this.agentClassOperations = agentClassOperations;
+    }
+    
+    void setAgentClassOperations(AgentClassOperations agentClassOperations) {
+    	this.agentClassOperations = agentClassOperations;
     }
 
     public Frame addAttributeList(Frame owner, String listName) throws GSimDefException {

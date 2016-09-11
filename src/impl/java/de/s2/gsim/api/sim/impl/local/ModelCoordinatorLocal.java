@@ -72,7 +72,7 @@ public class ModelCoordinatorLocal implements Simulation, Steppable {
 		this.env = env;
 
 		try {
-			pauseIntervals = env.getAgentPauses();
+			pauseIntervals = env.getAgentRuntimeConfig().getAgentPauses();
 			id = new SimulationId(env.getNamespace());
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -492,7 +492,7 @@ public class ModelCoordinatorLocal implements Simulation, Steppable {
 		ArrayList<String> ordered = new ArrayList<String>();
 		ArrayList<String> allAgents = new ArrayList<String>();
 		try {
-			Map<String, Integer> defined = env.getAgentOrder();
+			Map<String, Integer> defined = env.getAgentRuntimeConfig().getAgentOrder();
 			ArrayList<Integer> al = new ArrayList<Integer>(defined.values());
 			Collections.sort(al);
 			for (int o : al) {

@@ -3,8 +3,6 @@ package de.s2.gsim.sim;
 import static org.hamcrest.MatcherAssert.*;
 import static org.hamcrest.Matchers.*;
 
-
-
 import java.util.HashMap;
 import java.util.concurrent.Semaphore;
 
@@ -129,6 +127,7 @@ public class SimTest {
 	}
 
 	public static class TestAction extends SimAction {
+		private static final long serialVersionUID = 1L;
 
 		static String newValue = "Mofidied";
 		

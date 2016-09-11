@@ -14,8 +14,6 @@ public class AgentInstanceOperations {
 
     private EntitiesContainer container;
 
-    private AgentClassOperations agentClassOperations;
-
     public AgentInstanceOperations(EntitiesContainer container) {
         this.container = container;
     }

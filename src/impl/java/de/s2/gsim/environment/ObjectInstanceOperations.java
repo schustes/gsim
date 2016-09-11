@@ -8,6 +8,10 @@ import de.s2.gsim.objects.attribute.Attribute;
 public class ObjectInstanceOperations {
 
     private EntitiesContainer container;
+    
+    public ObjectInstanceOperations(EntitiesContainer container) {
+    	this.container = container;
+    }
 
     /**
      * Find the object reference specified by name.

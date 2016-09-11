@@ -1,7 +1,6 @@
 package de.s2.gsim.environment;
 
 import java.util.HashMap;
-import java.util.Map;
 import java.util.stream.Stream;
 
 /**
@@ -10,235 +9,178 @@ import java.util.stream.Stream;
  */
 public class Environment implements Cloneable {
 
-    /**
-     * Reference to all entities.
-     */
-    private EntitiesContainer container;
+	/**
+	 * Reference to all entities.
+	 */
+	private EntitiesContainer container;
 
-    /**
-     * Caches mappings from action names to executable class names.
-     */
-    private final Map<String, String> actionMappings = new HashMap<String, String>();
+	/**
+	 * Name space of the model.
+	 */
+	private final String ns;
 
-    /**
-     * Caches agent names to roles.
-     */
-    private final Map<String, String[]> agentMappings = new HashMap<String, String[]>();
+	/**
+	 * Runtime configs
+	 */
+	private AgentRuntimeConfig runtimeConfig;
 
-    /**
-     * Caches the executions cycles of agent classes.
-     */
-    private final Map<String, String> agentPauses = new HashMap<String, String>();
+	/**
+	 * Agent class operations
+	 */
+	private AgentClassOperations agentClassOperations;
 
-    /**
-     * Caches the ordering of agent roles for determining in which orders they are excuted within a cycle.
-     */
-    private final Map<String, Integer> agentOrder = new HashMap<String, Integer>();
+	/**
+	 * Object class operations.
+	 */
+	private ObjectClassOperations objectClassOperations;
 
-    /**
-     * Caches the agent class names to their runtime equivalents.
-     */
-    private final Map<String, String> agentRtClassMappings = new HashMap<String, String>();
+	/**
+	 * Agent instance operations.
+	 */
+	private AgentInstanceOperations agentInstanceOperations;
 
-    /**
-     * Caches the system agents active during a simulation.
-     */
-    private final Map<String, String> systemAgents = new HashMap<String, String>();
+	/**
+	 * Object instance operations.
+	 */
+	private ObjectInstanceOperations objectInstanceOperations;
+
+	/**
+	 * Constructor.
+	 * 
+	 * @param ns name space of the model
+	 */
+	public Environment(String ns) {
+		this.ns = ns;
+		this.container = new EntitiesContainer(ns);
+		this.runtimeConfig = new AgentRuntimeConfig();
+    	this.agentInstanceOperations = new AgentInstanceOperations(this.container);
+    	this.objectInstanceOperations = new ObjectInstanceOperations(this.container);
+    	this.objectClassOperations = new ObjectClassOperations(container);
+    	this.agentClassOperations = new AgentClassOperations(container, this.runtimeConfig);
+    	this.agentClassOperations.setObjectClassOperations(objectClassOperations);
+    	this.objectClassOperations.setAgentClassOperations(agentClassOperations);
+		
+	}
+
+	public Environment clone() {
+		Environment newEnvironment = new Environment(this.ns);
+		newEnvironment.copyFromEnvironment(this);
+		return newEnvironment;
+	}
+
+	/**
+	 * Removes all entities in this instance and all entities from the other Environment.
+	 * 
+	 * @param env the other Environment
+	 * @throws GSimDefException if a problem during the remove-add cycle occurs
+	 */
+	public void copyFromEnvironment(Environment env) throws GSimDefException {
+		try {
+			this.container.copyFromEnvironment(env.getContainer());
+			this.getAgentRuntimeConfig().getAgentPauses().clear();
+			this.getAgentRuntimeConfig().getAgentMappings().clear();
+			this.getAgentRuntimeConfig().getAgentOrder().clear();
+			this.getAgentRuntimeConfig().getAgentRtClassMappings().clear();
+			this.getAgentRuntimeConfig().getSystemAgents().clear();
+			this.getAgentRuntimeConfig().getAgentPauses().putAll(env.getAgentRuntimeConfig().getAgentPauses());
+			this.getAgentRuntimeConfig().getAgentMappings().putAll(env.getAgentRuntimeConfig().getAgentMappings());
+			this.getAgentRuntimeConfig().getAgentOrder().putAll(env.getAgentRuntimeConfig().getAgentOrder());
+			this.getAgentRuntimeConfig().getAgentRtClassMappings().putAll(env.getAgentRuntimeConfig().getAgentRtClassMappings());
+			this.getAgentRuntimeConfig().getSystemAgents().putAll(env.getAgentRuntimeConfig().getSystemAgents());
+		} catch (Exception e) {
+			throw new GSimDefException("Error in copy env", e);
+		}
+	}
+
+	/**
+	 * Get the runtime config.
+	 */
+	public AgentRuntimeConfig getAgentRuntimeConfig() {
+		return runtimeConfig;
+	}
 
 
-    /**
-     * Name space of the model.
-     */
-    private final String ns;
+	/**
+	 * Exports a tree representation of the object classes in this Environment.
+	 * 
+	 * @return the tree representation of object classes in this Environment
+	 */
+	public HierarchyTree exportObjectHierarchy() {
+		return exportType(container.getObjectClass(), container.getObjectSubClasses().stream());
+	}
 
-    /**
-     * Constructor.
-     * 
-     * @param ns name space of the model
-     */
-    public Environment(String ns) {
-        this.ns = ns;
-        this.container = new EntitiesContainer(ns);
-    }
+	/**
+	 * Exports a tree representation of the agent classes in this Environment.
+	 * 
+	 * @return the tree representation of agent classes in this Environment
+	 */
+	public HierarchyTree exportAgentHierarchy() {
+		return exportType(container.getAgentClass(), container.getAgentSubClasses().stream());
+	}
 
-    public Environment clone() {
-        Environment newEnvironment = new Environment(this.ns);
-        newEnvironment.copyFromEnvironment(this);
-        return newEnvironment;
-    }
-    
-    /**
-     * Removes all entities in this instance and all entities from the other Environment.
-     * 
-     * @param env the other Environment
-     * @throws GSimDefException if a problem during the remove-add cycle occurs
-     */
-    public void copyFromEnvironment(Environment env) throws GSimDefException {
-        try {
-            this.container.copyFromEnvironment(env.getContainer());
-            this.agentPauses.clear();
-            this.agentMappings.clear();
-            this.agentOrder.clear();
-            this.agentRtClassMappings.clear();
-            this.systemAgents.clear();
-            this.agentPauses.putAll(env.getAgentPauses());
-            this.agentMappings.putAll(env.getAgentMappings());
-            this.agentOrder.putAll(env.getAgentOrder());
-            this.agentRtClassMappings.putAll(env.getAgentRtClassMappings());
-            this.systemAgents.putAll(env.getSystemAgents());
-        } catch (Exception e) {
-            throw new GSimDefException("Error in copy env", e);
-        }
-    }
+	/**
+	 * Exports a tree representation of the behaviour classes in this Environment.
+	 * 
+	 * @return the tree representation of behaviour classes in this Environment
+	 */
+	public HierarchyTree exportBehaviourHierarchy() {
+		return exportType(container.getBehaviourClass(), container.getBehaviourClasses().stream());
+	}
 
-    /**
-     * Exports a tree representation of the object classes in this Environment.
-     * 
-     * @return the tree representation of object classes in this Environment
-     */
-    public HierarchyTree exportObjectHierarchy() {
-        return exportType(container.getObjectClass(), container.getObjectSubClasses().stream());
-    }
+	private HierarchyTree exportType(Frame root, Stream<? extends Frame> stream) {
 
-    /**
-     * Exports a tree representation of the agent classes in this Environment.
-     * 
-     * @return the tree representation of agent classes in this Environment
-     */
-    public HierarchyTree exportAgentHierarchy() {
-        return exportType(container.getAgentClass(), container.getAgentSubClasses().stream());
-    }
+		HashMap<String, HierarchyNode> nodes = new HashMap<String, HierarchyNode>();
+		HierarchyNode node = new HierarchyNode(root.clone());
+		nodes.put(node.getFrame().getName(), node);
 
-    /**
-     * Exports a tree representation of the behaviour classes in this Environment.
-     * 
-     * @return the tree representation of behaviour classes in this Environment
-     */
-    public HierarchyTree exportBehaviourHierarchy() {
-        return exportType(container.getBehaviourClass(), container.getBehaviourClasses().stream());
-    }
+		stream.forEach(frame -> {
+			node.insert(frame.clone());
+			nodes.put(node.getFrame().getName(), node);
+		});
 
-    private HierarchyTree exportType(Frame root, Stream<? extends Frame> stream) {
+		HierarchyNode[] top = new HierarchyNode[nodes.values().size()];
+		nodes.values().toArray(top);
 
-        HashMap<String, HierarchyNode> nodes = new HashMap<String, HierarchyNode>();
-        HierarchyNode node = new HierarchyNode(root.clone());
-        nodes.put(node.getFrame().getName(), node);
+		return new HierarchyTree(node);
 
-        stream.forEach(frame -> {
-            node.insert(frame.clone());
-            nodes.put(node.getFrame().getName(), node);
-        });
+	}
 
-        HierarchyNode[] top = new HierarchyNode[nodes.values().size()];
-        nodes.values().toArray(top);
+	/**
+	 * Gets the container where all frame and instances are stored.
+	 * 
+	 * @return
+	 */
+	public EntitiesContainer getContainer() {
+		return container;
+	}
 
-        return new HierarchyTree(node);
+	public String getNamespace() {
+		return this.ns;
+	}
 
-    }
+	public void setContainer(EntitiesContainer container) {
+		this.container = container;
+	}
 
-    /**
-     * Gets the container where all frame and instances are stored.
-     * 
-     * @return
-     */
-    public EntitiesContainer getContainer() {
-        return container;
-    }
+	public EntitiesContainer getEntities() {
+		return null;
+	}
 
-    public String getNamespace() {
-        return this.ns;
-    }
-
-    public void setContainer(EntitiesContainer container) {
-        this.container = container;
-    }
-
-    public Map<String, String> getActionMappings() {
-        return actionMappings;
-    }
-
-    public void addActionMapping(String name, String action) {
-        this.actionMappings.put(name, action);
-    }
-
-    public Map<String, String[]> getAgentMappings() {
-        return agentMappings;
-    }
-
-    public void addAgentMappings(String agentName, String[] roles) {
-        this.agentMappings.put(agentName, roles);
-    }
-
-    public Map<String, String> getAgentPauses() {
-        return agentPauses;
-    }
-
-    public void addAgentPause(String agentClassName, String interval) {
-        this.agentPauses.put(agentClassName, interval);
-    }
-
-    public Map<String, Integer> getAgentOrder() {
-        return agentOrder;
-    }
-
-    public void addAgentOrder(String agentClassName, int order) {
-        this.agentOrder.put(agentClassName, order);
-    }
-
-    public Map<String, String> getAgentRtClassMappings() {
-        return agentRtClassMappings;
-    }
-
-    public void addAgentRtClassMapping(String agentClassName, String rtName) {
-        this.agentRtClassMappings.put(agentClassName, rtName);
-    }
-
-    public Map<String, String> getSystemAgents() {
-        return systemAgents;
-    }
-
-    public void addSystemAgents(String name, String cls) {
-        this.systemAgents.put(name, cls);
-    }
-
-    public EntitiesContainer getEntities() {
-        return null;
-    }
-
-    public AgentClassOperations getAgentClassOperations() {
-    	AgentInstanceOperations agentInstanceOperations = new AgentInstanceOperations(this.container);
-    	ObjectInstanceOperations objectInstanceOperations = new ObjectInstanceOperations();
-    	ObjectClassOperations objectClassOperations = new ObjectClassOperations(container, null, objectInstanceOperations);
-    	AgentClassOperations agentClassOperations = new AgentClassOperations(container, agentInstanceOperations, objectInstanceOperations, objectClassOperations);
-    	return agentClassOperations;
-    }
-
-    public void addOrSetAgentMapping(String agentName, String[] roleNames) {
-        agentMappings.put(agentName, roleNames);
-    }
-
-    public void addOrSetAgentOrdering(Integer order, String roleName) {
-        agentOrder.put(roleName, order);
-    }
-
-    public void addOrSetRuntimeRoleMapping(String role, String cls) {
-        agentRtClassMappings.put(role, cls);
-    }
-
-    public void addOrSetSystemAgent(String name, String cls) {
-        systemAgents.put(name, cls);
-    }
+	public AgentClassOperations getAgentClassOperations() {
+		return this.agentClassOperations;
+	}
 
 	public ObjectClassOperations getObjectClassOperations() {
-		return new ObjectClassOperations(null, null,null);
+		return this.objectClassOperations;
 	}
-	
+
 	public ObjectInstanceOperations getObjectInstanceOperations() {
-		return new ObjectInstanceOperations();
+		return objectInstanceOperations;
 	}
-	
+
 	public AgentInstanceOperations getAgentInstanceOperations() {
-		return new AgentInstanceOperations(this.container);
+		return agentInstanceOperations;
 	}
+
 
 }
