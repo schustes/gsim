@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -213,7 +214,7 @@ public class Frame extends Unit<Frame, DomainAttribute> {
      * @param listName name of the list where this object is to be placed
      * @param frame the frame to add
      */
-    public void addOrSetChildFrame(@NotNull String listName, @NotNull Frame frame) {
+    public Frame addOrSetChildFrame(@NotNull String listName, @NotNull Frame frame) {
 
         TypedList<Frame> list;
         TypedMap<Frame> objectLists = super.getObjectLists();
@@ -224,9 +225,12 @@ public class Frame extends Unit<Frame, DomainAttribute> {
             list = objectLists.get(listName);
             list.remove(frame);
         }
-        list.add(frame.clone());
+        Frame f = frame.clone();
+        list.add(f);
 
         setDirty(true);
+        
+        return f;
     }
 
     /**
@@ -557,7 +561,7 @@ public class Frame extends Unit<Frame, DomainAttribute> {
      */
     public List<Frame> getDeclaredChildFrames(@NotNull String listname) {
         if (!getObjectLists().containsKey(listname)) {
-            return new ArrayList<Frame>();
+            throw new NoSuchElementException("List " + listname + " is no declared in this frame level.");
         }
         return getObjectLists().get(listname).stream().filter(o -> o instanceof Frame).map(o -> (Frame) o).collect(Collectors.toList());
     }
