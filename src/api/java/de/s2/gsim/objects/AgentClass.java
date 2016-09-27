@@ -73,15 +73,6 @@ public interface AgentClass extends ObjectClass {
     void removeObject(String list, ObjectClass object) throws GSimException;
 
     /**
-     * Removes an object class, identified by name only, from a list.
-     * 
-     * @param list the name of the list
-     * @param objectName the name of the object class
-     * @throws GSimException
-     */
-    void removeObject(String list, String objectName) throws GSimException;
-
-    /**
      * Resolves a path into the object it references. Each object can be described by a name that represents its position within the object hierachy.
      * For example the attribute attr of object obj in list list is given by list/obj/attr
      * 

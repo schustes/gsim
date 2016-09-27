@@ -21,17 +21,13 @@ public class RLRuleFrame extends UserRuleFrame {
 
     public static final String INST_LIST_TESTS = "tests";
 
-    public static RLRuleFrame RL_RULE_FRAME = new RLRuleFrame("template-rl-frame");
+   // public static RLRuleFrame RL_RULE_FRAME = new RLRuleFrame("template-rl-frame");
 
     private static Logger logger = Logger.getLogger(RLRuleFrame.class);
 
     private RLRuleFrame (Frame f) {
     	super(f);
     }
-    private RLRuleFrame(String name) {
-    	super(name);
-    }
- 
     public static RLRuleFrame inherit(Frame f) {
     	RLRuleFrame rf = new RLRuleFrame(f);
         return rf;
@@ -60,9 +56,10 @@ public class RLRuleFrame extends UserRuleFrame {
     }
 
     public static RLRuleFrame newRLRuleFrame(String name) {
-        RLRuleFrame f = new RLRuleFrame(name);
-        f.init();
-        return f;
+    	Frame f = Frame.newFrame(name, Optional.of(CATEGORY));
+        RLRuleFrame rf = new RLRuleFrame(f);
+        rf.init();
+        return rf;
     }
 
     public void addExpansion(ExpansionFrame cond) {

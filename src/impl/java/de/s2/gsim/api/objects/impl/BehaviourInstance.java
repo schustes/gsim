@@ -77,15 +77,15 @@ public class BehaviourInstance implements Behaviour, UnitWrapper {
         if (a == null) {
             throw new GSimException("Action " + name + " does not exist!");
         }
-        return new ActionInstanceDefinition(this, a);
+        return new ActionInstanceDef(this, a);
     }
 
     @Override
     public de.s2.gsim.objects.Action[] getAvailableActions() {
         ActionDef[] f = real.getAvailableActions();
-        ActionInstanceDefinition[] r = new ActionInstanceDefinition[f.length];
+        ActionInstanceDef[] r = new ActionInstanceDef[f.length];
         for (int i = 0; i < f.length; i++) {
-            r[i] = new ActionInstanceDefinition(this, f[i]);
+            r[i] = new ActionInstanceDef(this, f[i]);
         }
         return r;
     }

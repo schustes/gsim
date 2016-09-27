@@ -35,39 +35,6 @@ public class RuntimeAgent extends GenericAgent implements AgentType, RtAgent {
 
     private AgentInstanceSim simInstance;
 
-    /**
-     * Fully initialises the agent.
-     * 
-     * @param agent
-     *            GenericAgent
-     * @param roles
-     *            HashMap
-     * @param ruleBase
-     *            JessHandler
-     */
-    public RuntimeAgent(GenericAgent agent, HashMap<String, RtExecutionContextImpl> roles, JessHandler ruleBase, String ns) {
-        super(agent);
-        this.ns = ns;
-        this.roles = roles;
-        this.ruleBase = ruleBase;
-        // tree = new StateActionTree(getName(), ruleBase.rete);
-    }
-
-    /**
-     * Parrially initialises the agent with its rulebase. However, to give the agent actually the chance to do something, you have to add at least one
-     * Runtime role with addRuntimeRole(...)
-     * 
-     * @param agent
-     *            GenericAgent
-     * @param ruleBase
-     *            JessHandler
-     */
-    public RuntimeAgent(GenericAgent agent, JessHandler ruleBase, String ns) {
-        super(agent);
-        this.ns = ns;
-        this.ruleBase = ruleBase;
-        // tree = new StateActionTree(getName(), ruleBase.rete);
-    }
 
     /**
      * To make the agent work after calling this constructor, you have to set the rulebase with setRuleHandler(..) and add at least one runtime-role
@@ -76,11 +43,18 @@ public class RuntimeAgent extends GenericAgent implements AgentType, RtAgent {
      * @param agent
      *            GenericAgent
      */
-    public RuntimeAgent(GenericAgent agent, String ns) {
-        super(agent);
-        this.ns = ns;
+    public static RuntimeAgent runtimeAgent(GenericAgent base, String ns) {
+        GenericAgent ag = GenericAgent.from(base);
+    	RuntimeAgent a = new RuntimeAgent(ag);
+    	Instance.copy(base, a);
+        a.ns = ns;
+        return a;
     }
 
+    private RuntimeAgent(GenericAgent base) {
+    	super(base.getName(), (GenericAgentClass)base.getDefinition());
+    }
+    
     @Override
     public void addChildInstance(String list, Instance inst) {
         super.addChildInstance(list, inst);

@@ -32,26 +32,28 @@ public class Instance extends Unit<Instance, Attribute> {
 	 * @return the new instance
 	 */
 	public static Instance copy(@NotNull Instance from) {
-		Instance instance = new Instance(from);
+		Instance instance = new Instance(from.getName(), from.getDefinition());
+		return copy(from, instance);
+	}
 
+	public static Instance copy(Instance from, Instance to) {
 		for (String attListName: from.getAttributesListNames()) {
 			for (Attribute att: from.getAttributes(attListName)) {
-				instance.addOrSetAttribute(attListName, att.clone());
+				to.addOrSetAttribute(attListName, att.clone());
 			}
 		}
 
 		for (String instanceListName: from.getChildInstanceListNames()) {
 			TypedList<Frame> list = from.getDefinition().getChildFrameList(instanceListName);
-			instance.getObjectLists().put(instanceListName, new TypedList<Instance>(list.getType()));
+			to.getObjectLists().put(instanceListName, new TypedList<Instance>(list.getType()));
 			for (Instance child: from.getChildInstances(instanceListName)) {
-				instance.addChildInstance(instanceListName, Instance.copy(child));
+				to.addChildInstance(instanceListName, Instance.copy(child));
 			}
 		}
 
-		instance.setDirty(false);
-
-		return instance;
-
+		to.setDirty(false);
+		
+		return to;
 	}
 
 	/**
@@ -79,13 +81,15 @@ public class Instance extends Unit<Instance, Attribute> {
 	}
 
 	/**
-     * Constructs a new instance by using frame and name of the given instance (no copy!).
+     * Copy constructor.
      * 
      * @param inst the instance to create the new instance from
      */
 	protected Instance(@NotNull Instance inst) {
 		super(inst.getName(), inst.isMutable(), inst.isSystem());
 		this.frame = inst.getDefinition();
+		copy(inst, this);
+		
 	}
 
 	/**
@@ -455,11 +459,14 @@ public class Instance extends Unit<Instance, Attribute> {
 	 * @param listname the name of the attribute list
 	 * @param attribute the attribute
 	 */
-	public  void addOrSetAttribute(@NotNull String listname,@NotNull Attribute attribute) {
+	public void addOrSetAttribute(@NotNull String listname,@NotNull Attribute attribute) {
 
 		List<Attribute> list = getAttributeLists().putIfAbsent(listname, new ArrayList<>());
+		if (list == null) {
+			list = getAttributeLists().get(listname);
+		}
 		list.remove(attribute);
-		list.add(attribute);
+		list.add(attribute.clone());
 		setDirty(true);
 
 	}
@@ -631,7 +638,7 @@ public class Instance extends Unit<Instance, Attribute> {
         Instance containingInstance = this.resolvePath(containingInstancePath);
 
         if (containingInstance != null && list != null) {
-            containingInstance.removeDeclaredChildInstanceList(objectListPath.last());
+            containingInstance.removeDeclaredChildInstanceList(objectListPath.lastAsString());
             setDirty(true);
             return true;
         }

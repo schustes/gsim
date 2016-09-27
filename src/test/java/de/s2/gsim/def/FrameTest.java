@@ -1,4 +1,4 @@
-package de.s2.gsim;
+package de.s2.gsim.def;
 
 import org.junit.Test;
 

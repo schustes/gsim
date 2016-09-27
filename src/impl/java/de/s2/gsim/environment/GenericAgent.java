@@ -16,14 +16,17 @@ public class GenericAgent extends Instance {
     /**
      * Copy constructor.
      * 
-     * @param in
-     *            GenericAgent
+     * @param inst
      */
-    public GenericAgent(GenericAgent in) {
-        super(in);
-        behaviour = new BehaviourDef((BehaviourDef) in.getBehaviour().clone());
+    private GenericAgent(GenericAgent inst) {
+    	super(inst);
+        behaviour = new BehaviourDef((BehaviourDef) inst.getBehaviour().clone());    	
     }
-
+    
+    public static GenericAgent from(GenericAgent copy) {
+    	return new GenericAgent(copy);
+    }
+    
     /**
      * Inheritance constructor.
      * 
@@ -36,6 +39,7 @@ public class GenericAgent extends Instance {
      */
     public GenericAgent(String name, GenericAgentClass cls) {
         super(name, cls);
+        this.instanciate(cls);
         behaviour = new BehaviourDef(cls.getBehaviour());
     }
 

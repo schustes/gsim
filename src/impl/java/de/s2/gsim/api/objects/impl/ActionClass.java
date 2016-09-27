@@ -73,7 +73,7 @@ public class ActionClass implements de.s2.gsim.objects.Action, UnitWrapper {
     }
 
     @Override
-    public Unit toUnit() {
+    public Unit<?, ?> toUnit() {
         return real;
     }
 

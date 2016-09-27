@@ -8,10 +8,7 @@ import de.s2.gsim.objects.Rule;
 
 public class ActionInstance implements de.s2.gsim.objects.Action, UnitWrapper {
 
-    /**
-     *
-     */
-    private static final long serialVersionUID = 1L;
+    public static final long serialVersionUID = 1L;
 
     private Rule owner;
 
@@ -79,7 +76,7 @@ public class ActionInstance implements de.s2.gsim.objects.Action, UnitWrapper {
     }
 
     @Override
-    public Unit toUnit() {
+    public Unit<?, ?> toUnit() {
         return real;
     }
 

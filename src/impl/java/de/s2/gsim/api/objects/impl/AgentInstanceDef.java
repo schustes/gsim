@@ -3,6 +3,8 @@ package de.s2.gsim.api.objects.impl;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
 
 import org.apache.log4j.Logger;
 
@@ -24,22 +26,17 @@ import de.s2.gsim.objects.attribute.NumericalAttribute;
 import de.s2.gsim.objects.attribute.SetAttribute;
 import de.s2.gsim.objects.attribute.StringAttribute;
 
-public class AgentInstanceDef extends ObjectInstanceDef implements AgentInstance, UnitWrapper {
+public class AgentInstanceDef extends ObjectInstanceDef implements AgentInstance, UnitWrapper, Observer {
 
     private final static Logger logger = Logger.getLogger(AgentInstanceDef.class);
-    /**
-     *
-     */
+
     private static final long serialVersionUID = 1L;
 
-    public AgentInstanceDef(Environment env, GenericAgent owner) {
+    public AgentInstanceDef(Environment env, GenericAgent owner, AgentClassDef observable) {
         super(env, owner);
+        observable.addObserver(this);
     }
 
-    /**
-     * @see
-     * @link gsim.objects.AgentInstanceIF
-     */
     @Override
     public void addOrSetObject(String list, ObjectInstance object) throws GSimException {
 
@@ -77,10 +74,6 @@ public class AgentInstanceDef extends ObjectInstanceDef implements AgentInstance
         return false;
     }
 
-    /**
-     * @see
-     * @link gsim.objects.AgentInstanceIF
-     */
     @Override
     public Behaviour getBehaviour() throws GSimException {
 
@@ -107,10 +100,6 @@ public class AgentInstanceDef extends ObjectInstanceDef implements AgentInstance
         }
     }
 
-    /**
-     * @see
-     * @link gsim.objects.AgentInstanceIF
-     */
     @Override
     public String[] getObjectListNames() throws GSimException {
 
@@ -127,10 +116,6 @@ public class AgentInstanceDef extends ObjectInstanceDef implements AgentInstance
 
     }
 
-    /**
-     * @see
-     * @link gsim.objects.AgentInstanceIF
-     */
     @Override
     public ObjectInstance[] getObjects(String list) throws GSimException {
 
@@ -164,10 +149,6 @@ public class AgentInstanceDef extends ObjectInstanceDef implements AgentInstance
         real.defineObjectList(list, real.getDefinition().getListType(list));
     }
 
-    /**
-     * @see
-     * @link gsim.objects.AgentInstanceIF
-     */
     @Override
     public void removeObject(String list, ObjectInstance object) throws GSimException {
 
@@ -184,10 +165,6 @@ public class AgentInstanceDef extends ObjectInstanceDef implements AgentInstance
 
     }
 
-    /**
-     * @see
-     * @link gsim.objects.AgentInstanceIF
-     */
     @Override
     public void removeObject(String list, String objectName) throws GSimException {
 
@@ -204,10 +181,6 @@ public class AgentInstanceDef extends ObjectInstanceDef implements AgentInstance
 
     }
 
-    /**
-     * @see
-     * @link gsim.objects.AgentInstanceIF
-     */
     @Override
     public Object resolveName(String path) throws GSimException {
 
@@ -273,10 +246,6 @@ public class AgentInstanceDef extends ObjectInstanceDef implements AgentInstance
 
     }
 
-    /**
-     * @see
-     * @link gsim.objects.AgentInstanceIF
-     */
     @Override
     public void setBehaviour(Behaviour b) throws GSimException {
 
@@ -299,10 +268,6 @@ public class AgentInstanceDef extends ObjectInstanceDef implements AgentInstance
 
     }
 
-    /**
-     * @see
-     * @link gsim.objects.ObjectInstanceIF
-     */
     @Override
     public void setIntervalAttributeValue(String list, String attName, double from, double to) throws GSimException {
 
@@ -324,10 +289,6 @@ public class AgentInstanceDef extends ObjectInstanceDef implements AgentInstance
 
     }
 
-    /**
-     * @see
-     * @link gsim.objects.ObjectInstanceIF
-     */
     @Override
     public void setNumericalAttributeValue(String list, String attName, double value) throws GSimException {
 
@@ -348,10 +309,6 @@ public class AgentInstanceDef extends ObjectInstanceDef implements AgentInstance
 
     }
 
-    /**
-     * @see
-     * @link gsim.objects.ObjectInstanceIF
-     */
     @Override
     public void setSetAttributeValues(String list, String attName, String... values) throws GSimException {
 
@@ -377,10 +334,6 @@ public class AgentInstanceDef extends ObjectInstanceDef implements AgentInstance
 
     }
 
-    /**
-     * @see
-     * @link gsim.objects.ObjectInstanceIF
-     */
     @Override
     public void setStringAttributeValue(String list, String attName, String value) throws GSimException {
 
@@ -400,5 +353,12 @@ public class AgentInstanceDef extends ObjectInstanceDef implements AgentInstance
         }
 
     }
+
+	@Override
+	public void update(Observable o, Object arg) {
+		if (o instanceof AgentClassDef) {
+			super.real = env.getAgentInstanceOperations().getAgent(real.getName());
+		}
+	}
 
 }

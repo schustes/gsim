@@ -111,7 +111,7 @@ public class BehaviourDef extends Instance {
 
         BehaviourFrame f = (BehaviourFrame) getDefinition();
         Frame r = f.getRule(name);
-        r = new UserRuleFrame(name);
+        r = UserRuleFrame.newUserRuleFrame(name);
 
         Instance rule = new Instance(name, r);
 

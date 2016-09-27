@@ -16,10 +16,7 @@ import de.s2.gsim.objects.Rule;
 
 public class BehaviourClass implements Behaviour, UnitWrapper {
 
-    /**
-     *
-     */
-    private static final long serialVersionUID = 1L;
+	public static final long serialVersionUID = 1L;
 
     private AgentClass owner;
 

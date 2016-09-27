@@ -14,7 +14,7 @@ public class ActionCollectionFrame extends Frame {
     static final long serialVersionUID = 5049004885070737414L;
 
     public ActionCollectionFrame(Frame f) {
-        super(f);
+        super(f.getName(), f);
     }
 
     public ActionCollectionFrame(String name) {

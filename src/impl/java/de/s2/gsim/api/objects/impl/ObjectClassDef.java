@@ -1,6 +1,7 @@
 package de.s2.gsim.api.objects.impl;
 
 import java.util.ArrayList;
+import java.util.Observable;
 
 import de.s2.gsim.GSimException;
 import de.s2.gsim.environment.Environment;
@@ -11,11 +12,16 @@ import de.s2.gsim.objects.ObjectClass;
 import de.s2.gsim.objects.attribute.Attribute;
 import de.s2.gsim.objects.attribute.DomainAttribute;
 
-public class ObjectClassDef implements ObjectClass, UnitWrapper {
+/**
+ * Implementation of ObjectClass.
+ * 
+ * An ObjectClass may be observed by an AgentClass.
+ * 
+ * @author sschuster
+ *
+ */
+public class ObjectClassDef extends Observable implements ObjectClass, UnitWrapper {
 
-    /**
-     *
-     */
     private static final long serialVersionUID = 1L;
 
     protected boolean destroyed = false;
@@ -23,12 +29,18 @@ public class ObjectClassDef implements ObjectClass, UnitWrapper {
     protected Environment env;
 
     protected Frame real;
-
+    
+    /**
+     * Constructor.
+     * 
+     * @param env environment instance
+     * @param real the reference to the actual frame
+     */
     public ObjectClassDef(Environment env, Frame real) {
         this.env = env;
         this.real = real;
     }
-
+	
     @Override
     public void addAttribute(String list, DomainAttribute a) throws GSimException {
         if (destroyed) {
@@ -36,16 +48,18 @@ public class ObjectClassDef implements ObjectClass, UnitWrapper {
         }
 
         try {
+        	if (!real.getAttributeLists().containsKey(list)) {
+        		env.getObjectClassOperations().addAttributeList(real, Path.attributeListPath(list), a);
+        	}
             real = env.getObjectClassOperations().addObjectClassAttribute(real, Path.attributeListPath(list), a);
         } catch (Exception e) {
             throw new GSimException(e);
         }
+
+        onChange();
+        
     }
 
-    /**
-     * @see
-     * @link gsim.objects.ObjectClassIF
-     */
     @Override
     public void destroy() throws GSimException {
         if (destroyed) {
@@ -60,12 +74,10 @@ public class ObjectClassDef implements ObjectClass, UnitWrapper {
         }
 
         destroyed = true;
+        
+        onDestroy();
     }
 
-    /**
-     * @see
-     * @link gsim.objects.ObjectClassIF
-     */
     @Override
     public DomainAttribute getAttribute(String list, String attName) throws GSimException {
         if (destroyed) {
@@ -80,10 +92,6 @@ public class ObjectClassDef implements ObjectClass, UnitWrapper {
 
     }
 
-    /**
-     * @see
-     * @link gsim.objects.ObjectClassIF
-     */
     @Override
     public String[] getAttributeListNames() throws GSimException {
         if (destroyed) {
@@ -97,10 +105,6 @@ public class ObjectClassDef implements ObjectClass, UnitWrapper {
         }
     }
 
-    /**
-     * @see
-     * @link gsim.objects.ObjectClassIF
-     */
     @Override
     public DomainAttribute[] getAttributes(String list) throws GSimException {
 
@@ -115,10 +119,6 @@ public class ObjectClassDef implements ObjectClass, UnitWrapper {
         }
     }
 
-    /**
-     * @see
-     * @link gsim.objects.ObjectClassIF
-     */
     @Override
     public String getDefaultValue(String list, String attName) throws GSimException {
 
@@ -134,10 +134,6 @@ public class ObjectClassDef implements ObjectClass, UnitWrapper {
         }
     }
 
-    /**
-     * @see
-     * @link gsim.objects.ObjectClassIF
-     */
     @Override
     public String getName() throws GSimException {
 
@@ -157,10 +153,6 @@ public class ObjectClassDef implements ObjectClass, UnitWrapper {
         return real.isDeclaredAttribute(list, attName);
     }
 
-    /**
-     * @see
-     * @link gsim.objects.ObjectClassIF
-     */
     @Override
     public Object resolveName(String path) throws GSimException {
 
@@ -191,10 +183,6 @@ public class ObjectClassDef implements ObjectClass, UnitWrapper {
 
     }
 
-    /**
-     * @see
-     * @link gsim.objects.ObjectClassIF
-     */
     @Override
     public void setAttribute(String list, DomainAttribute a) throws GSimException {
 
@@ -207,13 +195,10 @@ public class ObjectClassDef implements ObjectClass, UnitWrapper {
         } catch (Exception e) {
             throw new GSimException(e);
         }
-
+        
+        onChange();
     }
 
-    /**
-     * @see
-     * @link gsim.objects.ObjectClassIF
-     */
     @Override
     public void setDefaultAttributeValue(String list, String attName, String value) throws GSimException {
 
@@ -228,12 +213,24 @@ public class ObjectClassDef implements ObjectClass, UnitWrapper {
         } catch (Exception e) {
             throw new GSimException(e);
         }
+        
+        onChange();
 
     }
 
     @Override
-    public Unit toUnit() {
+    public Unit<?, ?> toUnit() {
         return real;
     }
+    
+	protected void onChange() {
+		setChanged();
+		notifyObservers();
+	}
+
+	protected void onDestroy() {
+		setChanged();
+		notifyObservers(false);
+	}
 
 }

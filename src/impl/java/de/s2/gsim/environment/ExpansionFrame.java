@@ -15,7 +15,7 @@ public class ExpansionFrame extends Frame {
     public static ExpansionFrame DEFINITION = new ExpansionFrame("Expansion-template");
 
     public ExpansionFrame(Frame f) {
-        super(f);
+        super(f.getName(), f);
     }
 
     public ExpansionFrame(String forParameter) {

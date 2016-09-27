@@ -23,7 +23,7 @@ public class ConditionFrame extends Frame {
     static final long serialVersionUID = 8165736680329194821L;
 
     public ConditionFrame(Frame f) {
-        super(f);
+        super(f.getName(), f);
     }
 
     public ConditionFrame(String forParameter) {

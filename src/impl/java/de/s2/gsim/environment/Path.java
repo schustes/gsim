@@ -2,175 +2,198 @@ package de.s2.gsim.environment;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class Path<T> {
 
-    enum Type {
-        OBJECT, ATTRIBUTE, LIST, PATH
-    }
+	enum Type {
+		OBJECT, ATTRIBUTE, LIST, PATH
+	}
 
-    private final String name;
+	private final String name;
 
-    private Path<?> next;
+	private Path<?> next;
 
-    private final Type type;
+	private final Type type;
 
-    public Path(String name, Type type) {
-        this.name = name;
-        this.next = null;
-        this.type = type;
-    }
+	public Path(String name, Type type) {
+		this.name = name;
+		this.next = null;
+		this.type = type;
+	}
 
-    public Path(String name, Path<T> next, Type type) {
-        this.name = name;
-        this.next = next;
-        this.type = type;
-    }
+	public Path(String name, Path<T> next, Type type) {
+		this.name = name;
+		this.next = next;
+		this.type = type;
+	}
 
-    public String getName() {
-        return name;
-    }
+	public String getName() {
+		return name;
+	}
 
-    public Path<?> next() {
-        return next;
-    }
+	public Path<?> next() {
+		return next;
+	}
 
-    public Type getType() {
-        return type;
-    }
+	public Type getType() {
+		return type;
+	}
 
-    public void append(Path<?> p) {
-        this.next = p;
-    }
+	@SuppressWarnings("unchecked")
+	public <X>Path<X> append(Path<X> p) {
+		this.last().appendToSelf(p);
+		return (Path<X>) this;
+	}
 
-    public boolean isTerminal() {
-        return next == null;
-    }
+	@SuppressWarnings("unchecked")
+	private <X>Path<X> appendToSelf(Path<X> p) {
+		this.next = p;
+		return (Path<X>) this;
+	}
 
-    public String toString() {
-        StringBuilder b = new StringBuilder();
-        rek(this, b);
-        return b.toString();
-    }
+	public boolean isTerminal() {
+		return next == null;
+	}
 
-    private void rek(Path<?> p, StringBuilder b) {
-        b.append('/').append(p.name);
-        if (p.next != null) {
-            rek(p.next(), b);
-        }
-    }
+	public String toString() {
+		StringBuilder b = new StringBuilder();
+		rek(this, b);
+		return b.toString();
+	}
 
-    public String toStringArray() {
-        List<String> list = new ArrayList<>();
-        rekArray(this, list);
-        return null;
-    }
+	private void rek(Path<?> p, StringBuilder b) {
+		b.append('/').append(p.name);
+		if (p.next != null) {
+			rek(p.next(), b);
+		}
+	}
 
-    private void rekArray(Path<?> p, List<String> list) {
-        list.add(p.name);
-        if (p.next != null) {
-            rekArray(p.next, list);
-        }
-    }
+	public String[] toStringArray() {
+		List<String> list = new ArrayList<>();
+		rekArray(this, list);
+		return list.toArray(new String[0]);
+	}
 
-    public static <M extends List<V>, T, V> Path<M> withoutLastAttributeOrObject(Path<T> path, Type typeBeforeLast) {
+	private void rekArray(Path<?> p, List<String> list) {
+		list.add(p.name);
+		if (p.next != null) {
+			rekArray(p.next, list);
+		}
+	}
 
-        Path<?> p = path;
-        Path<M> p1 = new Path<>(path.getName(), typeBeforeLast);
+	public static <M extends List<V>, T, V> Path<M> withoutLastAttributeOrObject(Path<T> path, Type typeBeforeLast) {
 
-        while (p != null) {
-            p = p.next();
-            if (p.next() != null) {
-                p1.append(p);
-            }
-        }
+		Objects.requireNonNull(path);
 
-        return p1;
+		Path<?> p = path.next();
+		Path<M> p1 = new Path<>(path.getName(), typeBeforeLast);
 
-    }
+		while (p != null) {
+			if (p.next() != null) {
+				p1.appendToSelf(p);
+			}
+			p = p.next();
+		}
 
-    public static <M extends V, T, V> Path<M> withoutLastList(Path<T> path) {
+		return p1;
 
-        Path<?> p = path;
-        Path<M> p1 = new Path<>(path.getName(), Type.OBJECT);
+	}
 
-        while (p != null) {
-            p = p.next();
-            if (p.next() != null) {
-                p1.append(p);
-            }
-        }
+	public static <M extends V, T, V> Path<M> withoutLastList(Path<T> path) {
 
-        return p1;
+		Path<?> p = path;
+		Path<M> p1 = new Path<>(path.getName(), Type.OBJECT);
 
-    }
+		while (p != null) {
+			p = p.next();
+			if (p.next() != null) {
+				p1.appendToSelf(p);
+			}
+		}
 
-    public static <T> Path<T> attributePath(String... path) {
+		return p1;
 
-        if (path.length < 2) {
-            throw new IllegalArgumentException("Path must not be empty");
-        }
+	}
 
-        return build(Type.ATTRIBUTE, path);
-    }
+	public static <T> Path<T> attributePath(String... path) {
 
-    public static <T extends Unit<?,?>> Path<T> objectPath(String... path) {
+		if (path.length < 2) {
+			throw new IllegalArgumentException("Path must not be empty");
+		}
 
-        if (path.length < 2) {
-            throw new IllegalArgumentException("Path must not be empty");
-        }
+		return build(Type.ATTRIBUTE, path);
+	}
 
-        return build(Type.OBJECT, path);
+	public static <T extends Unit<?,?>> Path<T> objectPath(String... path) {
 
-    }
+		if (path.length < 2) {
+			throw new IllegalArgumentException("Path must not be empty");
+		}
 
-    public static <T extends TypedList<?>> Path<T> objectListPath(String... path) {
+		return build(Type.OBJECT, path);
 
-        if (path.length < 1) {
-            throw new IllegalArgumentException("Path must not be empty");
-        }
+	}
 
-        return build(Type.LIST, path);
+	public static <T extends TypedList<?>> Path<T> objectListPath(String... path) {
 
-    }
+		if (path.length < 1) {
+			throw new IllegalArgumentException("Path must not be empty");
+		}
 
-    public static <T extends List<?>> Path<T> attributeListPath(String... path) {
+		return build(Type.LIST, path);
 
-        if (path.length < 1) {
-            throw new IllegalArgumentException("Path must not be empty");
-        }
+	}
 
-        return build(Type.LIST, path);
+	public static <T extends List<?>> Path<T> attributeListPath(String... path) {
 
-    }
+		if (path.length < 1) {
+			throw new IllegalArgumentException("Path must not be empty");
+		}
 
-    private static <T> Path<T> build(Type type, String... path) {
-        Path<T> initial = new Path<T>(path[0], Type.PATH);
-        Path<T> current = initial;
-        for (int i = 1; i < path.length - 1; i++) {
-            Path<T> next = new Path<T>(path[i], Type.PATH);
-            current.append(next);
-            current = next;
-        }
-        if (path.length > 1) {
-            Path<T> last = new Path<T>(path[path.length - 1], Type.ATTRIBUTE);
-            current.append(last);
-        }
-        return initial;
-    }
+		return build(Type.LIST, path);
 
-    public String last() {
-        Path<?> p = next;
-        String ret = "";
-        do {
-            if (p == null) {
-                ret = this.name;
-            } else {
-                p = p.next;
-            }
-        } while (p != null);
-        return ret;
-    }
+	}
+
+	public static <T extends List<?>> Path<T> attributeListPath(List<String> path) {
+
+		if (path.size() < 1) {
+			throw new IllegalArgumentException("Path must not be empty");
+		}
+
+		return build(Type.LIST, path.toArray(new String[0]));
+
+	}
+
+	private static <T> Path<T> build(Type type, String[] path) {
+		Path<T> initial = new Path<T>(path[0], Type.PATH);
+		Path<T> current = initial;
+		for (int i = 1; i < path.length - 1; i++) {
+			Path<T> next = new Path<T>(path[i], Type.PATH);
+			current.appendToSelf(next);
+			current = next;
+		}
+		if (path.length > 1) {
+			Path<T> last = new Path<T>(path[path.length - 1], Type.ATTRIBUTE);
+			current.appendToSelf(last);
+		}
+		return initial;
+	}
+
+	public String lastAsString() {
+		Path<?> p = last();
+		return p.name;
+	}
+
+	public Path<?> last() {
+		Path<?> p = next;
+		Path<?> ret = this;
+		while (p!=null) {
+			ret = p;
+			p = p.next;
+		}
+		return ret;
+	}
 
 
 }

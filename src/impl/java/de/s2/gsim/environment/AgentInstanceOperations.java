@@ -76,7 +76,7 @@ public class AgentInstanceOperations {
     public GenericAgent instanciateAgentWithUniformDistributedAttributes(GenericAgentClass cls, String name) {
         GenericAgent a = new GenericAgent(name, cls);
         a = Generator.randomiseUniformAttributeValues(a);
-        container.getAgents().add(a);
+        container.addAgent(a);
         return (GenericAgent) a.clone();
     }
 

@@ -38,7 +38,7 @@ public class BehaviourFrame extends Frame {
 	}
 
 	public BehaviourFrame(BehaviourFrame f, String category) {
-		super(f);
+		super(f.getName(), f);
 		this.category = category;
 	}
 
@@ -50,7 +50,7 @@ public class BehaviourFrame extends Frame {
 	}
 	
 	private BehaviourFrame(Frame f) {
-		super(f);
+		super(f.getName(), f);
 	}
 
 	/**
@@ -168,7 +168,7 @@ public class BehaviourFrame extends Frame {
 	 * @return UserRuleFrame
 	 */
 	public UserRuleFrame createRule(String name) {
-		UserRuleFrame f = new UserRuleFrame(name);
+		UserRuleFrame f = UserRuleFrame.newUserRuleFrame(name)	;
 		return f;
 	}
 
@@ -433,7 +433,7 @@ public class BehaviourFrame extends Frame {
 
 		 ActionFrame f = new ActionFrame("{}", "");
 		 addOrSetChildFrame(ACTION_LIST, f);
-		 addOrSetChildFrame(RULE_LIST, new UserRuleFrame("{all-rules}"));
+		 addOrSetChildFrame(RULE_LIST, UserRuleFrame.newUserRuleFrame("{all-rules}"));
 
 		 super.defineAttributeList(ATTR_LIST);
 
@@ -462,7 +462,8 @@ public class BehaviourFrame extends Frame {
 		 cattr.setDefault("0");
 		 super.addOrSetAttribute(ATTR_LIST, cattr);
 
-		 super.defineObjectList(RL_LIST, RLRuleFrame.RL_RULE_FRAME);
+		 //public static RLRuleFrame RL_RULE_FRAME = new RLRuleFrame("template-rl-frame");
+		 super.defineObjectList(RL_LIST, RLRuleFrame.newRLRuleFrame("template-rl-frame"));
 
 	 }
 

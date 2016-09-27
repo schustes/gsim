@@ -22,13 +22,10 @@ public class UserRuleFrame extends Frame {
     static final long serialVersionUID = 4875468082081888178L;
 
     protected UserRuleFrame(Frame f) {
-    	super(f);
+    	super(f.getName(), f);
     }
     
-    protected UserRuleFrame(String name) {
-    	super(name);
-    }
-    
+
     public static UserRuleFrame copy(Frame f) {
     	UserRuleFrame ufr = new UserRuleFrame(f);
         Frame f1 = new ConditionFrame("{all-conditions}", "=", "don't care");
@@ -64,10 +61,6 @@ public class UserRuleFrame extends Frame {
         a.setDefault("true");
         f.addOrSetAttribute(ATTR_LIST_ATTRS, a);
 
-        DomainAttribute c = new DomainAttribute("update-lag", AttributeType.STRING);
-        c.setDefault("0");
-        f.addOrSetAttribute(ATTR_LIST_ATTRS, c);
-        
         return new UserRuleFrame(f);
 
     }

@@ -94,8 +94,11 @@ public class EntitiesContainer {
         Collection<? extends Frame> set = classToRemoveAttributeFrom.isSuccessor(agentClass.getName()) ? agentSubClasses.values() : objectSubClasses;
         set.stream().filter(ac -> ac.hasDeclaredChildFrame(classToRemoveAttributeFrom.getName())).forEach(frame -> {
             for (String list : classToRemoveAttributeFrom.getListNamesWithDeclaredChildFrame(classToRemoveAttributeFrom.getName())) {
-                Path<DomainAttribute> newPath = Path.attributePath(pathToChildFrame.toStringArray(), list, classToRemoveAttributeFrom.getName());
-                func.accept(frame, newPath);
+                //Path<DomainAttribute> newPath = Path.attributePath(pathToChildFrame.toStringArray(), list, classToRemoveAttributeFrom.getName());
+                
+            	Path<DomainAttribute> newPath = Path.objectPath(pathToChildFrame.toStringArray())
+            			.append(Path.attributePath(list, classToRemoveAttributeFrom.getName()));
+            	func.accept(frame, newPath);
             }
         });
     }
@@ -190,7 +193,7 @@ public class EntitiesContainer {
     public Set<GenericAgent> getAgents() {
         return new LinkedHashSet<>(agents.values());
     }
-
+    
     public void addAgent(GenericAgent agent) {
         this.agents.put(agent.getName(), agent);
     }
@@ -322,11 +325,12 @@ public class EntitiesContainer {
         
     }
 
-    public void replaceAgentSubClass(GenericAgentClass oldOne, GenericAgentClass newOne) {
+    public GenericAgentClass replaceAgentSubClass(GenericAgentClass oldOne, GenericAgentClass newOne) {
         if (!oldOne.getName().equals(newOne.getName())) {
             throw new IllegalArgumentException("The agent class to be replaced has not the same name as the one to replace with.");
         }
         this.agentSubClasses.put(oldOne.getName(), newOne);
+        return newOne;
     }
 
     public void replaceAgent(GenericAgent oldOne, GenericAgent newOne) {
@@ -374,6 +378,5 @@ public class EntitiesContainer {
         return top;
 
     }
-
 
 }

@@ -5,13 +5,13 @@ import de.s2.gsim.environment.ActionDef;
 import de.s2.gsim.environment.Unit;
 import de.s2.gsim.objects.Behaviour;
 
-public class ActionInstanceDefinition implements de.s2.gsim.objects.Action, UnitWrapper {
+public class ActionInstanceDef implements de.s2.gsim.objects.Action, UnitWrapper {
 
     private Behaviour owner;
 
     private ActionDef real;
 
-    public ActionInstanceDefinition(Behaviour owner, ActionDef real) {
+    public ActionInstanceDef(Behaviour owner, ActionDef real) {
         this.real = real;
         this.owner = owner;
     }
@@ -73,7 +73,7 @@ public class ActionInstanceDefinition implements de.s2.gsim.objects.Action, Unit
     }
 
     @Override
-    public Unit toUnit() {
+    public Unit<?, ?> toUnit() {
         return real;
     }
 

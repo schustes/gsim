@@ -2,6 +2,7 @@ package de.s2.gsim.api.objects.impl;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Observable;
 
 import de.s2.gsim.GSimException;
 import de.s2.gsim.environment.Frame;
@@ -16,7 +17,7 @@ import de.s2.gsim.objects.attribute.NumericalAttribute;
 import de.s2.gsim.objects.attribute.SetAttribute;
 import de.s2.gsim.objects.attribute.StringAttribute;
 
-public class ObjectInstanceSim implements ObjectInstance, UnitWrapper {
+public class ObjectInstanceSim extends Observable implements ObjectInstance, UnitWrapper {
 
     private static final long serialVersionUID = 1L;
 

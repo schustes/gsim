@@ -31,7 +31,7 @@ public class GenericAgentClass extends Frame {
     /**
      * Constructor for a top-level generic agent.
      */
-    public static GenericAgentClass baseGenericAgentClass() {
+     static GenericAgentClass baseGenericAgentClass() {
         GenericAgentClass cls = new GenericAgentClass(NAME);
         return cls;
     }
@@ -39,7 +39,7 @@ public class GenericAgentClass extends Frame {
     /**
      * Constructor for a top-level generic agent.
      */
-    public static GenericAgentClass baseGenericAgentClassWithName(String name) {
+     static GenericAgentClass baseGenericAgentClassWithName(String name) {
         GenericAgentClass cls = new GenericAgentClass(name);
         return cls;
     }
@@ -48,9 +48,9 @@ public class GenericAgentClass extends Frame {
     /**
      * Inherit.
      */
-    public static GenericAgentClass inherit(GenericAgentClass parent, String name) {
-    	Frame f = Frame.inherit(Arrays.asList(parent), name, Optional.of("generic"));
-    	GenericAgentClass cls = new GenericAgentClass(f);
+     static GenericAgentClass inherit(GenericAgentClass parent, String name) {
+    	//Frame f = Frame.inherit(Arrays.asList(parent), name, Optional.of("generic"));
+    	GenericAgentClass cls = new GenericAgentClass(name, (Frame)parent);
         BehaviourFrame bf = BehaviourFrame.inherit(name + "-behaviour", Arrays.asList(parent.getBehaviour()));
     	cls.behaviour = bf.clone();
     	return cls;
@@ -59,9 +59,9 @@ public class GenericAgentClass extends Frame {
     /**
      * Inherit.
      */
-    public static GenericAgentClass inherit(String name, GenericAgentClass... parents) {
-    	Frame f = Frame.inherit(Arrays.asList(parents), name, Optional.of("generic"));
-    	GenericAgentClass cls = new GenericAgentClass(f);
+     static GenericAgentClass inherit(String name, GenericAgentClass... parents) {
+    	//Frame f = Frame.inherit(Arrays.asList(parents), name, Optional.of("generic"));
+    	GenericAgentClass cls = new GenericAgentClass(name, parents);
     	
     	List<BehaviourFrame> behaviours = Arrays.stream(parents).map(g->g.getBehaviour()).collect(Collectors.toList());
         BehaviourFrame bf = BehaviourFrame.inherit(name + "-behaviour", behaviours);
@@ -71,27 +71,25 @@ public class GenericAgentClass extends Frame {
 
     }
 
-    
 
-    public static GenericAgentClass copy(Frame f) {
-    	Frame c = Frame.copy(f);
-    	GenericAgentClass cls = new GenericAgentClass(c);
-        cls.behaviour = BehaviourFrame.newBehaviour(f.getName() + "-behaviour");
-        return cls;
+    private GenericAgentClass(String name, Frame... f) {
+    	super(name, f);
     }
+
 
     /**
      * Copy constructor.
      */
     public static GenericAgentClass copy(GenericAgentClass cloneFrom) {
-    	Frame c = Frame.copy(cloneFrom);
-    	GenericAgentClass cls = new GenericAgentClass(c);
+        GenericAgentClass cls = new GenericAgentClass(cloneFrom);
+        cls.parents.putAll(cloneFrom.parents);
+        Frame.copyInternal(cloneFrom, cls);
         cls.behaviour = (BehaviourFrame) cloneFrom.getBehaviour().clone();
         return cls;
     }
 
-    private GenericAgentClass(Frame f) {
-    	super(f);
+    private GenericAgentClass(GenericAgentClass f) {
+    	super(f.getName(), Optional.of(f.getCategory()), f.isMutable(), f.isSystem());
     }
 
     /**
@@ -103,10 +101,10 @@ public class GenericAgentClass extends Frame {
      * @param name name of the new agent class
      * @return the agent class
      */
-    public static GenericAgentClass copyFromAndExtendWith(GenericAgentClass top, GenericAgentClass otherRole, String name) {
+     static GenericAgentClass copyFromAndExtendWith(GenericAgentClass top, GenericAgentClass otherRole, String name) {
 
     	Frame f = Frame.inherit(Arrays.asList(otherRole), name, Optional.of(EntityTypes.GENERIC.toString()));
-    	GenericAgentClass cls = new GenericAgentClass(f);
+    	GenericAgentClass cls = new GenericAgentClass(f.getName(), f);
         
     	for (Frame p: top.getParentFrames()) {
     		cls.parents.put(p.getName(), p);
@@ -152,9 +150,7 @@ public class GenericAgentClass extends Frame {
 
     @Override
     public GenericAgentClass clone() {
-        Frame f = (Frame) super.clone();
-        GenericAgentClass c = new GenericAgentClass(f);
-        c.setBehaviour(getBehaviour());
+        GenericAgentClass c = GenericAgentClass.copy(this);
         return c;
     }
 

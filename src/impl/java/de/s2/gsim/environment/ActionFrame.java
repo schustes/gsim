@@ -33,7 +33,7 @@ public class ActionFrame extends Frame {
      *            Frame
      */
     public ActionFrame(Frame def) {
-        super(def);
+        super(def.getName(), def);
     }
 
     /**

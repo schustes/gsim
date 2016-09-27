@@ -40,7 +40,7 @@ public class RuntimeAgentFactory {
                 HashMap<String, String> map = new HashMap<String, String>();
                 Frame def = element.getDefinition();
                 List<Frame> anc = def.getAncestors();
-                RuntimeAgent owner = new RuntimeAgent(element, ns + "/" + id);
+                RuntimeAgent owner = RuntimeAgent.runtimeAgent(element,  ns + "/" + id);//new RuntimeAgent(element, ns + "/" + id);
 
                 if (map.size() > 0) {
 
@@ -98,7 +98,8 @@ public class RuntimeAgentFactory {
                 HashMap map = new HashMap();
                 Frame def = element.getDefinition();
                 List<Frame> anc = def.getAncestors();
-                RuntimeAgent owner = new RuntimeAgent(element, env.getNamespace() + "/" + id);
+                RuntimeAgent owner = RuntimeAgent.runtimeAgent(element,  env.getNamespace() + "/" + id);
+                //new RuntimeAgent(element, env.getNamespace() + "/" + id);
 
                 if (map.size() > 0) {
                     Iterator it = map.keySet().iterator();
@@ -158,7 +159,7 @@ public class RuntimeAgentFactory {
             HashMap<String, String> map = new HashMap<String, String>();
             Frame def = a.getDefinition();
             List<Frame> anc = def.getAncestors();
-            RuntimeAgent owner = new RuntimeAgent(a, simId);
+            RuntimeAgent owner = RuntimeAgent.runtimeAgent(a, simId);//new RuntimeAgent(a, simId);
 
             if (map.size() > 0) {
                 Iterator it = map.keySet().iterator();

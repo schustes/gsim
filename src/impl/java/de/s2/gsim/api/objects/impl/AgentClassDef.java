@@ -1,8 +1,12 @@
 package de.s2.gsim.api.objects.impl;
 
+
+import static de.s2.gsim.api.objects.impl.ObserverUtils.*;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
 
 import de.s2.gsim.GSimException;
 import de.s2.gsim.environment.BehaviourFrame;
@@ -17,27 +21,11 @@ import de.s2.gsim.objects.Behaviour;
 import de.s2.gsim.objects.ObjectClass;
 import de.s2.gsim.objects.attribute.DomainAttribute;
 
-public class AgentClassDef extends ObjectClassDef implements AgentClass, UnitWrapper {
+public class AgentClassDef extends ObjectClassDef implements AgentClass, UnitWrapper, Observer {
 
-	// private Environment env;
-	// private GenericAgentClass real;
-	// private boolean destroyed=false;
+	public static final long serialVersionUID = 1L;
 
-	/**
-	 *
-	 */
-	private static final long serialVersionUID = 1L;
-
-	/**
-	 * 
-	 * @param env
-	 *            Environment
-	 * @param real
-	 *            GenericAgentClass
-	 */
 	public AgentClassDef(Environment env, GenericAgentClass real) {
-		// this.env=env;
-		// this.real=real;
 		super(env, real);
 	}
 
@@ -48,35 +36,38 @@ public class AgentClassDef extends ObjectClassDef implements AgentClass, UnitWra
 		}
 
 		try {
-            real = env.getAgentClassOperations().addAgentClassAttribute((GenericAgentClass) real, Path.attributeListPath(list), a);
+			real = env.getAgentClassOperations().addAgentClassAttribute((GenericAgentClass) real, Path.attributeListPath(list), a);
 		} catch (Exception e) {
 			throw new GSimException(e);
 		}
+
+		onChange();
+		//observe also attributes? Maybe later...
+
 	}
 
-	/**
-	 * @see
-	 * @link gsim.objects.AgentClassIF
-	 */
 	@Override
-	public void addOrSetObject(String list, ObjectClass object) throws GSimException {
+	public void addOrSetObject(String list, ObjectClass objectClass) throws GSimException {
 
 		if (destroyed) {
 			throw new GSimException("This object was removed from the runtime context.");
 		}
 
 		try {
-            real = env.getAgentClassOperations().addChildObject((GenericAgentClass) real, Path.objectListPath(list),
-                    (Frame) ((UnitWrapper) object).toUnit());
+			Frame object = (Frame) ((UnitWrapper) objectClass).toUnit();
+			if (!real.getObjectLists().containsKey(list)) {
+				env.getAgentClassOperations().addObjectList((GenericAgentClass)real, list, object);
+			}
+			real = env.getAgentClassOperations().addChildObject((GenericAgentClass) real, Path.objectListPath(list), object);
 		} catch (Exception e) {
 			throw new GSimException(e);
 		}
+
+		observeDependentObject(objectClass, this);
+
+		onChange();
 	}
 
-	/**
-	 * @see
-	 * @link gsim.objects.ObjectClassIF
-	 */
 	@Override
 	public void destroy() throws GSimException {
 		if (destroyed) {
@@ -84,18 +75,17 @@ public class AgentClassDef extends ObjectClassDef implements AgentClass, UnitWra
 		}
 
 		try {
-            env.getAgentClassOperations().removeAgentClass((GenericAgentClass) real);
+			env.getAgentClassOperations().removeAgentClass((GenericAgentClass) real);
 		} catch (Exception e) {
 			throw new GSimException(e);
 		}
 
 		destroyed = true;
+
+		onDestroy();
+
 	}
 
-	/**
-	 * @see
-	 * @link gsim.objects.AgentClassIF
-	 */
 	@Override
 	public Behaviour getBehaviour() throws GSimException {
 		if (destroyed) {
@@ -110,10 +100,6 @@ public class AgentClassDef extends ObjectClassDef implements AgentClass, UnitWra
 
 	}
 
-	/**
-	 * @see
-	 * @link gsim.objects.AgentClassIF
-	 */
 	@Override
 	public String[] getObjectListNames() throws GSimException {
 		if (destroyed) {
@@ -128,10 +114,6 @@ public class AgentClassDef extends ObjectClassDef implements AgentClass, UnitWra
 
 	}
 
-	/**
-	 * @see
-	 * @link gsim.objects.AgentClassIF
-	 */
 	@Override
 	public ObjectClass getObjectListType(String listName) throws GSimException {
 		if (destroyed) {
@@ -139,17 +121,15 @@ public class AgentClassDef extends ObjectClassDef implements AgentClass, UnitWra
 		}
 
 		try {
-			return new ChildObjectClass(this, listName, real.getListType(listName));
+			ObjectClassDef obj = new ObjectClassDef(env, real.getListType(listName));
+			obj.addObserver(this);
+			return obj;
 		} catch (Exception e) {
 			throw new GSimException(e);
 		}
 
 	}
 
-	/**
-	 * @see
-	 * @link gsim.objects.AgentClassIF
-	 */
 	@Override
 	public ObjectClass[] getObjects(String list) throws GSimException {
 		if (destroyed) {
@@ -160,7 +140,9 @@ public class AgentClassDef extends ObjectClassDef implements AgentClass, UnitWra
 			List<Frame> f = real.getChildFrames(list);
 			ObjectClass[] ret = new ObjectClass[f.size()];
 			for (int i = 0; i < f.size(); i++) {
-				ret[i] = new ChildObjectClass(this, list, f.get(i));
+				ObjectClassDef obj = new ObjectClassDef(env, f.get(i));
+				obj.addObserver(this);
+				ret[i] = obj;
 			}
 			return ret;
 		} catch (Exception e) {
@@ -179,10 +161,6 @@ public class AgentClassDef extends ObjectClassDef implements AgentClass, UnitWra
 		return real.getDeclaredAttribute(list, objectName) == null;
 	}
 
-	/**
-	 * @see
-	 * @link gsim.objects.AgentClassIF
-	 */
 	@Override
 	public void removeObject(String list, ObjectClass object) throws GSimException {
 
@@ -191,29 +169,13 @@ public class AgentClassDef extends ObjectClassDef implements AgentClass, UnitWra
 		}
 
 		try {
-            real = env.getAgentClassOperations().removeChildFrame((GenericAgentClass) real, Path.objectPath(list, object.getName()));
+			real = env.getAgentClassOperations().removeChildFrame((GenericAgentClass) real, Path.objectPath(list, object.getName()));
 		} catch (Exception e) {
 			throw new GSimException(e);
 		}
 
-	}
-
-	/**
-	 * @see
-	 * @link gsim.objects.AgentClassIF
-	 */
-	@Override
-	public void removeObject(String list, String objectName) throws GSimException {
-
-		if (destroyed) {
-			throw new GSimException("This object was removed from the runtime context.");
-		}
-
-		try {
-            real = env.getAgentClassOperations().removeChildFrame((GenericAgentClass) real, Path.objectPath(list, objectName));
-		} catch (Exception e) {
-			throw new GSimException(e);
-		}
+		stopObservingDependentObject(object, this);
+		this.onChange();
 
 	}
 
@@ -245,9 +207,9 @@ public class AgentClassDef extends ObjectClassDef implements AgentClass, UnitWra
 			} else if (o instanceof Frame) {
 				return new ObjectClassDef(env, (Frame) o);
 			} else if (o instanceof TypedList) {
-                TypedList<?> list = (TypedList<?>) o;
+				TypedList<?> list = (TypedList<?>) o;
 				ArrayList<ObjectClassDef> ret = new ArrayList<ObjectClassDef>();
-                Iterator<?> iter = list.iterator();
+				Iterator<?> iter = list.iterator();
 				while (iter.hasNext()) {
 					Frame f = (Frame) iter.next();
 					ObjectClassDef c = new ObjectClassDef(env, f);
@@ -273,19 +235,14 @@ public class AgentClassDef extends ObjectClassDef implements AgentClass, UnitWra
 		}
 
 		try {
-            real = env.getAgentClassOperations().modifyAgentClassAttribute((GenericAgentClass) real, Path.attributePath(list, a.getName()), a);
+			real = env.getAgentClassOperations().modifyAgentClassAttribute((GenericAgentClass) real, Path.attributePath(list, a.getName()), a);
 		} catch (Exception e) {
 			throw new GSimException(e);
 		}
 
+		onChange();
 	}
 
-	/**
-	 * 
-	 * @param b
-	 *            BehaviourIF
-	 * @throws GSimException
-	 */
 	@Override
 	public void setBehaviour(Behaviour b) throws GSimException {
 
@@ -297,10 +254,12 @@ public class AgentClassDef extends ObjectClassDef implements AgentClass, UnitWra
 			if (!(b instanceof BehaviourClass)) {
 				throw new GSimException("Passed Behaviour interface " + b + " is not a valid class for Frame-type objects!");
 			}
-            real = env.getAgentClassOperations().changeAgentClassBehaviour((GenericAgentClass) real, (BehaviourFrame) ((UnitWrapper) b).toUnit());
+			real = env.getAgentClassOperations().changeAgentClassBehaviour((GenericAgentClass) real, (BehaviourFrame) ((UnitWrapper) b).toUnit());
 		} catch (Exception e) {
 			throw new GSimException(e);
 		}
+
+		onChange();
 	}
 
 	@Override
@@ -313,20 +272,35 @@ public class AgentClassDef extends ObjectClassDef implements AgentClass, UnitWra
 		try {
 			DomainAttribute a = real.getAttribute(list, attName);
 			a.setDefault(value);
-            real = env.getAgentClassOperations().modifyAgentClassAttribute((GenericAgentClass) real, Path.attributePath(list, a.getName()), a);
+			real = env.getAgentClassOperations().modifyAgentClassAttribute((GenericAgentClass) real, Path.attributePath(list, a.getName()), a);
 		} catch (Exception e) {
 			throw new GSimException(e);
 		}
 
+		onChange();
+
 	}
 
-	/**
-	 * @see
-	 * @link gsim.objects.ObjectClassIF
-	 */
 	@Override
-    public Unit<Frame, DomainAttribute> toUnit() {
+	public Unit<Frame, DomainAttribute> toUnit() {
 		return real;
 	}
+
+	@Override
+	public void update(Observable o, Object arg) {
+		if (destroyed) {
+			return;
+		}
+
+		if (arg instanceof Boolean && ((Boolean)arg)==Boolean.FALSE) {
+			stopObservingDependent(o, this);
+		}
+
+		super.real = env.getAgentClassOperations().getAgentSubClass(real.getName());
+		super.setChanged();
+		super.notifyObservers();
+
+	}
+
 
 }

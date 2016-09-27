@@ -23,6 +23,11 @@ import de.s2.gsim.objects.attribute.NumericalAttribute;
 import de.s2.gsim.objects.attribute.SetAttribute;
 import de.s2.gsim.objects.attribute.StringAttribute;
 
+/**
+ * TODO continue here
+ * @author sschuster
+ *
+ */
 public class AgentInstanceSim implements AgentInstance, ObjectInstance, UnitWrapper, Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -60,7 +65,7 @@ public class AgentInstanceSim implements AgentInstance, ObjectInstance, UnitWrap
 
     @Override
     public ObjectInstance copy() {
-        GenericAgent copyAgent = new GenericAgent(real);
+        GenericAgent copyAgent = GenericAgent.from(real);
         return new AgentInstanceSim(copyAgent);
     }
 
