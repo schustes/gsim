@@ -17,7 +17,7 @@ import de.s2.gsim.objects.attribute.NumericalAttribute;
 import de.s2.gsim.objects.attribute.SetAttribute;
 import de.s2.gsim.objects.attribute.StringAttribute;
 
-public class ChildObjectInstance implements ObjectInstance, UnitWrapper {
+public class DependentObjectInstance implements ObjectInstance, UnitWrapper {
 
     private static final long serialVersionUID = 1L;
 
@@ -29,7 +29,7 @@ public class ChildObjectInstance implements ObjectInstance, UnitWrapper {
 
     private Instance real;
 
-    public ChildObjectInstance(AgentInstance env, String list, Instance real) {
+    public DependentObjectInstance(AgentInstance env, String list, Instance real) {
         this.env = env;
         this.real = real;
     }
@@ -38,7 +38,7 @@ public class ChildObjectInstance implements ObjectInstance, UnitWrapper {
     public ObjectInstance copy() {
         Instance copy = Instance.copy(real);
         AgentInstance agent = (AgentInstance) env.copy();
-        return new ChildObjectInstance(agent, list, copy);
+        return new DependentObjectInstance(agent, list, copy);
     }
 
     /**

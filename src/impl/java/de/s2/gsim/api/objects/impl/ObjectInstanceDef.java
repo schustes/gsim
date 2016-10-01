@@ -1,6 +1,8 @@
 package de.s2.gsim.api.objects.impl;
 
+import static de.s2.gsim.api.objects.impl.ObserverUtils.*;
 import java.util.ArrayList;
+
 import java.util.List;
 import java.util.Observable;
 
@@ -18,6 +20,10 @@ import de.s2.gsim.objects.attribute.NumericalAttribute;
 import de.s2.gsim.objects.attribute.SetAttribute;
 import de.s2.gsim.objects.attribute.StringAttribute;
 
+/**
+ * Implementation of definition object instance. Nofies any agents holding a relationship to it about changes.
+ *
+ */
 public class ObjectInstanceDef extends Observable implements ObjectInstance, UnitWrapper {
 
     private static final long serialVersionUID = 1L;
@@ -419,13 +425,18 @@ public class ObjectInstanceDef extends Observable implements ObjectInstance, Uni
 
     }
 
-    /**
-     * @see
-     * @link gsim.objects.ObjectInstanceIF
-     */
     @Override
     public Unit<?, ?> toUnit() {
         return real;
     }
 
+	protected void onChange() {
+		setChanged();
+		notifyObservers();
+	}
+
+	protected void onDestroy() {
+		setChanged();
+		notifyObservers(false);
+	}
 }

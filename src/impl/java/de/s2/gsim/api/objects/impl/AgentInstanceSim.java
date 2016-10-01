@@ -43,10 +43,6 @@ public class AgentInstanceSim implements AgentInstance, ObjectInstance, UnitWrap
         this.real = real;
     }
 
-    /**
-     * @see
-     * @link gsim.objects.AgentInstanceIF
-     */
     @Override
     public void addOrSetObject(String list, ObjectInstance object) throws GSimException {
 
@@ -73,7 +69,7 @@ public class AgentInstanceSim implements AgentInstance, ObjectInstance, UnitWrap
     public ObjectInstance createObjectFromListType(String objectName, String listName) {
         Frame f = real.getDefinition().getListType(listName);
         Instance instance = Instance.instanciate(objectName, f);
-        return new ChildObjectInstance(this, listName, instance);
+        return new DependentObjectInstance(this, listName, instance);
     }
 
     /**
@@ -231,7 +227,7 @@ public class AgentInstanceSim implements AgentInstance, ObjectInstance, UnitWrap
     public ObjectInstance getObject(String list, String objectName) throws GSimException {
         Instance in = real.getChildInstance(list, objectName);
         if (in != null) {
-            return new ChildObjectInstance(this, list, in);
+            return new DependentObjectInstance(this, list, in);
         } else {
             return null;
         }
@@ -273,7 +269,7 @@ public class AgentInstanceSim implements AgentInstance, ObjectInstance, UnitWrap
             List<Instance> f = real.getChildInstances(list);
             ObjectInstance[] ret = new ObjectInstance[f.size()];
             for (int i = 0; i < f.size(); i++) {
-                ret[i] = new ChildObjectInstance(this, list, f.get(i));
+                ret[i] = new DependentObjectInstance(this, list, f.get(i));
             }
             return ret;
 
@@ -400,14 +396,14 @@ public class AgentInstanceSim implements AgentInstance, ObjectInstance, UnitWrap
             if (o instanceof Attribute) {
                 return o;
             } else if (o instanceof Instance) {
-                return new ChildObjectInstance(this, p[0], (Instance) o);
+                return new DependentObjectInstance(this, p[0], (Instance) o);
             } else if (o instanceof TypedList) {
                 TypedList list = (TypedList) o;
-                ArrayList<ChildObjectInstance> ret = new ArrayList<ChildObjectInstance>();
+                ArrayList<DependentObjectInstance> ret = new ArrayList<DependentObjectInstance>();
                 Iterator iter = list.iterator();
                 while (iter.hasNext()) {
                     Instance f = (Instance) iter.next();
-                    ChildObjectInstance c = new ChildObjectInstance(this, p[0], f);
+                    DependentObjectInstance c = new DependentObjectInstance(this, p[0], f);
                     ret.add(c);
                 }
                 return ret;

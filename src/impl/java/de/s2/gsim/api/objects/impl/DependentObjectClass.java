@@ -10,7 +10,7 @@ import de.s2.gsim.objects.AgentClass;
 import de.s2.gsim.objects.ObjectClass;
 import de.s2.gsim.objects.attribute.DomainAttribute;
 
-public class ChildObjectClass implements ObjectClass, UnitWrapper {
+public class DependentObjectClass implements ObjectClass, UnitWrapper {
 
     /**
      *
@@ -25,7 +25,7 @@ public class ChildObjectClass implements ObjectClass, UnitWrapper {
 
     private Frame real;
 
-    public ChildObjectClass(AgentClass env, String list, Frame real) {
+    public DependentObjectClass(AgentClass env, String list, Frame real) {
         this.env = env;
         this.real = real;
         this.list = list;

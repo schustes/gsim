@@ -65,14 +65,6 @@ public interface AgentInstance extends ObjectInstance {
     ObjectInstance[] getObjects(String list) throws GSimException;
 
     /**
-     * Removes all objects from an object list.
-     * 
-     * @param list
-     * @throws GSimException
-     */
-    void removeAllObjects(String list) throws GSimException;
-
-    /**
      * Removes an object from the specified list.
      * 
      * @param list the name of the list
@@ -80,15 +72,6 @@ public interface AgentInstance extends ObjectInstance {
      * @throws GSimException
      */
     void removeObject(String list, ObjectInstance object) throws GSimException;
-
-    /**
-     * Removes an object, given by its name, from the specified list.
-     * 
-     * @param list the name of the list
-     * @param objectName the name of the object
-     * @throws GSimException
-     */
-    void removeObject(String list, String objectName) throws GSimException;
 
     /**
      * Sets the behaviour of this agent.

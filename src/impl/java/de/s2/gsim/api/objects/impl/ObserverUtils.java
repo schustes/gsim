@@ -4,6 +4,7 @@ import java.util.Observable;
 import java.util.Observer;
 
 import de.s2.gsim.objects.ObjectClass;
+import de.s2.gsim.objects.ObjectInstance;
 
 public class ObserverUtils {
 	
@@ -17,6 +18,11 @@ public class ObserverUtils {
 		}
 	}
 
+	public static void observeDependentObjectInstance(ObjectInstance objectClass, Observer obs) {
+		if (objectClass instanceof Observable) {
+			((Observable)objectClass).addObserver(obs);
+		}
+	}
 	public static void stopObservingDependent(Observable objectClass, Observer obs) {
 		objectClass.deleteObserver(obs);
 	}
@@ -26,4 +32,11 @@ public class ObserverUtils {
 			((Observable)objectClass).deleteObserver(obs);
 		}
 	}
+
+	public static void stopObservingDependentObjectInstance(ObjectInstance objectInstance, Observer obs) {
+		if (objectInstance instanceof Observable) {
+			((Observable)objectInstance).deleteObserver(obs);
+		}
+	}
+
 }

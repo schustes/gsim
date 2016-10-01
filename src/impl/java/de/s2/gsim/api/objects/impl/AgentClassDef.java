@@ -21,6 +21,10 @@ import de.s2.gsim.objects.Behaviour;
 import de.s2.gsim.objects.ObjectClass;
 import de.s2.gsim.objects.attribute.DomainAttribute;
 
+/**
+ * Definition time agent class. Notifies related objects (agent classes, agent instance) of any changes.
+ *
+ */
 public class AgentClassDef extends ObjectClassDef implements AgentClass, UnitWrapper, Observer {
 
 	public static final long serialVersionUID = 1L;

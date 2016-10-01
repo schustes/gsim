@@ -1,9 +1,6 @@
 package de.s2.gsim.api.objects.impl;
 
 import java.util.ArrayList;
-
-import static de.s2.gsim.api.objects.impl.ObserverUtils.*;
-
 import java.util.Iterator;
 import java.util.List;
 import java.util.Observable;
@@ -134,7 +131,7 @@ public class AgentClassSim extends Observable implements AgentClass, ObjectClass
 	@Override
 	public ObjectClass getObjectListType(String listName) throws GSimException {
 		try {
-			ObjectClass c = new ChildObjectClass(this, listName, real.getListType(listName));
+			ObjectClass c = new DependentObjectClass(this, listName, real.getListType(listName));
 			return c;
 		} catch (Exception e) {
 			throw new GSimException(e);
@@ -149,7 +146,7 @@ public class AgentClassSim extends Observable implements AgentClass, ObjectClass
 			List<Frame> f = real.getChildFrames(list);
 			ObjectClass[] ret = new ObjectClass[f.size()];
 			for (int i = 0; i < f.size(); i++) {
-				ObjectClass c = new ChildObjectClass(this, list, f.get(i));
+				ObjectClass c = new DependentObjectClass(this, list, f.get(i));
 				ret[i] = c;
 			}
 			return ret;
@@ -204,7 +201,7 @@ public class AgentClassSim extends Observable implements AgentClass, ObjectClass
 			if (o instanceof Attribute) {
 				return o;
 			} else if (o instanceof Frame) {
-				ObjectClass def = new ChildObjectClass(this,path.split("/")[0], (Frame) o);
+				ObjectClass def = new DependentObjectClass(this,path.split("/")[0], (Frame) o);
 				return def;
 			} else if (o instanceof TypedList) {
 				TypedList<?> list = (TypedList<?>) o;
