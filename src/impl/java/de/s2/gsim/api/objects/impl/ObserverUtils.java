@@ -6,6 +6,9 @@ import java.util.Observer;
 import de.s2.gsim.objects.ObjectClass;
 import de.s2.gsim.objects.ObjectInstance;
 
+/**
+ * Utils for oberver activities.
+ */
 public class ObserverUtils {
 	
 	private ObserverUtils() {

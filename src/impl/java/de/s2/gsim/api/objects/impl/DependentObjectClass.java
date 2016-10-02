@@ -10,11 +10,11 @@ import de.s2.gsim.objects.AgentClass;
 import de.s2.gsim.objects.ObjectClass;
 import de.s2.gsim.objects.attribute.DomainAttribute;
 
+/**
+ * A DependentObjectClass wraps any object that exits only in relationship to an owning agent. On changes the owner can directly react/notify other objects.
+ */
 public class DependentObjectClass implements ObjectClass, UnitWrapper {
 
-    /**
-     *
-     */
     private static final long serialVersionUID = 1L;
 
     private boolean destroyed = false;
@@ -45,10 +45,6 @@ public class DependentObjectClass implements ObjectClass, UnitWrapper {
         }
     }
 
-    /**
-     * @see
-     * @link gsim.objects.ObjectClassIF
-     */
     @Override
     public void destroy() throws GSimException {
         if (destroyed) {
@@ -65,10 +61,6 @@ public class DependentObjectClass implements ObjectClass, UnitWrapper {
         destroyed = true;
     }
 
-    /**
-     * @see
-     * @link gsim.objects.ObjectClassIF
-     */
     @Override
     public DomainAttribute getAttribute(String list, String attName) throws GSimException {
         if (destroyed) {
@@ -83,10 +75,6 @@ public class DependentObjectClass implements ObjectClass, UnitWrapper {
 
     }
 
-    /**
-     * @see
-     * @link gsim.objects.ObjectClassIF
-     */
     @Override
     public String[] getAttributeListNames() throws GSimException {
         if (destroyed) {
@@ -100,10 +88,6 @@ public class DependentObjectClass implements ObjectClass, UnitWrapper {
         }
     }
 
-    /**
-     * @see
-     * @link gsim.objects.ObjectClassIF
-     */
     @Override
     public DomainAttribute[] getAttributes(String list) throws GSimException {
 
@@ -118,10 +102,6 @@ public class DependentObjectClass implements ObjectClass, UnitWrapper {
         }
     }
 
-    /**
-     * @see
-     * @link gsim.objects.ObjectClassIF
-     */
     @Override
     public String getDefaultValue(String list, String attName) throws GSimException {
 
@@ -137,10 +117,6 @@ public class DependentObjectClass implements ObjectClass, UnitWrapper {
         }
     }
 
-    /**
-     * @see
-     * @link gsim.objects.ObjectClassIF
-     */
     @Override
     public String getName() throws GSimException {
 
@@ -160,10 +136,6 @@ public class DependentObjectClass implements ObjectClass, UnitWrapper {
         return real.isDeclaredAttribute(list, attName);
     }
 
-    /**
-     * @see
-     * @link gsim.objects.ObjectClassIF
-     */
     @Override
     public Object resolveName(String path) throws GSimException {
 
@@ -195,10 +167,6 @@ public class DependentObjectClass implements ObjectClass, UnitWrapper {
 
     }
 
-    /**
-     * @see
-     * @link gsim.objects.ObjectClassIF
-     */
     @Override
     public void setAttribute(String list, DomainAttribute a) throws GSimException {
 
@@ -214,11 +182,6 @@ public class DependentObjectClass implements ObjectClass, UnitWrapper {
         }
 
     }
-
-    /**
-     * @see
-     * @link gsim.objects.ObjectClassIF
-     */
     @Override
     public void setDefaultAttributeValue(String list, String attName, String value) throws GSimException {
 
@@ -237,7 +200,7 @@ public class DependentObjectClass implements ObjectClass, UnitWrapper {
     }
 
     @Override
-    public Unit toUnit() {
+    public Unit<?,?> toUnit() {
         return real;
     }
 

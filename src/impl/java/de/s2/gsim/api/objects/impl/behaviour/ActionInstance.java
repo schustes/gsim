@@ -1,16 +1,21 @@
-package de.s2.gsim.api.objects.impl;
+package de.s2.gsim.api.objects.impl.behaviour;
+
 
 import de.s2.gsim.GSimException;
-import de.s2.gsim.environment.ActionFrame;
+import de.s2.gsim.api.objects.impl.UnitWrapper;
+import de.s2.gsim.environment.ActionDef;
 import de.s2.gsim.environment.Unit;
+import de.s2.gsim.objects.Rule;
 
-public class ActionClass implements de.s2.gsim.objects.Action, UnitWrapper {
+public class ActionInstance implements de.s2.gsim.objects.Action, UnitWrapper {
 
-    private RuleClass owner;
+    public static final long serialVersionUID = 1L;
 
-    private ActionFrame real;
+    private Rule owner;
 
-    public ActionClass(RuleClass owner, ActionFrame real) {
+    private ActionDef real;
+
+    public ActionInstance(Rule owner, ActionDef real) {
         this.real = real;
         this.owner = owner;
     }
@@ -23,8 +28,7 @@ public class ActionClass implements de.s2.gsim.objects.Action, UnitWrapper {
 
     @Override
     public void clearObjectClassParams() throws GSimException {
-        real.clearObjectClassParams();
-        owner.addOrSetConsequent(this);
+        throw new GSimException("Not implemented");
     }
 
     @Override

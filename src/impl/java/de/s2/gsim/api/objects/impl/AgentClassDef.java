@@ -9,6 +9,7 @@ import java.util.Observable;
 import java.util.Observer;
 
 import de.s2.gsim.GSimException;
+import de.s2.gsim.api.objects.impl.behaviour.BehaviourClass;
 import de.s2.gsim.environment.BehaviourFrame;
 import de.s2.gsim.environment.Environment;
 import de.s2.gsim.environment.Frame;
@@ -23,7 +24,6 @@ import de.s2.gsim.objects.attribute.DomainAttribute;
 
 /**
  * Definition time agent class. Notifies related objects (agent classes, agent instance) of any changes.
- *
  */
 public class AgentClassDef extends ObjectClassDef implements AgentClass, UnitWrapper, Observer {
 
@@ -46,8 +46,6 @@ public class AgentClassDef extends ObjectClassDef implements AgentClass, UnitWra
 		}
 
 		onChange();
-		//observe also attributes? Maybe later...
-
 	}
 
 	@Override

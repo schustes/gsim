@@ -1,28 +1,25 @@
-package de.s2.gsim.api.objects.impl;
+package de.s2.gsim.api.objects.impl.behaviour;
 
 import de.s2.gsim.GSimException;
-import de.s2.gsim.environment.ExpansionDef;
+import de.s2.gsim.api.objects.impl.UnitWrapper;
+import de.s2.gsim.environment.ExpansionFrame;
 import de.s2.gsim.environment.Unit;
 import de.s2.gsim.objects.Expansion;
 
-public class ExpansionInstance implements Expansion, UnitWrapper {
+public class ExpansionClass implements Expansion, UnitWrapper {
 
-    private RuleInstance owner;
+    private RLActionNodeClass owner;
 
-    private ExpansionDef real;
+    private ExpansionFrame real;
 
-    public ExpansionInstance(RuleInstance owner, ExpansionDef real) {
+    public ExpansionClass(RLActionNodeClass owner, ExpansionFrame real) {
         this.real = real;
         this.owner = owner;
     }
 
     @Override
     public void addFiller(String filler) throws GSimException {
-    	
-    	if (!real.getFillers().contains(filler)) {
-    		real.getFillers().add(filler);
-    	}
-    	
+        real.addFiller(filler);
         owner.addOrSetExpansion(this);
     }
 
@@ -48,18 +45,18 @@ public class ExpansionInstance implements Expansion, UnitWrapper {
 
     @Override
     public boolean isNumerical() {
-        return Double.isNaN(Double.valueOf(real.getMin()));
+        return !Double.isNaN(Double.valueOf(real.getMin()));
     }
 
     @Override
     public void setMax(String parameterValue) throws GSimException {
-        real.setMax(Double.valueOf(parameterValue));
+        real.setMax(parameterValue);
         owner.addOrSetExpansion(this);
     }
 
     @Override
     public void setMin(String parameterValue) throws GSimException {
-        real.setMin(Double.valueOf(parameterValue));
+        real.setMin(parameterValue);
         owner.addOrSetExpansion(this);
     }
 

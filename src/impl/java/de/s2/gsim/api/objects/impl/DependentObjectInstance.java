@@ -17,6 +17,10 @@ import de.s2.gsim.objects.attribute.NumericalAttribute;
 import de.s2.gsim.objects.attribute.SetAttribute;
 import de.s2.gsim.objects.attribute.StringAttribute;
 
+/**
+ * A dependent object instance wraps a child instance of an owning agent. The dependent object instance updates only its parent, which then may trigger more
+ * notifications and events.
+ */
 public class DependentObjectInstance implements ObjectInstance, UnitWrapper {
 
     private static final long serialVersionUID = 1L;
@@ -41,10 +45,6 @@ public class DependentObjectInstance implements ObjectInstance, UnitWrapper {
         return new DependentObjectInstance(agent, list, copy);
     }
 
-    /**
-     * @see
-     * @link gsim.objects.ObjectInstanceIF
-     */
     @Override
     public void destroy() throws GSimException {
 
@@ -80,10 +80,6 @@ public class DependentObjectInstance implements ObjectInstance, UnitWrapper {
 
     }
 
-    /**
-     * @see
-     * @link gsim.objects.ObjectInstanceIF
-     */
     @Override
     public Attribute getAttribute(String list, String attName) throws GSimException {
 
@@ -99,10 +95,6 @@ public class DependentObjectInstance implements ObjectInstance, UnitWrapper {
 
     }
 
-    /**
-     * @see
-     * @link gsim.objects.ObjectInstanceIF
-     */
     @Override
     public String[] getAttributeListNames() throws GSimException {
 
@@ -118,10 +110,6 @@ public class DependentObjectInstance implements ObjectInstance, UnitWrapper {
 
     }
 
-    /**
-     * @see
-     * @link gsim.objects.ObjectInstanceIF
-     */
     @Override
     public Attribute[] getAttributes(String list) throws GSimException {
 
@@ -137,10 +125,6 @@ public class DependentObjectInstance implements ObjectInstance, UnitWrapper {
 
     }
 
-    /**
-     * @see
-     * @link gsim.objects.ObjectInstanceIF
-     */
     @Override
     public double getIntervalAttributeFrom(String list, String attName) throws GSimException {
 
@@ -157,10 +141,6 @@ public class DependentObjectInstance implements ObjectInstance, UnitWrapper {
 
     }
 
-    /**
-     * @see
-     * @link gsim.objects.ObjectInstanceIF
-     */
     @Override
     public double getIntervalAttributeTo(String list, String attName) throws GSimException {
 
@@ -176,10 +156,6 @@ public class DependentObjectInstance implements ObjectInstance, UnitWrapper {
         }
     }
 
-    /**
-     * @see
-     * @link gsim.objects.ObjectInstanceIF
-     */
     @Override
     public String getName() throws GSimException {
 
@@ -194,10 +170,6 @@ public class DependentObjectInstance implements ObjectInstance, UnitWrapper {
         }
     }
 
-    /**
-     * @see
-     * @link gsim.objects.ObjectInstanceIF
-     */
     @Override
     public double getNumericalAttribute(String list, String attName) throws GSimException {
 
@@ -213,10 +185,6 @@ public class DependentObjectInstance implements ObjectInstance, UnitWrapper {
         }
     }
 
-    /**
-     * @see
-     * @link gsim.objects.ObjectInstanceIF
-     */
     @Override
     public String[] getSetAttributeValues(String list, String attName) throws GSimException {
 
@@ -236,10 +204,6 @@ public class DependentObjectInstance implements ObjectInstance, UnitWrapper {
 
     }
 
-    /**
-     * @see
-     * @link gsim.objects.ObjectInstanceIF
-     */
     @Override
     public String getStringAttribute(String list, String attName) throws GSimException {
 
@@ -260,10 +224,6 @@ public class DependentObjectInstance implements ObjectInstance, UnitWrapper {
         return real.inheritsFrom(agentclassName);
     }
 
-    /**
-     * @see
-     * @link gsim.objects.ObjectInstanceIF
-     */
     @Override
     public Object resolveName(String path) throws GSimException {
 
@@ -294,12 +254,8 @@ public class DependentObjectInstance implements ObjectInstance, UnitWrapper {
         }
     }
 
-    /**
-     * @see
-     * @link gsim.objects.ObjectInstanceIF
-     */
     @Override
-    public synchronized void setAttribute(String list, Attribute a) throws GSimException {
+    public void setAttribute(String list, Attribute a) throws GSimException {
 
         if (destroyed) {
             throw new GSimException("This object was removed from the runtime context.");
@@ -314,12 +270,8 @@ public class DependentObjectInstance implements ObjectInstance, UnitWrapper {
 
     }
 
-    /**
-     * @see
-     * @link gsim.objects.ObjectInstanceIF
-     */
     @Override
-    public synchronized void setIntervalAttributeValue(String list, String attName, double from, double to) throws GSimException {
+    public void setIntervalAttributeValue(String list, String attName, double from, double to) throws GSimException {
 
         if (destroyed) {
             throw new GSimException("This object was removed from the runtime context.");
@@ -341,10 +293,6 @@ public class DependentObjectInstance implements ObjectInstance, UnitWrapper {
 
     }
 
-    /**
-     * @see
-     * @link gsim.objects.ObjectInstanceIF
-     */
     @Override
     public synchronized void setNumericalAttributeValue(String list, String attName, double value) throws GSimException {
 
@@ -368,10 +316,6 @@ public class DependentObjectInstance implements ObjectInstance, UnitWrapper {
 
     }
 
-    /**
-     * @see
-     * @link gsim.objects.ObjectInstanceIF
-     */
     @Override
     public synchronized void setSetAttributeValues(String list, String attName, String... values) throws GSimException {
 
@@ -402,10 +346,6 @@ public class DependentObjectInstance implements ObjectInstance, UnitWrapper {
 
     }
 
-    /**
-     * @see
-     * @link gsim.objects.ObjectInstanceIF
-     */
     @Override
     public synchronized void setStringAttributeValue(String list, String attName, String value) throws GSimException {
 
@@ -429,12 +369,8 @@ public class DependentObjectInstance implements ObjectInstance, UnitWrapper {
 
     }
 
-    /**
-     * @see
-     * @link gsim.objects.ObjectInstanceIF
-     */
     @Override
-    public Unit toUnit() {
+    public Unit<?,?> toUnit() {
         return real;
     }
 

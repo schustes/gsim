@@ -12,6 +12,7 @@ import java.util.Observer;
 import org.apache.log4j.Logger;
 
 import de.s2.gsim.GSimException;
+import de.s2.gsim.api.objects.impl.behaviour.BehaviourInstance;
 import de.s2.gsim.environment.BehaviourDef;
 import de.s2.gsim.environment.Environment;
 import de.s2.gsim.environment.Frame;
@@ -157,7 +158,7 @@ public class AgentInstanceDef extends ObjectInstanceDef implements AgentInstance
 
 	@Override
 	public int hashCode() {
-		return 1;
+		return getName().hashCode() + super.real.getDefinition().getName().hashCode();
 	}
 
 	@Override

@@ -597,7 +597,8 @@ public class Instance extends Unit<Instance, Attribute> {
 
 		for (String listname: frame.getAttributesListNames()) {
 			if (!this.getAttributeLists().containsKey(listname)) {
-				List<Attribute> attrList = getAttributeLists().putIfAbsent(listname, new ArrayList<>());
+				getAttributeLists().putIfAbsent(listname, new ArrayList<>());
+				List<Attribute> attrList = getAttributeLists().get(listname);
 				for (DomainAttribute da: frame.getAttributes(listname)) {
 					attrList.add(AttributeFactory.createDefaultAttribute(da));
 				}

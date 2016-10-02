@@ -1,23 +1,24 @@
-package de.s2.gsim.api.objects.impl;
+package de.s2.gsim.api.objects.impl.behaviour;
 
 import java.util.ArrayList;
 
 import de.s2.gsim.GSimException;
-import de.s2.gsim.environment.ActionFrame;
-import de.s2.gsim.environment.ConditionFrame;
+import de.s2.gsim.api.objects.impl.UnitWrapper;
+import de.s2.gsim.environment.ActionDef;
+import de.s2.gsim.environment.ConditionDef;
 import de.s2.gsim.environment.Unit;
-import de.s2.gsim.environment.UserRuleFrame;
+import de.s2.gsim.environment.UserRule;
 import de.s2.gsim.objects.Condition;
 import de.s2.gsim.objects.SelectionNode;
 
-public class SelectionNodeClass extends RuleClass implements SelectionNode {
+public class SelectionNodeInstance extends RuleInstance implements SelectionNode {
 
-    private RLActionNodeClass owner;
+    private RLActionNodeInstance owner;
 
-    private UserRuleFrame real;
+    private UserRule real;
 
-    public SelectionNodeClass(RLActionNodeClass owner, UserRuleFrame real) {
-        super(null, real);
+    public SelectionNodeInstance(RLActionNodeInstance owner, UserRule real) {
+        super(null, null);
         this.owner = owner;
         this.real = real;
     }
@@ -49,60 +50,73 @@ public class SelectionNodeClass extends RuleClass implements SelectionNode {
 
     @Override
     public void addNodeRefWithCondition(String actionRef, String objectRef, String relativeAttPath, String op, String val) throws GSimException {
-        de.s2.gsim.objects.Action action = owner.getConsequent(actionRef);
-        if (action == null) {
-            throw new GSimException(
-                    "Action-node reference " + actionRef + " references an action not defined in" + " parent-node " + owner.getName());
-        }
+        try {
 
-        addOrSetConsequent(action);
-        String s = "$" + actionRef + "$" + objectRef + "::" + relativeAttPath;
-        Condition condition = createCondition(s, op, val);
-        addOrSetCondition(condition);
+            de.s2.gsim.objects.Action action = owner.getConsequent(actionRef);
+            if (action == null) {
+                throw new GSimException(
+                        "Action-node reference " + actionRef + " references an action not defined in" + " parent-node " + owner.getName());
+            }
+
+            addOrSetConsequent(action);
+
+            Condition condition = createCondition(objectRef + "::" + relativeAttPath, op, val);
+            addOrSetCondition(condition);
+
+        } catch (Exception e) {
+            throw new GSimException(e);
+        }
 
     }
 
     @Override
     public void addNodeRefWithoutCondition(String actionRef, String objectRef, String relativeAttPath) throws GSimException {
-        de.s2.gsim.objects.Action action = owner.getConsequent(actionRef);
-        if (action == null) {
-            throw new GSimException(
-                    "Action-node reference " + actionRef + " references an action not defined in" + " parent-node " + owner.getName());
+        try {
+
+            de.s2.gsim.objects.Action action = owner.getConsequent(actionRef);
+            if (action == null) {
+                throw new GSimException(
+                        "Action-node reference " + actionRef + " references an action not defined in" + " parent-node " + owner.getName());
+            }
+
+            addOrSetConsequent(action);
+
+        } catch (Exception e) {
+            throw new GSimException(e);
         }
 
-        addOrSetConsequent(action);
     }
 
     @Override
     public void addOrSetCondition(Condition cond) {
-        ConditionFrame f = (ConditionFrame) ((UnitWrapper) cond).toUnit();
+        ConditionDef f = (ConditionDef) ((UnitWrapper) cond).toUnit();
         real.removeCondition(f);
         real.addCondition(f);
     }
 
     @Override
     public void addOrSetConsequent(de.s2.gsim.objects.Action cons) throws GSimException {
-        real.removeConsequence((ActionFrame) ((UnitWrapper) cons).toUnit());
-        real.addConsequence((ActionFrame) ((UnitWrapper) cons).toUnit());
+        real.removeConsequence((ActionDef) ((UnitWrapper) cons).toUnit());
+        real.addConsequence((ActionDef) ((UnitWrapper) cons).toUnit());
         owner.addOrSetSelectionNode(this);
     }
 
     @Override
     public Condition[] getConditions() {
-        ConditionFrame[] c = real.getConditions();
-        ConditionClass[] ret = new ConditionClass[c.length];
+        ConditionDef[] c = real.getConditions();
+        ConditionInstance[] ret = new ConditionInstance[c.length];
         for (int i = 0; i < c.length; i++) {
-            ret[i] = new ConditionClass(this, c[i]);
+            ret[i] = new ConditionInstance(this, c[i]);
         }
         return ret;
     }
 
     @Override
     public de.s2.gsim.objects.Action getConsequent(String name) {
-        ActionFrame[] c = real.getConsequents();
+        ActionDef[] c = real.getConsequents();
         for (int i = 0; i < c.length; i++) {
             if (c[i].getName().equals(name)) {
-                return new ActionClass(this, c[i]);
+                return new ActionInstance(this, c[i]);
             }
         }
         return null;
@@ -110,24 +124,12 @@ public class SelectionNodeClass extends RuleClass implements SelectionNode {
 
     @Override
     public de.s2.gsim.objects.Action[] getConsequents() {
-        ArrayList<ActionClass> list = new ArrayList<ActionClass>();
-
-        ActionFrame[] c = real.getConsequents();
-
+        ActionDef[] c = real.getConsequents();
+        ActionInstance[] ret = new ActionInstance[c.length];
         for (int i = 0; i < c.length; i++) {
-            if (!c[i].getName().startsWith("{")) {
-                list.add(new ActionClass(this, c[i]));
-            }
+            ret[i] = new ActionInstance(this, c[i]);
         }
-
-        ActionClass[] ret = new ActionClass[list.size()];
-        list.toArray(ret);
         return ret;
-    }
-
-    @Override
-    public String getName() {
-        return real.getName();
     }
 
     @Override
@@ -175,13 +177,13 @@ public class SelectionNodeClass extends RuleClass implements SelectionNode {
 
     @Override
     public void removeCondition(Condition cond) throws GSimException {
-        real.removeCondition((ConditionFrame) ((UnitWrapper) cond).toUnit());
+        real.removeCondition((ConditionDef) ((UnitWrapper) cond).toUnit());
         owner.addOrSetSelectionNode(this);
     }
 
     @Override
     public void removeConsequent(de.s2.gsim.objects.Action cons) throws GSimException {
-        real.removeConsequence((ActionFrame) ((UnitWrapper) cons).toUnit());
+        real.removeConsequence((ActionDef) ((UnitWrapper) cons).toUnit());
         owner.addOrSetSelectionNode(this);
     }
 

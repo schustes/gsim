@@ -22,6 +22,7 @@ import de.s2.gsim.objects.AgentInstance;
 import de.s2.gsim.objects.ObjectClass;
 import de.s2.gsim.objects.attribute.AttributeType;
 import de.s2.gsim.objects.attribute.DomainAttribute;
+import de.s2.gsim.objects.attribute.StringAttribute;
 
 public class EnvTest {
 
@@ -37,7 +38,17 @@ public class EnvTest {
 	}
 	
 	@Test 
-	public void objects_of_agent_instances_should_inherit_new_frame_attributes() throws Exception {
+	public void removal_of_children_is_propagated() {
+		throw new RuntimeException("implement");
+	}
+	
+	@Test 
+	public void removal_of_children_attribute_is_propagated() {
+		throw new RuntimeException("implement");
+	}
+	
+	@Test 
+	public void objects_of_agent_successors_should_inherit_new_frame_attributes() throws Exception {
 		
 		env.createAgentClass("Test", null);
 		AgentClass agentClass = env.getAgentClass("Test");
@@ -71,26 +82,36 @@ public class EnvTest {
 
 		assertThat("new attribute is in owning agent", agentClass.getObjects("children")[0].getAttribute("list", "att2"), notNullValue());
 	}
-	@Test 
-	public void objects_of_object_instances_should_inherit_new_frame_attributes() throws Exception {
-		throw new UnsupportedOperationException("Test must be implemented");
-	}
+
 
 	@Test 
-	public void agent_instances_should_inherit_new_frame_attributes() throws Exception {
-		throw new UnsupportedOperationException("Test must be implemented");
-	}
+	public void agent_instances_should_inherit_new_frame_attributes_in_new_list() throws Exception {
+		env.createAgentClass("Test", null);
+		AgentClass agentClass = env.getAgentClass("Test");
 
-	@Test 
-	public void objects_of_agent_classes_should_inherit_new_frame_attributes() throws Exception {
-		throw new UnsupportedOperationException("Test must be implemented");
-	}
+		AgentInstance inst = env.instanciateAgent(agentClass, "agent");
 
-	@Test 
-	public void objects_of_object_classes__should_inherit_new_frame_attributes() throws Exception {
-		throw new UnsupportedOperationException("Test must be implemented");
+		agentClass.addAttribute("list", new DomainAttribute("test-att", AttributeType.STRING));
+		
+		assertThat("new attribute of agentClass is propagated to instance", inst.getAttribute("list", "test-att"), notNullValue());
+	
 	}
 	
+	@Test 
+	public void agent_instances_should_inherit_new_frame_attributes_in_existing_list() throws Exception {
+		env.createAgentClass("Test", null);
+		AgentClass agentClass = env.getAgentClass("Test");
+		agentClass.addAttribute("list", new DomainAttribute("some-att", AttributeType.STRING));
+
+		AgentInstance inst = env.instanciateAgent(agentClass, "agent");
+
+		agentClass.addAttribute("list", new DomainAttribute("new-att", AttributeType.STRING));
+		
+		assertThat("new attribute of agentClass is propagated to instance", inst.getAttribute("list", "new-att"), notNullValue());
+		assertThat("existing attribute of agentClass is in instance", inst.getAttribute("list", "some-att"), notNullValue());
+	
+	}
+
 	@Test 
 	public void non_existing_agent_attributelist_should_be_created_on_the_fly() throws Exception {
 		env.createAgentClass("Test", null);

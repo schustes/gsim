@@ -1,6 +1,7 @@
-package de.s2.gsim.api.objects.impl;
+package de.s2.gsim.api.objects.impl.behaviour;
 
 import de.s2.gsim.GSimException;
+import de.s2.gsim.api.objects.impl.UnitWrapper;
 import de.s2.gsim.environment.ActionFrame;
 import de.s2.gsim.environment.ConditionFrame;
 import de.s2.gsim.environment.ExpansionFrame;

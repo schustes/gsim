@@ -194,14 +194,14 @@ public class AgentClassOperations {
                 subClass.replaceAncestor(newLocalRef);
                 container.getAllInstancesOfClass(subClass, GenericAgent.class).stream().forEach(succ -> {
                     succ.setFrame(subClass);
-                    succ.replaceChildAttribute(Path.attributePath(path.toStringArray()), AttributeFactory.createDefaultAttribute(a));//necessary?
+                    succ.addChildAttribute(Path.attributeListPath(path.toStringArray()), AttributeFactory.createDefaultAttribute(a));
                 });
             }
         }
 
         container.getAllInstancesOfClass(newLocalRef, GenericAgent.class).stream().forEach(succ -> {
             succ.setFrame(newLocalRef);
-            succ.addChildAttribute(Path.attributePath(path.toStringArray()), AttributeFactory.createDefaultAttribute(a));
+            succ.addChildAttribute(Path.attributeListPath(path.toStringArray()), AttributeFactory.createDefaultAttribute(a));
         });
 
         this.addChildAttributeInReferringAgents(newLocalRef, path, a);

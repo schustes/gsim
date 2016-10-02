@@ -1,11 +1,18 @@
 package de.s2.gsim.api.objects.impl;
 
+import static de.s2.gsim.api.objects.impl.ObserverUtils.*;
+
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
 
 import de.s2.gsim.GSimException;
+import de.s2.gsim.api.objects.impl.behaviour.BehaviourClass;
+import de.s2.gsim.api.objects.impl.behaviour.BehaviourInstance;
 import de.s2.gsim.environment.BehaviourDef;
 import de.s2.gsim.environment.Frame;
 import de.s2.gsim.environment.GenericAgent;
@@ -24,11 +31,9 @@ import de.s2.gsim.objects.attribute.SetAttribute;
 import de.s2.gsim.objects.attribute.StringAttribute;
 
 /**
- * TODO continue here
- * @author sschuster
- *
+ * AgentInstance implementation used to wrap agents during simulation time.
  */
-public class AgentInstanceSim implements AgentInstance, ObjectInstance, UnitWrapper, Serializable {
+public class AgentInstanceSim extends Observable implements AgentInstance, ObjectInstance, UnitWrapper, Serializable, Observer {
 
     private static final long serialVersionUID = 1L;
 
@@ -53,6 +58,7 @@ public class AgentInstanceSim implements AgentInstance, ObjectInstance, UnitWrap
         try {
             GenericAgent a = real;
             a.addChildInstance(list, (Instance) object);
+            observeDependentObjectInstance(object, this);
         } catch (Exception e) {
             throw new GSimException(e);
         }
@@ -72,34 +78,22 @@ public class AgentInstanceSim implements AgentInstance, ObjectInstance, UnitWrap
         return new DependentObjectInstance(this, listName, instance);
     }
 
-    /**
-     * @see
-     * @link gsim.objects.ObjectInstanceIF
-     */
     @Override
     public void destroy() throws GSimException {
-
         throw new GSimException("You can't delete an agent from a running simulation with this mechanism");
-
     }
 
     @Override
     public Attribute getAttribute(String attName) throws GSimException {
 
         try {
-
             return real.getAttribute(attName);
-
         } catch (Exception e) {
             throw new GSimException(e);
         }
 
     }
 
-    /**
-     * @see
-     * @link gsim.objects.ObjectInstanceIF
-     */
     @Override
     public Attribute getAttribute(String list, String attName) throws GSimException {
 
@@ -113,10 +107,6 @@ public class AgentInstanceSim implements AgentInstance, ObjectInstance, UnitWrap
 
     }
 
-    /**
-     * @see
-     * @link gsim.objects.ObjectInstanceIF
-     */
     @Override
     public String[] getAttributeListNames() throws GSimException {
 
@@ -128,10 +118,6 @@ public class AgentInstanceSim implements AgentInstance, ObjectInstance, UnitWrap
 
     }
 
-    /**
-     * @see
-     * @link gsim.objects.ObjectInstanceIF
-     */
     @Override
     public Attribute[] getAttributes(String list) throws GSimException {
 
@@ -143,10 +129,6 @@ public class AgentInstanceSim implements AgentInstance, ObjectInstance, UnitWrap
 
     }
 
-    /**
-     * @see
-     * @link gsim.objects.AgentInstanceIF
-     */
     @Override
     public Behaviour getBehaviour() throws GSimException {
 
@@ -163,10 +145,6 @@ public class AgentInstanceSim implements AgentInstance, ObjectInstance, UnitWrap
 
     }
 
-    /**
-     * @see
-     * @link gsim.objects.ObjectInstanceIF
-     */
     @Override
     public double getIntervalAttributeFrom(String list, String attName) throws GSimException {
 
@@ -179,10 +157,6 @@ public class AgentInstanceSim implements AgentInstance, ObjectInstance, UnitWrap
 
     }
 
-    /**
-     * @see
-     * @link gsim.objects.ObjectInstanceIF
-     */
     @Override
     public double getIntervalAttributeTo(String list, String attName) throws GSimException {
 
@@ -194,10 +168,6 @@ public class AgentInstanceSim implements AgentInstance, ObjectInstance, UnitWrap
         }
     }
 
-    /**
-     * @see
-     * @link gsim.objects.ObjectInstanceIF
-     */
     @Override
     public String getName() throws GSimException {
 
@@ -208,10 +178,6 @@ public class AgentInstanceSim implements AgentInstance, ObjectInstance, UnitWrap
         }
     }
 
-    /**
-     * @see
-     * @link gsim.objects.ObjectInstanceIF
-     */
     @Override
     public double getNumericalAttribute(String list, String attName) throws GSimException {
 
@@ -233,10 +199,6 @@ public class AgentInstanceSim implements AgentInstance, ObjectInstance, UnitWrap
         }
     }
 
-    /**
-     * @see
-     * @link gsim.objects.AgentInstanceIF
-     */
     @Override
     public String[] getObjectListNames() throws GSimException {
 
@@ -253,10 +215,6 @@ public class AgentInstanceSim implements AgentInstance, ObjectInstance, UnitWrap
 
     }
 
-    /**
-     * @see
-     * @link gsim.objects.AgentInstanceIF
-     */
     @Override
     public ObjectInstance[] getObjects(String list) throws GSimException {
 
@@ -279,10 +237,6 @@ public class AgentInstanceSim implements AgentInstance, ObjectInstance, UnitWrap
 
     }
 
-    /**
-     * @see
-     * @link gsim.objects.ObjectInstanceIF
-     */
     @Override
     public String[] getSetAttributeValues(String list, String attName) throws GSimException {
 
@@ -297,11 +251,7 @@ public class AgentInstanceSim implements AgentInstance, ObjectInstance, UnitWrap
         }
 
     }
-
-    /**
-     * @see
-     * @link gsim.objects.ObjectInstanceIF
-     */
+    
     @Override
     public String getStringAttribute(String list, String attName) throws GSimException {
 
@@ -319,17 +269,6 @@ public class AgentInstanceSim implements AgentInstance, ObjectInstance, UnitWrap
     }
 
     @Override
-    public void removeAllObjects(String list) {
-        Frame type = real.getDefinition().getListType(list);
-        real.removeDeclaredChildInstanceList(list);
-        real.defineObjectList(list, type);
-    }
-
-    /**
-     * @see
-     * @link gsim.objects.AgentInstanceIF
-     */
-    @Override
     public void removeObject(String list, ObjectInstance object) throws GSimException {
 
         if (destroyed) {
@@ -338,36 +277,15 @@ public class AgentInstanceSim implements AgentInstance, ObjectInstance, UnitWrap
 
         try {
             real.removeChildInstance(list, object.getName());
+            stopObservingDependentObjectInstance(object, this);
         } catch (Exception e) {
             throw new GSimException(e);
         }
 
     }
 
-    /**
-     * @see
-     * @link gsim.objects.AgentInstanceIF
-     */
-    @Override
-    public void removeObject(String list, String objectName) throws GSimException {
-
-        if (destroyed) {
-            throw new GSimException("This object was removed from the runtime context.");
-        }
-
-        try {
-            real.removeChildInstance(list, objectName);
-        } catch (Exception e) {
-            throw new GSimException(e);
-        }
-
-    }
-
-    /**
-     * @see
-     * @link gsim.objects.AgentInstanceIF
-     */
-    @Override
+    @SuppressWarnings("unchecked")
+	@Override
     public Object resolveName(String path) throws GSimException {
 
         if (destroyed) {
@@ -398,11 +316,11 @@ public class AgentInstanceSim implements AgentInstance, ObjectInstance, UnitWrap
             } else if (o instanceof Instance) {
                 return new DependentObjectInstance(this, p[0], (Instance) o);
             } else if (o instanceof TypedList) {
-                TypedList list = (TypedList) o;
-                ArrayList<DependentObjectInstance> ret = new ArrayList<DependentObjectInstance>();
-                Iterator iter = list.iterator();
+				TypedList<Instance> list = (TypedList<Instance>) o;
+                List<DependentObjectInstance> ret = new ArrayList<DependentObjectInstance>();
+                Iterator<Instance> iter = list.iterator();
                 while (iter.hasNext()) {
-                    Instance f = (Instance) iter.next();
+                    Instance f = iter.next();
                     DependentObjectInstance c = new DependentObjectInstance(this, p[0], f);
                     ret.add(c);
                 }
@@ -423,10 +341,6 @@ public class AgentInstanceSim implements AgentInstance, ObjectInstance, UnitWrap
         this.real = real;
     }
 
-    /**
-     * @see
-     * @link gsim.objects.ObjectInstanceIF
-     */
     @Override
     public void setAttribute(String list, Attribute a) throws GSimException {
 
@@ -436,16 +350,13 @@ public class AgentInstanceSim implements AgentInstance, ObjectInstance, UnitWrap
 
         try {
             real.addOrSetAttribute(list, a);
+            onChange();
         } catch (Exception e) {
             throw new GSimException(e);
         }
 
     }
 
-    /**
-     * @see
-     * @link gsim.objects.AgentInstanceIF
-     */
     @Override
     public void setBehaviour(Behaviour b) throws GSimException {
 
@@ -462,16 +373,14 @@ public class AgentInstanceSim implements AgentInstance, ObjectInstance, UnitWrap
             GenericAgent a = real;
             a.setBehaviour((BehaviourDef) ((UnitWrapper) b).toUnit());
 
+            onChange();
+            
         } catch (Exception e) {
             throw new GSimException(e);
         }
 
     }
 
-    /**
-     * @see
-     * @link gsim.objects.ObjectInstanceIF
-     */
     @Override
     public void setIntervalAttributeValue(String list, String attName, double from, double to) throws GSimException {
 
@@ -487,16 +396,13 @@ public class AgentInstanceSim implements AgentInstance, ObjectInstance, UnitWrap
             a.setFrom(from);
             a.setTo(to);
             real.addOrSetAttribute(list, a);
+            onChange();
         } catch (Exception e) {
             throw new GSimException(e);
         }
 
     }
 
-    /**
-     * @see
-     * @link gsim.objects.ObjectInstanceIF
-     */
     @Override
     public void setNumericalAttributeValue(String list, String attName, double value) throws GSimException {
 
@@ -511,16 +417,13 @@ public class AgentInstanceSim implements AgentInstance, ObjectInstance, UnitWrap
             }
             a.setValue(value);
             real.addOrSetAttribute(list, a);
+            onChange();
         } catch (Exception e) {
             throw new GSimException(e);
         }
 
     }
 
-    /**
-     * @see
-     * @link gsim.objects.ObjectInstanceIF
-     */
     @Override
     public void setSetAttributeValues(String list, String attName, String... values) throws GSimException {
 
@@ -540,16 +443,13 @@ public class AgentInstanceSim implements AgentInstance, ObjectInstance, UnitWrap
                 a.addEntry(v);
             }
             real.addOrSetAttribute(list, a);
+            onChange();
         } catch (Exception e) {
             throw new GSimException(e);
         }
 
     }
 
-    /**
-     * @see
-     * @link gsim.objects.ObjectInstanceIF
-     */
     @Override
     public void setStringAttributeValue(String list, String attName, String value) throws GSimException {
 
@@ -564,6 +464,7 @@ public class AgentInstanceSim implements AgentInstance, ObjectInstance, UnitWrap
             }
             a.setValue(value);
             real.addOrSetAttribute(list, a);
+            onChange();
         } catch (Exception e) {
             throw new GSimException(e);
         }
@@ -571,8 +472,17 @@ public class AgentInstanceSim implements AgentInstance, ObjectInstance, UnitWrap
     }
 
     @Override
-    public Unit toUnit() {
+    public Unit<?,?> toUnit() {
         return real;
     }
+    
+	protected void onChange() {
+		setChanged();
+		notifyObservers();
+	}
+
+	@Override
+	public void update(Observable o, Object arg) {
+	}
 
 }

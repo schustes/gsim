@@ -1,8 +1,6 @@
 package de.s2.gsim.api.objects.impl;
 
-import static de.s2.gsim.api.objects.impl.ObserverUtils.*;
 import java.util.ArrayList;
-
 import java.util.List;
 import java.util.Observable;
 
@@ -21,7 +19,7 @@ import de.s2.gsim.objects.attribute.SetAttribute;
 import de.s2.gsim.objects.attribute.StringAttribute;
 
 /**
- * Implementation of definition object instance. Nofies any agents holding a relationship to it about changes.
+ * Implementation of definition object instance. Notifies any agents holding a relationship to it about changes.
  *
  */
 public class ObjectInstanceDef extends Observable implements ObjectInstance, UnitWrapper {
@@ -45,10 +43,6 @@ public class ObjectInstanceDef extends Observable implements ObjectInstance, Uni
         return new ObjectInstanceDef(env, copy);
     }
 
-    /**
-     * @see
-     * @link gsim.objects.ObjectInstanceIF
-     */
     @Override
     public void destroy() throws GSimException {
 
@@ -64,6 +58,8 @@ public class ObjectInstanceDef extends Observable implements ObjectInstance, Uni
         }
 
         destroyed = true;
+        
+        onDestroy();
 
     }
 
@@ -84,10 +80,6 @@ public class ObjectInstanceDef extends Observable implements ObjectInstance, Uni
 
     }
 
-    /**
-     * @see
-     * @link gsim.objects.ObjectInstanceIF
-     */
     @Override
     public Attribute getAttribute(String list, String attName) throws GSimException {
 
@@ -105,10 +97,6 @@ public class ObjectInstanceDef extends Observable implements ObjectInstance, Uni
 
     }
 
-    /**
-     * @see
-     * @link gsim.objects.ObjectInstanceIF
-     */
     @Override
     public String[] getAttributeListNames() throws GSimException {
 
@@ -126,10 +114,6 @@ public class ObjectInstanceDef extends Observable implements ObjectInstance, Uni
 
     }
 
-    /**
-     * @see
-     * @link gsim.objects.ObjectInstanceIF
-     */
     @Override
     public Attribute[] getAttributes(String list) throws GSimException {
 
@@ -145,10 +129,6 @@ public class ObjectInstanceDef extends Observable implements ObjectInstance, Uni
 
     }
 
-    /**
-     * @see
-     * @link gsim.objects.ObjectInstanceIF
-     */
     @Override
     public double getIntervalAttributeFrom(String list, String attName) throws GSimException {
 
@@ -165,10 +145,6 @@ public class ObjectInstanceDef extends Observable implements ObjectInstance, Uni
 
     }
 
-    /**
-     * @see
-     * @link gsim.objects.ObjectInstanceIF
-     */
     @Override
     public double getIntervalAttributeTo(String list, String attName) throws GSimException {
 
@@ -184,10 +160,6 @@ public class ObjectInstanceDef extends Observable implements ObjectInstance, Uni
         }
     }
 
-    /**
-     * @see
-     * @link gsim.objects.ObjectInstanceIF
-     */
     @Override
     public String getName() throws GSimException {
 
@@ -202,10 +174,6 @@ public class ObjectInstanceDef extends Observable implements ObjectInstance, Uni
         }
     }
 
-    /**
-     * @see
-     * @link gsim.objects.ObjectInstanceIF
-     */
     @Override
     public double getNumericalAttribute(String list, String attName) throws GSimException {
 
@@ -221,10 +189,6 @@ public class ObjectInstanceDef extends Observable implements ObjectInstance, Uni
         }
     }
 
-    /**
-     * @see
-     * @link gsim.objects.ObjectInstanceIF
-     */
     @Override
     public String[] getSetAttributeValues(String list, String attName) throws GSimException {
 
@@ -244,10 +208,6 @@ public class ObjectInstanceDef extends Observable implements ObjectInstance, Uni
 
     }
 
-    /**
-     * @see
-     * @link gsim.objects.ObjectInstanceIF
-     */
     @Override
     public String getStringAttribute(String list, String attName) throws GSimException {
 
@@ -268,10 +228,6 @@ public class ObjectInstanceDef extends Observable implements ObjectInstance, Uni
         return real.inheritsFrom(agentclassName);
     }
 
-    /**
-     * @see
-     * @link gsim.objects.ObjectInstanceIF
-     */
     @Override
     public Object resolveName(String path) throws GSimException {
 
@@ -302,10 +258,6 @@ public class ObjectInstanceDef extends Observable implements ObjectInstance, Uni
         }
     }
 
-    /**
-     * @see
-     * @link gsim.objects.ObjectInstanceIF
-     */
     @Override
     public void setAttribute(String list, Attribute a) throws GSimException {
 
@@ -318,13 +270,11 @@ public class ObjectInstanceDef extends Observable implements ObjectInstance, Uni
         } catch (Exception e) {
             throw new GSimException(e);
         }
+        
+        onChange();
 
     }
 
-    /**
-     * @see
-     * @link gsim.objects.ObjectInstanceIF
-     */
     @Override
     public void setIntervalAttributeValue(String list, String attName, double from, double to) throws GSimException {
 
@@ -340,16 +290,13 @@ public class ObjectInstanceDef extends Observable implements ObjectInstance, Uni
             a.setFrom(from);
             a.setTo(to);
             real = env.getObjectInstanceOperations().modifyObjectAttribute(real, Path.attributePath(list, a.getName()), a);
+            onChange();
         } catch (Exception e) {
             throw new GSimException(e);
         }
 
     }
 
-    /**
-     * @see
-     * @link gsim.objects.ObjectInstanceIF
-     */
     @Override
     public void setNumericalAttributeValue(String list, String attName, double value) throws GSimException {
 
@@ -364,16 +311,13 @@ public class ObjectInstanceDef extends Observable implements ObjectInstance, Uni
             }
             a.setValue(value);
             real = env.getObjectInstanceOperations().modifyObjectAttribute(real, Path.attributePath(list, a.getName()), a);
+            onChange();
         } catch (Exception e) {
             throw new GSimException(e);
         }
 
     }
 
-    /**
-     * @see
-     * @link gsim.objects.ObjectInstanceIF
-     */
     @Override
     public void setSetAttributeValues(String list, String attName, String... values) throws GSimException {
 
@@ -395,16 +339,13 @@ public class ObjectInstanceDef extends Observable implements ObjectInstance, Uni
                 a.addEntry(v);
             }
             real = env.getObjectInstanceOperations().modifyObjectAttribute(real, Path.attributePath(list,a.getName()), a);
+            onChange();
         } catch (Exception e) {
             throw new GSimException(e);
         }
 
     }
 
-    /**
-     * @see
-     * @link gsim.objects.ObjectInstanceIF
-     */
     @Override
     public void setStringAttributeValue(String list, String attName, String value) throws GSimException {
 
@@ -419,6 +360,7 @@ public class ObjectInstanceDef extends Observable implements ObjectInstance, Uni
             }
             a.setValue(value);
             real = env.getObjectInstanceOperations().modifyObjectAttribute(real, Path.attributePath(list, a.getName()), a);
+            onChange();
         } catch (Exception e) {
             throw new GSimException(e);
         }

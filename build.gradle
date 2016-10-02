@@ -1,5 +1,6 @@
 apply plugin: "java"
 apply plugin: "maven"
+apply plugin: "jacoco"
 
 group = "de.2s.sim"
 version = "2.0-SNAPSHOT"
@@ -71,6 +72,28 @@ repositories {
     maven {
 		url 'http://176.94.74.31:7002/nexus/content/repositories/thirdparty/'
 	}    
+}
+
+jacoco {
+    toolVersion = "0.7.6.201602180812"
+    reportsDir = file("$buildDir/customJacocoReportDir")
+}
+
+test {
+	ignoreFailures = true
+}
+
+jacocoTestReport {
+
+    classDirectories = fileTree(dir: "${buildDir}/classes",  excludes: ['**/*Test*'])
+    sourceDirectories = files('src/impl/java')
+    executionData = files("${buildDir}/jacoco/test.exec")
+    
+    reports {
+        xml.enabled false
+        csv.enabled false
+        html.destination "${buildDir}/jacocoHtml"
+    }
 }
 
 uploadArchives {
