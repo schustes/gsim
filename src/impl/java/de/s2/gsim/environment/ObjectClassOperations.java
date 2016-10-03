@@ -27,7 +27,7 @@ public class ObjectClassOperations {
 		this.agentClassOperations = agentClassOperations;
 	}
 
-	public Frame addAttributeList0(Frame owner, String listName) throws GSimDefException {
+	public Frame addAttributeList(Frame owner, String listName) throws GSimDefException {
 		Frame here = findObjectClass(owner);
 		here.defineAttributeList(listName);
 		container.getObjectSubClasses().add(here);
@@ -43,7 +43,7 @@ public class ObjectClassOperations {
 
 	}
 
-	public Frame addAttributeList(Frame cls, Path<List<DomainAttribute>> path, DomainAttribute a) {
+	public Frame addAttribute(Frame cls, Path<List<DomainAttribute>> path, DomainAttribute a) {
 
 		Frame here = findObjectClass(cls);
 
@@ -60,7 +60,8 @@ public class ObjectClassOperations {
 			subClass.replaceAncestor(here);
 			container.getAllInstancesOfClass(subClass, Instance.class).stream().forEach(succ -> {
 				succ.setFrame(subClass);
-				succ.replaceChildAttribute(Path.attributePath(path.toStringArray()), AttributeFactory.createDefaultAttribute(a));//necessary?
+				succ.addChildAttribute(Path.attributePath(path.toStringArray()),
+						AttributeFactory.createDefaultAttribute(a));
 			});
 		}
 
@@ -90,21 +91,24 @@ public class ObjectClassOperations {
 	 * @param newValue
 	 * @return
 	 */
-	public Frame addObjectClassAttribute(Frame cls, Path<List<DomainAttribute>> path, DomainAttribute newValue) {
-
-		Frame here = findObjectClass(cls);
-		Set<Frame> objectSubClasses = container.getObjectSubClasses();
-
-		here.addChildAttribute(path, newValue);
-		here.setDirty(true);
-
-		objectSubClasses.stream().filter(f -> f.isSuccessor(cls.getName())).forEach(f -> f.replaceAncestor(here));
-
-		this.addChildAttributeInReferringObjects(cls, path, newValue);
-		agentClassOperations.addChildAttributeInReferringAgents(cls, path, newValue);
-
-		return (Frame) here.clone();
-	}
+	// public Frame addObjectClassAttribute(Frame cls,
+	// Path<List<DomainAttribute>> path, DomainAttribute newValue) {
+	//
+	// Frame here = findObjectClass(cls);
+	// Set<Frame> objectSubClasses = container.getObjectSubClasses();
+	//
+	// here.addChildAttribute(path, newValue);
+	// here.setDirty(true);
+	//
+	// objectSubClasses.stream().filter(f ->
+	// f.isSuccessor(cls.getName())).forEach(f -> f.replaceAncestor(here));
+	//
+	// this.addChildAttributeInReferringObjects(cls, path, newValue);
+	// agentClassOperations.addChildAttributeInReferringAgents(cls, path,
+	// newValue);
+	//
+	// return (Frame) here.clone();
+	// }
 
 	public void addObjectSubClass(Frame cls) {
 		container.addObjectClass(cls.clone());

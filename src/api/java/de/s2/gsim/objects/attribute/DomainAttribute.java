@@ -195,10 +195,10 @@ public class DomainAttribute {
     }
 
     public void copyFrom(DomainAttribute newValue) {
-        this.fillers = fillers.stream().collect(Collectors.toList());
-        this.defaultValue = getDefaultValue();
-        this.isMutable = isMutable();
-        this.isSystem = isSystem();
+        this.fillers = newValue.fillers.stream().collect(Collectors.toList());
+        this.defaultValue = newValue.getDefaultValue();
+        this.isMutable = newValue.isMutable();
+		this.isSystem = newValue.isSystem();
     }
 
 }

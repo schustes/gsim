@@ -130,24 +130,6 @@ public class EnvironmentTest {
 		assertThat("By-value", false, equalTo(test1AttrVal.equals(test2AttrVal)));
 
 		GenericAgentClass p1 = agentOperations.createAgentSubclass("p1", p0);
-		// expected.expect(NoSuchElementException.class);
-		// assertThat("no parent list must be declared in child",
-		// p1.getDeclaredChildFrames("p0-framelist"), nullValue());
-
-		// a.setDefault("test");
-		// p0.replaceChildAttribute(Path.attributePath("p0-framelist",
-		// "p0-TestFrame", "p0-child-attributes", a.getName()), a);
-		// test2AttrVal =
-		// p0.<DomainAttribute>resolvePath(Path.attributePath("p0-framelist",
-		// "p0-TestFrame", "p0-child-attributes",
-		// a.getName())).getDefaultValue();
-		// test1AttrVal = p0.getAttribute("p0-attributes",
-		// a.getName()).getDefaultValue();
-		// assertThat("Attribute in child was replaced with new one", "test",
-		// equalTo(test2AttrVal));
-		// assertThat("Attribute in parent was NOT replaced with new one",
-		// "test", not(equalTo(test1AttrVal)));
-
 		a.setDefault("over");
 		p1.addOrSetAttribute("p0-attributes", a);
 		test1AttrVal = p0.getAttribute("p0-attributes", a.getName()).getDefaultValue();
@@ -187,7 +169,7 @@ public class EnvironmentTest {
 			}
 			double avg = sum / popSize;
 
-			if (avg < (numericalVal + err) && avg > (numericalVal - err)) {
+			if (avg <= (numericalVal + err) && avg >= (numericalVal - err)) {
 				countExpected++;
 			}
 
@@ -217,6 +199,15 @@ public class EnvironmentTest {
 
 	@Test
 	public void verify_delete_agent() {
+
+		expected.expect(NoSuchElementException.class);
+
+		Environment env = new Environment("test");
+		AgentClassOperations agentOperations = env.getAgentClassOperations();
+		GenericAgentClass sub = agentOperations.createAgentSubclass("TestSub", null);
+		agentOperations.removeAgentClass(sub);
+
+		agentOperations.getAgentSubClass(sub.getName());
 
 	}
 

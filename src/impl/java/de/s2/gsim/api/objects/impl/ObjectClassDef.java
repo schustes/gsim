@@ -49,9 +49,9 @@ public class ObjectClassDef extends Observable implements ObjectClass, UnitWrapp
 
         try {
         	if (!real.getAttributeLists().containsKey(list)) {
-        		env.getObjectClassOperations().addAttributeList(real, Path.attributeListPath(list), a);
+				env.getObjectClassOperations().addAttributeList(real, list);
         	}
-            real = env.getObjectClassOperations().addObjectClassAttribute(real, Path.attributeListPath(list), a);
+			real = env.getObjectClassOperations().addAttribute(real, Path.attributeListPath(list), a);
         } catch (Exception e) {
             throw new GSimException(e);
         }

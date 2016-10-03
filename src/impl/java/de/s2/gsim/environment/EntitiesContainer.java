@@ -209,7 +209,9 @@ public class EntitiesContainer {
      * @return a set of subclasses
      */
     public Set<GenericAgentClass> getAgentSubClasses(GenericAgentClass ofWhich) {
-        return agentSubClasses.values().parallelStream().filter(a -> a.isSuccessor(ofWhich.getName())).collect(Collectors.toSet());
+		Set<GenericAgentClass> ret = agentSubClasses.values().stream().filter(a -> a.isSuccessor(ofWhich.getName()))
+				.collect(Collectors.toSet());
+		return ret;
     }
 
     /**

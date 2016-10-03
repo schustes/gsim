@@ -15,6 +15,8 @@ import java.util.stream.Collectors;
 
 import javax.validation.constraints.NotNull;
 
+import org.apache.log4j.Logger;
+
 import de.s2.gsim.objects.attribute.DomainAttribute;
 
 /**
@@ -931,11 +933,15 @@ public class Frame extends Unit<Frame, DomainAttribute> {
 		if (f != null) {
 			Path<List<Frame>> childFrameListPath = Path.withoutLastAttributeOrObject(framePath, Path.Type.LIST);
 			if (childFrameListPath != null) {
-				List<Frame> list = this.resolvePath(childFrameListPath, false);
-				if (list != null) {
-					list.remove(f);
-					setDirty(true);
-					return true;
+				try {
+					List<Frame> list = this.resolvePath(childFrameListPath, false);
+					if (list != null) {
+						list.remove(f);
+						setDirty(true);
+						return true;
+					}
+				} catch (GSimDefException e) {
+					Logger.getLogger(Frame.class).info(childFrameListPath + " seems not to be available on this level, ignoring removal command.");
 				}
 			}
 		}
