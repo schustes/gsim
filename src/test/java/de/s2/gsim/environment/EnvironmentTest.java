@@ -20,200 +20,210 @@ import de.s2.gsim.objects.attribute.NumericalAttribute;
 
 public class EnvironmentTest {
 
-	@Rule
-	public ExpectedException expected = ExpectedException.none();
-	
-	
-	@Test 
-	public void non_existing_agent_framelist_with_nonterminal_path_should_throw_exception() throws Exception {
+    @Rule
+    public ExpectedException expected = ExpectedException.none();
 
-		Path<List<DomainAttribute>> path = Path.attributeListPath("test", "test");
+    @Test
+    public void non_existing_agent_framelist_with_nonterminal_path_should_throw_exception() throws Exception {
 
-		expected.expect(GSimDefException.class);
-		expected.expectMessage("Path " + path + " does not exit and is not terminal, so no list can be created!");
+        Path<List<DomainAttribute>> path = Path.attributeListPath("test", "test");
 
-		Environment env = new Environment("test");
-		AgentClassOperations agentOperations = env.getAgentClassOperations();
+        expected.expect(GSimDefException.class);
+        expected.expectMessage("Path " + path + " does not exit and is not terminal, so no list can be created!");
 
-		GenericAgentClass a = agentOperations.createAgentSubclass("Test agent class",
-				agentOperations.getGenericAgentClass());
-		agentOperations.addAgentClassAttribute(a, path, new DomainAttribute("test", AttributeType.STRING));
-		
-		
-	}
+        Environment env = new Environment("test");
+        AgentClassOperations agentOperations = env.getAgentClassOperations();
+
+        GenericAgentClass a = agentOperations.createAgentSubclass("Test agent class", agentOperations.getGenericAgentClass());
+        agentOperations.addAgentClassAttribute(a, path, new DomainAttribute("test", AttributeType.STRING));
 
 
-	@Test
-	public void verify_adding_agent_classes() {
+    }
 
-		Environment env = new Environment("test");
 
-		AgentClassOperations agentOperations = env.getAgentClassOperations();
+    @Test
+    public void verify_adding_agent_classes() {
 
-		GenericAgentClass a = agentOperations.createAgentSubclass("Test agent class",
-				agentOperations.getGenericAgentClass());
+        Environment env = new Environment("test");
 
-		assertThat("Agent inherits from top class", a.getParentFrames().get(0),
-				equalTo(agentOperations.getGenericAgentClass()));
+        AgentClassOperations agentOperations = env.getAgentClassOperations();
 
-		assertThat("Agent count is 1", agentOperations.getAgentSubClasses().size(), equalTo(1));
+        GenericAgentClass a = agentOperations.createAgentSubclass("Test agent class", agentOperations.getGenericAgentClass());
 
-	}
+        assertThat("Agent inherits from top class", a.getParentFrames().get(0), equalTo(agentOperations.getGenericAgentClass()));
 
-	@Test
-	public void verify_find_agent_classes() {
+        assertThat("Agent count is 1", agentOperations.getAgentSubClasses().size(), equalTo(1));
 
-		Environment env = new Environment("test");
+    }
 
-		AgentClassOperations agentOperations = env.getAgentClassOperations();
+    @Test
+    public void verify_find_agent_classes() {
 
-		for (int i = 0; i < 1000; i++) {
-			agentOperations.createAgentSubclass(String.valueOf(i), agentOperations.getGenericAgentClass());
-		}
+        Environment env = new Environment("test");
 
-		double start = System.currentTimeMillis();
-		GenericAgentClass found = agentOperations.getAgentSubClass("50");
-		double total = System.currentTimeMillis() - start;
-		System.out.println("Duration find: " + (total / 1000d));
+        AgentClassOperations agentOperations = env.getAgentClassOperations();
 
-		assertThat("Agent class was found", found, notNullValue());
-		assertThat("Correct agent class was found", found.getName(), equalTo("50"));
+        for (int i = 0; i < 1000; i++) {
+            agentOperations.createAgentSubclass(String.valueOf(i), agentOperations.getGenericAgentClass());
+        }
 
-	}
+        double start = System.currentTimeMillis();
+        GenericAgentClass found = agentOperations.getAgentSubClass("50");
+        double total = System.currentTimeMillis() - start;
+        System.out.println("Duration find: " + (total / 1000d));
 
-	@Test
-	public void agentclass_not_found_throws_nosuch_element_exception() {
+        assertThat("Agent class was found", found, notNullValue());
+        assertThat("Correct agent class was found", found.getName(), equalTo("50"));
 
-		expected.expect(NoSuchElementException.class);
-		expected.expectMessage("No value present");
+    }
 
-		Environment env = new Environment("test");
+    @Test
+    public void agentclass_not_found_throws_nosuch_element_exception() {
 
-		AgentClassOperations agentOperations = env.getAgentClassOperations();
+        expected.expect(NoSuchElementException.class);
+        expected.expectMessage("No value present");
 
-		for (int i = 0; i < 10; i++) {
-			agentOperations.createAgentSubclass(String.valueOf(i), agentOperations.getGenericAgentClass());
-		}
+        Environment env = new Environment("test");
 
-		agentOperations.getAgentSubClass("50");
+        AgentClassOperations agentOperations = env.getAgentClassOperations();
 
-	}
+        for (int i = 0; i < 10; i++) {
+            agentOperations.createAgentSubclass(String.valueOf(i), agentOperations.getGenericAgentClass());
+        }
 
-	@Test
-	public void verify_inheritance() {
+        agentOperations.getAgentSubClass("50");
 
-		Environment env = new Environment("test");
+    }
 
-		AgentClassOperations agentOperations = env.getAgentClassOperations();
+    @Test
+    public void verify_inheritance() {
 
-		GenericAgentClass p0 = agentOperations.createAgentSubclass("p0", agentOperations.getGenericAgentClass());
-		p0.defineAttributeList("p0-attributes");
-		Frame f = Frame.newFrame("p0-TestFrame");
-		DomainAttribute a = new DomainAttribute("p0-attribute", AttributeType.STRING);
-		p0.defineObjectList("p0-framelist", f);
-		a.setDefault("p0-attr");
-		p0.addOrSetAttribute("p0-attributes", a);
+        Environment env = new Environment("test");
 
-		f.addOrSetAttribute("p0-child-attributes", a);
-		p0.addOrSetChildFrame("p0-framelist", f);
-		DomainAttribute astroke = f.getAttribute("p0-child-attributes", a.getName());
-		astroke.setDefault("c0");
-		f.addOrSetAttribute("p0-child-attributes", astroke);
-		p0.addOrSetChildFrame("p0-framelist", f);
+        AgentClassOperations agentOperations = env.getAgentClassOperations();
 
-		String test1AttrVal = p0.getAttribute("p0-attributes", a.getName()).getDefaultValue();
-		String test2AttrVal = p0
-				.<DomainAttribute>resolvePath(
-						Path.attributePath("p0-framelist", "p0-TestFrame", "p0-child-attributes", a.getName()))
-				.getDefaultValue();
+        GenericAgentClass p0 = agentOperations.createAgentSubclass("p0", agentOperations.getGenericAgentClass());
+        p0.defineAttributeList("p0-attributes");
+        Frame f = Frame.newFrame("p0-TestFrame");
+        DomainAttribute a = new DomainAttribute("p0-attribute", AttributeType.STRING);
+        p0.defineObjectList("p0-framelist", f);
+        a.setDefault("p0-attr");
+        p0.addOrSetAttribute("p0-attributes", a);
 
-		assertThat("By-value", false, equalTo(test1AttrVal.equals(test2AttrVal)));
+        f.addOrSetAttribute("p0-child-attributes", a);
+        p0.addOrSetChildFrame("p0-framelist", f);
+        DomainAttribute astroke = f.getAttribute("p0-child-attributes", a.getName());
+        astroke.setDefault("c0");
+        f.addOrSetAttribute("p0-child-attributes", astroke);
+        p0.addOrSetChildFrame("p0-framelist", f);
 
-		GenericAgentClass p1 = agentOperations.createAgentSubclass("p1", p0);
-		a.setDefault("over");
-		p1.addOrSetAttribute("p0-attributes", a);
-		test1AttrVal = p0.getAttribute("p0-attributes", a.getName()).getDefaultValue();
-		test2AttrVal = p1.getAttribute("p0-attributes", a.getName()).getDefaultValue();
-		System.out.println(test1AttrVal + "::" + test2AttrVal);
-		assertThat("No backpropagation of overloaded child attributes", test1AttrVal, not(equalTo(test2AttrVal)));
+        String test1AttrVal = p0.getAttribute("p0-attributes", a.getName()).getDefaultValue();
+        String test2AttrVal = p0.<DomainAttribute> resolvePath(Path.attributePath("p0-framelist", "p0-TestFrame", "p0-child-attributes", a.getName()))
+                .getDefaultValue();
 
-	}
+        assertThat("By-value", false, equalTo(test1AttrVal.equals(test2AttrVal)));
 
-	@Test
-	public void verify_agent_instanciation_normal_distributed_attributes() {
-		Environment env = new Environment("test");
+        GenericAgentClass p1 = agentOperations.createAgentSubclass("p1", p0);
+        a.setDefault("over");
+        p1.addOrSetAttribute("p0-attributes", a);
+        test1AttrVal = p0.getAttribute("p0-attributes", a.getName()).getDefaultValue();
+        test2AttrVal = p1.getAttribute("p0-attributes", a.getName()).getDefaultValue();
+        System.out.println(test1AttrVal + "::" + test2AttrVal);
+        assertThat("No backpropagation of overloaded child attributes", test1AttrVal, not(equalTo(test2AttrVal)));
 
-		double numericalVal = 5d;
+    }
 
-		AgentInstanceOperations operations = env.getAgentInstanceOperations();
-		AgentClassOperations agentClassOperations = env.getAgentClassOperations();
-		GenericAgentClass agentClass = agentClassOperations.createAgentSubclass("agent",
-				agentClassOperations.getGenericAgentClass());
-		DomainAttribute a = new DomainAttribute("attribute", AttributeType.NUMERICAL);
-		a.setDefault(String.valueOf(numericalVal));
-		agentClass.addOrSetAttribute("attributes", a);
+    @Test
+    public void verify_agent_instanciation_normal_distributed_attributes() {
+        Environment env = new Environment("test");
 
-		double svar = 0.5;
-		int popSize = 50;
-		double err = 2.576 * (svar / (Math.sqrt((double) popSize)));// 99%
-																	// 95%=1,645
-		int countExpected = 0;
-		int samples = 100;
+        double numericalVal = 5d;
 
-		for (int i = 0; i < samples; i++) {
-			List<GenericAgent> population = operations.instanciateAgentsWithNormalDistributedAttributes(agentClass,
-					Optional.empty(), svar, popSize);
-			double sum = 0;
-			for (GenericAgent agent : population) {
-				sum += ((NumericalAttribute) agent.getAttribute("attribute")).getValue();
-			}
-			double avg = sum / popSize;
+        AgentInstanceOperations operations = env.getAgentInstanceOperations();
+        AgentClassOperations agentClassOperations = env.getAgentClassOperations();
+        GenericAgentClass agentClass = agentClassOperations.createAgentSubclass("agent", agentClassOperations.getGenericAgentClass());
+        DomainAttribute a = new DomainAttribute("attribute", AttributeType.NUMERICAL);
+        a.setDefault(String.valueOf(numericalVal));
+        agentClass.addOrSetAttribute("attributes", a);
 
-			if (avg <= (numericalVal + err) && avg >= (numericalVal - err)) {
-				countExpected++;
-			}
+        double svar = 0.5;
+        int popSize = 50;
+        double err = 2.576 * (svar / (Math.sqrt((double) popSize)));// 99%
+        // 95%=1,645
+        int countExpected = 0;
+        int samples = 100;
 
-		}
+        for (int i = 0; i < samples; i++) {
+            List<GenericAgent> population = operations.instanciateAgentsWithNormalDistributedAttributes(agentClass, Optional.empty(), svar, popSize);
+            double sum = 0;
+            for (GenericAgent agent : population) {
+                sum += ((NumericalAttribute) agent.getAttribute("attribute")).getValue();
+            }
+            double avg = sum / popSize;
 
-		double minimumExpectedCorrectSamples = ((double) samples) * 0.99;
-		assertThat("Distribution in expected confidence interval ", (double) countExpected,
-				greaterThan(minimumExpectedCorrectSamples));
+            if (avg <= (numericalVal + err) && avg >= (numericalVal - err)) {
+                countExpected++;
+            }
 
-	}
+        }
 
-	@Test
-	public void verify_adding_object_classes() {
+        double minimumExpectedCorrectSamples = ((double) samples) * 0.99;
+        assertThat("Distribution in expected confidence interval ", (double) countExpected, greaterThan(minimumExpectedCorrectSamples));
 
-		Environment env = new Environment("test");
+    }
 
-		ObjectClassOperations objectOperations = env.getObjectClassOperations();
+    @Test
+    public void verify_adding_object_classes() {
 
-		Frame subFrame = objectOperations.createObjectSubClass("TestObject", objectOperations.getObjectClass());
+        Environment env = new Environment("test");
 
-		assertThat("Sub object class inherits from top class", subFrame.getParentFrames().get(0),
-				equalTo(objectOperations.getObjectClass()));
+        ObjectClassOperations objectOperations = env.getObjectClassOperations();
 
-		assertThat("Object count is 1", objectOperations.getObjectSubClasses().size(), equalTo(1));
+        Frame subFrame = objectOperations.createObjectSubClass("TestObject", objectOperations.getObjectClass());
 
-	}
+        assertThat("Sub object class inherits from top class", subFrame.getParentFrames().get(0), equalTo(objectOperations.getObjectClass()));
 
-	@Test
-	public void verify_delete_agent() {
+        assertThat("Object count is 1", objectOperations.getObjectSubClasses().size(), equalTo(1));
 
-		expected.expect(NoSuchElementException.class);
+    }
 
-		Environment env = new Environment("test");
-		AgentClassOperations agentOperations = env.getAgentClassOperations();
-		GenericAgentClass sub = agentOperations.createAgentSubclass("TestSub", null);
-		agentOperations.removeAgentClass(sub);
+    @Test
+    public void verify_delete_agent() {
 
-		agentOperations.getAgentSubClass(sub.getName());
+        expected.expect(NoSuchElementException.class);
 
-	}
+        Environment env = new Environment("test");
+        AgentClassOperations agentOperations = env.getAgentClassOperations();
+        GenericAgentClass sub = agentOperations.createAgentSubclass("TestSub", null);
+        agentOperations.removeAgentClass(sub);
 
-	@Test
-	public void verify_propagation_of_child_frames() {
+        agentOperations.getAgentSubClass(sub.getName());
 
-	}
+    }
+
+    @Test
+    public void verify_behaviour_inheritance() {
+
+        Environment env = new Environment("test");
+
+        AgentClassOperations agentOperations = env.getAgentClassOperations();
+        GenericAgentClass base = agentOperations.createAgentSubclass("Base", null);
+        GenericAgentClass sub = agentOperations.createAgentSubclass("Sub", base);
+
+        BehaviourFrame baseBehaviour = base.getBehaviour();
+        BehaviourFrame subBehaviour = sub.getBehaviour();
+
+        ActionFrame action = ActionFrame.newActionFrame("base-action", "com.test.action1");
+        UserRuleFrame urf = UserRuleFrame.newUserRuleFrame("rule-1");
+        ConditionFrame cf = ConditionFrame.newConditionFrame("a", ">", "b");
+
+        throw new UnsupportedOperationException("Continue implementation");
+
+    }
+
+    @Test
+    public void verify_propagation_of_child_frames() {
+
+    }
 
 }

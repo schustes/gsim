@@ -21,34 +21,25 @@ public class UserRuleFrame extends Frame {
 
     static final long serialVersionUID = 4875468082081888178L;
 
-    protected UserRuleFrame(Frame f) {
-    	super(f.getName(), f);
+    protected UserRuleFrame(String name, Frame... parents) {
+        super(name, parents);
     }
     
-
-    public static UserRuleFrame copy(Frame f) {
-    	UserRuleFrame ufr = new UserRuleFrame(f);
-        Frame f1 = new ConditionFrame("{all-conditions}", "=", "don't care");
-        Frame f2 = new ActionFrame("{all-actions}", "action");
-        ufr.addOrSetChildFrame("conditions", f1);
-        ufr.addOrSetChildFrame("consequences", f2);
-
-        if (ufr.getAttribute(ATTR_LIST_ATTRS, "activated") == null) {
-            DomainAttribute a = new DomainAttribute("activated", AttributeType.STRING);
-            a.setDefault("true");
-            ufr.addOrSetAttribute(ATTR_LIST_ATTRS, a);
-        }
-        
-        return ufr;
-
+    /**
+     * Inheritance constructor.
+     */
+    public static UserRuleFrame inheritFromUserRuleFrames(List<UserRuleFrame> parents, String name, String category) {
+    	Frame f = Frame.inherit(parents, name, Optional.of(category));
+        return new UserRuleFrame(f.getName(), f);
     }
 
     /**
-     * Inheritance constructor
+     * Wrap an existing frame.
      */
-    public static UserRuleFrame inherit(List<Frame> parents, String name, String category) {
-    	Frame f = Frame.inherit(parents, name, Optional.of(category));
-    	return new UserRuleFrame(f);
+    public static UserRuleFrame wrap(Frame orig, String name, String category) {
+        UserRuleFrame ur = new UserRuleFrame(orig.getName(), orig.getParentFrames().toArray(new Frame[0]));
+        Frame.copyInternal(orig, ur);
+        return ur;
     }
 
     public static UserRuleFrame newUserRuleFrame(String name) {
@@ -61,7 +52,7 @@ public class UserRuleFrame extends Frame {
         a.setDefault("true");
         f.addOrSetAttribute(ATTR_LIST_ATTRS, a);
 
-        return new UserRuleFrame(f);
+        return new UserRuleFrame(f.getName(), f);
 
     }
 
@@ -78,7 +69,7 @@ public class UserRuleFrame extends Frame {
     }
 
     public ConditionFrame createCondition(String var, String op, String val) {
-        ConditionFrame f = new ConditionFrame(var, op, val);
+        ConditionFrame f = ConditionFrame.newConditionFrame(var, op, val);
         return f;
     }
 
@@ -86,7 +77,7 @@ public class UserRuleFrame extends Frame {
         ArrayList<ConditionFrame> list = new ArrayList<>();
         for (Frame f: getChildFrames(UserRuleFrame.INST_LIST_COND)) {
             if (!f.getName().startsWith("{")) {
-                list.add(new ConditionFrame(f));
+                list.add(ConditionFrame.copyAndWrap(f));
             }
         }
         ConditionFrame[] cond = new ConditionFrame[list.size()];

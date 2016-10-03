@@ -22,11 +22,49 @@ public class ConditionFrame extends Frame {
 
     static final long serialVersionUID = 8165736680329194821L;
 
-    public ConditionFrame(Frame f) {
-        super(f.getName(), f);
+    /**
+     * Creates a condition frame for a certain operand (attribute) and default operator and value.
+     * 
+     * @param var the operand (e.g. lists/numerical-attr-1)
+     * @param op the operator (e.g. '=' or '>')
+     * @param val the value (e.g. a constant like '1')
+     * @return the frame
+     */
+    public static ConditionFrame newConditionFrame(String var, String op, String val) {
+        return new ConditionFrame(var, op, val);
     }
 
-    public ConditionFrame(String forParameter) {
+    /**
+     * Creates a condition frame for a certain operand (attribute) without a default expression.
+     * 
+     * @param var the operand (e.g. lists/numerical-attr-1)
+     * @return the frame
+     */
+    public static ConditionFrame newConditionFrame(String forVar) {
+        return new ConditionFrame(forVar);
+    }
+
+    /**
+     * Wraps a frame to a condition frame by copying the properties of the given one.
+     * 
+     * @param from the condition frame to copy from
+     * @return the copied frame
+     */
+    public static ConditionFrame copyAndWrap(Frame from) {
+        return new ConditionFrame(from);
+    }
+
+    /**
+     * Wraps a frame to a condition frame by creating a copy of f.
+     * 
+     * @param f the frame to copy
+     */
+    private ConditionFrame(Frame f) {
+        super(f.getName(), f.getParentFrames().toArray(new ConditionFrame[0]));
+        super.copyInternal(f, this);
+    }
+
+    private ConditionFrame(String forParameter) {
         super(forParameter + "-condition-" + cern.jet.random.Uniform.staticNextDouble(), Optional.of("condition"), true, false);
         DomainAttribute a0 = new DomainAttribute("parameter-name", AttributeType.STRING);
         DomainAttribute a = new DomainAttribute("parameter-class", AttributeType.STRING);
@@ -47,7 +85,7 @@ public class ConditionFrame extends Frame {
         addOrSetAttribute(ATTR_LIST_PARAM, c);
     }
 
-    public ConditionFrame(String var, String op, String val) {
+    private ConditionFrame(String var, String op, String val) {
         this(var);
         setDefaults(var, op, val);
     }

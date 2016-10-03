@@ -141,7 +141,7 @@ public class Frame extends Unit<Frame, DomainAttribute> {
 	 * @param category an additional classification
 	 * @return the new Frame
 	 */
-	public static Frame newFrame(@NotNull String name, Optional<String> category) {
+    protected static Frame newFrame(@NotNull String name, Optional<String> category) {
 		return new Frame(name, category, true, false);
 	}
 
@@ -151,7 +151,7 @@ public class Frame extends Unit<Frame, DomainAttribute> {
 	 * @param name the name
 	 * @return the new Frame
 	 */
-	public static Frame newFrame(@NotNull String name) {
+    protected static Frame newFrame(@NotNull String name) {
 		return new Frame(name);
 	}
 
@@ -162,7 +162,7 @@ public class Frame extends Unit<Frame, DomainAttribute> {
 	 * @param newName the new name
 	 * @return the new frame
 	 */
-	public static Frame copy(@NotNull Frame from, @NotNull String newName) {
+    protected static Frame copy(@NotNull Frame from, @NotNull String newName) {
 
 		Frame frame = Frame.inherit(from.getParentFrames(), newName, Optional.of(from.getCategory()), from.isMutable(), from.isSystem());
 
@@ -175,7 +175,7 @@ public class Frame extends Unit<Frame, DomainAttribute> {
 	 * @param from the frame to copy from
 	 * @return the new frame
 	 */
-	public static Frame copy(@NotNull Frame from) {
+    protected static Frame copy(@NotNull Frame from) {
 
 		Frame frame = Frame.inherit(from.getParentFrames(), from.getName(), Optional.of(from.getCategory()), from.isMutable(), from.isSystem());
 

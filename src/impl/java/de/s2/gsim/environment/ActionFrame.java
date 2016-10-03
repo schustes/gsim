@@ -27,26 +27,42 @@ public class ActionFrame extends Frame {
     static final long serialVersionUID = 1273007039000489581L;
 
     /**
-     * Copy constructor.
+     * Creates an action frame by inheriting the properties of the given one.
      * 
-     * @param def
-     *            Frame
+     * @param parent
+     * @return the new ActionFrame
      */
-    public ActionFrame(Frame def) {
+    public static ActionFrame inherit(ActionFrame parent) {
+        return new ActionFrame(parent);
+    }
+
+    /**
+     * Creates a action frame.
+     * 
+     * @param name the name of the action
+     * @param actionImplClass the actual java implementation class
+     * @return the action frame
+     */
+    public static ActionFrame newActionFrame(String name, String actionImplClass) {
+        return new ActionFrame(name, actionImplClass);
+    }
+
+    /**
+     * Constructor by inheriting super type.
+     * 
+     * @param def the frame to inherit from
+     */
+    protected ActionFrame(Frame def) {
         super(def.getName(), def);
     }
 
     /**
      * Top level constructor.
      * 
-     * @param name
-     *            String
-     * @param defaultClass
-     *            String
-     * @param id
-     *            int
+     * @param name the name of the action
+     * @param defaultClass the SimAction class to execute
      */
-    public ActionFrame(String name, String defaultClass) {
+    private ActionFrame(String name, String defaultClass) {
         super(name, Optional.of(CATEGORY), true, false);
         DomainAttribute a = new DomainAttribute("class-name", AttributeType.STRING);
         a.setDefault(defaultClass);

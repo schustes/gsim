@@ -55,7 +55,7 @@ public class BehaviourClass implements Behaviour, UnitWrapper {
 
     @Override
     public de.s2.gsim.objects.Action createAction(String name, String cls) throws GSimException {
-        ActionFrame a = new ActionFrame(name, cls);
+        ActionFrame a = ActionFrame.newActionFrame(name, cls);
         real.addAction(a);
         return new ActionClass2(this, a);
     }

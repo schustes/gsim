@@ -98,7 +98,7 @@ public class RLActionNodeClass extends RuleClass implements RLActionNode, UnitWr
         if (f != null) {
             return new EvaluatorClass(this, f);
         } else {
-            Condition e = new EvaluatorClass(this, new ConditionFrame(new String("dummy")));
+            Condition e = new EvaluatorClass(this, ConditionFrame.newConditionFrame(new String("dummy")));
             setEvaluator(e);
             return e;
         }

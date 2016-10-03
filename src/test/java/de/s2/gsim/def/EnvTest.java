@@ -1,6 +1,7 @@
 package de.s2.gsim.def;
 
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.startsWith;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
@@ -28,245 +29,263 @@ import de.s2.gsim.objects.attribute.DomainAttribute;
 
 public class EnvTest {
 
-	ModelDefinitionEnvironment env;
-	
-	@Rule
-	public ExpectedException expected = ExpectedException.none();
+    ModelDefinitionEnvironment env;
 
-	@Before
-	public void setupEnv() {
-		GSimCore core = GSimCoreFactory.defaultFactory().createCore();
-		core = GSimCoreFactory.customFactory("Standalone").createCore();
-		env = core.create("test", new HashMap<>());
-	}
-	
-	@Test 
-	public void removal_of_children_is_propagated() {
+    @Rule
+    public ExpectedException expected = ExpectedException.none();
 
-		expected.expect(NoSuchElementException.class);
+    @Before
+    public void setupEnv() {
+        GSimCore core = GSimCoreFactory.defaultFactory().createCore();
+        core = GSimCoreFactory.customFactory("Standalone").createCore();
+        env = core.create("test", new HashMap<>());
+    }
 
-		env.createAgentClass("Test", null);
-		AgentClass agentClass = env.getAgentClass("Test");
+    @Test
+    public void verify_retrieval_of_subtypes() throws Exception {
+        AgentClass agentClass = env.createAgentClass("Test", null);
+        AgentClass agentClass2 = env.createAgentClass("Test2", null);
+        String prefix1 = "test-1";
+        String prefix2 = "test-2";
+        env.instanciateAgentsUniformDistributed(agentClass, prefix1, 10);
+        env.instanciateAgentsUniformDistributed(agentClass2, prefix2, 10);
 
-		ObjectClass objClass = env.createObjectClass("obj-class", null);
-		objClass.addAttribute("obj-list", new DomainAttribute("att-1", AttributeType.STRING));
+        AgentInstance[] testInstances = env.getAgents(agentClass.getName());
+        AgentInstance[] test2Instances = env.getAgents(agentClass.getName());
 
-		agentClass.addOrSetObject("list", objClass);
+        assertThat("agent instances are separate", testInstances.length, equalTo(10));
+        assertThat("agent instances are separate", test2Instances.length, equalTo(10));
 
-		AgentClass subClass = env.createAgentClass("sub", agentClass.getName());
-		AgentInstance inst = env.instanciateAgent(subClass, "agent_instance");
-		
-		agentClass.removeObject("list", objClass);
-		
-		assertThat("attribute of child object should be empty", subClass.getAttributes("list").length, equalTo(0));
-		
-		inst.getObject("list", "att-1");
+        assertThat("agent instances are in correct lists", testInstances[1].getName(), startsWith(prefix1));
+        assertThat("agent instances are in correct lists", test2Instances[5].getName(), startsWith(prefix2));
+
+    }
+
+    @Test
+    public void removal_of_children_is_propagated() {
+
+        expected.expect(NoSuchElementException.class);
+
+        env.createAgentClass("Test", null);
+        AgentClass agentClass = env.getAgentClass("Test");
+
+        ObjectClass objClass = env.createObjectClass("obj-class", null);
+        objClass.addAttribute("obj-list", new DomainAttribute("att-1", AttributeType.STRING));
+
+        agentClass.addOrSetObject("list", objClass);
+
+        AgentClass subClass = env.createAgentClass("sub", agentClass.getName());
+        AgentInstance inst = env.instanciateAgent(subClass, "agent_instance");
+
+        agentClass.removeObject("list", objClass);
+
+        assertThat("attribute of child object should be empty", subClass.getAttributes("list").length, equalTo(0));
+
+        inst.getObject("list", "att-1");
+
+    }
+
+    @Test
+    public void destroy_is_propagated() {
+        env.createAgentClass("Test", null);
+        AgentClass agentClass = env.getAgentClass("Test");
+
+        ObjectClass objClass = env.createObjectClass("obj-class", null);
+        objClass.addAttribute("obj-list", new DomainAttribute("att-1", AttributeType.STRING));
+
+        agentClass.addOrSetObject("list", objClass);
+
+        AgentClass subClass = env.createAgentClass("sub", agentClass.getName());
+
+        objClass.destroy();
+
+        assertThat("attribute of child object should be empty", subClass.getAttributes("list").length, equalTo(0));
+
+    }
+
+    @Test
+    public void objects_of_agent_successors_should_inherit_new_frame_attributes() throws Exception {
+
+        env.createAgentClass("Test", null);
+        AgentClass agentClass = env.getAgentClass("Test");
+
+        ObjectClass objClass = env.createObjectClass("obj-class", null);
+        objClass.addAttribute("on-the-fly", new DomainAttribute("Test", AttributeType.STRING));
+
+        agentClass.addOrSetObject("list", objClass);// register agentClass for changes of objClass
+
+        AgentInstance inst = env.instanciateAgent(agentClass, "agent");// register inst with changes of agentClass
+        assertThat("original attribute is available", inst.getObject("list", "obj-class"), not(nullValue()));
+        objClass.addAttribute("on-the-fly", new DomainAttribute("new", AttributeType.STRING));
+
+        assertThat("new attribute is in owning agent", agentClass.getObjects("list")[0].getAttribute("on-the-fly", "new"), notNullValue());
+        assertThat("instance has a new instance of the new attribute", inst.getObject("list", "obj-class").getAttribute("new"), notNullValue());
+
+    }
+
+    @Test
+    public void objects_of_simagent_classes_should_reference_dependent_objects() throws Exception {
+
+        Environment env = new Environment("");
+        GenericAgentClass real = env.getAgentClassOperations().createAgentSubclass("test", null);
+        Frame dep = env.getObjectClassOperations().createObjectSubClass("obj", null);
+        dep.defineAttributeList("list");
+        dep.addOrSetAttribute("list", new DomainAttribute("att", AttributeType.STRING));
+        real.addOrSetChildFrame("children", dep);
+        AgentClass agentClass = new AgentClassSim(real);
+        ObjectClass wrapped = agentClass.getObjects("children")[0];
+        wrapped.addAttribute("list", new DomainAttribute("att2", AttributeType.STRING));
+
+        assertThat("new attribute is in owning agent", agentClass.getObjects("children")[0].getAttribute("list", "att2"), notNullValue());
+    }
 
 
-	}
-	
-	@Test 
-	public void destroy_is_propagated() {
-		env.createAgentClass("Test", null);
-		AgentClass agentClass = env.getAgentClass("Test");
+    @Test
+    public void agent_instances_should_inherit_new_frame_attributes_in_new_list() throws Exception {
+        env.createAgentClass("Test", null);
+        AgentClass agentClass = env.getAgentClass("Test");
 
-		ObjectClass objClass = env.createObjectClass("obj-class", null);
-		objClass.addAttribute("obj-list", new DomainAttribute("att-1", AttributeType.STRING));
+        AgentInstance inst = env.instanciateAgent(agentClass, "agent");
 
-		agentClass.addOrSetObject("list", objClass);
+        agentClass.addAttribute("list", new DomainAttribute("test-att", AttributeType.STRING));
 
-		AgentClass subClass = env.createAgentClass("sub", agentClass.getName());
+        assertThat("new attribute of agentClass is propagated to instance", inst.getAttribute("list", "test-att"), notNullValue());
 
-		objClass.destroy();
+    }
 
-		assertThat("attribute of child object should be empty", subClass.getAttributes("list").length, equalTo(0));
+    @Test
+    public void agent_instances_should_inherit_new_frame_attributes_in_existing_list() throws Exception {
+        env.createAgentClass("Test", null);
+        AgentClass agentClass = env.getAgentClass("Test");
+        agentClass.addAttribute("list", new DomainAttribute("some-att", AttributeType.STRING));
 
-	}
-	
-	@Test 
-	public void objects_of_agent_successors_should_inherit_new_frame_attributes() throws Exception {
-		
-		env.createAgentClass("Test", null);
-		AgentClass agentClass = env.getAgentClass("Test");
+        AgentInstance inst = env.instanciateAgent(agentClass, "agent");
 
-		ObjectClass objClass = env.createObjectClass("obj-class", null);
-		objClass.addAttribute("on-the-fly", new DomainAttribute("Test", AttributeType.STRING));
-		
-		agentClass.addOrSetObject("list", objClass);//register agentClass for changes of objClass
+        agentClass.addAttribute("list", new DomainAttribute("new-att", AttributeType.STRING));
 
-		AgentInstance inst = env.instanciateAgent(agentClass, "agent");//register inst with changes of agentClass
-		assertThat("original attribute is available", inst.getObject("list", "obj-class"), not(nullValue()));
-		objClass.addAttribute("on-the-fly", new DomainAttribute("new", AttributeType.STRING));
+        assertThat("new attribute of agentClass is propagated to instance", inst.getAttribute("list", "new-att"), notNullValue());
+        assertThat("existing attribute of agentClass is in instance", inst.getAttribute("list", "some-att"), notNullValue());
 
-		assertThat("new attribute is in owning agent", agentClass.getObjects("list")[0].getAttribute("on-the-fly", "new"), notNullValue());
-		assertThat("instance has a new instance of the new attribute", inst.getObject("list","obj-class").getAttribute("new"), notNullValue());
+    }
 
-	}
+    @Test
+    public void non_existing_agent_attributelist_should_be_created_on_the_fly() throws Exception {
+        env.createAgentClass("Test", null);
+        AgentClass agentClass = env.getAgentClass("Test");
+        agentClass.addAttribute("on-the-fly", new DomainAttribute("Test", AttributeType.STRING));
+        assertThat("attribute list exists", agentClass.getAttributeListNames()[0], equalTo("on-the-fly"));
+    }
 
-	@Test 
-	public void objects_of_simagent_classes_should_reference_dependent_objects() throws Exception {
-		
-		Environment env = new Environment("");
-		GenericAgentClass real = env.getAgentClassOperations().createAgentSubclass("test", null);
-		Frame dep = env.getObjectClassOperations().createObjectSubClass("obj", null);
-		dep.defineAttributeList("list");
-		dep.addOrSetAttribute("list", new DomainAttribute("att", AttributeType.STRING));
-		real.addOrSetChildFrame("children", dep);
-		AgentClass agentClass = new AgentClassSim(real);
-		ObjectClass wrapped = agentClass.getObjects("children")[0];
-		wrapped.addAttribute("list", new DomainAttribute("att2", AttributeType.STRING));
+    @Test
+    public void non_existing_object_attributelist_should_be_created_on_the_fly() throws Exception {
+        env.createObjectClass("Test", null);
+        ObjectClass objClass = env.getObjectClass("Test");
+        objClass.addAttribute("on-the-fly", new DomainAttribute("Test", AttributeType.STRING));
+        assertThat("attribute list exists", objClass.getAttributeListNames()[0], equalTo("on-the-fly"));
+    }
 
-		assertThat("new attribute is in owning agent", agentClass.getObjects("children")[0].getAttribute("list", "att2"), notNullValue());
-	}
+    @Test
+    public void non_existing_agent_framelist_should_be_created_on_the_fly() throws Exception {
+        env.createAgentClass("Test", null);
+        AgentClass agentClass = env.getAgentClass("Test");
+        agentClass.addOrSetObject("on-the-fly", env.createObjectClass("obj", null));
+        assertThat("object list exists", agentClass.getObjectListNames()[0], equalTo("on-the-fly"));
+        assertThat("object exists", agentClass.getObjects("on-the-fly").length, equalTo(1));
+    }
 
+    @Test
+    public void inherited_agent_attribute_should_not_overwrite_parent_attribute() throws Exception {
 
-	@Test 
-	public void agent_instances_should_inherit_new_frame_attributes_in_new_list() throws Exception {
-		env.createAgentClass("Test", null);
-		AgentClass agentClass = env.getAgentClass("Test");
+        env.createAgentClass("Test", null);
+        AgentClass agentClass = env.getAgentClass("Test");
 
-		AgentInstance inst = env.instanciateAgent(agentClass, "agent");
+        DomainAttribute att = new DomainAttribute("att-1", AttributeType.STRING);
+        att.setDefault("Hello world");
+        agentClass.addAttribute("list-1", att);
 
-		agentClass.addAttribute("list", new DomainAttribute("test-att", AttributeType.STRING));
-		
-		assertThat("new attribute of agentClass is propagated to instance", inst.getAttribute("list", "test-att"), notNullValue());
-	
-	}
-	
-	@Test 
-	public void agent_instances_should_inherit_new_frame_attributes_in_existing_list() throws Exception {
-		env.createAgentClass("Test", null);
-		AgentClass agentClass = env.getAgentClass("Test");
-		agentClass.addAttribute("list", new DomainAttribute("some-att", AttributeType.STRING));
+        AgentClass subtype = env.createAgentClass("Sub", "Test");
+        DomainAttribute inherited = subtype.getAttribute("list-1", "att-1");
+        inherited.setDefault("Hello subworld!");
+        subtype.setAttribute("list-1", inherited);
 
-		AgentInstance inst = env.instanciateAgent(agentClass, "agent");
+        DomainAttribute original = agentClass.getAttribute("list-1", "att-1");
+        inherited = subtype.getAttribute("list-1", "att-1");
 
-		agentClass.addAttribute("list", new DomainAttribute("new-att", AttributeType.STRING));
-		
-		assertThat("new attribute of agentClass is propagated to instance", inst.getAttribute("list", "new-att"), notNullValue());
-		assertThat("existing attribute of agentClass is in instance", inst.getAttribute("list", "some-att"), notNullValue());
-	
-	}
+        assertThat("Subclass modifications must not influence parent state", original.getDefaultValue(), not(equalTo(inherited.getDefaultValue())));
 
-	@Test 
-	public void non_existing_agent_attributelist_should_be_created_on_the_fly() throws Exception {
-		env.createAgentClass("Test", null);
-		AgentClass agentClass = env.getAgentClass("Test");
-		agentClass.addAttribute("on-the-fly", new DomainAttribute("Test", AttributeType.STRING));
-		assertThat("attribute list exists", agentClass.getAttributeListNames()[0], equalTo("on-the-fly"));
-	}
-	
-	@Test 
-	public void non_existing_object_attributelist_should_be_created_on_the_fly() throws Exception {
-		env.createObjectClass("Test", null);
-		ObjectClass objClass = env.getObjectClass("Test");
-		objClass.addAttribute("on-the-fly", new DomainAttribute("Test", AttributeType.STRING));
-		assertThat("attribute list exists", objClass.getAttributeListNames()[0], equalTo("on-the-fly"));
-	}
-	
-	@Test 
-	public void non_existing_agent_framelist_should_be_created_on_the_fly() throws Exception {
-		env.createAgentClass("Test", null);
-		AgentClass agentClass = env.getAgentClass("Test");
-		agentClass.addOrSetObject("on-the-fly", env.createObjectClass("obj", null));
-		assertThat("object list exists", agentClass.getObjectListNames()[0], equalTo("on-the-fly"));
-		assertThat("object exists", agentClass.getObjects("on-the-fly").length, equalTo(1));
-	}
-	
-	@Test
-	public void inherited_agent_attribute_should_not_overwrite_parent_attribute() throws Exception {
+    }
 
-		env.createAgentClass("Test", null);
-		AgentClass agentClass = env.getAgentClass("Test");
+    @Test
+    public void modifications_of_supertype_must_not_overwrite_modified_inherited_attribute() throws Exception {
 
-		DomainAttribute att = new DomainAttribute("att-1",AttributeType.STRING);
-		att.setDefault("Hello world");
-		agentClass.addAttribute("list-1", att);
+        env.createAgentClass("Test", null);
+        AgentClass agentClass = env.getAgentClass("Test");
+        String objectList = "objects";
+        String attrList = "olist-1";
+        String attrName = "att-1";
+        String defaultValue = "Hello world";
+        String overridenValue = "Hello subtype world!";
+        String secondTimeOverride = "Second time override";
 
-		AgentClass subtype = env.createAgentClass("Sub", "Test");
-		DomainAttribute inherited = subtype.getAttribute("list-1", "att-1");
-		inherited.setDefault("Hello subworld!");
-		subtype.setAttribute("list-1", inherited);
+        DomainAttribute att = new DomainAttribute(attrName, AttributeType.STRING);
+        att.setDefault(defaultValue);
+        ObjectClass objectClass = env.createObjectClass("TestObject", null);
+        objectClass.addAttribute(attrList, att);
+        agentClass.addOrSetObject(objectList, objectClass);
 
-		DomainAttribute original = agentClass.getAttribute("list-1", "att-1");
-		inherited = subtype.getAttribute("list-1", "att-1");
+        AgentClass subtype = env.createAgentClass("Sub", "Test");
+        ObjectClass inheritedObject = subtype.getObjects(objectList)[0];
+        DomainAttribute inherited = inheritedObject.getAttribute(attrList, attrName);
+        inherited.setDefault(overridenValue);
+        inheritedObject.setAttribute(attrList, inherited);
+        subtype.addOrSetObject(objectList, inheritedObject);
 
-		assertThat("Subclass modifications must not influence parent state", original.getDefaultValue(), not(equalTo(inherited.getDefaultValue())));
+        ObjectClass originalObject = agentClass.getObjects(objectList)[0];
+        DomainAttribute originalAttribute = originalObject.getAttribute(attrList, attrName);
+        originalAttribute.setDefault(secondTimeOverride);
+        originalObject.setAttribute(attrList, originalAttribute);
+        agentClass.addOrSetObject(objectList, originalObject);
 
-	}
+        DomainAttribute originalTest = agentClass.getObjects(objectList)[0].getAttribute(attrList, attrName);
+        DomainAttribute inheritedTest = subtype.getObjects(objectList)[0].getAttribute(attrList, attrName);
 
-	@Test
-	public void modifications_of_supertype_must_not_overwrite_modified_inherited_attribute() throws Exception {
+        assertThat("Subclass modifications must not influence parent state", originalTest.getDefaultValue(), equalTo(secondTimeOverride));
+        assertThat("Subclass modifications must not influence parent state", originalTest.getDefaultValue(),
+                not(equalTo(inheritedTest.getDefaultValue())));
 
-		env.createAgentClass("Test", null);
-		AgentClass agentClass = env.getAgentClass("Test");
-		String objectList = "objects";
-		String attrList = "olist-1";
-		String attrName = "att-1";
-		String defaultValue = "Hello world";
-		String overridenValue = "Hello subtype world!";
-		String secondTimeOverride = "Second time override";
+    }
 
-		DomainAttribute att = new DomainAttribute(attrName, AttributeType.STRING);
-		att.setDefault(defaultValue);
-		ObjectClass objectClass = env.createObjectClass("TestObject", null);
-		objectClass.addAttribute(attrList, att);
-		agentClass.addOrSetObject(objectList, objectClass);
+    @Test
+    public void inherited_agent_object_attribute_must_not_overwrite_parent_attribute() throws Exception {
 
-		AgentClass subtype = env.createAgentClass("Sub", "Test");
-		ObjectClass inheritedObject = subtype.getObjects(objectList)[0];
-		DomainAttribute inherited = inheritedObject.getAttribute(attrList, attrName);
-		inherited.setDefault(overridenValue);
-		inheritedObject.setAttribute(attrList, inherited);
-		subtype.addOrSetObject(objectList, inheritedObject);
+        env.createAgentClass("Test", null);
+        AgentClass agentClass = env.getAgentClass("Test");
+        String objectList = "objects";
+        String attrList = "olist-1";
+        String attrName = "att-1";
+        String defaultValue = "Hello world";
+        String overridenValue = "Hello subtype world!";
 
-		ObjectClass originalObject = agentClass.getObjects(objectList)[0];
-		DomainAttribute originalAttribute = originalObject.getAttribute(attrList, attrName);
-		originalAttribute.setDefault(secondTimeOverride);
-		originalObject.setAttribute(attrList, originalAttribute);
-		agentClass.addOrSetObject(objectList, originalObject);
+        DomainAttribute att = new DomainAttribute(attrName, AttributeType.STRING);
+        att.setDefault(defaultValue);
+        ObjectClass objectClass = env.createObjectClass("TestObject", null);
+        objectClass.addAttribute(attrList, att);
+        agentClass.addOrSetObject(objectList, objectClass);
 
-		DomainAttribute originalTest = agentClass.getObjects(objectList)[0].getAttribute(attrList, attrName);
-		DomainAttribute inheritedTest = subtype.getObjects(objectList)[0].getAttribute(attrList, attrName);
+        AgentClass subtype = env.createAgentClass("Sub", "Test");
+        ObjectClass inheritedObject = subtype.getObjects(objectList)[0];
+        DomainAttribute inherited = inheritedObject.getAttribute(attrList, attrName);
+        inherited.setDefault(overridenValue);
+        inheritedObject.setAttribute(attrList, inherited);
+        // subtype.addOrSetObject(objectList, inheritedObject);
 
-		assertThat("Subclass modifications must not influence parent state", originalTest.getDefaultValue(),
-				equalTo(secondTimeOverride));
-		assertThat("Subclass modifications must not influence parent state", originalTest.getDefaultValue(),
-				not(equalTo(inheritedTest.getDefaultValue())));
+        DomainAttribute originalTest = agentClass.getObjects(objectList)[0].getAttribute(attrList, attrName);
+        DomainAttribute inheritedTest = subtype.getObjects(objectList)[0].getAttribute(attrList, attrName);
 
-	}
+        assertThat("Subclass modifications must not influence parent state", originalTest.getDefaultValue(), equalTo(defaultValue));
+        assertThat("Subclass modifications must not influence parent state", inheritedTest.getDefaultValue(), not(equalTo(defaultValue)));
+        assertThat("Subclass modifications is expected", inheritedTest.getDefaultValue(), equalTo(overridenValue));
 
-	@Test
-	public void inherited_agent_object_attribute_must_not_overwrite_parent_attribute() throws Exception {
-
-		env.createAgentClass("Test", null);
-		AgentClass agentClass = env.getAgentClass("Test");
-		String objectList = "objects";
-		String attrList = "olist-1";
-		String attrName = "att-1";
-		String defaultValue = "Hello world";
-		String overridenValue ="Hello subtype world!";
-
-		DomainAttribute att = new DomainAttribute(attrName,AttributeType.STRING);
-		att.setDefault(defaultValue);
-		ObjectClass objectClass = env.createObjectClass("TestObject", null);
-		objectClass.addAttribute(attrList, att);
-		agentClass.addOrSetObject(objectList, objectClass);
-
-		AgentClass subtype = env.createAgentClass("Sub", "Test");
-		ObjectClass inheritedObject = subtype.getObjects(objectList)[0];
-		DomainAttribute inherited = inheritedObject.getAttribute(attrList, attrName);
-		inherited.setDefault(overridenValue);
-		inheritedObject.setAttribute(attrList, inherited);
-		// subtype.addOrSetObject(objectList, inheritedObject);
-
-		DomainAttribute originalTest = agentClass.getObjects(objectList)[0].getAttribute(attrList, attrName);
-		DomainAttribute inheritedTest = subtype.getObjects(objectList)[0].getAttribute(attrList, attrName);
-	
-		assertThat("Subclass modifications must not influence parent state", originalTest.getDefaultValue(), equalTo(defaultValue));
-		assertThat("Subclass modifications must not influence parent state", inheritedTest.getDefaultValue(), not(equalTo(defaultValue)));
-		assertThat("Subclass modifications is expected", inheritedTest.getDefaultValue(), equalTo(overridenValue));
-
-	}
+    }
 
 }

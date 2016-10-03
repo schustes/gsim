@@ -21,7 +21,7 @@ public class ConditionDef extends Instance {
     }
 
     public ConditionDef(String parameterName, String operator, String parameterValue) {
-        super(parameterName, new ConditionFrame(parameterName));
+        super(parameterName, ConditionFrame.newConditionFrame(parameterName));
         super.setAttribute(new StringAttribute("parameter-name", parameterName));
         super.setAttribute(new StringAttribute("operator", operator));
         super.setAttribute(new StringAttribute("parameter-value", parameterValue));

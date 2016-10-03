@@ -1,7 +1,7 @@
 package de.s2.gsim.environment;
 
 
-import static de.s2.gsim.environment.CommonFunctions.*;
+import static de.s2.gsim.environment.CommonFunctions.existsPath;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -233,9 +233,9 @@ public class AgentClassOperations {
 			if (subClass.isSuccessor(cls.getName())) {
 				BehaviourFrame beh = subClass.getBehaviour();
 				if (!(f instanceof RLRuleFrame)) {
-					beh.addOrSetRule(UserRuleFrame.inherit(Arrays.asList(f), f.getName(), f.getCategory()));
+                    beh.addOrSetRule(UserRuleFrame.inheritFromUserRuleFrames(Arrays.asList(f), f.getName(), f.getCategory()));
 				} else {
-					beh.addRLRule(RLRuleFrame.inherit(Arrays.asList(f), f.getName(), f.getCategory()));
+                    beh.addRLRule(RLRuleFrame.inheritFromRLRuleFrames(Arrays.asList(f), f.getName(), f.getCategory()));
 				}
 
 				subClass.replaceAncestor(here);

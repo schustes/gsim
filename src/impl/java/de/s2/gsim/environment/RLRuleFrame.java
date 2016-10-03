@@ -25,39 +25,48 @@ public class RLRuleFrame extends UserRuleFrame {
 
     private static Logger logger = Logger.getLogger(RLRuleFrame.class);
 
-    private RLRuleFrame (Frame f) {
-    	super(f);
+    private RLRuleFrame(String name, Frame... f) {
+        super(name, f);
     }
     public static RLRuleFrame inherit(Frame f) {
-    	RLRuleFrame rf = new RLRuleFrame(f);
+        RLRuleFrame rf = new RLRuleFrame(f.getName(), f);
         return rf;
+    }
+
+    /**
+     * Wrap an existing frame.
+     */
+    public static RLRuleFrame copy(Frame orig) {
+        RLRuleFrame ur = new RLRuleFrame(orig.getName(), orig.getParentFrames().toArray(new Frame[0]));
+        Frame.copyInternal(orig, ur);
+        return ur;
     }
 
     public static RLRuleFrame inherit(String name, Frame... parents) {
     	Objects.requireNonNull(parents);
     	Frame f = inherit(Arrays.asList(parents), name, Optional.empty());
-        RLRuleFrame ff = new RLRuleFrame(f);
+        RLRuleFrame ff = new RLRuleFrame(f.getName(), f);
         ff.init();
     	return ff;
     }
 
-    public static RLRuleFrame copy(Frame cloneFrom, String newName) {
+    public static RLRuleFrame copyAndWrap(Frame cloneFrom, String newName) {
     	Frame f = Frame.copy(cloneFrom, newName);
-    	RLRuleFrame rf = new RLRuleFrame(f);
+        RLRuleFrame rf = new RLRuleFrame(f.getName(), f);
     	return rf;
 
     }
 
-    public static RLRuleFrame inherit(List<Frame> parents, String name, String category) {
+    public static RLRuleFrame inheritFromRLRuleFrames(List<? extends UserRuleFrame> parents, String name, String category) {
         Frame f = Frame.inherit(parents, name, Optional.of(category));
-        RLRuleFrame ff = new RLRuleFrame(f);
+        RLRuleFrame ff = new RLRuleFrame(f.getName(), f);
         ff.init();
         return ff;
     }
 
     public static RLRuleFrame newRLRuleFrame(String name) {
     	Frame f = Frame.newFrame(name, Optional.of(CATEGORY));
-        RLRuleFrame rf = new RLRuleFrame(f);
+        RLRuleFrame rf = new RLRuleFrame(f.getName(), f);
         rf.init();
         return rf;
     }
@@ -84,9 +93,7 @@ public class RLRuleFrame extends UserRuleFrame {
 
     @Override
     public Frame clone() {
-        Frame f = (Frame) super.clone();
-        RLRuleFrame c = new RLRuleFrame(f);
-        return c;
+        return RLRuleFrame.copy(this);
     }
 
     public double getAvgBeta() {
@@ -113,7 +120,7 @@ public class RLRuleFrame extends UserRuleFrame {
         ArrayList<ConditionFrame> list = new ArrayList<>();
         for (Frame f: getChildFrames(INST_LIST_LEARNING)) {
             if (!f.getName().startsWith("{")) {
-                list.add(new ConditionFrame(f));
+                list.add(ConditionFrame.copyAndWrap(f));
             }
         }
 
@@ -150,7 +157,7 @@ public class RLRuleFrame extends UserRuleFrame {
         List<Frame> f = getChildFrames(INST_LIST_SHORTCUTS);
         UserRuleFrame[] res = new UserRuleFrame[f.size()];
         for (int i = 0; i < f.size(); i++) {
-            res[i] = new UserRuleFrame(f.get(i));
+            res[i] = new UserRuleFrame(f.get(i).getName(), f.get(i));
         }
         return res;
     }

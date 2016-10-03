@@ -1034,7 +1034,7 @@ public class EnvironmentSetup {
                 String name = action.getAttributeValue("name");
                 String cls = action.getAttributeValue("class");
 
-                ActionFrame f = new ActionFrame(name, cls);
+                ActionFrame f = ActionFrame.newActionFrame(name, cls);
                 frames.add(f);
 
                 actionCollections.put(f.getName(), f);
