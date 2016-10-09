@@ -51,7 +51,7 @@ public class GenericAgentClass extends Frame {
      static GenericAgentClass inherit(GenericAgentClass parent, String name) {
     	//Frame f = Frame.inherit(Arrays.asList(parent), name, Optional.of("generic"));
     	GenericAgentClass cls = new GenericAgentClass(name, (Frame)parent);
-        BehaviourFrame bf = BehaviourFrame.inherit(name + "-behaviour", Arrays.asList(parent.getBehaviour()));
+        BehaviourFrame bf = BehaviourFrame.inherit(name + "-behaviour", parent.getBehaviour());
     	cls.behaviour = bf.clone();
     	return cls;
     }
@@ -64,7 +64,7 @@ public class GenericAgentClass extends Frame {
     	GenericAgentClass cls = new GenericAgentClass(name, parents);
     	
     	List<BehaviourFrame> behaviours = Arrays.stream(parents).map(g->g.getBehaviour()).collect(Collectors.toList());
-        BehaviourFrame bf = BehaviourFrame.inherit(name + "-behaviour", behaviours);
+        BehaviourFrame bf = BehaviourFrame.inherit(name + "-behaviour", behaviours.toArray(new BehaviourFrame[behaviours.size()]));
     	cls.behaviour = bf.clone();
     	
     	return cls;
@@ -126,7 +126,7 @@ public class GenericAgentClass extends Frame {
         }
         allParents.add(otherRole.getBehaviour());
 
-        cls.behaviour = (BehaviourFrame) BehaviourFrame.inherit(behaviourName, allParents).clone();
+        cls.behaviour = (BehaviourFrame) BehaviourFrame.inherit(behaviourName, allParents.toArray(new BehaviourFrame[allParents.size()])).clone();
 
         cls.behaviour.setDeleteUnusedAfter(old.getDeleteUnusedAfter());
         cls.behaviour.setMaxDepth(old.getMaxDepth());

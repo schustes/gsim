@@ -125,7 +125,11 @@ public class Frame extends Unit<Frame, DomainAttribute> {
 	 * @param isSystem whether is system
 	 * @return the new frame
 	 */
-	private static Frame inherit(@NotNull List<Frame> parents, @NotNull String name, Optional<String> category, boolean isMutable, boolean isSystem) {
+	private static Frame inherit(@NotNull List<Frame> parents
+			, @NotNull String name
+			, Optional<String> category
+			, boolean isMutable
+			, boolean isSystem) {
 		Frame f = new Frame(name, category, isMutable, isSystem);
 		for (Frame parent : parents) {
 			f.parents.put(parent.getName(), parent);
@@ -190,7 +194,7 @@ public class Frame extends Unit<Frame, DomainAttribute> {
 	 * @param to the frame to copy to
 	 * @return references to the same frame being copied to
 	 */
-	protected static Frame copyInternal(@NotNull Frame from, @NotNull Frame to) {
+	protected static <F extends Frame> F copyInternal(@NotNull F from, @NotNull F to) {
 
 		from.getDeclaredAttributesListNames().stream().forEach(attList -> {
 			from.getDeclaredAttributes(attList).forEach(att -> to.addOrSetAttribute(attList, att));
@@ -574,7 +578,7 @@ public class Frame extends Unit<Frame, DomainAttribute> {
 	 */
 	public List<Frame> getDeclaredChildFrames(@NotNull String listname) {
 		if (!getObjectLists().containsKey(listname)) {
-			throw new NoSuchElementException("List " + listname + " is no declared in this frame level.");
+			throw new NoSuchElementException("List " + listname + " is not declared in this frame level.");
 		}
 		return getObjectLists().get(listname).stream().filter(o -> o instanceof Frame).map(o -> (Frame) o).collect(Collectors.toList());
 	}

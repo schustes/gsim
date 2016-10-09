@@ -51,6 +51,14 @@ public class BehaviourFrame extends Frame {
     private BehaviourFrame(Frame f) {
         super(f.getName(), f);
     }
+    
+    private BehaviourFrame(String name, Frame... f) {
+        super(name, f);
+    }
+    
+    private BehaviourFrame(String name) {
+    	 super(name, Optional.of(EntityTypes.BEHAVIOUR.toString()), false, true);
+    }
 
     /**
      * Copy, but give it a new name.
@@ -67,15 +75,15 @@ public class BehaviourFrame extends Frame {
     /**
      * Inheritance constructor.
      */
-    public static BehaviourFrame inherit(String name, List<BehaviourFrame> parents) {
-        Frame ff = Frame.inherit(parents, name, Optional.of(EntityTypes.BEHAVIOUR.toString()));
-        BehaviourFrame bf = new BehaviourFrame(ff);
+    public static BehaviourFrame inherit(String name, BehaviourFrame... parent) {
+        //Frame ff = Frame.inherit(parents, name, Optional.of(EntityTypes.BEHAVIOUR.toString()));
+        BehaviourFrame bf = new BehaviourFrame(name, parent);
         return bf;
     }
 
     public static BehaviourFrame newBehaviour(String name) {
-        Frame f = new Frame(name, Optional.of(EntityTypes.BEHAVIOUR.toString()), false, true);
-        BehaviourFrame bf = new BehaviourFrame(f);
+       // Frame f = new Frame(name, Optional.of(EntityTypes.BEHAVIOUR.toString()), false, true);
+        BehaviourFrame bf = new BehaviourFrame(name);
         bf.init();
         return bf;
     }
@@ -107,8 +115,8 @@ public class BehaviourFrame extends Frame {
      */
     @Override
     public BehaviourFrame clone() {
-        Frame a = (Frame) super.clone();
-        return new BehaviourFrame(a);
+    	BehaviourFrame b = new BehaviourFrame(this.getName(), this.getParentFrames().toArray(new BehaviourFrame[0]));
+    	return super.copyInternal(this, b);
     }
 
     /**
@@ -236,6 +244,11 @@ public class BehaviourFrame extends Frame {
      * @return UserRuleFrame[]
      */
     public UserRuleFrame[] getDeclaredRules() {
+    	
+    	if (!this.getObjectLists().containsKey(RULE_LIST)) {
+    		return new UserRuleFrame[0];
+    	}
+    	
         List<Frame> f = getDeclaredChildFrames(RULE_LIST);
 
         if (f == null) {

@@ -449,7 +449,7 @@ public class AgentClassOperations {
 
 		if (parent != null) {
 			BehaviourFrame here = getBehaviour(parent.getName());
-			behaviourFrame = BehaviourFrame.inherit(name, Arrays.asList(here));
+			behaviourFrame = BehaviourFrame.inherit(name, here);
 		} else {
 			behaviourFrame = BehaviourFrame.newBehaviour(name);
 			for (ActionFrame actionFrame : container.getAgentClass().getBehaviour().getAvailableActions()) {

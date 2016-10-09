@@ -202,7 +202,7 @@ public class EnvironmentTest {
     }
 
     @Test
-    public void verify_behaviour_inheritance() {
+    public void verify_behaviour_frame_inheritance() {
 
         Environment env = new Environment("test");
 
@@ -211,14 +211,76 @@ public class EnvironmentTest {
         GenericAgentClass sub = agentOperations.createAgentSubclass("Sub", base);
 
         BehaviourFrame baseBehaviour = base.getBehaviour();
-        BehaviourFrame subBehaviour = sub.getBehaviour();
 
         ActionFrame action = ActionFrame.newActionFrame("base-action", "com.test.action1");
         UserRuleFrame urf = UserRuleFrame.newUserRuleFrame("rule-1");
         ConditionFrame cf = ConditionFrame.newConditionFrame("a", ">", "b");
+        
+        baseBehaviour.addAction(action);
+        urf.addCondition(cf);
+        urf.addConsequence(action);
+        baseBehaviour.addOrSetRule(urf);
+        
+        env.getAgentClassOperations().changeAgentClassBehaviour(base, baseBehaviour);
 
-        throw new UnsupportedOperationException("Continue implementation");
+        BehaviourFrame subBehaviour = sub.getBehaviour();
+        UserRuleFrame subRule = subBehaviour.getRule("rule-1");
+        assertThat("Subrule is present in child agent after parent was modified", subRule, notNullValue());
+        
+        UserRuleFrame newRule = subBehaviour.createRule("rule-1");
+        ConditionFrame newCondition = newRule.createCondition("a", "<", "b");
+        newRule.addCondition(newCondition);
+        newRule.addConsequence(action);
+        subBehaviour.addOrSetRule(newRule);
+        
+        env.getAgentClassOperations().changeAgentClassBehaviour(sub, subBehaviour);
+        
+        UserRuleFrame pRule = env.getAgentClassOperations().getAgentSubClass("Base").getBehaviour().getRule("rule-1");
+        UserRuleFrame sRule = env.getAgentClassOperations().getAgentSubClass("Sub").getBehaviour().getRule("rule-1");
+        
+        assertThat("Overridden rule is retrieved", sRule.getConditions()[0].getOperator(), equalTo("<"));
+        assertThat("Parent rule is not modified", pRule.getConditions()[0].getOperator(), equalTo(">"));
+    }
+    
+    @Test
+    public void verify_behaviour_instance_inheritance() {
 
+        Environment env = new Environment("test");
+
+        AgentClassOperations agentOperations = env.getAgentClassOperations();
+        GenericAgentClass base = agentOperations.createAgentSubclass("Base", null);
+        GenericAgentClass sub = agentOperations.createAgentSubclass("Sub", base);
+
+        BehaviourFrame baseBehaviour = base.getBehaviour();
+
+        ActionFrame action = ActionFrame.newActionFrame("base-action", "com.test.action1");
+        UserRuleFrame urf = UserRuleFrame.newUserRuleFrame("rule-1");
+        ConditionFrame cf = ConditionFrame.newConditionFrame("a", ">", "b");
+        
+        baseBehaviour.addAction(action);
+        urf.addCondition(cf);
+        urf.addConsequence(action);
+        baseBehaviour.addOrSetRule(urf);
+        
+        env.getAgentClassOperations().changeAgentClassBehaviour(base, baseBehaviour);
+
+        BehaviourFrame subBehaviour = sub.getBehaviour();
+        UserRuleFrame subRule = subBehaviour.getRule("rule-1");
+        assertThat("Subrule is present in child agent after parent was modified", subRule, notNullValue());
+        
+        UserRuleFrame newRule = subBehaviour.createRule("rule-1");
+        ConditionFrame newCondition = newRule.createCondition("a", "<", "b");
+        newRule.addCondition(newCondition);
+        newRule.addConsequence(action);
+        subBehaviour.addOrSetRule(newRule);
+        
+        env.getAgentClassOperations().changeAgentClassBehaviour(sub, subBehaviour);
+        
+        UserRuleFrame pRule = env.getAgentClassOperations().getAgentSubClass("Base").getBehaviour().getRule("rule-1");
+        UserRuleFrame sRule = env.getAgentClassOperations().getAgentSubClass("Sub").getBehaviour().getRule("rule-1");
+        
+        assertThat("Overridden rule is retrieved", sRule.getConditions()[0].getOperator(), equalTo("<"));
+        assertThat("Parent rule is not modified", pRule.getConditions()[0].getOperator(), equalTo(">"));
     }
 
     @Test
