@@ -395,7 +395,7 @@ public class AgentClassOperations {
 
 				for (GenericAgent agent : container.getAllInstancesOfClass(p, GenericAgent.class)) {
 					agent.setDirty(true);
-					BehaviourDef np = new BehaviourDef(sb);
+					BehaviourDef np = BehaviourDef.instanciate(sb);
 					agent.setFrame(p);
 					agent.setBehaviour(np);
 				}
@@ -417,7 +417,7 @@ public class AgentClassOperations {
 
 		for (GenericAgent a : container.getAllInstancesOfClass(here, GenericAgent.class)) {
 			a.setDirty(true);
-			BehaviourDef np = new BehaviourDef(behaviourFrame);
+			BehaviourDef np = BehaviourDef.instanciate(behaviourFrame);
 			a.setFrame(here);
 			a.setBehaviour(np);
 		}

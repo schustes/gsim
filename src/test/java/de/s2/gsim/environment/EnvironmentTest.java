@@ -14,6 +14,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import de.s2.gsim.objects.AgentInstance;
 import de.s2.gsim.objects.attribute.AttributeType;
 import de.s2.gsim.objects.attribute.DomainAttribute;
 import de.s2.gsim.objects.attribute.NumericalAttribute;
@@ -249,7 +250,6 @@ public class EnvironmentTest {
 
         AgentClassOperations agentOperations = env.getAgentClassOperations();
         GenericAgentClass base = agentOperations.createAgentSubclass("Base", null);
-        GenericAgentClass sub = agentOperations.createAgentSubclass("Sub", base);
 
         BehaviourFrame baseBehaviour = base.getBehaviour();
 
@@ -263,24 +263,23 @@ public class EnvironmentTest {
         baseBehaviour.addOrSetRule(urf);
         
         env.getAgentClassOperations().changeAgentClassBehaviour(base, baseBehaviour);
-
-        BehaviourFrame subBehaviour = sub.getBehaviour();
-        UserRuleFrame subRule = subBehaviour.getRule("rule-1");
-        assertThat("Subrule is present in child agent after parent was modified", subRule, notNullValue());
         
-        UserRuleFrame newRule = subBehaviour.createRule("rule-1");
-        ConditionFrame newCondition = newRule.createCondition("a", "<", "b");
-        newRule.addCondition(newCondition);
-        newRule.addConsequence(action);
-        subBehaviour.addOrSetRule(newRule);
+        GenericAgent agent = env.getAgentInstanceOperations().instanciateAgentWithUniformDistributedAttributes(base, "Instance");
         
-        env.getAgentClassOperations().changeAgentClassBehaviour(sub, subBehaviour);
+        UserRule ruleInstance = agent.getBehaviour().getRule("rule-1");
         
-        UserRuleFrame pRule = env.getAgentClassOperations().getAgentSubClass("Base").getBehaviour().getRule("rule-1");
-        UserRuleFrame sRule = env.getAgentClassOperations().getAgentSubClass("Sub").getBehaviour().getRule("rule-1");
+        assertThat("Instance rule is available", ruleInstance.getConditions()[0].getOperator(), equalTo(">"));
         
-        assertThat("Overridden rule is retrieved", sRule.getConditions()[0].getOperator(), equalTo("<"));
-        assertThat("Parent rule is not modified", pRule.getConditions()[0].getOperator(), equalTo(">"));
+        urf.addCondition(ConditionFrame.newConditionFrame("a", "<", "c"));
+        baseBehaviour.addOrSetRule(urf);
+        
+        env.getAgentClassOperations().changeAgentClassBehaviour(base, baseBehaviour);
+        
+        agent = env.getAgentInstanceOperations().getAgent("Instance");
+        ruleInstance = agent.getBehaviour().getRule("rule-1");
+        
+        assertThat("Instance rule is modified", ruleInstance.getConditions().length, equalTo(2));
+        
     }
 
     @Test

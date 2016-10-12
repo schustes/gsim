@@ -8,16 +8,12 @@ public class BehaviourDef extends Instance {
 
     public static final long serialVersionUID = 47162704396246620L;
 
-    /**
-     * Inheritance constructor.
-     * 
-     * @see Frame(String, Frame, int).
-     * @param f
-     *            Frame
-     * @param id
-     *            int
-     */
-    public BehaviourDef(Frame f) {
+    public static BehaviourDef instanciate(BehaviourFrame frame) {
+    	Instance inst = Instance.instanciate(frame.getName(), frame);   	
+    	return new BehaviourDef(inst);
+    }
+    
+    private BehaviourDef(Frame f) {
         super(f.getName(), f);
     }
 

@@ -40,7 +40,7 @@ public class GenericAgent extends Instance {
     public GenericAgent(String name, GenericAgentClass cls) {
         super(name, cls);
         this.instanciate(cls);
-        behaviour = new BehaviourDef(cls.getBehaviour());
+        behaviour =  BehaviourDef.instanciate(cls.getBehaviour());
     }
 
     @Override
