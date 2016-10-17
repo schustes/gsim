@@ -1,5 +1,9 @@
 package de.s2.gsim.objects;
 
+import de.s2.gsim.api.objects.impl.UnitWrapper;
+import de.s2.gsim.environment.Frame;
+import de.s2.gsim.objects.attribute.DomainAttribute;
+
 /**
  * Represents a simple if-then rule.
  * 

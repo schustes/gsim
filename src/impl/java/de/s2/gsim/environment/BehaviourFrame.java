@@ -33,19 +33,25 @@ public class BehaviourFrame extends Frame {
      * @param f BehaviourFrame
      */
     public static BehaviourFrame copy(BehaviourFrame f) {
-        return new BehaviourFrame(f);
+    	 return copyWithName(f.getName(), f);
     }
 
-    public BehaviourFrame(BehaviourFrame f, String category) {
-        super(f.getName(), f);
-        this.category = category;
-    }
+//    public BehaviourFrame(BehaviourFrame f, String category) {
+//        super(f.getName(), f);
+//        this.category = category;
+//    }
 
     /**
      * Copy constructor
      */
     public static BehaviourFrame copy(Frame f) {
-        return new BehaviourFrame(f);
+        return copyWithName(f.getName(), f);
+    }
+
+    public static BehaviourFrame copyWithName(String name, Frame f) {
+        BehaviourFrame bf = new BehaviourFrame(name, f.getParentFrames().toArray(new Frame[0]));
+        Frame.copyInternal(f, bf);
+        return bf;
     }
 
     private BehaviourFrame(Frame f) {
@@ -60,17 +66,6 @@ public class BehaviourFrame extends Frame {
     	 super(name, Optional.of(EntityTypes.BEHAVIOUR.toString()), false, true);
     }
 
-    /**
-     * Copy, but give it a new name.
-     * 
-     * @param f BehaviourFrame
-     * @param p PerceptionFrame
-     */
-    public static BehaviourFrame copy(String name, BehaviourFrame f, String category) {
-        Frame ff = Frame.copy(f, name);
-        BehaviourFrame bf = new BehaviourFrame(ff);
-        return bf;
-    }
 
     /**
      * Inheritance constructor.
@@ -257,7 +252,7 @@ public class BehaviourFrame extends Frame {
 
         UserRuleFrame[] uf = new UserRuleFrame[f.size()];
         for (int i = 0; i < f.size(); i++) {
-            uf[i] = new UserRuleFrame(f.get(i).getName(), f.get(i));
+            uf[i] = UserRuleFrame.wrap(f.get(i));
         }
         return uf;
     }
@@ -326,7 +321,7 @@ public class BehaviourFrame extends Frame {
         List<Frame> f = getChildFrames(RULE_LIST);
         UserRuleFrame[] uf = new UserRuleFrame[f.size()];
         for (int i = 0; i < f.size(); i++) {
-            uf[i] = new UserRuleFrame(f.get(i).getName(), f.get(i));
+            uf[i] = UserRuleFrame.wrap(f.get(i));
         }
         return uf;
     }

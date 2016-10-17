@@ -6,113 +6,120 @@ import de.s2.gsim.GSimException;
 import de.s2.gsim.api.objects.impl.UnitWrapper;
 import de.s2.gsim.environment.ActionFrame;
 import de.s2.gsim.environment.ConditionFrame;
+import de.s2.gsim.environment.Frame;
 import de.s2.gsim.environment.Unit;
 import de.s2.gsim.environment.UserRuleFrame;
 import de.s2.gsim.objects.Condition;
 import de.s2.gsim.objects.Rule;
+import de.s2.gsim.objects.attribute.DomainAttribute;
 
 public class RuleClass implements Rule, UnitWrapper {
 
-    protected BehaviourClass owner;
+	protected BehaviourClass owner;
 
-    protected UserRuleFrame real;
+	private UserRuleFrame real;
 
-    public RuleClass(BehaviourClass owner, UserRuleFrame real) {
-        this.real = real;
-        this.owner = owner;
-    }
+	protected UserRuleFrame getReal() {
+		real = (UserRuleFrame) ((UnitWrapper) owner.getRule(real.getName())).toUnit();
+		return real;
+	}
 
-    @Override
-    public void addOrSetCondition(Condition cond) throws GSimException {
-        ConditionFrame f = (ConditionFrame) ((UnitWrapper) cond).toUnit();
-        real.removeCondition(f);
-        real.addCondition(f);
-        owner.addOrSetRule(this);
-    }
+	public RuleClass(BehaviourClass owner, UserRuleFrame real) {
+		this.real = real;
+		this.owner = owner;
+	}
 
-    @Override
-    public void addOrSetConsequent(de.s2.gsim.objects.Action cons) throws GSimException {
-        real.removeConsequence((ActionFrame) ((UnitWrapper) cons).toUnit());
-        real.addConsequence((ActionFrame) ((UnitWrapper) cons).toUnit());
-        owner.addOrSetRule(this);
-    }
+	@Override
+	public void addOrSetCondition(Condition cond) throws GSimException {
+		ConditionFrame f = (ConditionFrame) ((UnitWrapper) cond).toUnit();
+		getReal().removeCondition(f);
+		getReal().addCondition(f);
+		owner.addOrSetRule(this);
+	}
 
-    @Override
-    public Condition createCondition(String paramName, String op, String val) throws GSimException {
-        ConditionFrame c = real.createCondition(paramName, op, val);
-        real.addCondition(c);
-        return new ConditionClass(this, c);
-    }
+	@Override
+	public void addOrSetConsequent(de.s2.gsim.objects.Action cons) throws GSimException {
+		getReal().removeConsequence((ActionFrame) ((UnitWrapper) cons).toUnit());
+		getReal().addConsequence((ActionFrame) ((UnitWrapper) cons).toUnit());
+		owner.addOrSetRule(this);
+	}
 
-    @Override
-    public Condition[] getConditions() {
+	@Override
+	public Condition createCondition(String paramName, String op, String val) throws GSimException {
+		ConditionFrame c = getReal().createCondition(paramName, op, val);
+		getReal().addCondition(c);
+		return new ConditionClass(this, c);
+	}
 
-        ConditionFrame[] c = real.getConditions();
-        ConditionClass[] ret = new ConditionClass[c.length];
-        for (int i = 0; i < c.length; i++) {
-            ret[i] = new ConditionClass(this, c[i]);
-        }
-        return ret;
-    }
+	@Override
+	public Condition[] getConditions() {
 
-    @Override
-    public de.s2.gsim.objects.Action getConsequent(String name) {
-        ActionFrame[] c = real.getConsequents();
-        for (int i = 0; i < c.length; i++) {
-            if (c[i].getName().equals(name)) {
-                return new ActionClass(this, c[i]);
-            }
-        }
-        return null;
-    }
+		ConditionFrame[] c = getReal().getConditions();
+		ConditionClass[] ret = new ConditionClass[c.length];
+		for (int i = 0; i < c.length; i++) {
+			ret[i] = new ConditionClass(this, c[i]);
+		}
+		return ret;
+	}
 
-    @Override
-    public de.s2.gsim.objects.Action[] getConsequents() {
-        ArrayList<de.s2.gsim.objects.Action> list = new ArrayList<>();
+	@Override
+	public de.s2.gsim.objects.Action getConsequent(String name) {
+		ActionFrame[] c = getReal().getConsequents();
+		for (int i = 0; i < c.length; i++) {
+			if (c[i].getName().equals(name)) {
+				return new ActionClass(this, c[i]);
+			}
+		}
+		return null;
+	}
 
-        ActionFrame[] c = real.getConsequents();
-        for (int i = 0; i < c.length; i++) {
-            if (!c[i].getName().startsWith("{")) {
-                list.add(new ActionClass(this, c[i]));
-            }
-        }
+	@Override
+	public de.s2.gsim.objects.Action[] getConsequents() {
+		ArrayList<de.s2.gsim.objects.Action> list = new ArrayList<>();
 
-        de.s2.gsim.objects.Action[] ret = new ActionClass[list.size()];
-        list.toArray(ret);
-        return ret;
-    }
+		ActionFrame[] c = getReal().getConsequents();
+		for (int i = 0; i < c.length; i++) {
+			if (!c[i].getName().startsWith("{")) {
+				list.add(new ActionClass(this, c[i]));
+			}
+		}
 
-    @Override
-    public String getName() throws GSimException {
-        return real.getName();
-    }
+		de.s2.gsim.objects.Action[] ret = new ActionClass[list.size()];
+		list.toArray(ret);
+		return ret;
+	}
 
-    @Override
-    public boolean isActivated() {
-        return real.isActivated();
-    }
+	@Override
+	public String getName() throws GSimException {
+		return getReal().getName();
+	}
 
-    @Override
-    public void removeCondition(Condition cond) throws GSimException {
-        real.removeCondition((ConditionFrame) ((UnitWrapper) cond).toUnit());
-        owner.addOrSetRule(this);
-    }
+	@Override
+	public boolean isActivated() {
+		return getReal().isActivated();
+	}
 
-    @Override
-    public void removeConsequent(de.s2.gsim.objects.Action cons) throws GSimException {
-        real.removeConsequence((ActionFrame) ((UnitWrapper) cons).toUnit());
-        owner.addOrSetRule(this);
-    }
+	@Override
+	public void removeCondition(Condition cond) throws GSimException {
+		getReal().removeCondition((ConditionFrame) ((UnitWrapper) cond).toUnit());
+		owner.addOrSetRule(this);
+	}
 
-    @Override
-    public void setActivated(boolean b) throws GSimException {
-        real.setActivated(b);
-        owner.addOrSetRule(this);
-    }
+	@Override
+	public void removeConsequent(de.s2.gsim.objects.Action cons) throws GSimException {
+		getReal().removeConsequence((ActionFrame) ((UnitWrapper) cons).toUnit());
+		owner.addOrSetRule(this);
+	}
 
-    @Override
-    public Unit toUnit() {
-        return real;
-    }
+	@Override
+	public void setActivated(boolean b) throws GSimException {
+		getReal().setActivated(b);
+		owner.addOrSetRule(this);
+	}
+
+	@Override
+	public Unit<Frame, DomainAttribute> toUnit() {
+		return real;
+	}
 
 }

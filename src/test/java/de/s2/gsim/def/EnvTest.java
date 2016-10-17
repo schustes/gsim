@@ -21,8 +21,10 @@ import de.s2.gsim.api.objects.impl.AgentClassSim;
 import de.s2.gsim.environment.Environment;
 import de.s2.gsim.environment.Frame;
 import de.s2.gsim.environment.GenericAgentClass;
+import de.s2.gsim.objects.Action;
 import de.s2.gsim.objects.AgentClass;
 import de.s2.gsim.objects.AgentInstance;
+import de.s2.gsim.objects.Condition;
 import de.s2.gsim.objects.ObjectClass;
 import de.s2.gsim.objects.attribute.AttributeType;
 import de.s2.gsim.objects.attribute.DomainAttribute;
@@ -34,11 +36,67 @@ public class EnvTest {
     @Rule
     public ExpectedException expected = ExpectedException.none();
 
+    static GSimCore core = GSimCoreFactory.defaultFactory().createCore();
+
     @Before
     public void setupEnv() {
-        GSimCore core = GSimCoreFactory.defaultFactory().createCore();
-        core = GSimCoreFactory.customFactory("Standalone").createCore();
+       // core = GSimCoreFactory.customFactory("Standalone").createCore();
         env = core.create("test", new HashMap<>());
+    }
+    
+    @Test
+    public void verify_behaviour_class_inheritance() throws Exception {
+    
+    	AgentClass parent = env.createAgentClass("Test", null);
+    	AgentClass child = env.createAgentClass("Test2", "Test");
+    	
+    	//TODO behaviour wrappers and owning agents are out-of-sync. environment agentClasses and frames look fine.
+    	
+    	parent.addAttribute("numbers", new DomainAttribute("counter", AttributeType.NUMERICAL));
+    	de.s2.gsim.objects.Rule rule = parent.getBehaviour().createRule("test");
+    	Condition condition = rule.createCondition("numbers/counter", ">", "0");
+    	Action action = parent.getBehaviour().createAction("consequent", "de.2s.sim.TestAction");
+    	parent.getBehaviour().addOrSetAction(action);
+    	rule.addOrSetConsequent(action);
+    	Action consequent = rule.getConsequent(action.getName());
+    	rule.addOrSetCondition(condition);
+    	parent.getBehaviour().addOrSetRule(rule);
+    	
+    	rule = parent.getBehaviour().getRule("test");//rule is not correct
+    	assertThat("Rule conditions exist", rule.getConditions(), notNullValue());
+    	assertThat("Rule consequents exist", rule.getConsequents(), notNullValue());
+    	
+    	de.s2.gsim.objects.Rule ruleChild = child.getBehaviour().getRule("test");
+    	assertThat("Child agent inherits parent behaviour", ruleChild, notNullValue());
+    	
+    	Condition oldConditionRef = ruleChild.getConditions()[0];
+    	Action oldActionRef = ruleChild.getConsequents()[0];
+    	
+    	//destroys previous behaviour !?
+    	rule.getConditions()[0].setOperator("<");
+    	rule.getConsequents()[0].setActionClassName("modified.class");
+    	//TODO references are not observing, only agents. But a change in parent rule wrapper should also be propagated to child rule wrappers
+    	//--> behaviour must observe agent and notify rules and available actions,
+    	// rule must observe behaviour and notify conditions and consequents, action must observe behaviour
+    	//
+    	//ruleChild = child.getBehaviour().getRule("test");// then this is obsolete.
+    	String op = ruleChild.getConditions()[0].getOperator();
+    	String op1 = oldConditionRef.getOperator();
+    	
+    	assertThat("Parent modifications are propagated", op, equalTo("<"));    	
+    	assertThat("All refs are updated", op, equalTo(op1));
+    	
+    	String modified = consequent.getActionClassName();
+    	assertThat("Original action refs updated", modified, equalTo("modified.class"));
+
+    	String s = oldActionRef.getActionClassName();
+    	assertThat("Dependent action refs updated", s, equalTo("modified.class"));
+
+    }
+
+    @Test
+    public void verify_behaviour_instance_inheritance() throws Exception {
+    	//TODO - on instance level also getParentWrapper()... must be called and get all instances fresh from env up to top level
     }
 
     @Test
@@ -51,7 +109,7 @@ public class EnvTest {
         env.instanciateAgentsUniformDistributed(agentClass2, prefix2, 10);
 
         AgentInstance[] testInstances = env.getAgents(agentClass.getName());
-        AgentInstance[] test2Instances = env.getAgents(agentClass.getName());
+        AgentInstance[] test2Instances = env.getAgents(agentClass2.getName());
 
         assertThat("agent instances are separate", testInstances.length, equalTo(10));
         assertThat("agent instances are separate", test2Instances.length, equalTo(10));

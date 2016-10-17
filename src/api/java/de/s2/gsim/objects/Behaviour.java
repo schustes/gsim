@@ -3,6 +3,7 @@ package de.s2.gsim.objects;
 import java.io.Serializable;
 
 import de.s2.gsim.GSimException;
+import de.s2.gsim.environment.Unit;
 
 /**
  * The <code>Behaviour</code> class is the interface representing both behaviour frames and instances. It contains the whole behaviour of the agent,
@@ -218,5 +219,7 @@ public interface Behaviour extends Serializable {
      * @throws GSimException
      */
     void setUpdateInterval(int n) throws GSimException;
+    
+   
 
 }

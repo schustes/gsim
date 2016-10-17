@@ -4,6 +4,6 @@ import de.s2.gsim.environment.Unit;
 
 public interface UnitWrapper {
 
-    public Unit<?,?> toUnit();
+    Unit<?, ?> toUnit();
 
 }

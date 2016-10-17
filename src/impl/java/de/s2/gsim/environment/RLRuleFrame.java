@@ -36,10 +36,8 @@ public class RLRuleFrame extends UserRuleFrame {
     /**
      * Wrap an existing frame.
      */
-    public static RLRuleFrame copy(Frame orig) {
-        RLRuleFrame ur = new RLRuleFrame(orig.getName(), orig.getParentFrames().toArray(new Frame[0]));
-        Frame.copyInternal(orig, ur);
-        return ur;
+    public static RLRuleFrame wrap(Frame orig) {
+    	return wrap(orig, orig.getName());
     }
 
     public static RLRuleFrame inherit(String name, Frame... parents) {
@@ -50,11 +48,10 @@ public class RLRuleFrame extends UserRuleFrame {
     	return ff;
     }
 
-    public static RLRuleFrame copyAndWrap(Frame cloneFrom, String newName) {
-    	Frame f = Frame.copy(cloneFrom, newName);
-        RLRuleFrame rf = new RLRuleFrame(f.getName(), f);
-    	return rf;
-
+    public static RLRuleFrame wrap(Frame orig, String newName) {
+        RLRuleFrame ur = new RLRuleFrame(newName, orig.getParentFrames().toArray(new Frame[0]));
+        Frame.copyInternal(orig, ur);
+        return ur;
     }
 
     public static RLRuleFrame inheritFromRLRuleFrames(List<? extends UserRuleFrame> parents, String name, String category) {
@@ -93,7 +90,7 @@ public class RLRuleFrame extends UserRuleFrame {
 
     @Override
     public Frame clone() {
-        return RLRuleFrame.copy(this);
+        return RLRuleFrame.wrap(this);
     }
 
     public double getAvgBeta() {
@@ -157,7 +154,7 @@ public class RLRuleFrame extends UserRuleFrame {
         List<Frame> f = getChildFrames(INST_LIST_SHORTCUTS);
         UserRuleFrame[] res = new UserRuleFrame[f.size()];
         for (int i = 0; i < f.size(); i++) {
-            res[i] = new UserRuleFrame(f.get(i).getName(), f.get(i));
+            res[i] = UserRuleFrame.wrap(f.get(i));
         }
         return res;
     }

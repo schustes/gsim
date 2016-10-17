@@ -136,7 +136,7 @@ public class AgentClassOperations {
 		BehaviourFrame behaviourClass = BehaviourFrame.newBehaviour("Behaviour");
 		container.getBehaviourClasses().add(behaviourClass);
 		for (GenericAgentClass c : container.getAgentSubClasses()) {
-			BehaviourFrame f = new BehaviourFrame(c.getBehaviour(), BehaviourFrame.CATEGORY);
+			BehaviourFrame f = BehaviourFrame.inherit(c.getBehaviour().getName(), c.getBehaviour());
 			f.replaceAncestor(behaviourClass);
 			container.getBehaviourClasses().add(f);
 		}

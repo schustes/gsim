@@ -9,27 +9,39 @@ import de.s2.gsim.objects.Condition;
 public class ConditionClass implements Condition, UnitWrapper {
 
     private RuleClass owner;
-
+    
     private ConditionFrame real;
+    
+    private ConditionFrame getReal() {
+    	
+    	for (Condition c: owner.getConditions()) {
+    		ConditionFrame f= (ConditionFrame)((UnitWrapper)c).toUnit();
+    		if (f.getName().equals(real.getName())) {
+    			this.real = f;
+    			break;
+    		}
+    	}
+    	return this.real;
+    }
 
     public ConditionClass(RuleClass owner, ConditionFrame real) {
         this.real = real;
         this.owner = owner;
     }
-
+    
     @Override
     public String getOperator() {
-        return real.getOperator();
+        return getReal().getOperator();
     }
 
     @Override
     public String getParameterName() {
-        return real.getParameterName();
+        return getReal().getParameterName();
     }
 
     @Override
     public String getParameterValue() {
-        return real.getParameterValue();
+        return getReal().getParameterValue();
     }
 
     @Override
@@ -51,7 +63,7 @@ public class ConditionClass implements Condition, UnitWrapper {
     }
 
     @Override
-    public Unit toUnit() {
+    public Unit<?,?> toUnit() {
         return real;
     }
 

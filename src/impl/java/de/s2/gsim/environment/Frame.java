@@ -25,7 +25,7 @@ import de.s2.gsim.objects.attribute.DomainAttribute;
  * @author stephan
  *
  */
-public class Frame extends Unit<Frame, DomainAttribute> {
+public class Frame extends Unit<Frame , DomainAttribute> {
 
 	/**
 	 * An optional classification.
@@ -362,8 +362,10 @@ public class Frame extends Unit<Frame, DomainAttribute> {
 	/**
 	 * Gets ancestor identified by its name.
 	 * 
+	 * Throws a NoSuchElementException if not found
+	 * 
 	 * @param name the ancestor's name
-	 * @return the ancestor or null if not found
+	 * @return the ancestor
 	 */
 	public Frame getAncestor(@NotNull String name) {
 

@@ -41,10 +41,17 @@ public class UserRuleFrame extends Frame {
         Frame.copyInternal(orig, ur);
         return ur;
     }
+    
+    /**
+     * Wrap an existing frame.
+     */
+    public static UserRuleFrame wrap(Frame orig) {
+    	return wrap(orig, orig.getName(), orig.getCategory());
+    }
 
     public static UserRuleFrame newUserRuleFrame(String name) {
 
-    	Frame f = Frame.newFrame(name, Optional.of(CATEGORY));
+    	UserRuleFrame f = new UserRuleFrame(name);// Frame.newFrame(name, Optional.of(CATEGORY));
         Frame f2 = Frame.newFrame("{all-actions}", Optional.of("action"));
         f.addOrSetChildFrame("consequences", f2);
 
@@ -52,7 +59,7 @@ public class UserRuleFrame extends Frame {
         a.setDefault("true");
         f.addOrSetAttribute(ATTR_LIST_ATTRS, a);
 
-        return new UserRuleFrame(f.getName(), f);
+        return f;
 
     }
 

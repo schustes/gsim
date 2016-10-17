@@ -28,17 +28,30 @@ public class ObjectClassDef extends Observable implements ObjectClass, UnitWrapp
 
     protected Environment env;
 
-    protected Frame real;
+    private Frame real;
     
     /**
      * Constructor.
      * 
      * @param env environment instance
-     * @param real the reference to the actual frame
+     * @param getReal() the reference to the actual frame
      */
     public ObjectClassDef(Environment env, Frame real) {
         this.env = env;
         this.real = real;
+    }
+    
+    protected Frame getRealRef() {
+    	return this.real;
+    }
+    
+    protected Frame getReal() {
+    	this.real = env.getObjectClassOperations().getObjectSubClass(real.getName());
+    	return this.real;
+    }
+    
+    protected void setReal(Frame real) {
+    	this.real = real;
     }
 	
     @Override
@@ -48,10 +61,10 @@ public class ObjectClassDef extends Observable implements ObjectClass, UnitWrapp
         }
 
         try {
-        	if (!real.getAttributeLists().containsKey(list)) {
-				env.getObjectClassOperations().addAttributeList(real, list);
+        	if (!getReal().getAttributeLists().containsKey(list)) {
+				env.getObjectClassOperations().addAttributeList(getReal(), list);
         	}
-			real = env.getObjectClassOperations().addAttribute(real, Path.attributeListPath(list), a);
+        	this.real = env.getObjectClassOperations().addAttribute(getReal(), Path.attributeListPath(list), a);
         } catch (Exception e) {
             throw new GSimException(e);
         }
@@ -67,8 +80,8 @@ public class ObjectClassDef extends Observable implements ObjectClass, UnitWrapp
         }
 
         try {
-            env.getObjectClassOperations().removeObjectClass(real);
-            real = null;
+            env.getObjectClassOperations().removeObjectClass(getReal());
+            this.real = null;
         } catch (Exception e) {
             throw new GSimException(e);
         }
@@ -85,7 +98,7 @@ public class ObjectClassDef extends Observable implements ObjectClass, UnitWrapp
         }
 
         try {
-            return real.getAttribute(list, attName);
+            return getReal().getAttribute(list, attName);
         } catch (Exception e) {
             throw new GSimException(e);
         }
@@ -99,7 +112,7 @@ public class ObjectClassDef extends Observable implements ObjectClass, UnitWrapp
         }
 
         try {
-            return real.getAttributesListNames().toArray(new String[0]);
+            return getReal().getAttributesListNames().toArray(new String[0]);
         } catch (Exception e) {
             throw new GSimException(e);
         }
@@ -113,7 +126,7 @@ public class ObjectClassDef extends Observable implements ObjectClass, UnitWrapp
         }
 
         try {
-            return real.getAttributes(list).toArray(new DomainAttribute[0]);
+            return getReal().getAttributes(list).toArray(new DomainAttribute[0]);
         } catch (Exception e) {
             throw new GSimException(e);
         }
@@ -127,7 +140,7 @@ public class ObjectClassDef extends Observable implements ObjectClass, UnitWrapp
         }
 
         try {
-            DomainAttribute a = real.getAttribute(list, attName);
+            DomainAttribute a = getReal().getAttribute(list, attName);
             return a.getDefaultValue();
         } catch (Exception e) {
             throw new GSimException(e);
@@ -142,7 +155,7 @@ public class ObjectClassDef extends Observable implements ObjectClass, UnitWrapp
         }
 
         try {
-            return real.getName();
+            return getReal().getName();
         } catch (Exception e) {
             throw new GSimException(e);
         }
@@ -150,7 +163,7 @@ public class ObjectClassDef extends Observable implements ObjectClass, UnitWrapp
 
     @Override
     public boolean isDeclaredAttribute(String list, String attName) throws GSimException {
-        return real.isDeclaredAttribute(list, attName);
+        return getReal().isDeclaredAttribute(list, attName);
     }
 
     @Override
@@ -161,10 +174,10 @@ public class ObjectClassDef extends Observable implements ObjectClass, UnitWrapp
         }
 
         try {
-        	Object o = real.resolvePath(Path.attributePath(path.split("/")));
+        	Object o = getReal().resolvePath(Path.attributePath(path.split("/")));
 
 			if (o == null) {
-				o = real.resolvePath(Path.attributeListPath(path.split("/")));
+				o = getReal().resolvePath(Path.attributeListPath(path.split("/")));
 			} 
 
 			if (o == null) {
@@ -191,7 +204,7 @@ public class ObjectClassDef extends Observable implements ObjectClass, UnitWrapp
         }
 
         try {
-            real = env.getObjectClassOperations().modifyObjectClassAttribute(real, Path.attributePath(list, a.getName()), a);
+        	real = env.getObjectClassOperations().modifyObjectClassAttribute(getReal(), Path.attributePath(list, a.getName()), a);
         } catch (Exception e) {
             throw new GSimException(e);
         }
@@ -207,9 +220,9 @@ public class ObjectClassDef extends Observable implements ObjectClass, UnitWrapp
         }
 
         try {
-            DomainAttribute a = real.getAttribute(list, attName);
+            DomainAttribute a = getReal().getAttribute(list, attName);
             a.setDefault(value);
-            real = env.getObjectClassOperations().modifyObjectClassAttribute(real, Path.attributePath(list, a.getName()), a);
+           real = env.getObjectClassOperations().modifyObjectClassAttribute(getReal(), Path.attributePath(list, a.getName()), a);
         } catch (Exception e) {
             throw new GSimException(e);
         }

@@ -72,6 +72,10 @@ public class EnvironmentWrapper implements ModelDefinitionEnvironment {
 
             GenericAgentClass newAgentClass = env.getAgentClassOperations().createAgentSubclass(name, g);
             AgentClassDef def = new AgentClassDef(env, newAgentClass);
+            AgentClassDef parentWrapper = wrapperAgents.get(parent);
+            if (parentWrapper != null) {
+            	parentWrapper.addObserver(def);
+            }
             wrapperAgents.put(def.getName(), def);
 
             return def;

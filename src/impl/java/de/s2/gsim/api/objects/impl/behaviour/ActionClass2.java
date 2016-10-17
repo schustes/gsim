@@ -19,60 +19,65 @@ public class ActionClass2 implements de.s2.gsim.objects.Action, UnitWrapper {
         this.owner = owner;
     }
 
+    private ActionFrame getReal() {
+    	this.real = (ActionFrame)((UnitWrapper)owner.getAction(real.getName())).toUnit();
+    	return this.real;
+    }
+    
     @Override
     public void addObjectClassParam(String objectClassName) throws GSimException {
-        real.addObjectClassParam(objectClassName, null);
+    	getReal().addObjectClassParam(objectClassName, null);
         owner.addOrSetAction(this);
     }
 
     @Override
     public void clearObjectClassParams() throws GSimException {
-        real.clearObjectClassParams();
+    	getReal().clearObjectClassParams();
         owner.addOrSetAction(this);
     }
 
     @Override
     public String getActionClassName() {
-        return real.getClassName();
+        return getReal().getClassName();
     }
 
     public String getFilterExpression(String objParam) {
-        return real.getFilterExpression(objParam);
+        return getReal().getFilterExpression(objParam);
     }
 
     @Override
     public String getName() {
-        return real.getName();
+        return getReal().getName();
     }
 
     @Override
     public String[] getObjectClassParams() {
-        return real.getObjectClassParams();
+        return getReal().getObjectClassParams();
     }
 
     public double getSalience() {
-        return real.getSalience();
+        return getReal().getSalience();
     }
 
     @Override
     public boolean hasObjectParameter() {
-        return real.hasObjectParameter();
+        return getReal().hasObjectParameter();
     }
 
     @Override
     public void removeObjectClassParam(String name) throws GSimException {
-        real.removeObjectClassParam(name);
+    	getReal().removeObjectClassParam(name);
         owner.addOrSetAction(this);
     }
 
     @Override
     public void setActionClassName(String className) throws GSimException {
-        real.setClassName(className);
+    	getReal().setClassName(className);
         owner.addOrSetAction(this);
     }
 
     public void setSalience(int s) throws GSimException {
-        real.setSalience(s);
+    	getReal().setSalience(s);
         owner.addOrSetAction(this);
     }
 
