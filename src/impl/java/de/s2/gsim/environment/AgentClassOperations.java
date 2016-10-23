@@ -538,13 +538,7 @@ public class AgentClassOperations {
 
 		GenericAgentClass actualRef = this.findGenericAgentClass(cls);
 
-		String listName = Path.withoutLastAttributeOrObject(path, Path.Type.ATTRIBUTE).getName();
-		String attrName = path.lastAsString();
-		if (actualRef.isDeclaredAttribute(listName, attrName)) {
-			actualRef.replaceChildAttribute(path, domainAttribute);
-		} else {
-			actualRef.addOrSetAttribute(listName, domainAttribute);
-		}
+		createOrModifyAttribute(path, domainAttribute, actualRef);
 
 		Iterator<GenericAgentClass> iter = container.getAgentSubClasses().iterator();
 
@@ -552,8 +546,10 @@ public class AgentClassOperations {
 			GenericAgentClass c = iter.next();
 
 			if (c.isSuccessor(actualRef.getName())) {
-				c.replaceChildAttribute(path, domainAttribute);
 				c.replaceAncestor(actualRef);
+
+				createOrModifyAttribute(path, domainAttribute, c);
+
 				replaceMemberAttributes(c, path, domainAttribute);
 			}
 		}
@@ -561,6 +557,17 @@ public class AgentClassOperations {
 		replaceMemberAttributes(actualRef, path, domainAttribute);
 
 		return (GenericAgentClass) actualRef.clone();
+	}
+
+	private void createOrModifyAttribute(Path<DomainAttribute> path, DomainAttribute domainAttribute,
+			GenericAgentClass agentClass) {
+		String listName = Path.withoutLastAttributeOrObject(path, Path.Type.ATTRIBUTE).getName();
+		String attrName = domainAttribute.getName();
+		if (agentClass.isDeclaredAttribute(listName, attrName)) {
+			agentClass.replaceChildAttribute(path, domainAttribute);
+		} else {
+			agentClass.addOrSetAttribute(listName, domainAttribute);
+		}
 	}
 
 	/**
@@ -675,7 +682,7 @@ public class AgentClassOperations {
 
 		container.getAgentSubClasses(here).stream().forEach(sub -> {
 			sub.replaceAncestor(here);
-			sub.removeChildFrame(path);
+			// sub.removeChildFrame(path);
 			for (GenericAgent member : container.getInstancesOfClass(sub, GenericAgent.class)) {
 				member.setFrame(sub);
 				// member.removeChildInstance(Path.<Instance>objectPath(path.toStringArray()));

@@ -247,8 +247,10 @@ public class ObjectInstanceDef extends Observable implements ObjectInstance, Uni
                 return null;
             }
 
-            if (o instanceof Attribute || o instanceof ArrayList) {
-                return o;
+			if (o instanceof Attribute) {
+				return ((Attribute) o).clone();
+			} else if (o instanceof ArrayList) {
+				return ((ArrayList<?>) o).clone();
             } else {
                 throw new GSimException("Can't handle return value " + o);
             }

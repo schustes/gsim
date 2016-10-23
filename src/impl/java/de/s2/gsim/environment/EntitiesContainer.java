@@ -275,7 +275,7 @@ public class EntitiesContainer {
      * @return
      */
     public Set<Frame> getObjectSubClasses(Frame parent) {
-        return objectSubClasses.parallelStream().filter(f -> f.isSuccessor(parent.getName())).collect(Collectors.toSet());
+		return objectSubClasses.stream().filter(f -> f.isSuccessor(parent.getName())).collect(Collectors.toSet());
     }
 
     /**
@@ -285,7 +285,7 @@ public class EntitiesContainer {
      * @return
      */
     public Set<Frame> getObjectSubClasses(String parent) {
-        return objectSubClasses.parallelStream().filter(f -> f.isSuccessor(parent)).collect(Collectors.toSet());
+		return objectSubClasses.stream().filter(f -> f.isSuccessor(parent)).collect(Collectors.toSet());
     }
 
     /**

@@ -200,7 +200,7 @@ public class AgentClassSim extends Observable implements AgentClass, ObjectClass
 			}
 
 			if (o instanceof Attribute) {
-				return o;
+				return ((Attribute) o).clone();
 			} else if (o instanceof Frame) {
 				ObjectClass def = new DependentObjectClass(this,path.split("/")[0], (Frame) o);
 				return def;
@@ -216,7 +216,7 @@ public class AgentClassSim extends Observable implements AgentClass, ObjectClass
 				}
 				return ret;
 			} else if (o instanceof ArrayList) {
-				return o;
+				return ((ArrayList<?>) o).clone();
 			} else {
 				throw new GSimException("Can't handle return value " + o);
 			}

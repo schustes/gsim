@@ -312,7 +312,7 @@ public class AgentInstanceSim extends Observable implements AgentInstance, Objec
 			}
 
             if (o instanceof Attribute) {
-                return o;
+				return ((Attribute) o).clone();
             } else if (o instanceof Instance) {
                 return new DependentObjectInstance(this, p[0], (Instance) o);
             } else if (o instanceof TypedList) {
@@ -327,7 +327,7 @@ public class AgentInstanceSim extends Observable implements AgentInstance, Objec
                 return ret;
 
             } else if (o instanceof ArrayList) {
-                return o;
+				return ((ArrayList<?>) o).clone();
             } else {
                 throw new GSimException("Can't handle return value " + o);
             }

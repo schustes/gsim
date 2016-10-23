@@ -67,6 +67,10 @@ public class AgentClassDef extends ObjectClassDef implements AgentClass, UnitWra
 			if (!getReal().getObjectLists().containsKey(list)) {
 				env.getAgentClassOperations().addObjectList((GenericAgentClass) getReal(), list, object);
 			}
+			if (getReal().containsChildFrame(list, object)) {
+				env.getAgentClassOperations().removeChildFrame((GenericAgentClass) getReal(),
+						Path.objectPath(list, object.getName()));
+			}
 			setReal(env.getAgentClassOperations().addChildObject((GenericAgentClass)  getReal(), Path.objectListPath(list), object));
 		} catch (Exception e) {
 			throw new GSimException(e);
@@ -149,8 +153,7 @@ public class AgentClassDef extends ObjectClassDef implements AgentClass, UnitWra
 			List<Frame> f = getReal().getChildFrames(list);
 			ObjectClass[] ret = new ObjectClass[f.size()];
 			for (int i = 0; i < f.size(); i++) {
-				ObjectClassDef obj = new ObjectClassDef(env, f.get(i));
-				obj.addObserver(this);
+				DependentObjectClass obj = new DependentObjectClass(this, list, f.get(i).clone());
 				ret[i] = obj;
 			}
 			return ret;
@@ -212,7 +215,7 @@ public class AgentClassDef extends ObjectClassDef implements AgentClass, UnitWra
 			}
 
 			if (o instanceof DomainAttribute) {
-				return o;
+				return ((DomainAttribute) o).clone();
 			} else if (o instanceof Frame) {
 				return new ObjectClassDef(env, (Frame) o);
 			} else if (o instanceof TypedList) {
@@ -227,7 +230,7 @@ public class AgentClassDef extends ObjectClassDef implements AgentClass, UnitWra
 				return ret;
 
 			} else if (o instanceof ArrayList) {
-				return o;
+				return ((ArrayList<?>) o).clone();
 			} else {
 				throw new GSimException("Can't handle return value " + o);
 			}

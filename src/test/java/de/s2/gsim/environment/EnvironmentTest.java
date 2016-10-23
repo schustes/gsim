@@ -1,6 +1,8 @@
 package de.s2.gsim.environment;
 
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.Matchers.greaterThanOrEqualTo;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.not;
@@ -13,6 +15,7 @@ import java.util.Optional;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.mockito.internal.matchers.GreaterOrEqual;
 
 import de.s2.gsim.objects.AgentInstance;
 import de.s2.gsim.objects.attribute.AttributeType;
@@ -30,7 +33,7 @@ public class EnvironmentTest {
         Path<List<DomainAttribute>> path = Path.attributeListPath("test", "test");
 
         expected.expect(GSimDefException.class);
-        expected.expectMessage("Path " + path + " does not exit and is not terminal, so no list can be created!");
+		expected.expectMessage("Path " + path + " does not exist and is not terminal, so no list can be created!");
 
         Environment env = new Environment("test");
         AgentClassOperations agentOperations = env.getAgentClassOperations();
@@ -169,7 +172,8 @@ public class EnvironmentTest {
         }
 
         double minimumExpectedCorrectSamples = ((double) samples) * 0.99;
-        assertThat("Distribution in expected confidence interval ", (double) countExpected, greaterThan(minimumExpectedCorrectSamples));
+		assertThat("Distribution in expected confidence interval ", (double) countExpected,
+				greaterThanOrEqualTo(minimumExpectedCorrectSamples));
 
     }
 

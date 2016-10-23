@@ -1,12 +1,25 @@
 apply plugin: "java"
 apply plugin: "maven"
 apply plugin: "jacoco"
+//apply plugin: "org.sonarqube"
 
 group = "de.2s.sim"
 version = "2.0-SNAPSHOT"
 
 repositories {
-    mavenCentral()
+    maven {
+        url 'https://plugins.gradle.org/m2/'
+    }	
+	mavenCentral()
+    maven {
+		url 'http://176.94.74.31:7002/nexus/content/repositories/snapshots/'
+	}    
+    maven {
+		url 'http://176.94.74.31:7002/nexus/content/repositories/releases/'
+	}    
+    maven {
+		url 'http://176.94.74.31:7002/nexus/content/repositories/thirdparty/'
+	}    
 }
 
 sourceSets.all { set ->
@@ -26,6 +39,10 @@ sourceSets {
 }
 
 dependencies {
+    //classpath "org.sonarqube.gradle:gradle-sonarqube-plugin:1.0"
+    //classpath "org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.0.1"
+    //classpath 'org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.1'
+
     apiCompile 'commons-codec:commons-codec:1.5'
 	apiCompile 'cern:colt:1.0'
 	apiCompile 'log4j:log4j:1.2.17'
@@ -54,24 +71,12 @@ dependencies {
     
     runtime configurations.apiRuntime
     runtime configurations.implRuntime
-}
+}    
+
 
 jar {
     from sourceSets.api.output
     from sourceSets.impl.output
-}
-
-repositories {
-	mavenCentral()
-    maven {
-		url 'http://176.94.74.31:7002/nexus/content/repositories/snapshots/'
-	}    
-    maven {
-		url 'http://176.94.74.31:7002/nexus/content/repositories/releases/'
-	}    
-    maven {
-		url 'http://176.94.74.31:7002/nexus/content/repositories/thirdparty/'
-	}    
 }
 
 jacoco {
@@ -96,6 +101,11 @@ jacocoTestReport {
     }
 }
 
+//sonarqube {
+  //  properties {
+        //property "sonar.jacoco.reportPath", "${buildDir}/jacoco/test.exec"
+    //}
+//}
 uploadArchives {
     repositories {
         mavenDeployer {

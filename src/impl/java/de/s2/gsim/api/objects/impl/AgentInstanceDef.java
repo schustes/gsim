@@ -203,7 +203,7 @@ public class AgentInstanceDef extends ObjectInstanceDef implements AgentInstance
 			}
 
 			if (o instanceof Attribute) {
-				return o;
+				return ((Attribute) o).clone();
 			} else if (o instanceof Instance) {
 				return new ObjectInstanceDef(env, (Instance) o);
 			} else if (o instanceof TypedList) {
@@ -218,7 +218,7 @@ public class AgentInstanceDef extends ObjectInstanceDef implements AgentInstance
 				return ret;
 
 			} else if (o instanceof ArrayList) {
-				return o;
+				return ((ArrayList<?>) o).clone();
 			} else {
 				throw new GSimException("Can't handle return value " + o);
 			}

@@ -419,19 +419,23 @@ public class Frame extends Unit<Frame , DomainAttribute> {
 	 * @return the attribute or null if not found
 	 */
 	public DomainAttribute getAttribute(@NotNull String listname, @NotNull String attrName) {
+		return getAttribute(listname, attrName, true);
+	}
+
+	private DomainAttribute getAttribute(@NotNull String listname, @NotNull String attrName, boolean clone) {
 
 		if (getAttributeLists().containsKey(listname)) {
 			List<DomainAttribute> list = getAttributeLists().get(listname);
 			Optional<DomainAttribute> thisFrameAtt = list.stream().filter(attr -> attr.getName().equals(attrName)).reduce((a1, a2) -> a2);
 			if (thisFrameAtt.isPresent()) {
-				return thisFrameAtt.get();
+				return clone ? thisFrameAtt.get().clone() : thisFrameAtt.get();
 			}
 		}
 
 		for (Frame ancestor : getAncestors()) {
 			DomainAttribute da = ancestor.getAttribute(listname, attrName);
 			if (da != null) {
-				return (DomainAttribute) da;
+				return clone ? da.clone() : da;
 			}
 		}
 
@@ -541,11 +545,14 @@ public class Frame extends Unit<Frame , DomainAttribute> {
 	}
 
 	/**
-	 * Gets an attribute from the given list declared in this frame (attributes of the same list name in ancestors are ignored).
+	 * Gets an attribute from the given list declared in this frame (attributes
+	 * of the same list name in ancestors are ignored).
 	 * 
-	 * @param listname the list name
-	 * @param attrName the attribute name
-	 * @return the attribute or null if nothing was found
+	 * @param listname
+	 *            the list name
+	 * @param attrName
+	 *            the attribute name
+	 * @return the attribute or throws a NoSuchElementException if not present
 	 */
 	public DomainAttribute getDeclaredAttribute(@NotNull String listname, @NotNull String attrName) {
 		List<DomainAttribute> attrs = getAttributeLists().getOrDefault(listname, new ArrayList<DomainAttribute>());
@@ -683,11 +690,16 @@ public class Frame extends Unit<Frame , DomainAttribute> {
 	 */
 	public boolean isDeclaredAttribute(@NotNull String listName, @NotNull String attributeName) {
 
-		if (getAncestors().stream().anyMatch(f -> f.getDeclaredAttribute(listName, attributeName) != null)) {
-			return false;
+		try {
+			return this.getDeclaredAttribute(listName, attributeName) != null;
+		} catch (NoSuchElementException e) {
+			try {
+				getAncestors().stream().anyMatch(f -> f.getDeclaredAttribute(listName, attributeName) != null);
+				return false;
+			} catch (NoSuchElementException e2) {
+				return false;
+			}
 		}
-
-		return this.getDeclaredAttribute(listName, attributeName) != null;
 
 	}
 
@@ -715,7 +727,8 @@ public class Frame extends Unit<Frame , DomainAttribute> {
 	 * @return true if this frame is successor, false otherwise
 	 */
 	public boolean isSuccessor(@NotNull String ancestorName) {
-		return getAncestors().stream().anyMatch(f -> f.getName().equals(ancestorName));
+		boolean a = getAncestors().stream().anyMatch(f -> f.getName().equals(ancestorName));
+		return a;
 	}
 
 	/**
@@ -820,7 +833,7 @@ public class Frame extends Unit<Frame , DomainAttribute> {
 
 		// Step into attribute lists to find attribute
 		if (getAttributeLists().containsKey(path.getName()) && !path.isTerminal()) {
-			return (T) this.getAttribute(path.getName(), path.next().getName());
+			return (T) this.getAttribute(path.getName(), path.next().getName(), false);
 		}
 
 		// found attribute

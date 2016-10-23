@@ -50,19 +50,11 @@ public class EnvTest {
     	AgentClass parent = env.createAgentClass("Test", null);
     	AgentClass child = env.createAgentClass("Test2", "Test");
     	
-    	//TODO behaviour wrappers and owning agents are out-of-sync. environment agentClasses and frames look fine.
+		de.s2.gsim.objects.Rule rule = createTestRule(parent);
+
+		Action consequent = rule.getConsequents()[0];
     	
-    	parent.addAttribute("numbers", new DomainAttribute("counter", AttributeType.NUMERICAL));
-    	de.s2.gsim.objects.Rule rule = parent.getBehaviour().createRule("test");
-    	Condition condition = rule.createCondition("numbers/counter", ">", "0");
-    	Action action = parent.getBehaviour().createAction("consequent", "de.2s.sim.TestAction");
-    	parent.getBehaviour().addOrSetAction(action);
-    	rule.addOrSetConsequent(action);
-    	Action consequent = rule.getConsequent(action.getName());
-    	rule.addOrSetCondition(condition);
-    	parent.getBehaviour().addOrSetRule(rule);
-    	
-    	rule = parent.getBehaviour().getRule("test");//rule is not correct
+		rule = parent.getBehaviour().getRule("test");
     	assertThat("Rule conditions exist", rule.getConditions(), notNullValue());
     	assertThat("Rule consequents exist", rule.getConsequents(), notNullValue());
     	
@@ -72,14 +64,8 @@ public class EnvTest {
     	Condition oldConditionRef = ruleChild.getConditions()[0];
     	Action oldActionRef = ruleChild.getConsequents()[0];
     	
-    	//destroys previous behaviour !?
     	rule.getConditions()[0].setOperator("<");
     	rule.getConsequents()[0].setActionClassName("modified.class");
-    	//TODO references are not observing, only agents. But a change in parent rule wrapper should also be propagated to child rule wrappers
-    	//--> behaviour must observe agent and notify rules and available actions,
-    	// rule must observe behaviour and notify conditions and consequents, action must observe behaviour
-    	//
-    	//ruleChild = child.getBehaviour().getRule("test");// then this is obsolete.
     	String op = ruleChild.getConditions()[0].getOperator();
     	String op1 = oldConditionRef.getOperator();
     	
@@ -94,9 +80,40 @@ public class EnvTest {
 
     }
 
+	private de.s2.gsim.objects.Rule createTestRule(AgentClass parent) {
+		parent.addAttribute("numbers", new DomainAttribute("counter", AttributeType.NUMERICAL));
+		parent.setDefaultAttributeValue("numbers", "counter", "0");
+		de.s2.gsim.objects.Rule rule = parent.getBehaviour().createRule("test");
+		Condition condition = rule.createCondition("numbers/counter", ">", "0");
+		Action action = parent.getBehaviour().createAction("consequent", "de.2s.sim.TestAction");
+		parent.getBehaviour().addOrSetAction(action);
+		rule.addOrSetConsequent(action);
+
+		rule.addOrSetCondition(condition);
+		parent.getBehaviour().addOrSetRule(rule);
+		return rule;
+	}
+
     @Test
     public void verify_behaviour_instance_inheritance() throws Exception {
-    	//TODO - on instance level also getParentWrapper()... must be called and get all instances fresh from env up to top level
+
+		AgentClass parent = env.createAgentClass("Test", null);
+		AgentClass child = env.createAgentClass("Test2", "Test");
+		de.s2.gsim.objects.Rule parentRule = createTestRule(parent);
+
+		assertThat("In child class parent rule is available",
+				child.getBehaviour().getRule(parentRule.getName()).getName(), equalTo(parentRule.getName()));
+
+		AgentInstance instance = env.instanciateAgent(child, "instance");
+
+		assertThat("In child instance parent rule is available",
+				instance.getBehaviour().getRule(parentRule.getName()).getName(), equalTo(parentRule.getName()));
+
+		parentRule.addOrSetCondition(parentRule.createCondition("numbers", "=", "0"));
+
+		assertThat("In child instance parent rule is available",
+				instance.getBehaviour().getRule(parentRule.getName()).getConditions().length, equalTo(2));
+
     }
 
     @Test
@@ -263,8 +280,8 @@ public class EnvTest {
 
         AgentClass subtype = env.createAgentClass("Sub", "Test");
         DomainAttribute inherited = subtype.getAttribute("list-1", "att-1");
-        inherited.setDefault("Hello subworld!");
-        subtype.setAttribute("list-1", inherited);
+		inherited.setDefault("Hello subworld!");
+		subtype.setAttribute("list-1", inherited);
 
         DomainAttribute original = agentClass.getAttribute("list-1", "att-1");
         inherited = subtype.getAttribute("list-1", "att-1");
@@ -301,11 +318,12 @@ public class EnvTest {
         ObjectClass originalObject = agentClass.getObjects(objectList)[0];
         DomainAttribute originalAttribute = originalObject.getAttribute(attrList, attrName);
         originalAttribute.setDefault(secondTimeOverride);
+		DomainAttribute inheritedTest = subtype.getObjects(objectList)[0].getAttribute(attrList, attrName);
         originalObject.setAttribute(attrList, originalAttribute);
         agentClass.addOrSetObject(objectList, originalObject);
 
         DomainAttribute originalTest = agentClass.getObjects(objectList)[0].getAttribute(attrList, attrName);
-        DomainAttribute inheritedTest = subtype.getObjects(objectList)[0].getAttribute(attrList, attrName);
+		inheritedTest = subtype.getObjects(objectList)[0].getAttribute(attrList, attrName);
 
         assertThat("Subclass modifications must not influence parent state", originalTest.getDefaultValue(), equalTo(secondTimeOverride));
         assertThat("Subclass modifications must not influence parent state", originalTest.getDefaultValue(),

@@ -185,7 +185,7 @@ public class ObjectClassDef extends Observable implements ObjectClass, UnitWrapp
             }
 
             if (o instanceof Attribute || o instanceof ArrayList) {
-                return o;
+				return ((Attribute) o).clone();
             } else {
                 throw new GSimException("Can't handle return value " + o);
             }

@@ -156,7 +156,7 @@ public class DependentObjectClass implements ObjectClass, UnitWrapper {
             }
 
             if (o instanceof DomainAttribute || o instanceof ArrayList) {
-                return o;
+				return ((DomainAttribute) o).clone();
             } else {
                 throw new GSimException("Can't handle return value " + o);
             }
