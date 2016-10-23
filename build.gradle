@@ -44,6 +44,7 @@ dependencies {
     //classpath 'org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.1'
 
     apiCompile 'commons-codec:commons-codec:1.5'
+    apiCompile sourceSets.impl.output
 	apiCompile 'cern:colt:1.0'
 	apiCompile 'log4j:log4j:1.2.17'
 	apiCompile 'org.checkerframework:checker:1.9.12'
