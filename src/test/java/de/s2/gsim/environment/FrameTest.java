@@ -2,8 +2,6 @@ package de.s2.gsim.environment;
 
 import org.junit.Test;
 
-import de.s2.gsim.environment.Frame;
-
 public class FrameTest {
 
 	@Test
