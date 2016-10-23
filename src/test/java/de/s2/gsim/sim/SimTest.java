@@ -69,6 +69,8 @@ public class SimTest {
 		
 		blockUntilSimulationFinished(m);
 
+		System.out.println("before: " + before);
+
 		String after = rt.getAgent().getAttribute(ATTR_NAME).toValueString();
 
 		assertThat("Simulation changed agent state", after, not(equalTo(before)));

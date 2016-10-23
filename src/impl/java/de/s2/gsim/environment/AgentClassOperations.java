@@ -480,7 +480,7 @@ public class AgentClassOperations {
 
 	public List<String> getAgentNames(String ofClass) {
 
-		return container.getAgents().stream().filter(agent -> agent.inheritsFrom(ofClass)).map(GenericAgent::getName)
+		return container.getAgents().stream().filter(agent -> agent.inheritsFromOrIsOfType(ofClass)).map(GenericAgent::getName)
 				.collect(Collectors.toList());
 	}
 
@@ -489,7 +489,7 @@ public class AgentClassOperations {
 	}
 
 	public List<GenericAgent> getAgents(String ofClass) {
-		return container.getAgents().stream().filter(agent -> agent.inheritsFrom(ofClass)).map(GenericAgent::clone)
+		return container.getAgents().stream().filter(agent -> agent.inheritsFromOrIsOfType(ofClass)).map(GenericAgent::clone)
 				.collect(Collectors.toList());
 	}
 

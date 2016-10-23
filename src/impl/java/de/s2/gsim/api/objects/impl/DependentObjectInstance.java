@@ -221,7 +221,7 @@ public class DependentObjectInstance implements ObjectInstance, UnitWrapper {
 
     @Override
     public boolean inheritsFrom(String agentclassName) {
-        return real.inheritsFrom(agentclassName);
+        return real.inheritsFromOrIsOfType(agentclassName);
     }
 
     @Override

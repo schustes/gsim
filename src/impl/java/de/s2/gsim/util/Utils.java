@@ -158,7 +158,7 @@ public class Utils {
         }
 
         for (Instance obj : agent.getChildInstances(listName)) {
-            if (obj.inheritsFrom(className)) {
+            if (obj.inheritsFromOrIsOfType(className)) {
                 set.add(obj);
             }
         }

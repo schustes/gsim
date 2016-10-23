@@ -265,7 +265,7 @@ public class AgentInstanceSim extends Observable implements AgentInstance, Objec
 
     @Override
     public boolean inheritsFrom(String agentclassName) {
-        return real.inheritsFrom(agentclassName);
+        return real.inheritsFromOrIsOfType(agentclassName);
     }
 
     @Override

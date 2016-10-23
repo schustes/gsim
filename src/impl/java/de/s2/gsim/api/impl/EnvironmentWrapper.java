@@ -231,7 +231,7 @@ public class EnvironmentWrapper implements ModelDefinitionEnvironment {
             } else {
                 ArrayList<AgentInstanceDef> list = new ArrayList<AgentInstanceDef>();
                 for (int i = 0; i < f.length; i++) {
-                    if (f[i].inheritsFrom(parent)) {
+                    if (f[i].inheritsFromOrIsOfType(parent)) {
                         list.add(new AgentInstanceDef(env, f[i], wrapperAgents.get(f[i].getDefinition().getName())));
                     }
                 }
@@ -265,7 +265,7 @@ public class EnvironmentWrapper implements ModelDefinitionEnvironment {
             } else {
                 ArrayList<AgentInstanceDef> list = new ArrayList<AgentInstanceDef>();
                 for (int i = 0; i < f.length; i++) {
-                    if (f[i].inheritsFrom(parent)) {
+                    if (f[i].inheritsFromOrIsOfType(parent)) {
                         list.add(new AgentInstanceDef(env, f[i],  wrapperAgents.get(f[i].getDefinition().getName())));
                     }
                 }

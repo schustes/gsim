@@ -108,33 +108,21 @@ public class RuntimeAgent extends GenericAgent implements AgentType, RtAgent {
         try {
 
             this.globals = globals;
-            if (this.inheritsFrom(roleName)) {
-                GenericAgentClass c = (GenericAgentClass) getDefinition().getAncestor(roleName);
-                if (c == null && getDefinition().getName().equals(roleName)) {
-                    c = (GenericAgentClass) getDefinition();
-                }
 
-                if (c.getBehaviour().getDeclaredRules().length > 0 || c.getBehaviour().getDeclaredRLRules().length > 0) {
-                    executeRules(roleName);
-                }
+			GenericAgentClass c = null;
+			if (this.inheritsFrom(roleName)) {
+				c = (GenericAgentClass) getDefinition().getAncestor(roleName);
+			} else if (this.getDefinition().getName().equals(roleName)) {
+				c = (GenericAgentClass) getDefinition();
+			}
+
+			if (c.getBehaviour().getDeclaredRules().length > 0) {
+				ruleBase.executeUserRules(roleName, globals);
             }
 
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    public void executeRules(String role) {
-
-        if (role.equals("Seller-Action")) {
-
-            if (getChildInstances("queue").size() == 0) {
-                return;
-            }
-
-        }
-
-        ruleBase.executeUserRules(role, globals);
     }
 
     public String[] getCurrentStrategy() {

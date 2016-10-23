@@ -225,7 +225,7 @@ public class ObjectInstanceDef extends Observable implements ObjectInstance, Uni
 
     @Override
     public boolean inheritsFrom(String agentclassName) {
-        return real.inheritsFrom(agentclassName);
+        return real.inheritsFromOrIsOfType(agentclassName);
     }
 
     @Override

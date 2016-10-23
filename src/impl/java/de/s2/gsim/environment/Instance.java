@@ -307,37 +307,55 @@ public class Instance extends Unit<Instance, Attribute> {
 	 */
 
 	public  boolean inheritsFrom(@NotNull Frame frame) {
-		return this.inheritsFrom(frame.getName());
+		return this.inheritsFromOrIsOfType(frame.getName());
 	}
 
 	/**
-	 * Check if this instance has something in common with the frame with the specified name.
+	 * Check if this instance has an ancestor or is an instance of the given
+	 * type.
 	 * 
-	 * @param frameName the name of the frame
-	 * @return boolean true if the instance was created from this frame (possibly amongst others)
+	 * @param frameName
+	 *            the name of the frame
+	 * @return boolean true if the instance was created from this frame
+	 *         (possibly amongst others)
 	 */
-
-	public boolean inheritsFrom(@NotNull String frameName) {
+	public boolean inheritsFromOrIsOfType(@NotNull String frameName) {
 
 		if (frame.getName().equals(frameName)) {
 			return true;
 		} else {
-			try {
-				Frame f = frame.getAncestor(frameName);
-				System.out.println(f);
-				return true;
-			} catch (NoSuchElementException e) {
-				return false;
-			}
+			return inheritsFrom(frameName);
+		}
+	}
+
+	/**
+	 * Check if this instance has an ancestor of the given type.
+	 * 
+	 * @param frameName
+	 *            the name of the frame
+	 * @return boolean true if the instance was created from this frame
+	 *         (possibly amongst others)
+	 */
+	public boolean inheritsFrom(@NotNull String frameName) {
+
+		try {
+			Frame f = frame.getAncestor(frameName);
+			System.out.println(f);
+			return true;
+		} catch (NoSuchElementException e) {
+			return false;
 		}
 	}
 
 	/**
 	 * Remove an attribute in the specified list.
 	 * 
-	 * @param listName name of the attribute list
-	 * @param attributeName attribute name
-	 * @return true if the attribute was removed, false otherwise, e.g. if the list or attribute does not exist
+	 * @param listName
+	 *            name of the attribute list
+	 * @param attributeName
+	 *            attribute name
+	 * @return true if the attribute was removed, false otherwise, e.g. if the
+	 *         list or attribute does not exist
 	 */
 	public  boolean removeAttribute(@NotNull String listName, @NotNull String attributeName) {
 

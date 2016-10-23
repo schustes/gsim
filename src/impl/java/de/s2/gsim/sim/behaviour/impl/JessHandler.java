@@ -102,7 +102,7 @@ public class JessHandler implements java.io.Serializable {
         }
         clean();
         createEngine(ownerAgent, props);
-        ownerAgent.getBehaviour().setFrame(null);
+		// ownerAgent.getBehaviour().setFrame(null);
         rlRanges = new RLParameterRanges();
         initRLRanges();
     }

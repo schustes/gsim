@@ -95,7 +95,7 @@ public class ModelCoordinatorLocal implements Simulation, Steppable {
 
 			for (RuntimeAgent element : a) {
 				r.add(element);
-				if (element.inheritsFrom("GP")) {
+				if (element.inheritsFromOrIsOfType("GP")) {
 				}
 				agents.put(element.getName(), element);
 			}
