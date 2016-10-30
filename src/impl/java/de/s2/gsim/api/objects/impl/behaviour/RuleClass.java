@@ -7,6 +7,7 @@ import de.s2.gsim.api.objects.impl.UnitWrapper;
 import de.s2.gsim.environment.ActionFrame;
 import de.s2.gsim.environment.ConditionFrame;
 import de.s2.gsim.environment.Frame;
+import de.s2.gsim.environment.RLRuleFrame;
 import de.s2.gsim.environment.Unit;
 import de.s2.gsim.environment.UserRuleFrame;
 import de.s2.gsim.objects.Condition;
@@ -20,7 +21,11 @@ public class RuleClass implements Rule, UnitWrapper {
 	private UserRuleFrame real;
 
 	protected UserRuleFrame getReal() {
-		real = (UserRuleFrame) ((UnitWrapper) owner.getRule(real.getName())).toUnit();
+		if (real instanceof RLRuleFrame) {
+			real = (UserRuleFrame) ((UnitWrapper) owner.getRLActionNode(real.getName())).toUnit();
+		} else {
+			real = (UserRuleFrame) ((UnitWrapper) owner.getRule(real.getName())).toUnit();
+		}
 		return real;
 	}
 

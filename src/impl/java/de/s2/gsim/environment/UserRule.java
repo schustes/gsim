@@ -49,7 +49,7 @@ public class UserRule extends Instance {
     
     protected UserRule(Instance inst) {
         super(inst);
-        if (this.getAttribute(UserRuleFrame.ATTR_LIST_ATTRS, "activated") == null) {
+        if (!this.containsAttribute(UserRuleFrame.ATTR_LIST_ATTRS, "activated")) {
             DomainAttribute a = new DomainAttribute("activated", AttributeType.STRING);
             a.setDefault("true");
             getDefinition().addOrSetAttribute(UserRuleFrame.ATTR_LIST_ATTRS, a);
@@ -163,16 +163,19 @@ public class UserRule extends Instance {
     }
 
     public String getUpdateLag() {
-        StringAttribute a = (StringAttribute) this.getAttribute(ActionFrame.ATTR_LIST_ATTRS, "update-lag");
+    	if (!this.containsAttribute(ActionFrame.ATTR_LIST_ATTRS, "update-lag")) {
+    		return "1";
+    	}
+    	StringAttribute a = (StringAttribute) this.getAttribute(ActionFrame.ATTR_LIST_ATTRS, "update-lag");
         return a.getValue();
     }
 
     public String getUpdateSpan() {
-        StringAttribute a = (StringAttribute) this.getAttribute(ActionFrame.ATTR_LIST_ATTRS, "update-span");
-        if (a == null) {
-            return null;
-        }
-        return a.getValue();
+    	if (!this.containsAttribute(ActionFrame.ATTR_LIST_ATTRS, "update-span")) {
+    		return null;
+    	}
+    	
+        return ((StringAttribute) this.getAttribute(ActionFrame.ATTR_LIST_ATTRS, "update-span")).getValue();
     }
 
     @Override

@@ -12,7 +12,7 @@ import de.s2.gsim.objects.Condition;
 import de.s2.gsim.objects.Expansion;
 import de.s2.gsim.objects.RLActionNode;
 import de.s2.gsim.objects.SelectionNode;
-
+//RLActionNode is WRONG
 public class RLActionNodeClass extends RuleClass implements RLActionNode, UnitWrapper {
 
     public RLActionNodeClass(BehaviourClass owner, RLRuleFrame c) {
@@ -52,6 +52,7 @@ public class RLActionNodeClass extends RuleClass implements RLActionNode, UnitWr
     public Condition createEvaluator(String paramName, String op, String val) throws GSimException {
         ConditionFrame c = getReal().createCondition(paramName, op, val);
         ((RLRuleFrame) getReal()).setEvaluationFunction(c);
+        owner.addOrSetRLActionNode(this);
         return new ConditionClass(this, c);
     }
 

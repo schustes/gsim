@@ -40,7 +40,7 @@ public class RLParser {
         try {
             String rules = doBuild();
 
-            // System.out.println(rules);
+            System.out.println(rules);
             rete.executeCommand(rules);
 
             FactHandler.getInstance().parseAndInsertGlobalRLFacts(agent, rete);
@@ -92,7 +92,7 @@ public class RLParser {
 
             boolean hasExpansion = false;
             for (int i = 0; i < r.length; i++) {
-                if (r[i].isActivated() && r[i].getAttribute("equivalent-actionset") == null) {
+                if (r[i].isActivated() && !r[i].containsAttribute("equivalent-actionset")) {
 
                     if (!r[i].hasExpansions()) {
                         String expRuleFinal = rlBuilder.createRLRuleSet(r[i]);
@@ -120,7 +120,7 @@ public class RLParser {
 
             for (int i = 0; i < r.length; i++) {
 
-                if (r[i].isActivated() && r[i].getAttribute("equivalent-actionset") != null) {
+                if (r[i].isActivated() && r[i].containsAttribute("equivalent-actionset")) {
 
                     String expRuleFinal = rlBuilder.buildIntermediateRule(r[i]);
                     res += expRuleFinal + "\n";

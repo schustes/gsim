@@ -33,20 +33,20 @@ public class UserRuleFrame extends Frame {
         return new UserRuleFrame(f.getName(), f);
     }
 
+
     /**
      * Wrap an existing frame.
      */
-    public static UserRuleFrame wrap(Frame orig, String name, String category) {
+    public static UserRuleFrame wrap(Frame orig, String name) {
         UserRuleFrame ur = new UserRuleFrame(orig.getName(), orig.getParentFrames().toArray(new Frame[0]));
         Frame.copyInternal(orig, ur);
         return ur;
-    }
-    
+    }  
     /**
      * Wrap an existing frame.
      */
     public static UserRuleFrame wrap(Frame orig) {
-    	return wrap(orig, orig.getName(), orig.getCategory());
+    	return wrap(orig, orig.getName());
     }
 
     public static UserRuleFrame newUserRuleFrame(String name) {
