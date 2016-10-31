@@ -1,9 +1,5 @@
 package de.s2.gsim.objects;
 
-import de.s2.gsim.GSimException;
-import de.s2.gsim.api.objects.impl.UnitWrapper;
-import de.s2.gsim.environment.ConditionFrame;
-
 /**
  * An RLActionNode manages the reinforcement learning and state space partitioning part according to the BRA algorithm of the agent.
  * 
