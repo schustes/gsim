@@ -211,7 +211,7 @@ public class BehaviourFrame extends Frame {
         }
         RLRuleFrame[] uf = new RLRuleFrame[f.size()];
         for (int i = 0; i < f.size(); i++) {
-            uf[i] = RLRuleFrame.inherit(f.get(i));
+            uf[i] = RLRuleFrame.wrap(f.get(i));
         }
         return uf;
     }
@@ -281,7 +281,7 @@ public class BehaviourFrame extends Frame {
         List<Frame> f = getChildFrames(RL_LIST);
         RLRuleFrame[] uf = new RLRuleFrame[f.size()];
         for (int i = 0; i < f.size(); i++) {
-            uf[i] = RLRuleFrame.inherit(f.get(i));
+            uf[i] = RLRuleFrame.wrap(f.get(i));
         }
         return uf;
     }

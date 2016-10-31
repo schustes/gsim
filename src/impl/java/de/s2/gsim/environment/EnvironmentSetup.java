@@ -536,7 +536,7 @@ public class EnvironmentSetup {
                 String refName = unresolved.get(name);
                 RLRuleFrame a = agent.getBehaviour().getRLRule(refName);
                 if (a != null) {
-                	RLRuleFrame rf = RLRuleFrame.inherit(name, a);
+                	RLRuleFrame rf = RLRuleFrame.wrap(a, name);
                     for (ConditionFrame c : rf.getConditions()) {
                         rf.removeCondition(c);
                     }

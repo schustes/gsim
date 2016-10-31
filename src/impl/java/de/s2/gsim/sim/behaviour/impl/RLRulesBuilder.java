@@ -144,12 +144,12 @@ public class RLRulesBuilder {
     String createRLRuleSet(RLRule rule) throws GSimEngineException {
 
         String res = addShortCuts(rule, "");
-        String[] rules = null;
+        String[] rules = new String[0];
         if (res.length() > 0) {
             rules = buildExperimentationTerminalRules(rule, true);
             res += "\n";
         } else {
-            rules = buildExperimentationTerminalRules(rule, false);
+           rules = buildExperimentationTerminalRules(rule, false);
         }
 
         // String res = "";
@@ -218,7 +218,7 @@ public class RLRulesBuilder {
             FUNCTION f = rule.isComparison() ? FUNCTION.COMPARISON : FUNCTION.SIMPLE_SOFTMAX;
 
             String helpRulesForRootRule = "\n";
-            if (rule.getAttribute("equivalent-state") == null && rule.getAttribute("equivalent-actionset") == null) {
+            if (!rule.containsAttribute("equivalent-state") && !rule.containsAttribute("equivalent-actionset") ) {
                 helpRulesForRootRule = buildExperimentationFunctions(createRuleIdentifier(rule), rule.getConsequents(), f,
                         rule.getEvaluationFunction());
 

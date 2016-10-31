@@ -28,7 +28,7 @@ public class RLRuleFrame extends UserRuleFrame {
     private RLRuleFrame(String name, Frame... f) {
         super(name, f);
     }
-    public static RLRuleFrame inherit(Frame f) {
+    public static RLRuleFrame inherit1(Frame f) {
         RLRuleFrame rf = new RLRuleFrame(f.getName(), f);
         return rf;
     }

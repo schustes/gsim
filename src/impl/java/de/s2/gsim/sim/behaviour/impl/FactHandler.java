@@ -599,7 +599,7 @@ public class FactHandler {
                     String sfn = g.getName() + "_0" + 0;
                     FactHandler.getInstance().insertNonExistentExecutedFinalFacts(rete, agent, g, sfn);
 
-                    if (g.getAttribute("equivalent-state") == null && g.getAttribute("equivalent-actionset") == null) {
+                    if (!g.containsAttribute("equivalent-state")  && !g.containsAttribute("equivalent-actionset") ) {
                         insertGlobalAvgFacts(g, getEvaluationFunctionNames(agent), rete);
                         insertListFact(g, rete);
                     }

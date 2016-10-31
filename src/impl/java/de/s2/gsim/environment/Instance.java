@@ -202,6 +202,22 @@ public class Instance extends Unit<Instance, Attribute> {
 				.filter(attr -> attr.getName().equals(attrName))
 				.findFirst().get();
 	}
+	
+	public boolean containsAttribute(@NotNull String listname, @NotNull String attrName) {
+		try {
+			return getAttribute(listname, attrName) != null;
+		} catch (NoSuchElementException e) {
+			return false;
+		}
+	}
+	
+	public boolean containsAttribute(@NotNull String attrName) {
+		try {
+			return getAttribute(attrName) != null;
+		} catch (NoSuchElementException e) {
+			return false;
+		}
+	}
 
 	/**
 	 * Return all attributes in the list with the specified name.

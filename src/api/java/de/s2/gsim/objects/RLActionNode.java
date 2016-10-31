@@ -1,5 +1,9 @@
 package de.s2.gsim.objects;
 
+import de.s2.gsim.GSimException;
+import de.s2.gsim.api.objects.impl.UnitWrapper;
+import de.s2.gsim.environment.ConditionFrame;
+
 /**
  * An RLActionNode manages the reinforcement learning and state space partitioning part according to the BRA algorithm of the agent.
  * 
@@ -38,6 +42,9 @@ public interface RLActionNode {
         SOFTMAX
     }
 
+    void addOrSetCondition(Condition cond);
+
+    void addOrSetConsequent(de.s2.gsim.objects.Action cons);
     /**
      * Adds or sets an {@link Expansion} to the learning node. An expansion is a component of the state description.
      * 
