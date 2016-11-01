@@ -1,57 +1,31 @@
 package de.s2.gsim.api.objects.impl.behaviour;
 
-import de.s2.gsim.GSimException;
 import de.s2.gsim.api.objects.impl.UnitWrapper;
 import de.s2.gsim.environment.ConditionDef;
 import de.s2.gsim.environment.Unit;
-import de.s2.gsim.objects.Condition;
+import de.s2.gsim.objects.Evaluator;
+import de.s2.gsim.objects.Path;
 
-public class EvaluatorInstance implements Condition, UnitWrapper {
-
-    private RLActionNodeInstance owner;
+public class EvaluatorInstance implements Evaluator, UnitWrapper {
 
     private ConditionDef real;
 
-    public EvaluatorInstance(RLActionNodeInstance owner, ConditionDef real) {
+	public EvaluatorInstance(ConditionDef real) {
         this.real = real;
-        this.owner = owner;
     }
 
     @Override
-    public String getOperator() {
-        return real.getOperator();
+	public Path<?> getAttributeRef() {
+		return Path.attributePath(real.getParameterName());
     }
 
     @Override
-    public String getParameterName() {
-        return real.getParameterName();
+	public double getAlpha() {
+		return Double.parseDouble(real.getParameterValue());
     }
 
     @Override
-    public String getParameterValue() {
-        return real.getParameterValue();
-    }
-
-    @Override
-    public void setOperator(String str) throws GSimException {
-        real.setOperator(str);
-        owner.setEvaluator(this);
-    }
-
-    @Override
-    public void setParameterName(String str) throws GSimException {
-        real.setParameterName(str);
-        owner.setEvaluator(this);
-    }
-
-    @Override
-    public void setParameterValue(String str) throws GSimException {
-        real.setParameterValue(str);
-        owner.setEvaluator(this);
-    }
-
-    @Override
-    public Unit toUnit() {
+	public Unit<?, ?> toUnit() {
         return real;
     }
 }

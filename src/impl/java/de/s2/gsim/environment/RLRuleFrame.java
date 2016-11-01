@@ -233,7 +233,7 @@ public class RLRuleFrame extends UserRuleFrame {
         super.addOrSetAttribute(ATTR_LIST_ATTRS, a);
     }
 
-    public void setEvaluationFunction(ConditionFrame f) {
+	public void setEvaluationFunction(Frame f) {
         for (Frame a : super.getChildFrames(RLRuleFrame.INST_LIST_LEARNING)) {
             super.removeChildFrame(RLRuleFrame.INST_LIST_LEARNING, a.getName());
         }

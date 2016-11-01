@@ -1,5 +1,7 @@
 package de.s2.gsim.sim.agent;
 
+import java.util.Optional;
+
 import de.s2.gsim.objects.AgentInstance;
 
 /**
@@ -39,7 +41,7 @@ public interface RtAgent {
      * 
      * @return name of the action
      */
-    String getLastAction();
+	Optional<String> getLastAction();
 
     /**
      * Returns the agent in its current state.

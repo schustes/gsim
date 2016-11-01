@@ -7,8 +7,8 @@ import java.util.List;
 
 import de.s2.gsim.api.sim.agent.impl.RuntimeAgent;
 import de.s2.gsim.environment.ExpansionDef;
-import de.s2.gsim.environment.Path;
 import de.s2.gsim.environment.RLRule;
+import de.s2.gsim.objects.Path;
 import de.s2.gsim.objects.attribute.Attribute;
 import de.s2.gsim.objects.attribute.DomainAttribute;
 import de.s2.gsim.sim.behaviour.impl.jessfunction.DynamicRuleBuilder;

@@ -9,6 +9,7 @@ import de.s2.gsim.environment.Frame;
 import de.s2.gsim.environment.RLRuleFrame;
 import de.s2.gsim.environment.UserRuleFrame;
 import de.s2.gsim.objects.Condition;
+import de.s2.gsim.objects.Evaluator;
 import de.s2.gsim.objects.Expansion;
 import de.s2.gsim.objects.RLActionNode;
 import de.s2.gsim.objects.SelectionNode;
@@ -49,11 +50,11 @@ public class RLActionNodeClass extends RuleClass implements RLActionNode, UnitWr
     }
 
     @Override
-    public Condition createEvaluator(String paramName, String op, String val) throws GSimException {
-        ConditionFrame c = getReal().createCondition(paramName, op, val);
+	public Evaluator createEvaluator(String paramName, double val) throws GSimException {
+		ConditionFrame c = getReal().createCondition(paramName, "", String.valueOf(val));
         ((RLRuleFrame) getReal()).setEvaluationFunction(c);
         owner.addOrSetRLActionNode(this);
-        return new ConditionClass(this, c);
+		return new EvaluatorClass(c);
     }
 
     @Override
@@ -78,12 +79,6 @@ public class RLActionNodeClass extends RuleClass implements RLActionNode, UnitWr
         return new ExpansionClass(this, f);
     }
 
-    @Override
-    public SelectionNode createSelectionNode(String name) throws GSimException {
-        UserRuleFrame f = UserRuleFrame.newUserRuleFrame(name);
-        return new SelectionNodeClass(this, f);
-    }
-
     public double getComparisonDiscount() {
         return ((RLRuleFrame) getReal()).getAvgBeta();
     }
@@ -94,12 +89,12 @@ public class RLActionNodeClass extends RuleClass implements RLActionNode, UnitWr
     }
 
     @Override
-    public Condition getEvaluator() throws GSimException {
+	public Evaluator getEvaluator() throws GSimException {
         ConditionFrame f = ((RLRuleFrame) getReal()).getEvaluationFunction();
         if (f != null) {
-            return new EvaluatorClass(this, f);
+			return new EvaluatorClass(f);
         } else {
-            Condition e = new EvaluatorClass(this, ConditionFrame.newConditionFrame(new String("dummy")));
+			Evaluator e = new EvaluatorClass(ConditionFrame.newConditionFrame(new String("dummy")));
             setEvaluator(e);
             return e;
         }
@@ -146,26 +141,6 @@ public class RLActionNodeClass extends RuleClass implements RLActionNode, UnitWr
         return null;
     }
 
-    @Override
-    public SelectionNode getSelectionNode(String name) throws GSimException {
-        for (SelectionNode c : getSelectionNodes()) {
-            if (c.getName().equals(name)) {
-                return c;
-            }
-        }
-        return null;
-    }
-
-    @Override
-    public SelectionNode[] getSelectionNodes() {
-        UserRuleFrame[] r = ((RLRuleFrame) getReal()).getSelectionRules();
-        SelectionNodeClass[] sc = new SelectionNodeClass[r.length];
-        for (int i = 0; i < sc.length; i++) {
-            sc[i] = new SelectionNodeClass(this, r[i]);
-        }
-        return sc;
-    }
-
     public String getUpdateLag() {
         return ((RLRuleFrame) getReal()).getUpdateLag();
     }
@@ -195,8 +170,8 @@ public class RLActionNodeClass extends RuleClass implements RLActionNode, UnitWr
     }
 
     @Override
-    public void setEvaluator(Condition f) throws GSimException {
-        ConditionFrame c = (ConditionFrame) ((UnitWrapper) f).toUnit();
+    public void setEvaluator(Evaluator f) throws GSimException {
+		Frame c = (ConditionFrame) ((UnitWrapper) f).toUnit();
         ((RLRuleFrame) getReal()).setEvaluationFunction(c);
         owner.addOrSetRLActionNode(this);
     }

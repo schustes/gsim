@@ -5,8 +5,8 @@ import java.util.HashSet;
 
 import de.s2.gsim.environment.Frame;
 import de.s2.gsim.environment.Instance;
-import de.s2.gsim.environment.Path;
 import de.s2.gsim.objects.AgentInstance;
+import de.s2.gsim.objects.Path;
 import de.s2.gsim.objects.attribute.Attribute;
 import de.s2.gsim.objects.attribute.IntervalAttribute;
 import de.s2.gsim.objects.attribute.NumericalAttribute;

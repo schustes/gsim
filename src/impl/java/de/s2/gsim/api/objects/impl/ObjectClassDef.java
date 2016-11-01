@@ -6,9 +6,9 @@ import java.util.Observable;
 import de.s2.gsim.GSimException;
 import de.s2.gsim.environment.Environment;
 import de.s2.gsim.environment.Frame;
-import de.s2.gsim.environment.Path;
 import de.s2.gsim.environment.Unit;
 import de.s2.gsim.objects.ObjectClass;
+import de.s2.gsim.objects.Path;
 import de.s2.gsim.objects.attribute.Attribute;
 import de.s2.gsim.objects.attribute.DomainAttribute;
 

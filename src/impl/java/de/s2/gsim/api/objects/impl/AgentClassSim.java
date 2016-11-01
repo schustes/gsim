@@ -12,11 +12,11 @@ import de.s2.gsim.environment.BehaviourFrame;
 import de.s2.gsim.environment.Environment;
 import de.s2.gsim.environment.Frame;
 import de.s2.gsim.environment.GenericAgentClass;
-import de.s2.gsim.environment.Path;
 import de.s2.gsim.environment.TypedList;
 import de.s2.gsim.objects.AgentClass;
 import de.s2.gsim.objects.Behaviour;
 import de.s2.gsim.objects.ObjectClass;
+import de.s2.gsim.objects.Path;
 import de.s2.gsim.objects.attribute.Attribute;
 import de.s2.gsim.objects.attribute.DomainAttribute;
 

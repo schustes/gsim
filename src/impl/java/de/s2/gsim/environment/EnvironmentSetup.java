@@ -18,6 +18,7 @@ import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.input.SAXBuilder;
 
+import de.s2.gsim.objects.Path;
 import de.s2.gsim.objects.attribute.AttributeConstants;
 import de.s2.gsim.objects.attribute.AttributeType;
 import de.s2.gsim.objects.attribute.DomainAttribute;

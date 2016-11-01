@@ -19,10 +19,10 @@ import de.s2.gsim.environment.ExpansionDef;
 import de.s2.gsim.environment.Frame;
 import de.s2.gsim.environment.GenericAgentClass;
 import de.s2.gsim.environment.Instance;
-import de.s2.gsim.environment.Path;
 import de.s2.gsim.environment.RLRule;
 import de.s2.gsim.environment.UserRule;
 import de.s2.gsim.environment.UserRuleFrame;
+import de.s2.gsim.objects.Path;
 import de.s2.gsim.objects.attribute.Attribute;
 import de.s2.gsim.objects.attribute.AttributeConstants;
 import de.s2.gsim.objects.attribute.DomainAttribute;
@@ -758,7 +758,7 @@ public class JessHandler implements java.io.Serializable {
     private void retractObsoleteActions() throws JessException {
 
         for (Instance rule : owner.getBehaviour().getChildInstances(BehaviourFrame.RL_LIST)) {
-            if (rule.getAttribute("retract-osbolete-actions") != null
+			if (rule.containsAttribute("retract-osbolete-actions")
                     && rule.getAttribute("retract-osbolete-actions").toValueString().equalsIgnoreCase("true")) {
                 for (Instance a : rule.getChildInstances(UserRuleFrame.INST_LIST_CONS)) {
                     ActionDef action = new ActionDef(a);

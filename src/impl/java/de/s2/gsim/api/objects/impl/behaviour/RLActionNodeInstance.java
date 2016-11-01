@@ -9,8 +9,8 @@ import de.s2.gsim.environment.Instance;
 import de.s2.gsim.environment.RLRule;
 import de.s2.gsim.environment.RLRuleFrame;
 import de.s2.gsim.environment.UserRule;
-import de.s2.gsim.environment.UserRuleFrame;
 import de.s2.gsim.objects.Condition;
+import de.s2.gsim.objects.Evaluator;
 import de.s2.gsim.objects.Expansion;
 import de.s2.gsim.objects.RLActionNode;
 import de.s2.gsim.objects.SelectionNode;
@@ -44,10 +44,10 @@ public class RLActionNodeInstance extends RuleInstance implements RLActionNode, 
     }
 
     @Override
-    public Condition createEvaluator(String paramName, String op, String val) throws GSimException {
-        ConditionDef c = real.createCondition(paramName, op, val);
+	public Evaluator createEvaluator(String paramName, double val) throws GSimException {
+		ConditionDef c = real.createCondition(paramName, "", String.valueOf(val));
         ((RLRule) real).setEvaluationFunction(c);
-        return new ConditionInstance(this, c);
+		return new EvaluatorInstance(c);
     }
 
     @Override
@@ -67,11 +67,6 @@ public class RLActionNodeInstance extends RuleInstance implements RLActionNode, 
         return new ExpansionInstance(this, f);
     }
 
-    @Override
-    public SelectionNode createSelectionNode(String name) throws GSimException {
-    	return new SelectionNodeInstance(this, UserRule.instanciate(UserRuleFrame.newUserRuleFrame("shortcut-frame"), name));
-    }
-
     public double getComparisonDiscount() {
         return ((RLRule) real).getAvgBeta();
     }
@@ -82,10 +77,10 @@ public class RLActionNodeInstance extends RuleInstance implements RLActionNode, 
     }
 
     @Override
-    public Condition getEvaluator() {
+	public Evaluator getEvaluator() {
         ConditionDef f = ((RLRule) real).getEvaluationFunction();
         if (f != null) {
-            return new EvaluatorInstance(this, f);
+			return new EvaluatorInstance(f);
         }
         return null;
     }
@@ -131,26 +126,6 @@ public class RLActionNodeInstance extends RuleInstance implements RLActionNode, 
         return null;
     }
 
-    @Override
-    public SelectionNode getSelectionNode(String name) throws GSimException {
-        for (SelectionNode c : getSelectionNodes()) {
-            if (c.getName().equals(name)) {
-                return c;
-            }
-        }
-        return null;
-    }
-
-    @Override
-    public SelectionNode[] getSelectionNodes() {
-        UserRule[] r = ((RLRule) real).getShortSelectionRules();
-        SelectionNodeInstance[] sc = new SelectionNodeInstance[r.length];
-        for (int i = 0; i < sc.length; i++) {
-            sc[i] = new SelectionNodeInstance(this, r[i]);
-        }
-        return sc;
-    }
-
     public String getUpdateLag() {
         return ((RLRule) real).getUpdateLag();
     }
@@ -173,7 +148,7 @@ public class RLActionNodeInstance extends RuleInstance implements RLActionNode, 
     }
 
     @Override
-    public void setEvaluator(Condition f) throws GSimException {
+	public void setEvaluator(Evaluator f) throws GSimException {
         ConditionDef c = (ConditionDef) ((UnitWrapper) f).toUnit();
         ((RLRule) real).setEvaluationFunction(c);
         owner.addOrSetRLActionNode(this);

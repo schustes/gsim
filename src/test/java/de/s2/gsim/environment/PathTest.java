@@ -11,6 +11,7 @@ import java.util.Optional;
 
 import org.junit.Test;
 
+import de.s2.gsim.objects.Path;
 import de.s2.gsim.objects.attribute.Attribute;
 import de.s2.gsim.objects.attribute.AttributeType;
 import de.s2.gsim.objects.attribute.DomainAttribute;

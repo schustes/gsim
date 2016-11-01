@@ -14,6 +14,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import de.s2.gsim.objects.Path;
 import de.s2.gsim.objects.attribute.AttributeType;
 import de.s2.gsim.objects.attribute.DomainAttribute;
 import de.s2.gsim.objects.attribute.NumericalAttribute;

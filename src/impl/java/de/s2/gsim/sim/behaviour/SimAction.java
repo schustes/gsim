@@ -33,6 +33,11 @@ public abstract class SimAction implements java.io.Serializable {
 
 	public abstract Object execute();
 
+	public final void doExecute() {
+		execute();
+		ctx.getAgent().setLastActionClassName(name);
+	}
+
 	public Context getContext() {
 		return ctx;
 	}
@@ -97,6 +102,7 @@ public abstract class SimAction implements java.io.Serializable {
 			} else {
 				a = (SimAction) Class.forName(actionClass).newInstance();
 			}
+			a.name = className;
 			return a;
 		} catch (Exception e2) {
 			e2.printStackTrace();

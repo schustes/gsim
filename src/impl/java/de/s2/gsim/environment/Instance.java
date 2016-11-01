@@ -8,6 +8,7 @@ import java.util.NoSuchElementException;
 
 import javax.validation.constraints.NotNull;
 
+import de.s2.gsim.objects.Path;
 import de.s2.gsim.objects.attribute.Attribute;
 import de.s2.gsim.objects.attribute.AttributeFactory;
 import de.s2.gsim.objects.attribute.DomainAttribute;

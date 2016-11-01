@@ -11,9 +11,9 @@ import de.s2.gsim.environment.ExpansionDef;
 import de.s2.gsim.environment.Frame;
 import de.s2.gsim.environment.GenericAgentClass;
 import de.s2.gsim.environment.Instance;
-import de.s2.gsim.environment.Path;
 import de.s2.gsim.environment.RLRule;
 import de.s2.gsim.environment.Unit;
+import de.s2.gsim.objects.Path;
 import de.s2.gsim.objects.attribute.AttributeConstants;
 import de.s2.gsim.objects.attribute.DomainAttribute;
 import de.s2.gsim.sim.GSimEngineException;
@@ -40,7 +40,6 @@ public class RLParser {
         try {
             String rules = doBuild();
 
-            System.out.println(rules);
             rete.executeCommand(rules);
 
             FactHandler.getInstance().parseAndInsertGlobalRLFacts(agent, rete);

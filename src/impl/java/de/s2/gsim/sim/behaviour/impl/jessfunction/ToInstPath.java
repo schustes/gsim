@@ -2,7 +2,7 @@ package de.s2.gsim.sim.behaviour.impl.jessfunction;
 
 import de.s2.gsim.environment.Frame;
 import de.s2.gsim.environment.Instance;
-import de.s2.gsim.environment.Path;
+import de.s2.gsim.objects.Path;
 import jess.Context;
 import jess.JessException;
 import jess.RU;

@@ -12,6 +12,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import android.annotation.Nullable;
+import de.s2.gsim.objects.Path;
 import de.s2.gsim.objects.attribute.Attribute;
 import de.s2.gsim.objects.attribute.AttributeFactory;
 import de.s2.gsim.objects.attribute.DomainAttribute;

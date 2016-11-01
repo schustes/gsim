@@ -8,6 +8,7 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import de.s2.gsim.objects.Path;
 import de.s2.gsim.objects.attribute.Attribute;
 
 public class AgentInstanceOperations {

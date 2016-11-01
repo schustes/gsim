@@ -111,7 +111,7 @@ public abstract class Generator {
                         IntervalAttribute att = (IntervalAttribute) atts.get(k);
                         att.setFrom(v);
                         att.setTo(v);
-                    } else if (atts.get(k) instanceof NumericalAttribute) {
+					} else if (atts.get(k) instanceof NumericalAttribute && isNumerical(da.getDefaultValue())) {
                         NumericalAttribute att = (NumericalAttribute) atts.get(k);
                         double mean = Double.parseDouble(da.getDefaultValue());
                         double v = cern.jet.random.Uniform.staticNextDoubleFromTo(mean - mean, mean * 2);
@@ -124,15 +124,24 @@ public abstract class Generator {
         return obj;
     }
 
-    /**
-     * Randomises attribute values. For this, 'svar' is interpreted as the percentage of variation in the values of the default values of the domain
-     * attributes, which are seen as mean values of the normal distribution from which the values are drawn. This means that svar is expected to be >0
-     * and <1.
-     * 
-     * @param obj Instance
-     * @param svar double
-     * @return Instance
-     */
+	private static boolean isNumerical(String defaultValue) {
+		try {
+			Double.parseDouble(defaultValue);
+			return true;
+		} catch (NumberFormatException e) {
+			return false;
+		}
+	}
+
+	/**
+	 * Randomises attribute values. For this, 'svar' is interpreted as the percentage of variation in the values of the default values of
+	 * the domain attributes, which are seen as mean values of the normal distribution from which the values are drawn. This means that svar
+	 * is expected to be >0 and <1.
+	 * 
+	 * @param obj Instance
+	 * @param svar double
+	 * @return Instance
+	 */
     private static Instance randomiseNormallyDistributedAttributeValues(Instance obj, double svar) {
 
         List<String> lists = obj.getAttributesListNames();

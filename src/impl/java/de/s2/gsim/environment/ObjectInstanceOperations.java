@@ -3,6 +3,7 @@ package de.s2.gsim.environment;
 import java.util.Iterator;
 import java.util.List;
 
+import de.s2.gsim.objects.Path;
 import de.s2.gsim.objects.attribute.Attribute;
 
 public class ObjectInstanceOperations {

@@ -4,7 +4,7 @@ import de.s2.gsim.api.sim.agent.impl.RuntimeAgent;
 import de.s2.gsim.environment.Frame;
 import de.s2.gsim.environment.GenericAgentClass;
 import de.s2.gsim.environment.Instance;
-import de.s2.gsim.environment.Path;
+import de.s2.gsim.objects.Path;
 import de.s2.gsim.objects.attribute.Attribute;
 import de.s2.gsim.objects.attribute.AttributeConstants;
 import de.s2.gsim.objects.attribute.DomainAttribute;

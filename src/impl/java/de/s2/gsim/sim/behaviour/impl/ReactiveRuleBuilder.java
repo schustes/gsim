@@ -127,7 +127,7 @@ public class ReactiveRuleBuilder {
                         nRule += ctxString;
                         nRule += " (set ?res context ?ctx)\n";
                         // nRule += " (assert (executed-" + ruleIdent + "))\n";
-                        nRule += " (call ?res execute))\n";
+						nRule += " (call ?res doExecute))\n";
 
                         res += nRule + "\n";
                     }
@@ -191,7 +191,7 @@ public class ReactiveRuleBuilder {
             nRule += ctxString;
             nRule += " (set ?res context ?ctx)\n";
             // nRule += " (assert (executed-" + ruleIdent + "))\n";
-            nRule += " (call ?res execute))\n";
+			nRule += " (call ?res doExecute))\n";
 
             return nRule;
 

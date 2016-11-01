@@ -11,6 +11,7 @@ import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import de.s2.gsim.objects.Path;
 import de.s2.gsim.objects.attribute.DomainAttribute;
 
 /**

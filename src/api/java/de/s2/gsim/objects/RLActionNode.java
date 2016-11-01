@@ -56,15 +56,14 @@ public interface RLActionNode {
     void addOrSetSelectionNode(SelectionNode selectionNode);
 
     /**
-     * Creates a {@link Condition}. A condition qualifies the circumstances under which the RLActionNode is activated. An RLActionNode extends a
-     * normal if-then rule.
-     * 
-     * @param paramName the condition parameter name in form of a FQN, e.g. attribute-list-1/attribute-name
-     * @param op the operator, e.g. >, <
-     * @param val the condition value, e.g. a number that the attribute holds at a certain state of the agent
-     * @return the condition
-     */
-    Condition createEvaluator(String paramName, String op, String val);
+	 * Creates a {@link Evaluator}. An evaluator is basically a container for holding a path to an attribute used as reward for the RL
+	 * algorithm and the learning rate alpha to be applied to this node.
+	 * 
+	 * @param attributeRef
+	 * @param alpha
+	 * @return the condition
+	 */
+	Evaluator createEvaluator(String attributeRef, double alpha);
 
     /**
      * Creates a numerical {@link Expansion}, describing the space it covers.
@@ -86,26 +85,19 @@ public interface RLActionNode {
     Expansion createExpansion(String param, String[] fillers);
 
     /**
-     * Creates a {@link SelectionNode} with the given name.
-     * 
-     * @param name the name
-     * @return the node
-     */
-    SelectionNode createSelectionNode(String name);
-
-    /**
-     * Gets the learning discount factor.
-     * 
-     * @return the factor
-     */
+	 * Gets the learning discount factor (beta).
+	 * 
+	 * @return the factor
+	 */
     double getDiscount();
 
     /**
-     * Gets the activation condition of the node.
-     * 
-     * @return the condition
-     */
-    Condition getEvaluator();
+	 * Gets the evaluator of the node; this is a pair holding alpha and a path
+	 * to the reward variable.
+	 * 
+	 * @return the condition
+	 */
+	Evaluator getEvaluator();
 
     /**
      * Gets the restriction interval, which describes how often this node should be executed (e.g. every 3 time steps etc.).
@@ -143,21 +135,6 @@ public interface RLActionNode {
     Policy getPolicy();
 
     /**
-     * Gets the selection node with the given name.
-     * 
-     * @param name the name
-     * @return the selection node
-     */
-    SelectionNode getSelectionNode(String name);
-
-    /**
-     * Gets all selection nodes.
-     * 
-     * @return the nodes
-     */
-    SelectionNode[] getSelectionNodes();
-
-    /**
      * Removes an expansion.
      * 
      * @param expansion the expansion
@@ -179,11 +156,11 @@ public interface RLActionNode {
     void setDiscount(double discount);
 
     /**
-     * Sets the activation condition.
-     * 
-     * @param condition the condition
-     */
-    void setEvaluator(Condition condition);
+	 * Sets the evaluation info.
+	 * 
+	 * @param eval the evaluator
+	 */
+	void setEvaluator(Evaluator eval);
 
     /**
      * Sets the execution interval restriction

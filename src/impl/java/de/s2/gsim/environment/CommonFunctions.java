@@ -2,6 +2,7 @@ package de.s2.gsim.environment;
 
 import java.util.List;
 
+import de.s2.gsim.objects.Path;
 import de.s2.gsim.objects.attribute.DomainAttribute;
 
 public class CommonFunctions {

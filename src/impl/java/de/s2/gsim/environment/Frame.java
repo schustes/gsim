@@ -17,6 +17,7 @@ import javax.validation.constraints.NotNull;
 
 import org.apache.log4j.Logger;
 
+import de.s2.gsim.objects.Path;
 import de.s2.gsim.objects.attribute.DomainAttribute;
 
 /**

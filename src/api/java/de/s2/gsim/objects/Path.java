@@ -1,12 +1,15 @@
-package de.s2.gsim.environment;
+package de.s2.gsim.objects;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import de.s2.gsim.environment.TypedList;
+import de.s2.gsim.environment.Unit;
+
 public class Path<T> {
 
-	enum Type {
+	public enum Type {
 		OBJECT, ATTRIBUTE, LIST, PATH
 	}
 

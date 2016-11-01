@@ -70,7 +70,7 @@ public class RLRulesBuilder {
         nRule += "  (set ?ctx executionContext (?*agent* getExecutionContext(new java.lang.String ?ctxName)))\n";
         nRule += "  (foreach ?object $?param (call ?ctx addObject ?object))\n";
         nRule += "  (call ?res setContext ?ctx)\n";
-        nRule += "  (call ?res execute) )\n ";
+		nRule += "  (call ?res doExecute) )\n ";
 
         return nRule;
     }
