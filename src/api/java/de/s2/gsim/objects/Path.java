@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import de.s2.gsim.environment.TypedList;
-import de.s2.gsim.environment.Unit;
+//import de.s2.gsim.environment.TypedList;
+//import de.s2.gsim.environment.Unit;
 
 public class Path<T> {
 
@@ -128,7 +128,8 @@ public class Path<T> {
 		return build(Type.ATTRIBUTE, path);
 	}
 
-	public static <T extends Unit<?,?>> Path<T> objectPath(String... path) {
+	public static <T> Path<T> objectPath(String... path) {
+		// public static <T extends Unit<?,?>> Path<T> objectPath(String... path) {
 
 		if (path.length < 2) {
 			throw new IllegalArgumentException("Path must not be empty");
@@ -138,7 +139,8 @@ public class Path<T> {
 
 	}
 
-	public static <T extends TypedList<?>> Path<T> objectListPath(String... path) {
+	public static <T> Path<T> objectListPath(String... path) {
+		// public static <T extends TypedList<?>> Path<T> objectListPath(String... path) {
 
 		if (path.length < 1) {
 			throw new IllegalArgumentException("Path must not be empty");
