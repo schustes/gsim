@@ -1,7 +1,7 @@
 package de.s2.gsim.sim;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.*;
 import static org.hamcrest.Matchers.not;
 
 import java.util.HashMap;
@@ -9,6 +9,7 @@ import java.util.concurrent.Semaphore;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.internal.matchers.GreaterOrEqual;
 
 import de.s2.gsim.GSimCore;
 import de.s2.gsim.GSimCoreFactory;
@@ -60,8 +61,46 @@ public class SimTest {
 	@Test
 	public void rl_rule_should_fire() throws Exception {
 
+		int samples = 5;
+		int steps = 80;
+		double alpha = 0.1;
+
+		env.createAgentClass(AGENT_CLASS_NAME, null);
+
+		AgentClass agentClass = createBaseTestAgent();
+
+		Behaviour behaviour = agentClass.getBehaviour();
+		Action action1 = behaviour.createAction(action0Name, TestAction0.class.getName());
+		Action action2 = behaviour.createAction(action1Name, TestAction1.class.getName());
+
+		RLActionNode rule = behaviour.createRLActionNode("RL");
+
+		rule.addOrSetConsequent(action1);
+		rule.addOrSetConsequent(action2);
+
+		Rule rewardRule = behaviour.createRule("reward-rule");
+		Action rewardAction = behaviour.createAction("rewardAction", RewardComputation.class.getName());
+		rewardRule.addOrSetConsequent(rewardAction);
+
+		// first param is reward variable, and last is alpha!
+		rule.createEvaluator(ATTR_LIST + "/" + EVAL_ATTR, alpha);
+		agentClass.setBehaviour(behaviour);
+
+		AgentInstance agent = env.instanciateAgent(agentClass, AGENT_NAME);
+
+		double expectedIntuitive = steps * 0.7;
+		
+		for (int i=0; i<samples; i++) {
+			double counterAction = runRLsimulation(agent, alpha, steps);
+			assertThat("Count of test action must be significantly over 2/3 of all actions or so", expectedIntuitive, lessThanOrEqualTo(counterAction));
+		}
+
+	}
+
+	public void scientific_rl_rule_test() throws Exception {
+
 		int samples = 10;
-		int steps = 999;
+		int steps = 50;
 		double alpha = 0.1;
 
 		env.createAgentClass(AGENT_CLASS_NAME, null);
@@ -100,8 +139,15 @@ public class SimTest {
 		double expectedFrequency0 = Math.floor((steps + 1) * pr0);
 		double expectedFrequency1 = Math.ceil((steps + 1) * pr1);
 
+		
+		double expectedIntuitive = steps * 0.7;
+		
+		for (int i=0; i<samples; i++) {
+			double counterAction = runRLsimulation(agent, alpha, steps);
+			assertThat("Count of test action must be significantly over 2/3 of all actions or so", counterAction, lessThanOrEqualTo(counterAction));
+		}
 
-		NormalDistributedUtil.sample(100, samples, 10, expectedFrequency0, () -> {
+		NormalDistributedUtil.sample(10, samples, 10, expectedFrequency0, () -> {
 			try {
 				double counterAction1 = runRLsimulation(agent, alpha, steps);
 				System.out.println("count action1: " + counterAction1);
@@ -112,7 +158,6 @@ public class SimTest {
 			return 0D;
 		});
 	}
-
 	public double runRLsimulation(AgentInstance testAgent, double alpha, int steps) throws Exception {
 
 
