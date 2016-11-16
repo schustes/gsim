@@ -91,12 +91,6 @@ public class SimCoreLocalImpl implements GSimCore {
     }
 
     @Override
-    public BatchManager createBatchManager(de.s2.gsim.sim.Executable e, Map<String, Object> props) throws GSimException {
-        LocalBatchManager m = new LocalBatchManager(e);
-        return m;
-    }
-
-    @Override
     public SimulationController createScenarioManager(ModelDefinitionEnvironment env, Map<String, Object> props, int steps, int runs) throws GSimException {
 
         if (env instanceof EnvironmentWrapper) {

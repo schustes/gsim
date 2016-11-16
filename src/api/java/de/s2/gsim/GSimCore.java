@@ -40,17 +40,6 @@ public interface GSimCore {
     ModelDefinitionEnvironment create(String ns, InputStream setup, Map<String, Object> props) throws GSimException;
 
     /**
-     * Creates a BatchManager. A BatchManager is a utility that executes a java class on behalf of the user. For example, the user writes a program
-     * that iterates over a number of parameter settings. In remote mode, this class is sent the server.
-     * 
-     * @param ex executable interface
-     * @param props runtime properties
-     * @return BatchManager
-     * @throws GSimException
-     */
-    BatchManager createBatchManager(Executable ex, Map<String, Object> props) throws GSimException;
-
-    /**
      * Creates a ScenarioController (used to start and control simulation).
      * 
      * @param env DefinitionEnvironment
