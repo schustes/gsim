@@ -126,7 +126,7 @@ public class DomainAttribute {
      */
     public boolean isFiller(String value) {
         if (getType() == AttributeType.NUMERICAL && isNumerical(value)
-                || getType() == AttributeType.STRING) && !isNumerical(value)) {
+                || getType() == AttributeType.STRING && !isNumerical(value)) {
             return true;
         }
         if (fillers.contains("{}")) {
