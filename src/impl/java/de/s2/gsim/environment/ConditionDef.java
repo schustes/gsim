@@ -1,5 +1,7 @@
 package de.s2.gsim.environment;
 
+import de.s2.gsim.objects.attribute.AttributeType;
+import de.s2.gsim.objects.attribute.DomainAttribute;
 import de.s2.gsim.objects.attribute.StringAttribute;
 
 public class ConditionDef extends Instance {
@@ -21,7 +23,11 @@ public class ConditionDef extends Instance {
     }
 
     public ConditionDef(String parameterName, String operator, String parameterValue) {
-        super(parameterName, ConditionFrame.newConditionFrame(parameterName));
+        
+   // 	super(parameterName, ConditionFrame.newConditionFrame(parameterName));
+        super(Instance.instanciate(parameterName, ConditionFrame.newConditionFrame(parameterName)));
+    	
+    	
         super.setAttribute(new StringAttribute("parameter-name", parameterName));
         super.setAttribute(new StringAttribute("operator", operator));
         super.setAttribute(new StringAttribute("parameter-value", parameterValue));

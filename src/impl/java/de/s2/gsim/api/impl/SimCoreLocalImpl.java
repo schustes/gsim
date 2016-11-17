@@ -102,11 +102,6 @@ public class SimCoreLocalImpl implements GSimCore {
         }
     }
 
-    public void endSession() throws GSimException {
-        // TODO Auto-generated method stub
-
-    }
-
     public String getConfigDir() {
         return configDir;
     }

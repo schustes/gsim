@@ -243,6 +243,7 @@ public class EnvironmentTest {
         assertThat("Overridden rule is retrieved", sRule.getConditions()[0].getOperator(), equalTo("<"));
         assertThat("Parent rule is not modified", pRule.getConditions()[0].getOperator(), equalTo(">"));
     }
+
     
     @Test
     public void verify_behaviour_instance_inheritance() {

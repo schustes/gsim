@@ -15,6 +15,7 @@ import de.s2.gsim.environment.RLRule;
 import de.s2.gsim.environment.Unit;
 import de.s2.gsim.objects.Path;
 import de.s2.gsim.objects.attribute.AttributeConstants;
+import de.s2.gsim.objects.attribute.AttributeType;
 import de.s2.gsim.objects.attribute.DomainAttribute;
 import de.s2.gsim.sim.GSimEngineException;
 import jess.Fact;
@@ -205,9 +206,9 @@ public class RLParser {
             } else {
                 a = agent.getDefinition().resolvePath(Path.attributePath(path.split("/")));
             }
-            if (a.getType().equals(AttributeConstants.INTERVAL)) {
+            if (a.getType() == AttributeType.INTERVAL) {
                 exp.setIntervalAttributes(path, Double.parseDouble(e.getFillers().get(0)), Double.parseDouble(e.getFillers().get(1)));
-            } else if (a.getType().equals(AttributeConstants.SET)) {
+            } else if (a.getType() == AttributeType.SET) {
                 exp.setSetAttributes(path, e.getFillers());
             }
         }

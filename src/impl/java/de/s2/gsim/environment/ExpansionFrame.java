@@ -41,25 +41,25 @@ public class ExpansionFrame extends Frame {
     }
 
     public void addFiller(String s) {
-        DomainAttribute a = this.getAttribute("fillers");
+        DomainAttribute a = this.getAttribute(ATTR_LIST_ATTRS, "fillers");
         List<String> s0 = a.getFillers();
         if (!s0.contains(s)) {
             a.addFiller(s);
         }
-        super.addOrSetAttribute("fillers", a);
+        super.addOrSetAttribute(ATTR_LIST_ATTRS, a);
     }
 
     public List<String> getFillers() {
-        DomainAttribute a0 = this.getAttribute("fillers");
+        DomainAttribute a0 = this.getAttribute(ATTR_LIST_ATTRS, "fillers");
         return a0.getFillers();
     }
 
     public String getMax() {
-        return this.getAttribute("max").getDefaultValue();
+        return this.getAttribute(ATTR_LIST_ATTRS, "max").getDefaultValue();
     }
 
     public String getMin() {
-        return this.getAttribute("min").getDefaultValue();
+        return this.getAttribute(ATTR_LIST_ATTRS, "min").getDefaultValue();
     }
 
     public String getParameterName() {

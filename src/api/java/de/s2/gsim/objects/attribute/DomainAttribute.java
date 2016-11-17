@@ -125,8 +125,8 @@ public class DomainAttribute {
      * Checks if a value is valid, given the properties set in the domain.xml
      */
     public boolean isFiller(String value) {
-        if (getType().equals(AttributeConstants.NUMERICAL) && isNumerical(value)
-                || getType().equals(AttributeConstants.STRING) && !isNumerical(value)) {
+        if (getType() == AttributeType.NUMERICAL && isNumerical(value)
+                || getType() == AttributeType.STRING) && !isNumerical(value)) {
             return true;
         }
         if (fillers.contains("{}")) {

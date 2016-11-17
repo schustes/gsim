@@ -233,28 +233,24 @@ public class BehaviourClass implements Behaviour, UnitWrapper {
     @Override
     public void setMaxNodes(int n) throws GSimException {
         getReal().setMaxNodes(n);
-        getReal().setDirty(true);
         owner.setBehaviour(this);
     }
 
     @Override
     public void setRevaluationProb(double d) throws GSimException {
         getReal().setRevalProb(d);
-        getReal().setDirty(true);
         owner.setBehaviour(this);
     }
 
     @Override
     public void setRevisitCostFraction(double d) throws GSimException {
         getReal().setRevisitCost(d);
-        getReal().setDirty(true);
         owner.setBehaviour(this);
     }
 
     @Override
     public void setUpdateInterval(int n) throws GSimException {
         getReal().setStateUpdateInterval(n);
-        getReal().setDirty(true);
         owner.setBehaviour(this);
     }
 

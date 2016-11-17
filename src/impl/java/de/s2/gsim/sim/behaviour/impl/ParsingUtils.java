@@ -7,6 +7,7 @@ import de.s2.gsim.environment.Instance;
 import de.s2.gsim.objects.Path;
 import de.s2.gsim.objects.attribute.Attribute;
 import de.s2.gsim.objects.attribute.AttributeConstants;
+import de.s2.gsim.objects.attribute.AttributeType;
 import de.s2.gsim.objects.attribute.DomainAttribute;
 import de.s2.gsim.objects.attribute.IntervalAttribute;
 import de.s2.gsim.objects.attribute.NumericalAttribute;
@@ -62,7 +63,7 @@ public class ParsingUtils {
 			Frame object = agent.getDefinition().getListType(listName);
 			if (object != null) {
 				DomainAttribute datt = (DomainAttribute) object.resolvePath(Path.attributePath(ref1));
-				if (datt.getType().equals(AttributeConstants.NUMERICAL) || datt.getType().equals(AttributeConstants.INTERVAL)) {
+				if (datt.getType() == AttributeType.NUMERICAL || datt.getType() == AttributeType.INTERVAL) {
 					return true;
 				} 
 				return false;

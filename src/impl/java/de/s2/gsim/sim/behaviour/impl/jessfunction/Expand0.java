@@ -160,7 +160,7 @@ public class Expand0 extends DynamicRuleBuilder implements java.io.Serializable 
                 String newRule2 = createNewExperimentalRuleCat(b, r0, stateNameExpanded_Siblings, unexpandedElemsSpec.attributeSpec,
                         fillersOfSiblingAttributes, remaining, context);
                 context.getEngine().executeCommand(newRule2);
-
+System.out.println(newRule1);
                 logger.debug(newRule1);
                 logger.debug(newRule2);
             }
@@ -286,8 +286,8 @@ public class Expand0 extends DynamicRuleBuilder implements java.io.Serializable 
             String newStateName1 = stateFact_split1.getSlotValue("name").stringValue(context);
             String newStateName2 = stateFact_split2.getSlotValue("name").stringValue(context);
 
-            Fact stateFactElem_split1 = addStateFactIntervalElem(toExpand, from, from + dist / 2d, context);
-            Fact stateFactElem_split2 = addStateFactIntervalElem(toExpand, from + dist / 2d, to, context);
+            Fact stateFactElem_split1 = addStateFactIntervalElem(newStateName1, toExpand, from, from + dist / 2d, context);
+            Fact stateFactElem_split2 = addStateFactIntervalElem(newStateName2, toExpand, from + dist / 2d, to, context);
 
             if (existsEquivalent(stateFact, new Fact[] { stateFactElem_split1 }, context)) {
                 return;
@@ -310,8 +310,8 @@ public class Expand0 extends DynamicRuleBuilder implements java.io.Serializable 
                 context.getEngine()
                         .executeCommand(createNewSelectionNodes(b, rootRule, agent, newStateName2, stateFactElem_split2, remaining, context));
             } else {
-                context.getEngine().executeCommand(createNewExperimentalRule(b, rootRule, agent, newStateName1, remaining, context));
-                context.getEngine().executeCommand(createNewExperimentalRule(b, rootRule, agent, newStateName2, remaining, context));
+                context.getEngine().executeCommand(createNewExperimentalRule(b, rootRule, agent, newStateName1, remaining, context, paramName, from, from + dist / 2d));
+                context.getEngine().executeCommand(createNewExperimentalRule(b, rootRule, agent, newStateName2, remaining, context, paramName, from + dist / 2d, to));
             }
 
             context.getEngine().assertFact(stateFact_split1);

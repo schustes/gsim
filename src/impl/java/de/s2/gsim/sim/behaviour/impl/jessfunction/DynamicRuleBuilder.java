@@ -81,13 +81,13 @@ public class DynamicRuleBuilder {
 
     }
 
-    public Fact addStateFactIntervalElem(Fact state, double from, double to, Context context) throws JessException {
+    public Fact addStateFactIntervalElem(String stateName, Fact stateFactElem, double from, double to, Context context) throws JessException {
 
-        String stateName = state.getSlotValue("name").stringValue(context);
-        String param = state.getSlotValue("name").stringValue(context);
+        //String stateName = stateFactElem.getSlotValue("name").stringValue(context);
+        String param = stateFactElem.getSlotValue("param-name").stringValue(context);
         String name = param + "->" + String.valueOf(from) + ":" + String.valueOf(to);
 
-        return FactHandler.getInstance().addStateFactElement(context.getEngine(), state, stateName, name, param, from, to);
+        return FactHandler.getInstance().addStateFactElement(context.getEngine(), stateFactElem, stateName, name, param, from, to);
 
     }
 
@@ -102,21 +102,23 @@ public class DynamicRuleBuilder {
         return connectedActionNodes;
     }
 
-    protected String createNewExperimentalRule(TreeExpansionBuilder b, RLRule r, RuntimeAgent a, String stateName, Fact[] statefactelems,
-            Context context) throws JessException {
+    //TODO condition fehlt!
+    protected String createNewExperimentalRule(TreeExpansionBuilder b, RLRule r, RuntimeAgent a, String stateName, Fact[] remainingStatefactelems,
+            Context context, String param, double from, double to) throws JessException {
 
         Attribute2ValuesMap consts = new Attribute2ValuesMap();
+        consts.setIntervalAttributes(param, from, to);
 
-        for (int i = 0; i < statefactelems.length; i++) {
-            String s = statefactelems[i].getDeftemplate().getBaseName();
-            String pm = statefactelems[i].getSlotValue("name").stringValue(context);
+        for (int i = 0; i < remainingStatefactelems.length; i++) {
+            String s = remainingStatefactelems[i].getDeftemplate().getBaseName();
+            String pm = remainingStatefactelems[i].getSlotValue("name").stringValue(context);
             if (s.equals("state-fact-element")) {
-                double m = statefactelems[i].getSlotValue("from").floatValue(context);
-                double x = statefactelems[i].getSlotValue("to").floatValue(context);
+                double m = remainingStatefactelems[i].getSlotValue("from").floatValue(context);
+                double x = remainingStatefactelems[i].getSlotValue("to").floatValue(context);
                 consts.setIntervalAttributes(pm, m, x);
 
             } else {
-                String c = statefactelems[i].getSlotValue("category").stringValue(context);
+                String c = remainingStatefactelems[i].getSlotValue("category").stringValue(context);
 
                 List<String> fillersNow = consts.getFillers(pm);// getFillers(consts, c);
                 fillersNow = maybeAddFiller(fillersNow, c);// add filler to array
@@ -128,6 +130,7 @@ public class DynamicRuleBuilder {
         String n = "";
         try {
             n = b.buildExperimentationRule(r, stateName, consts);
+            System.out.println(">>>>>>>>>>>>>>>>>>>>>>" + n);
         } catch (Exception e) {
             e.printStackTrace();
         }

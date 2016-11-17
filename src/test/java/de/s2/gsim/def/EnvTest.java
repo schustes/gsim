@@ -24,6 +24,7 @@ import de.s2.gsim.environment.GenericAgentClass;
 import de.s2.gsim.objects.Action;
 import de.s2.gsim.objects.AgentClass;
 import de.s2.gsim.objects.AgentInstance;
+import de.s2.gsim.objects.Behaviour;
 import de.s2.gsim.objects.Condition;
 import de.s2.gsim.objects.ObjectClass;
 import de.s2.gsim.objects.attribute.AttributeType;
@@ -42,6 +43,16 @@ public class EnvTest {
     public void setupEnv() {
        // core = GSimCoreFactory.customFactory("Standalone").createCore();
         env = core.create("test", new HashMap<>());
+    }
+    
+    @Test
+    public void verify_behaviour_attributes_are_set() throws Exception {
+    	AgentClass parent = env.createAgentClass("Test", null);
+    	Behaviour beh = parent.getBehaviour();
+    	int count = 99;
+    	beh.setMaxNodes(count);
+    	int m = beh.getMaxNodes();
+    	assertThat("Max nodes property is set", m, equalTo(count));  
     }
     
     @Test

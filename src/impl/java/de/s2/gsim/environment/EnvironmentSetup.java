@@ -630,16 +630,16 @@ public class EnvironmentSetup {
                 if (att == null) {
                     throw new GSimDefException("Attribute referenced in expansion " + attRef + " cannot be resolved.");
                 }
-                if (att.getType().equals(AttributeConstants.NUMERICAL)) {
+                if (att.getType() == AttributeType.NUMERICAL) {
                     if (f.getMax().equals(String.valueOf(Double.NaN)) || f.getMin().equals(String.valueOf(Double.NaN))) {
                         throw new GSimDefException("Attribute " + attRef + " is numerical, but no boundaries were specified.");
                     }
-                } else if (att.getType().equals(AttributeConstants.SET)) {
+                } else if (att.getType()== AttributeType.SET) {
                     String[] fillers = (String[])att.getFillers().toArray();
                     f.setFillers(fillers);
                     n.addExpansion(f);
                     agent.getBehaviour().addRLRule(n);
-                } else if (att.getType().equals(AttributeConstants.INTERVAL)) {
+                } else if (att.getType() == AttributeType.INTERVAL) {
                     f.setFillers((String[])att.getFillers().toArray());
                     f.setMin(att.getFillers().get(0));
                     f.setMax(att.getFillers().get(1));

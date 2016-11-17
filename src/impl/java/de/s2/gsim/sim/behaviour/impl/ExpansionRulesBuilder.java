@@ -187,9 +187,12 @@ public class ExpansionRulesBuilder {
         n1 += " (test (> (* ?*state-elem-count* 2)  (+ (child-count-" + role + " ?sfn) 0) )  )\n";
         n1 += " (test (= (* ?v (/ ?act ?t)) (max-value-" + role + " ?h ?t)) )\n";
         n1 += " =>\n";
+        n1 += " (bind ?k (max-value-" + role + " ?h ?t) )\n";
+       // n1 += " (printout t --- ?v ::: ?k :: ?h)";
         n1 += "  (expand ?fact0) \n";
         n1 += "  (bind ?c (child-count-" + role + " ?sfn)) \n";
         n1 += "  (assert (expanded))  )\n";
+        
         n1 += "\n(defrule expand_FIRST_BEST_ROOT-" + role + "\n";
         n1 += " (timer (time ?t&:(=(mod ?t " + interval + ") 0)))\n";
         n1 += rtContext;
@@ -238,9 +241,10 @@ public class ExpansionRulesBuilder {
         f4 += "  (bind ?act (fact-slot-value ?state count))\n";
         f4 += "  (bind ?lf (fact-slot-value ?state leaf))\n";
         f4 += "  (bind ?v (* ?c (/ ?act ?t))) \n";
-        f4 += "  (if (and (> (count-all-elems-" + role + " ?sfn)  1) (> ?v ?n)) then (bind ?n ?v)) )\n";
+//        f4 += " (printout t => (count-all-elems-" + role + " ?sfn)   )";
+        f4 += "  (if (and (>= (count-all-elems-" + role + " ?sfn)  1) (> ?v ?n)) then (bind ?n ?v)) )\n";
         f4 += " (return ?n)) \n";
-
+        
         f4 += "\n(deffunction max-value-overall-" + role + "(?t) \n";
         f4 += " (bind ?n -1)\n";
         f4 += " (bind ?it (run-query list-states \"" + role + "\"))\n";

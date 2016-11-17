@@ -25,6 +25,7 @@ import de.s2.gsim.environment.UserRuleFrame;
 import de.s2.gsim.objects.Path;
 import de.s2.gsim.objects.attribute.Attribute;
 import de.s2.gsim.objects.attribute.AttributeConstants;
+import de.s2.gsim.objects.attribute.AttributeType;
 import de.s2.gsim.objects.attribute.DomainAttribute;
 import de.s2.gsim.objects.attribute.IntervalAttribute;
 import de.s2.gsim.sim.GSimEngineException;
@@ -112,14 +113,14 @@ public class JessHandler implements java.io.Serializable {
             for (ExpansionDef e : r.getExpansions()) {
                 String path = e.getParameterName();
                 DomainAttribute a = extractAtt(path);// (DomainAttribute) this.owner.getDefinition().resolveName(path.split("/"));
-                if (a.getType().equals(AttributeConstants.SET)) {
+                if (a.getType() == AttributeType.SET) {
                     ArrayList<String> modifiedSet = rlRanges.getNewCategoricalParameterValues(path, a.getFillers());
                     RLRulesUpdate rlUpdate = new RLRulesUpdate(owner, debugDir);
                     for (String n : modifiedSet) {
                         logger.debug("Modified set, att=" + path + ", new=" + n);
                         rlUpdate.update(a, n, rete.getGlobalContext());
                     }
-                } else if (a.getType().equals(AttributeConstants.INTERVAL)) {
+                } else if (a.getType() == AttributeType.INTERVAL) {
                     double[] modifiedRange = rlRanges.getNewIntervalParameterRange(path,
                             new double[] { Double.parseDouble(a.getFillers().get(0)), Double.parseDouble(a.getFillers().get(1)) });
                     if (modifiedRange != null) {
@@ -282,12 +283,12 @@ public class JessHandler implements java.io.Serializable {
                 String path = e.getParameterName();
                 // DomainAttribute a = (DomainAttribute) this.owner.getDefinition().resolveName(path.split("/"));
                 DomainAttribute a = extractAtt(path);
-                if (a.getType().equals(AttributeConstants.SET)) {
+                if (a.getType() == AttributeType.SET) {
                     rlRanges.initCategoricalParameters(path, e.getFillers());// e!
                                                                              // because
                                                                              // default
                                                                              // values...
-                } else if (a.getType().equals(AttributeConstants.INTERVAL)) {
+                } else if (a.getType() == AttributeType.INTERVAL) {
                     rlRanges.initIntervalParameterRange(path,
                             new double[] { Double.parseDouble(e.getFillers().get(0)), Double.parseDouble(a.getFillers().get(1)) });
                 }
@@ -302,9 +303,9 @@ public class JessHandler implements java.io.Serializable {
                 Path<DomainAttribute> p = Path.attributePath(path.split("/"));
                 //DomainAttribute a = (DomainAttribute) owner.getDefinition().resolveName(path.split("/"));
                 DomainAttribute a = owner.getDefinition().resolvePath(p);
-                if (a.getType().equals(AttributeConstants.SET)) {
+                if (a.getType() == AttributeType.SET) {
                     rlRanges.initCategoricalParameters(path, a.getFillers());
-                } else if (a.getType().equals(AttributeConstants.INTERVAL)) {
+                } else if (a.getType() == AttributeType.INTERVAL) {
                     rlRanges.initIntervalParameterRange(path,
                             new double[] { Double.parseDouble(a.getFillers().get(0)), Double.parseDouble(a.getFillers().get(1)) });
                 }
