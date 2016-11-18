@@ -98,7 +98,7 @@ public class SimTest {
 	}
 
 	@Test
-	public void bra_expansion() throws Exception {
+	public void bra_expansion_numerical() throws Exception {
 
 		int samples = 1;
 		int steps = 10;
@@ -154,7 +154,108 @@ public class SimTest {
 		}
 
 	}
-	
+
+	@Test
+	public void bra_expansion_categorical() throws Exception {
+
+		int samples = 1;
+		int steps = 10;
+		int expandInterval=2;
+		double alpha = 0.1;
+
+		env.createAgentClass(AGENT_CLASS_NAME, null);
+
+		AgentClass agentClass = createBaseTestAgent();
+
+		Behaviour behaviour = agentClass.getBehaviour();
+		Action action1 = behaviour.createAction(action0Name, TestAction0.class.getName());
+		Action action2 = behaviour.createAction(action1Name, TestAction1.class.getName());
+
+		RLActionNode rule = behaviour.createRLActionNode("RL");
+
+		rule.addOrSetConsequent(action1);
+		rule.addOrSetConsequent(action2);
+
+		Rule rewardRule = behaviour.createRule("reward-rule");
+		Action rewardAction = behaviour.createAction("rewardAction", RewardComputation.class.getName());
+		rewardRule.addOrSetConsequent(rewardAction);
+
+		// first param is reward variable, and last is alpha!
+		rule.createEvaluator(ATTR_LIST + "/" + EVAL_ATTR, alpha);
+		agentClass.setBehaviour(behaviour);
+		
+		DomainAttribute cat = new DomainAttribute("Letters", AttributeType.SET);
+		cat.addFiller("A");
+		cat.addFiller("B");
+		cat.addFiller("C");
+		agentClass.addAttribute(ATTR_LIST, cat);
+
+		Expansion expansion = rule.createExpansion(ATTR_LIST+"/Letters", new String[] {"A", "B", "C"});
+		rule.addOrSetExpansion(expansion);
+		behaviour.setMaxNodes(3);
+		behaviour.setRevaluationProb(0.3);
+		behaviour.setUpdateInterval(expandInterval);
+		behaviour.setRevisitCostFraction(0.5);
+		agentClass.setBehaviour(behaviour);
+
+		AgentInstance agent = env.instanciateAgent(agentClass, AGENT_NAME);
+
+		for (int i=0; i<samples; i++) {
+			double counterAction = runRLsimulation(agent, alpha, steps);
+		//	assertThat("Count of test action must be significantly over 2/3 of all actions or so", expectedIntuitive, lessThanOrEqualTo(counterAction));
+		}
+	}
+	@Test
+	public void bra_expansion_categorical() throws Exception {
+
+		int samples = 1;
+		int steps = 10;
+		int expandInterval=2;
+		double alpha = 0.1;
+
+		env.createAgentClass(AGENT_CLASS_NAME, null);
+
+		AgentClass agentClass = createBaseTestAgent();
+
+		Behaviour behaviour = agentClass.getBehaviour();
+		Action action1 = behaviour.createAction(action0Name, TestAction0.class.getName());
+		Action action2 = behaviour.createAction(action1Name, TestAction1.class.getName());
+
+		RLActionNode rule = behaviour.createRLActionNode("RL");
+
+		rule.addOrSetConsequent(action1);
+		rule.addOrSetConsequent(action2);
+
+		Rule rewardRule = behaviour.createRule("reward-rule");
+		Action rewardAction = behaviour.createAction("rewardAction", RewardComputation.class.getName());
+		rewardRule.addOrSetConsequent(rewardAction);
+
+		// first param is reward variable, and last is alpha!
+		rule.createEvaluator(ATTR_LIST + "/" + EVAL_ATTR, alpha);
+		agentClass.setBehaviour(behaviour);
+		
+		DomainAttribute cat = new DomainAttribute("Letters", AttributeType.SET);
+		cat.addFiller("A");
+		cat.addFiller("B");
+		cat.addFiller("C");
+		agentClass.addAttribute(ATTR_LIST, cat);
+
+		Expansion expansion = rule.createExpansion(ATTR_LIST+"/Letters", new String[] {"A", "B", "C"});
+		rule.addOrSetExpansion(expansion);
+		behaviour.setMaxNodes(3);
+		behaviour.setRevaluationProb(0.3);
+		behaviour.setUpdateInterval(expandInterval);
+		behaviour.setRevisitCostFraction(0.5);
+		agentClass.setBehaviour(behaviour);
+
+		AgentInstance agent = env.instanciateAgent(agentClass, AGENT_NAME);
+
+		for (int i=0; i<samples; i++) {
+			double counterAction = runRLsimulation(agent, alpha, steps);
+		//	assertThat("Count of test action must be significantly over 2/3 of all actions or so", expectedIntuitive, lessThanOrEqualTo(counterAction));
+		}
+	}
+
 	@SuppressWarnings("unused")
 	private void scientific_rl_rule_test() throws Exception {
 
