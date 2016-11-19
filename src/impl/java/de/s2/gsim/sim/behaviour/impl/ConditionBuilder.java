@@ -103,8 +103,6 @@ public class ConditionBuilder {
     public String createCategoricalAtomCondition(String attName, List<String> selectedFillers, Object2VariableBindingTable objRefs, String nRule_1)
             throws GSimEngineException {
 
-        // if (true)return "";
-
         if (selectedFillers.size() == 1) {
             return this.createCategoricalAtomCondition(attName, selectedFillers.get(0), objRefs, nRule_1);
         }

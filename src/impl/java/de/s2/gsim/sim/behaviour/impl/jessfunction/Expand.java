@@ -45,6 +45,8 @@ public class Expand extends DynamicRuleBuilder implements Userfunction, java.io.
         // while (allStateFactElems.size() > 0) {
         Fact elemToExpand = allStateFactElems.remove(0);
 
+		System.out.println(">>>>>> SELECTED FOR EXPANSION >>>>>>" + elemToExpand);
+
         String pName = elemToExpand.getSlotValue("param-name").stringValue(context);
         Expand0 impl = new Expand0();
         try {
@@ -71,16 +73,5 @@ public class Expand extends DynamicRuleBuilder implements Userfunction, java.io.
         return "expand";
     }
 
-    private class StateFactElemCategorySpec {
-        public String attributeSpec = ""; // parameter name. e.g. 'profit'
-
-        public ArrayList<Fact> facts = new ArrayList<Fact>();// facts containing
-                                                             // the parameter
-
-        public ArrayList<String> fillers = new ArrayList<String>();// possible
-                                                                   // fillers
-                                                                   // present
-
-    }
 
 }

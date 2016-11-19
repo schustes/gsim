@@ -15,6 +15,8 @@ import de.s2.gsim.GSimCore;
 import de.s2.gsim.GSimCoreFactory;
 import de.s2.gsim.api.sim.agent.impl.RuntimeAgent;
 import de.s2.gsim.def.ModelDefinitionEnvironment;
+import de.s2.gsim.environment.Generator;
+import de.s2.gsim.environment.GenericAgent;
 import de.s2.gsim.objects.Action;
 import de.s2.gsim.objects.AgentClass;
 import de.s2.gsim.objects.AgentInstance;
@@ -22,8 +24,10 @@ import de.s2.gsim.objects.Behaviour;
 import de.s2.gsim.objects.Expansion;
 import de.s2.gsim.objects.RLActionNode;
 import de.s2.gsim.objects.Rule;
+import de.s2.gsim.objects.attribute.Attribute;
 import de.s2.gsim.objects.attribute.AttributeType;
 import de.s2.gsim.objects.attribute.DomainAttribute;
+import de.s2.gsim.objects.attribute.IntervalAttribute;
 import de.s2.gsim.objects.attribute.NumericalAttribute;
 import de.s2.gsim.objects.attribute.StringAttribute;
 import de.s2.gsim.sim.agent.RtAgent;
@@ -38,6 +42,7 @@ public class SimTest {
 	static final String ATTR_NAME_1 = "attr-1";
 	static final String ATTR_NAME_2 = "attr-2";
 	static final String ATTR_LIST = "attr-list-1";
+	static final String VAL_LIST = "attr-list-2";
 	static final String AGENT_NAME = "test";
 	static final String AGENT_CLASS_NAME = "test-class";
 
@@ -122,7 +127,6 @@ public class SimTest {
 		Action rewardAction = behaviour.createAction("rewardAction", RewardComputation.class.getName());
 		rewardRule.addOrSetConsequent(rewardAction);
 
-		// first param is reward variable, and last is alpha!
 		rule.createEvaluator(ATTR_LIST + "/" + EVAL_ATTR, alpha);
 		agentClass.setBehaviour(behaviour);
 		
@@ -156,10 +160,10 @@ public class SimTest {
 	}
 
 	@Test
-	public void bra_expansion_categorical() throws Exception {
+	public void bra_expansion_categorical_and_numerical() throws Exception {
 
 		int samples = 1;
-		int steps = 10;
+		int steps = 100;
 		int expandInterval=2;
 		double alpha = 0.1;
 
@@ -188,25 +192,41 @@ public class SimTest {
 		cat.addFiller("A");
 		cat.addFiller("B");
 		cat.addFiller("C");
-		agentClass.addAttribute(ATTR_LIST, cat);
+		cat.setDefault("B");
+		agentClass.addAttribute(VAL_LIST, cat);
 
-		Expansion expansion = rule.createExpansion(ATTR_LIST+"/Letters", new String[] {"A", "B", "C"});
+		Expansion expansion = rule.createExpansion(VAL_LIST + "/Letters", new String[] { "A", "B", "C" });
 		rule.addOrSetExpansion(expansion);
-		behaviour.setMaxNodes(3);
-		behaviour.setRevaluationProb(0.3);
+
+		DomainAttribute interval1 = new DomainAttribute("wealth", AttributeType.INTERVAL);
+		interval1.addFiller("0");
+		interval1.addFiller("10");
+		interval1.setDefault("4");
+		agentClass.addAttribute(VAL_LIST, interval1);
+		Expansion expansion2 = rule.createExpansion(VAL_LIST + "/wealth", "0", "10");
+		expansion2.setMin("0");
+		expansion2.setMax("10");
+		expansion2.addFiller("0");
+		expansion2.addFiller("10");
+		rule.addOrSetExpansion(expansion2);
+
+		behaviour.setMaxNodes(10);
+		behaviour.setRevaluationProb(0.9);
 		behaviour.setUpdateInterval(expandInterval);
-		behaviour.setRevisitCostFraction(0.5);
+		behaviour.setRevisitCostFraction(0);
+
 		agentClass.setBehaviour(behaviour);
 
 		AgentInstance agent = env.instanciateAgent(agentClass, AGENT_NAME);
 
 		for (int i=0; i<samples; i++) {
 			double counterAction = runRLsimulation(agent, alpha, steps);
+			System.out.println("COUNT: " + counterAction);
 		//	assertThat("Count of test action must be significantly over 2/3 of all actions or so", expectedIntuitive, lessThanOrEqualTo(counterAction));
 		}
 	}
 	@Test
-	public void bra_expansion_categorical_and_numerical() throws Exception {
+	public void bra_expansion_categorical() throws Exception {
 
 		int samples = 1;
 		int steps = 10;
@@ -439,6 +459,8 @@ public class SimTest {
 			counter.setValue(counter.getValue() + 1);
 			agent.addOrSetAttribute(ATTR_LIST, instanciated);
 
+			shuffleAttributes(agent);
+
 			return null;			
 		}
 	}
@@ -458,9 +480,15 @@ public class SimTest {
 			counter.setValue(counter.getValue() + 1);
 			agent.addOrSetAttribute(ATTR_LIST, instanciated);
 
+			shuffleAttributes(agent);
+
 			return null;			
 		}
 
+	}
+
+	private static void shuffleAttributes(RuntimeAgent agent) {
+		Generator.randomiseUniformDistributedAttributeValues(agent, VAL_LIST);
 	}
 
 	public static class RewardComputation extends SimAction {

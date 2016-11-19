@@ -130,7 +130,7 @@ public class DynamicRuleBuilder {
         String n = "";
         try {
             n = b.buildExperimentationRule(r, stateName, consts);
-            System.out.println(">>>>>>>>>>>>>>>>>>>>>>" + n);
+			// System.out.println(">>>>>>>>>>>>>>>>>>>>>>" + n);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -166,7 +166,7 @@ public class DynamicRuleBuilder {
         String n = "";
         try {
             n = b.buildExperimentationRule(r, stateName, consts);
-            System.out.println(">>>>>>>>>>>>>>>>>>>>>>" + n);
+			// System.out.println(">>>>>>>>>>>>>>>>>>>>>>" + n);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -245,7 +245,8 @@ public class DynamicRuleBuilder {
 
     }
 
-    protected int getTime(Rete rete) {
+	@SuppressWarnings("rawtypes")
+	protected int getTime(Rete rete) {
         try {
             Iterator iter = rete.listFacts();
             while (iter.hasNext()) {
@@ -301,6 +302,11 @@ public class DynamicRuleBuilder {
     }
 
     private List<String> maybeAddFiller(List<String> oldFillers, String newFiller) {
+		if (oldFillers == null) {
+			List<String> mutableList = new ArrayList<>();
+			mutableList.add(newFiller);
+			return mutableList;
+		}
         for (String s : oldFillers) {
             if (s.equals(newFiller)) {
                 return oldFillers;
