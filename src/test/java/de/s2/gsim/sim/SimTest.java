@@ -206,7 +206,7 @@ public class SimTest {
 		}
 	}
 	@Test
-	public void bra_expansion_categorical() throws Exception {
+	public void bra_expansion_categorical_and_numerical() throws Exception {
 
 		int samples = 1;
 		int steps = 10;
