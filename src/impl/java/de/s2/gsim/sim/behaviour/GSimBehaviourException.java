@@ -20,7 +20,7 @@ package de.s2.gsim.sim.behaviour;
  * @author not attributable
  * @version 1.0
  */
-public class GSimBehaviourException extends Exception {
+public class GSimBehaviourException extends RuntimeException {
     /**
      * 
      */

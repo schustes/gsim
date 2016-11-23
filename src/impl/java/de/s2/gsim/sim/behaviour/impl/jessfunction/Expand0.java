@@ -4,7 +4,16 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
 
+import org.apache.log4j.Logger;
+
+import de.s2.gsim.api.sim.agent.impl.RuntimeAgent;
+import de.s2.gsim.environment.RLRule;
+import de.s2.gsim.sim.behaviour.GSimBehaviourException;
+import de.s2.gsim.sim.behaviour.impl.FactHandler;
+import de.s2.gsim.sim.behaviour.impl.TreeExpansionBuilder;
 import jess.Context;
 import jess.Fact;
 import jess.JessException;
@@ -12,13 +21,6 @@ import jess.RU;
 import jess.Rete;
 import jess.Value;
 import jess.ValueVector;
-
-import org.apache.log4j.Logger;
-
-import de.s2.gsim.api.sim.agent.impl.RuntimeAgent;
-import de.s2.gsim.environment.RLRule;
-import de.s2.gsim.sim.behaviour.impl.FactHandler;
-import de.s2.gsim.sim.behaviour.impl.TreeExpansionBuilder;
 
 public class Expand0 extends DynamicRuleBuilder implements java.io.Serializable {
 
@@ -37,7 +39,7 @@ public class Expand0 extends DynamicRuleBuilder implements java.io.Serializable 
 	 * @throws JessException
 	 */
 	public boolean createNextStatesCat(RuntimeAgent agent, Fact stateFact, Fact toExpand, ArrayList<Fact> allElemsList, Context context,
-	        boolean copy) throws JessException {
+			boolean copy) throws GSimBehaviourException {
 
 		try {
 
@@ -70,9 +72,9 @@ public class Expand0 extends DynamicRuleBuilder implements java.io.Serializable 
 				Logger.getLogger(Rete.class).debug(" Statefact " + stateFactName + " is now fully expanded.");
 				return false;
 			} // this means that there are no elems of this state with a value for
-			  // this
-			  // parameter --> the selected fact is the last, and because there is only
-			  // one value, nothing can be expanded
+			// this
+			// parameter --> the selected fact is the last, and because there is only
+			// one value, nothing can be expanded
 
 			int oldDepth = (int) stateFact.getSlotValue("depth").floatValue(context);
 
@@ -92,12 +94,12 @@ public class Expand0 extends DynamicRuleBuilder implements java.io.Serializable 
 			String cat1 = toExpand.getSlotValue("category").stringValue(context);
 			// the state descriptor:
 			Fact newStateFactSplit_1 = expandStateDescription(stateFact, rootRule0, unexpandedElemsSpec.attributeSpec, context,
-			        oldDepth + 1, copy);
+					oldDepth + 1, copy);
 			String stateNameExpanded_New = newStateFactSplit_1.getSlotValue("name").stringValue(context);
 
 			// the extracted value (=1 elem)
 			Fact stateFactElem_1 = super.addStateFactCategoryElem(newStateFactSplit_1,
-			        toExpand.getSlotValue("param-name").stringValue(context), cat1, context);
+					toExpand.getSlotValue("param-name").stringValue(context), cat1, context);
 
 			// StateFacts of other, non-selected attributes
 
@@ -116,7 +118,7 @@ public class Expand0 extends DynamicRuleBuilder implements java.io.Serializable 
 			// rest (e.g.: state1=a, state2=b or c. Old state a or b or c)
 			// expand=create new Fact from parent 'stateFact' (new name is generated)
 			Fact newStateFactSplit_2 = expandStateDescription(stateFact, rootRule0, unexpandedElemsSpec.attributeSpec, context,
-			        oldDepth + 1, copy);
+					oldDepth + 1, copy);
 			// this is the generated name:
 			String stateNameExpanded_Siblings = newStateFactSplit_2.getSlotValue("name").stringValue(context);
 
@@ -130,7 +132,7 @@ public class Expand0 extends DynamicRuleBuilder implements java.io.Serializable 
 				// set
 				// of parameter values defined by the parent state.
 				Fact stateFactElem_2 = super.addStateFactCategoryElem(newStateFactSplit_2,
-				        toExpand.getSlotValue("param-name").stringValue(context), cat2, context);
+						toExpand.getSlotValue("param-name").stringValue(context), cat2, context);
 				context.getEngine().assertFact(stateFactElem_2);
 			}
 
@@ -145,20 +147,20 @@ public class Expand0 extends DynamicRuleBuilder implements java.io.Serializable 
 			allElemsList.toArray(remaining);
 
 			// append state-elems of additional attributes (if more than 1 attribute present)
-			appendRemainingStateFactElemsCat(remaining, stateNameExpanded_New, context);
-			appendRemainingStateFactElemsCat(remaining, stateNameExpanded_Siblings, context);
+			appendRemainingStateFactElems(allElemsList, stateNameExpanded_New, context);
+			appendRemainingStateFactElems(allElemsList, stateNameExpanded_Siblings, context);
 
 			if (r0.hasSelectors()) {
 				context.getEngine().executeCommand(createNewSelectionNodesCat(b, r0, stateNameExpanded_New,
-				        unexpandedElemsSpec.attributeSpec, fillersOfExpandAttribute, remaining, oldDepth + 1, context));
+						unexpandedElemsSpec.attributeSpec, fillersOfExpandAttribute, remaining, oldDepth + 1, context));
 				context.getEngine().executeCommand(createNewSelectionNodesCat(b, r0, stateNameExpanded_Siblings,
-				        unexpandedElemsSpec.attributeSpec, fillersOfSiblingAttributes, remaining, oldDepth + 1, context));
+						unexpandedElemsSpec.attributeSpec, fillersOfSiblingAttributes, remaining, oldDepth + 1, context));
 			} else {
 				String newRule1 = createNewExperimentalRuleCat(b, r0, stateNameExpanded_New, unexpandedElemsSpec.attributeSpec,
-				        fillersOfExpandAttribute, remaining, context);
+						fillersOfExpandAttribute, remaining, context);
 				context.getEngine().executeCommand(newRule1);
 				String newRule2 = createNewExperimentalRuleCat(b, r0, stateNameExpanded_Siblings, unexpandedElemsSpec.attributeSpec,
-				        fillersOfSiblingAttributes, remaining, context);
+						fillersOfSiblingAttributes, remaining, context);
 				context.getEngine().executeCommand(newRule2);
 				System.out.println("===============\n" + newRule1);
 				System.out.println(newRule2 + "==================\n");
@@ -185,84 +187,8 @@ public class Expand0 extends DynamicRuleBuilder implements java.io.Serializable 
 		return true;
 	}
 
-	/*
-	 * //the same as createNextStates(), but without splitting - simply add category, delete old rules, and create new ones up to root.
-	 * private void recursivelyAddNewAttribute(Context context, Fact addedCategory) {
-	 * 
-	 * String attributeSpec=null; String attributeValue=null;
-	 * 
-	 * try {
-	 * 
-	 * String stateFactElemName = addedCategory.getSlotValue("name").stringValue(context); String stateFactName =
-	 * addedCategory.getSlotValue("elem-parent").stringValue(context); String toExpandParamName =
-	 * addedCategory.getSlotValue("param-name").stringValue(context); String toExpandCategoryValue =
-	 * addedCategory.getSlotValue("category").stringValue(context);
-	 * 
-	 * Fact stateFact = FactHandler.getInstance().getFact("state-fact", stateFactName, context); String stateFactParent =
-	 * stateFact.getSlotValue("parent").stringValue(context); Fact parentFact = FactHandler.getInstance().getFact("state-fact",
-	 * stateFactParent, context);
-	 * 
-	 * //now create new statefactelem for elem-parent stateFactParent.
-	 * 
-	 * //then delete old rules and create new one with complete list of elems (?)
-	 * 
-	 * allElemsList.remove(toExpand);// important: list without the // extracted element >> that's why it works further down. Ugly.
-	 * StateFactElemCategorySpec unexpandedElemsSpec = extractCategoryElemSpec( allElemsList, context, toExpandParamName);//contains the
-	 * fillers of other state-elems //for the same parameter
-	 * 
-	 * if (unexpandedElemsSpec.facts.size() == 0) { Logger.getLogger(Rete.class).debug( " Statefact " + stateFactName +
-	 * " is now fully expanded."); return false; } //this means that there are no elems of this state with a value for this //parameter -->
-	 * the selected fact is the last, and because there is only //one value, nothing can be expanded
-	 * 
-	 * int oldDepth = (int) stateFact.getSlotValue("depth").floatValue( context); // ----------------------------------------------// //now:
-	 * create two states: one with the elems for the selected param, //one for ?
-	 * 
-	 * TreeExpansionBuilder b = new TreeExpansionBuilder(agent); // ceate and insert extracted new category (state fact, and // elem-fact)
-	 * // String toExpandAttributeSpec = // toExpand.getSlotValue("param-name").stringValue(context); String[] fillersOfExpandAttribute =
-	 * new String[] { toExpandCategoryValue }; String[] fillersOfSiblingAttributes = unexpandedElemsSpec.fillers .toArray(new
-	 * String[unexpandedElemsSpec.fillers.size()]);
-	 * 
-	 * String cat1 = toExpand.getSlotValue("category") .stringValue(context); //the state descriptor: Fact newStateFactSplit_1 =
-	 * expandStateDescription(stateFact, unexpandedElemsSpec.attributeSpec, context, oldDepth + 1); String stateNameExpanded_New =
-	 * newStateFactSplit_1.getSlotValue( "name").stringValue(context);
-	 * 
-	 * //the extracted value (=1 elem) Fact stateFactElem_1 = super.addStateFactCategoryElem(newStateFactSplit_1, cat1, context);
-	 * 
-	 * if (existsEquivalent(stateFact, new Fact[] { stateFactElem_1 }, context)) { return false; }
-	 * 
-	 * context.getEngine().assertFact(stateFactElem_1); // // insert the - constant - remaining rest of the original state //??? is the
-	 * same???
-	 * 
-	 * //the result: one state with one elem (the extracted), this state with the //rest (e.g.: state1=a, state2=b or c. Old state a or b or
-	 * c) //expand=create new Fact from parent 'stateFact' (new name is generated) Fact newStateFactSplit_2 =
-	 * expandStateDescription(stateFact, unexpandedElemsSpec.attributeSpec, context, oldDepth + 1); //this is the generated name: String
-	 * stateNameExpanded_Siblings = newStateFactSplit_2 .getSlotValue("name").stringValue(context);
-	 * 
-	 * //the elems holding the filler values for the remaining categories of //the state for (Fact s : unexpandedElemsSpec.facts) { String
-	 * cat2 = s.getSlotValue("category").stringValue(context); //as spec holds the rest, stateFactElem_2 holds the elements disjunct from
-	 * //the parameter value specified in stateFactElem_1. The union is the set //of parameter values defined by the parent state. Fact
-	 * stateFactElem_2 = addStateFactCategoryElem(newStateFactSplit_2, cat2, context); context.getEngine().assertFact(stateFactElem_2); } //
-	 * original rule String rootRule0 = stateNameExpanded_New.split("_")[0]; RLRule r0 = agent.getBehaviour().getRLRule(rootRule0); // //
-	 * remaining list holds the original list of sf-elems except the // to-expand-elem Fact[] remaining = new Fact[allElemsList.size()];
-	 * allElemsList.toArray(remaining); if (r0.hasSelectors()) { context.getEngine().executeCommand( this.createNewSelectionNodesCat(b, r0,
-	 * stateNameExpanded_New, unexpandedElemsSpec.attributeSpec, fillersOfExpandAttribute, remaining, oldDepth + 1, context));
-	 * context.getEngine().executeCommand( this.createNewSelectionNodesCat(b, r0, stateNameExpanded_Siblings,
-	 * unexpandedElemsSpec.attributeSpec, fillersOfSiblingAttributes, remaining, oldDepth + 1, context)); } else {
-	 * context.getEngine().executeCommand( this.createNewExperimentalRuleCat(b, r0, stateNameExpanded_New,
-	 * unexpandedElemsSpec.attributeSpec,//--> List with all elems of parent plus added child-statefact. fillersOfExpandAttribute,
-	 * remaining, context)); context.getEngine() .executeCommand( this.createNewExperimentalRuleCat(b, r0, stateNameExpanded_Siblings,
-	 * unexpandedElemsSpec.attributeSpec, fillersOfSiblingAttributes, remaining, context)); } insertNewActionNodes(context,
-	 * stateNameExpanded_New);
-	 * 
-	 * insertNewActionNodes(context, stateNameExpanded_Siblings);
-	 * 
-	 * recursivelyAddNewAttribute(); } catch (Exception e) { e.printStackTrace(); }
-	 * 
-	 * 
-	 * throw new UnsupportedOperationException("Do something about it"); }
-	 */
 	public void createNextStatesNum(RuntimeAgent agent, Fact stateFact, Fact toExpand, ArrayList<Fact> allElems, Context context,
-	        boolean copy) throws JessException {
+			boolean copy) throws GSimBehaviourException {
 
 		try {
 			String stateFactName = stateFact.getSlotValue("name").stringValue(context);
@@ -301,8 +227,8 @@ public class Expand0 extends DynamicRuleBuilder implements java.io.Serializable 
 			context.getEngine().assertFact(stateFactElem_split2);
 
 			// append state-elems of additional attributes (if more than 1 attribute present)
-			appendRemainingStateFactElemsInterval(remaining, newStateName1, context);
-			appendRemainingStateFactElemsInterval(remaining, newStateName2, context);
+			appendRemainingStateFactElems(allElems, newStateName1, context);
+			appendRemainingStateFactElems(allElems, newStateName2, context);
 
 			TreeExpansionBuilder b = new TreeExpansionBuilder(agent);
 
@@ -310,14 +236,14 @@ public class Expand0 extends DynamicRuleBuilder implements java.io.Serializable 
 
 			if (rootRule.hasSelectors()) {
 				context.getEngine().executeCommand(
-				        createNewSelectionNodes(b, rootRule, agent, newStateName1, stateFactElem_split1, remaining, context));
+						createNewSelectionNodes(b, rootRule, agent, newStateName1, stateFactElem_split1, remaining, context));
 				context.getEngine().executeCommand(
-				        createNewSelectionNodes(b, rootRule, agent, newStateName2, stateFactElem_split2, remaining, context));
+						createNewSelectionNodes(b, rootRule, agent, newStateName2, stateFactElem_split2, remaining, context));
 			} else {
 				context.getEngine().executeCommand(createNewExperimentalRule(b, rootRule, agent, newStateName1, remaining, context,
-				        paramName, from, from + dist / 2d));
+						paramName, from, from + dist / 2d));
 				context.getEngine().executeCommand(
-				        createNewExperimentalRule(b, rootRule, agent, newStateName2, remaining, context, paramName, from + dist / 2d, to));
+						createNewExperimentalRule(b, rootRule, agent, newStateName2, remaining, context, paramName, from + dist / 2d, to));
 			}
 
 			context.getEngine().assertFact(stateFact_split1);
@@ -331,29 +257,45 @@ public class Expand0 extends DynamicRuleBuilder implements java.io.Serializable 
 		}
 	}
 
-	private void appendRemainingStateFactElemsCat(Fact[] remaining, String stateFactName, Context context) throws JessException {
-		for (Fact f : remaining) {
-			if (f.getDeftemplate().getBaseName().equals("state-fact-category")) {
-				String attributeName = f.getSlotValue("param-name").stringValue(context);
-				String categoryValue = f.getSlotValue("category").stringValue(context);
-				String name = attributeName + "->" + String.valueOf(categoryValue);
-				FactHandler.getInstance().addStateFactCat(context.getEngine(), stateFactName, name, attributeName, categoryValue);
-			}
-		}
+	private void appendRemainingStateFactElems(List<Fact> remaining, String stateFactName, Context context)  {
+		applyIfConditionMatches(remaining, Expand0::isNumericalStateFactElem, (Fact f) -> appendRemainingStateFactElemsInterval(f, stateFactName, context));
+		applyIfConditionMatches(remaining, Expand0::isCategoricalStateFactElem, (Fact f) -> appendRemainingStateFactElemsCat(f, stateFactName, context));
+	}
+	
+	private void applyIfConditionMatches(List<Fact> remaining, Predicate<Fact> p, Consumer<Fact> c)  {
+		remaining.stream().filter(p).forEach(c);
 	}
 
-	private void appendRemainingStateFactElemsInterval(Fact[] remaining, String stateFactName, Context context) throws JessException {
-		for (Fact f : remaining) {
-			if (f.getDeftemplate().getBaseName().equals("state-fact-element")) {
-				String attributeName = f.getSlotValue("param-name").stringValue(context);
-				String from = f.getSlotValue("from").stringValue(context);
-				String to = f.getSlotValue("to").stringValue(context);
+	private static boolean isNumericalStateFactElem(Fact f) {
+		return (f.getDeftemplate().getBaseName().equals("state-fact-element"));
+	}
 
-				String name = attributeName + "->" + String.valueOf(from) + ":" + String.valueOf(to);
+	private static boolean isCategoricalStateFactElem(Fact f) {
+		return f.getDeftemplate().getBaseName().equals("state-fact-category");
+	}
 
-				FactHandler.getInstance().addStateFactElement(context.getEngine(), stateFactName, name, attributeName,
-				        Double.parseDouble(from), Double.parseDouble(to));
-			}
+	private static void appendRemainingStateFactElemsCat(Fact f, String stateFactName, Context context)  {
+		try {
+			String attributeName = f.getSlotValue("param-name").stringValue(context);
+			String categoryValue = f.getSlotValue("category").stringValue(context);
+			String name = attributeName + "->" + String.valueOf(categoryValue);
+			FactHandler.getInstance().addStateFactCat(context.getEngine(), stateFactName, name, attributeName, categoryValue);
+		} catch (JessException e) {
+			throw new GSimBehaviourException(e);
+		}
+
+	}
+
+	private static void appendRemainingStateFactElemsInterval(Fact f, String stateFactName, Context context)  {
+		try {
+			String attributeName = f.getSlotValue("param-name").stringValue(context);
+			String from = f.getSlotValue("from").stringValue(context);
+			String to = f.getSlotValue("to").stringValue(context);
+			String name = attributeName + "->" + String.valueOf(from) + ":" + String.valueOf(to);
+			FactHandler.getInstance().addStateFactElement(context.getEngine(), stateFactName, name, attributeName,
+					Double.parseDouble(from), Double.parseDouble(to));
+		} catch (JessException e) {
+			throw new GSimBehaviourException(e);
 		}
 	}
 
@@ -464,7 +406,7 @@ public class Expand0 extends DynamicRuleBuilder implements java.io.Serializable 
 	 * @throws JessException
 	 */
 	private Fact expandStateDescription(Fact oldDesc, String rootRuleName, String paramName, Context context, int depth, boolean copy)
-	        throws JessException {
+			throws JessException {
 
 		// String ruleName = oldDesc.getSlotValue("rule").stringValue(context);
 		int t = getTime(context.getEngine());
@@ -479,7 +421,7 @@ public class Expand0 extends DynamicRuleBuilder implements java.io.Serializable 
 	}
 
 	private StateFactElemCategorySpec extractCategoryElemSpec(ArrayList<Fact> allElemsList, Context context, String toExpandParamName)
-	        throws JessException {
+			throws JessException {
 
 		Iterator iter = allElemsList.iterator();
 		StateFactElemCategorySpec spec = new StateFactElemCategorySpec();
