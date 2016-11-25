@@ -5,6 +5,8 @@ import java.util.HashSet;
 import de.s2.gsim.environment.Frame;
 import de.s2.gsim.environment.Instance;
 import de.s2.gsim.objects.Path;
+import de.s2.gsim.objects.attribute.Attribute;
+import de.s2.gsim.objects.attribute.NumericalAttribute;
 
 public class Utils {
 
@@ -61,7 +63,12 @@ public class Utils {
             return false;
         }
     }
-
+    
+    public static boolean isNumericalAttribute(Instance obj, String pathToAtt) {
+        Attribute a = (Attribute) obj.resolvePath(Path.attributePath(pathToAtt.split("/")));
+        return (a instanceof NumericalAttribute);
+    }
+    
     public static String toInstPath(Instance agent, String framePath, String instName) {
         String[] p = framePath.split("/");
         for (int i = 0; i < p.length; i++) {
