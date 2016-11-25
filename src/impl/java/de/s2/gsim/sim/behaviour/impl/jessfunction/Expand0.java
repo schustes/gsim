@@ -61,13 +61,7 @@ public class Expand0 extends DynamicRuleBuilder implements java.io.Serializable 
 			String rootRule0 = stateFactName.split("_")[0];
 
 			allElemsList.remove(toExpand);// important: list without the
-			// extracted element >> that's why it works further down. Ugly.
 			StateFactElemCategorySpec unexpandedElemsSpec = extractCategoryElemSpec(allElemsList, context, toExpandParamName);// contains
-			// the fillers
-			// of
-			// other state-elems
-			// for the same parameter
-
 			if (unexpandedElemsSpec.facts.size() == 0) {
 				Logger.getLogger(Rete.class).debug(" Statefact " + stateFactName + " is now fully expanded.");
 				return false;
@@ -78,16 +72,9 @@ public class Expand0 extends DynamicRuleBuilder implements java.io.Serializable 
 
 			int oldDepth = (int) stateFact.getSlotValue("depth").floatValue(context);
 
-			// ----------------------------------------------//
-			// now: create two states: one with the elems for the selected param,
-			// one for ?
-
 			TreeExpansionBuilder b = new TreeExpansionBuilder(agent);
 
-			// ceate and insert extracted new category (state fact, and
-			// elem-fact)
-			// String toExpandAttributeSpec =
-			// toExpand.getSlotValue("param-name").stringValue(context);
+			// ceate and insert extracted new category (state fact, and elem-fact)
 			List<String> fillersOfExpandAttribute = Arrays.asList(toExpandCategoryValue);
 			List<String> fillersOfSiblingAttributes = unexpandedElemsSpec.fillers;
 
@@ -102,23 +89,12 @@ public class Expand0 extends DynamicRuleBuilder implements java.io.Serializable 
 					toExpand.getSlotValue("param-name").stringValue(context), cat1, context);
 
 			// StateFacts of other, non-selected attributes
-
 			if (existsEquivalent(stateFact, new Fact[] { stateFactElem_1 }, context)) {
 				return false;
 			}
 
 			context.getEngine().assertFact(stateFactElem_1);
-			
 
-			//
-
-			// insert the - constant - remaining rest of the original state
-			// ??? is the same???
-
-			// the result: one state with one elem (the extracted), this state with
-			// the
-			// rest (e.g.: state1=a, state2=b or c. Old state a or b or c)
-			// expand=create new Fact from parent 'stateFact' (new name is generated)
 			Fact newStateFactSplit_2 = expandStateDescription(stateFact, rootRule0, unexpandedElemsSpec.attributeSpec, context,
 					oldDepth + 1, copy);
 			// this is the generated name:
@@ -129,24 +105,18 @@ public class Expand0 extends DynamicRuleBuilder implements java.io.Serializable 
 			for (Fact s : unexpandedElemsSpec.facts) {
 				String cat2 = s.getSlotValue("category").stringValue(context);
 				// as spec holds the rest, stateFactElem_2 holds the elements disjunct
-				// from
-				// the parameter value specified in stateFactElem_1. The union is the
-				// set
-				// of parameter values defined by the parent state.
+				// from the parameter value specified in stateFactElem_1. The union is the
+				// set of parameter values defined by the parent state.
 				Fact stateFactElem_2 = super.addStateFactCategoryElem(newStateFactSplit_2,
 						toExpand.getSlotValue("param-name").stringValue(context), cat2, context);
 				context.getEngine().assertFact(stateFactElem_2);
-				
-//System.out.println(stateFactElem_2);
 			}
 
 			// original rule
-			// String rootRule0 = stateNameExpanded_New.split("_")[0];
 			RLRule r0 = agent.getBehaviour().getRLRule(rootRule0);
 			//
 
-			// remaining list holds the original list of sf-elems except the
-			// to-expand-elem
+			// remaining list holds the original list of sf-elems except the to-expand-elem
 			Fact[] remaining = new Fact[allElemsList.size()];
 			allElemsList.toArray(remaining);
 
@@ -154,38 +124,23 @@ public class Expand0 extends DynamicRuleBuilder implements java.io.Serializable 
 			appendRemainingStateFactElems(allElemsList, stateNameExpanded_New, context);
 			appendRemainingStateFactElems(allElemsList, stateNameExpanded_Siblings, context);
 
-			if (r0.hasSelectors()) {
-				context.getEngine().executeCommand(createNewSelectionNodesCat(b, r0, stateNameExpanded_New,
-						unexpandedElemsSpec.attributeSpec, fillersOfExpandAttribute, remaining, oldDepth + 1, context));
-				context.getEngine().executeCommand(createNewSelectionNodesCat(b, r0, stateNameExpanded_Siblings,
-						unexpandedElemsSpec.attributeSpec, fillersOfSiblingAttributes, remaining, oldDepth + 1, context));
-			} else {
-				String newRule1 = createNewExperimentalRuleCat(b, r0, stateNameExpanded_New, unexpandedElemsSpec.attributeSpec,
-						fillersOfExpandAttribute, remaining, context);
-				context.getEngine().executeCommand(newRule1);
-				String newRule2 = createNewExperimentalRuleCat(b, r0, stateNameExpanded_Siblings, unexpandedElemsSpec.attributeSpec,
-						fillersOfSiblingAttributes, remaining, context);
-				context.getEngine().executeCommand(newRule2);
-				//System.out.println("===============\n" + newRule1);
-				//System.out.println(newRule2 + "==================\n");
-				logger.debug(newRule1);
-				logger.debug(newRule2);
-			}
+			String newRule1 = createNewExperimentalRuleCat(b, r0, stateNameExpanded_New, unexpandedElemsSpec.attributeSpec,
+					fillersOfExpandAttribute, remaining, context);
+			context.getEngine().executeCommand(newRule1);
+			String newRule2 = createNewExperimentalRuleCat(b, r0, stateNameExpanded_Siblings, unexpandedElemsSpec.attributeSpec,
+					fillersOfSiblingAttributes, remaining, context);
+			context.getEngine().executeCommand(newRule2);
+			//System.out.println("===============\n" + newRule1);
+			//System.out.println(newRule2 + "==================\n");
+			logger.debug(newRule1);
+			logger.debug(newRule2);
 
 			insertNewActionNodes(context, stateFactName, stateNameExpanded_New);
 			insertNewActionNodes(context, stateFactName, stateNameExpanded_Siblings);
 
 			// deactivate old state
-
 			stateFact.setSlotValue("active", new Value(0.0, RU.FLOAT));
 			context.getEngine().retract(stateFact);
-			// context.getEngine().assertFact(stateFact);
-
-			// recursivelyAddNewAttribute();
-			
-//			System.out.println(stateFactElem_1);
-//			System.out.println(newStateFactSplit_1);
-//			System.out.println(newStateFactSplit_2);
 
 			logger.debug("=======END EXPAND AGENT:" + agent.getName() + "=================");
 
@@ -242,18 +197,10 @@ public class Expand0 extends DynamicRuleBuilder implements java.io.Serializable 
 
 			RLRule rootRule = agent.getBehaviour().getRLRule(newStateName1.split("_")[0]);
 
-			if (rootRule.hasSelectors()) {
-				context.getEngine().executeCommand(
-						createNewSelectionNodes(b, rootRule, agent, newStateName1, stateFactElem_split1, remaining, context));
-				context.getEngine().executeCommand(
-						createNewSelectionNodes(b, rootRule, agent, newStateName2, stateFactElem_split2, remaining, context));
-			} else {
-				context.getEngine().executeCommand(createNewExperimentalRule(b, rootRule, agent, newStateName1, remaining, context,
-						paramName, from, from + dist / 2d));
-				context.getEngine().executeCommand(
-						createNewExperimentalRule(b, rootRule, agent, newStateName2, remaining, context, paramName, from + dist / 2d, to));
-			}
-
+			context.getEngine().executeCommand(createNewExperimentalRule(b, rootRule, agent, newStateName1, remaining, context,
+					paramName, from, from + dist / 2d));
+			context.getEngine().executeCommand(
+					createNewExperimentalRule(b, rootRule, agent, newStateName2, remaining, context, paramName, from + dist / 2d, to));
 			context.getEngine().assertFact(stateFact_split1);
 			context.getEngine().assertFact(stateFact_split2);
 			System.out.println(stateFact_split1);
@@ -271,7 +218,7 @@ public class Expand0 extends DynamicRuleBuilder implements java.io.Serializable 
 		applyIfConditionMatches(remaining, Expand0::isNumericalStateFactElem, (Fact f) -> appendRemainingStateFactElemsInterval(f, stateFactName, context));
 		applyIfConditionMatches(remaining, Expand0::isCategoricalStateFactElem, (Fact f) -> appendRemainingStateFactElemsCat(f, stateFactName, context));
 	}
-	
+
 	private void applyIfConditionMatches(List<Fact> remaining, Predicate<Fact> p, Consumer<Fact> c)  {
 		remaining.stream().filter(p).forEach(c);
 	}

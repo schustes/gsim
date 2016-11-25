@@ -133,10 +133,6 @@ public class RLRule extends UserRule {
         return super.getChildInstances(RLRuleFrame.INST_LIST_EXP).size() > 0;
     }
 
-    public boolean hasSelectors() {
-        return (getShortSelectionRules().length > 0);
-    }
-
     public boolean isAveraging() {
         StringAttribute a = (StringAttribute) super.getAttribute(UserRuleFrame.ATTR_LIST_ATTRS, "averaging");
         return Boolean.valueOf(a.getValue()).booleanValue();
