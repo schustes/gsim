@@ -78,9 +78,9 @@ public class RLRulesUpdate {
                 // (1 rule <-> 1 state)
                 String newRule = builder.addCategoryToExperimentalRule(treeBuilder, agent, baseRule, stateName, elems, domain.getName(), newFiller,
                         context);
-
+//System.out.println("-------------------\n" + newRule+"\n---------------");
                 // add the new element to this state (exactly 1 at a time)
-                builder.addStateFactCategoryElem(state, newFiller, spec, context);
+                builder.addStateFactCategoryElem(state, spec, newFiller, context);
 
                 Rete rete = context.getEngine();
                 CollectiveTreeDBWriter f = new CollectiveTreeDBWriter();
@@ -91,13 +91,15 @@ public class RLRulesUpdate {
                 // don't forget to add the modified rules
                 context.getEngine().executeCommand(newRule);
 
-                // make new expansion one level deeper
+                // make new expansion one level deeper - why? 
                 double depth = state.getSlotValue("depth").floatValue(context);
                 if (depth > 0) {
-                    expandOriginalNodeToDeeperLevel(stateName, newFiller, context);
+                	//System.out.println(">>>>>>>>>EXPANDDD>>>>>>>>>>>>>>>>");
+                   // expandOriginalNodeToDeeperLevel(stateName, newFiller, context);
                 }
                 f = new CollectiveTreeDBWriter();
                 f.output("after_deepening", rete, debugDir);
+
 
             }
 
@@ -193,7 +195,8 @@ public class RLRulesUpdate {
         }
 
         try {
-            impl.createNextStatesCat(agent, stateFact, elemToExpand, allStateFactElems, context, true);
+            impl.createNextStatesCat(agent, stateFact, elemToExpand, allStateFactElems, context, false);
+            
         } catch (Exception e) {
             throw new JessException("", "", e);
         }

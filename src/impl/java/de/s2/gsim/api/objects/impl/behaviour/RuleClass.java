@@ -53,6 +53,7 @@ public class RuleClass implements Rule, UnitWrapper {
 	public Condition createCondition(String paramName, String op, String val) throws GSimException {
 		ConditionFrame c = getReal().createCondition(paramName, op, val);
 		getReal().addCondition(c);
+		owner.addOrSetRule(this);
 		return new ConditionClass(this, c);
 	}
 

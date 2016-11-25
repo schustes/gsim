@@ -291,6 +291,8 @@ public class RLRulesBuilder {
 
         // if (rule.hasExpansions()) {
         n += " (bind ?new-value (+ ?old-value (* 0.5 (- ?currentReward ?old-value))))\n";
+        n += " (bind ?sc (+ ?state-count 1) )\n";
+        //n+=" (printout t :: ?sfn : ?t : ?state-count :  ?new-value)";
         n += " (modify ?state-description (value ?new-value) (last-activation ?t) (count (+ ?state-count 1)) )\n";
         // }
 

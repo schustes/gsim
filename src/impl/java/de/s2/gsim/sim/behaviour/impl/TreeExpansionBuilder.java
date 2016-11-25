@@ -36,21 +36,6 @@ public class TreeExpansionBuilder {
         return buildExperimentationRule(rootRule, stateName, exp);
     }
 
-    public String createShortCuts(RLRule ownerRule, String stateFactName, Attribute2ValuesMap exp) throws GSimEngineException {
-
-        UserRule[] shortcuts = ownerRule.getShortSelectionRules();
-
-        StringBuffer buffer = new StringBuffer();
-        for (UserRule shortcut : shortcuts) {
-
-            refTable.build(ownerRule);
-
-            String conditionString = createConditionString(ownerRule, refTable, exp);
-            buffer.append(general.createShortcut(ownerRule, shortcut, stateFactName, conditionString, refTable));
-        }
-        return buffer.toString();
-    }
-
     private String createConditions(UserRule rule, Object2VariableBindingTable objRefs, String ruleSoFar) throws GSimEngineException {
 
         String n = "";

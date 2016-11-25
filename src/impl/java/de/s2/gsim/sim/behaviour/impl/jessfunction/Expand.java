@@ -45,7 +45,7 @@ public class Expand extends DynamicRuleBuilder implements Userfunction, java.io.
         // while (allStateFactElems.size() > 0) {
         Fact elemToExpand = allStateFactElems.remove(0);
 
-		System.out.println(">>>>>> SELECTED FOR EXPANSION >>>>>>" + elemToExpand);
+		//System.out.println(">>>>>> SELECTED FOR EXPANSION >>>>>>" + elemToExpand);
 
         String pName = elemToExpand.getSlotValue("param-name").stringValue(context);
         Expand0 impl = new Expand0();
@@ -64,7 +64,7 @@ public class Expand extends DynamicRuleBuilder implements Userfunction, java.io.
         double exCount = stateFact.getSlotValue("expansion-count").floatValue(context) + 1;
         stateFact.setSlotValue("expansion-count", new Value(exCount, RU.FLOAT));
         context.getEngine().assertFact(stateFact);
-
+  
         return null;
     }
 

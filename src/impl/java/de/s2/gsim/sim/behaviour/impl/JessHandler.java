@@ -2,6 +2,7 @@ package de.s2.gsim.sim.behaviour.impl;
 
 import java.io.File;
 import java.io.FileWriter;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -24,10 +25,10 @@ import de.s2.gsim.environment.UserRule;
 import de.s2.gsim.environment.UserRuleFrame;
 import de.s2.gsim.objects.Path;
 import de.s2.gsim.objects.attribute.Attribute;
-import de.s2.gsim.objects.attribute.AttributeConstants;
 import de.s2.gsim.objects.attribute.AttributeType;
 import de.s2.gsim.objects.attribute.DomainAttribute;
 import de.s2.gsim.objects.attribute.IntervalAttribute;
+import de.s2.gsim.objects.attribute.SetAttribute;
 import de.s2.gsim.sim.GSimEngineException;
 import de.s2.gsim.sim.behaviour.GSimBehaviourException;
 import de.s2.gsim.sim.behaviour.impl.jessfunction.Expand;
@@ -114,7 +115,8 @@ public class JessHandler implements java.io.Serializable {
                 String path = e.getParameterName();
                 DomainAttribute a = extractAtt(path);// (DomainAttribute) this.owner.getDefinition().resolveName(path.split("/"));
                 if (a.getType() == AttributeType.SET) {
-                    ArrayList<String> modifiedSet = rlRanges.getNewCategoricalParameterValues(path, a.getFillers());
+                	SetAttribute current = (SetAttribute)owner.resolvePath(Path.attributePath(path.split("/")));
+                    ArrayList<String> modifiedSet = rlRanges.getNewCategoricalParameterValues(path, current.getFillersAndEntries());
                     RLRulesUpdate rlUpdate = new RLRulesUpdate(owner, debugDir);
                     for (String n : modifiedSet) {
                         logger.debug("Modified set, att=" + path + ", new=" + n);
@@ -349,7 +351,7 @@ public class JessHandler implements java.io.Serializable {
 
         int y = 0;
         try {
-
+        	
             Iterator iter = rete.listFacts();
 
             while (iter.hasNext()) {
@@ -801,7 +803,136 @@ public class JessHandler implements java.io.Serializable {
             dir.mkdirs();
         }
     }
+    
+    private static class Constant implements java.io.Serializable {
 
+        private static final long serialVersionUID = 7594202672886051100L;
+
+        private String name = "test";
+
+        private String value = "";
+
+        public Constant(String name, String value) {
+            this.name = name;
+            this.value = value;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (o instanceof Constant) {
+                Constant c = (Constant) o;
+                return c.getValue().equals(getValue()) && c.getName().equals(getName());
+            }
+            return false;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public String getValue() {
+            return value;
+        }
+
+        @Override
+        public int hashCode() {
+            return 89;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public void setValue(String value) {
+            this.value = value;
+        }
+
+    };
+    
+    private class RLParameterRanges implements Serializable {
+
+        private static final long serialVersionUID = 1L;
+
+        private HashMap<String, ArrayList<String>> categories;
+
+        private HashMap<String, double[]> intervals;
+
+        public RLParameterRanges() {
+            intervals = new HashMap<String, double[]>();
+            categories = new HashMap<String, ArrayList<String>>();
+        }
+
+        public ArrayList<String> getNewCategoricalParameterValues(String attName, List<String> allFillers) {
+            ArrayList<String> contained = categories.get(attName);
+            ArrayList<String> result = new ArrayList<String>();
+            if (contained == null) {
+                ArrayList<String> list = new ArrayList<String>();
+                for (String s : allFillers) {
+                    list.add(s);
+                }
+                categories.put(attName, list);
+            } else {
+
+                for (String s : allFillers) {
+                    boolean exists = false;
+                    for (String t : contained) {
+                        if (t.equals(s)) {
+                            exists = true;
+                        }
+                    }
+                    if (!exists) {
+                        contained.add(s);
+                        result.add(s);
+                    }
+                }
+            }
+            return result;
+        }
+
+        /**
+         * 
+         * @param attName
+         * @param currentInterval
+         * @return null if there are no updates for the interval
+         */
+        public double[] getNewIntervalParameterRange(String attName, double[] currentInterval) {
+
+            double[] contained = intervals.get(attName);
+            double[] result = null;
+            if (contained == null) {
+                intervals.put(attName, currentInterval);
+            } else {
+                boolean changed = false;
+                if (contained[0] > currentInterval[0]) {
+                    contained[0] = currentInterval[0];
+                    changed = true;
+                }
+
+                if (contained[1] < currentInterval[1]) {
+                    contained[1] = currentInterval[1];
+                    changed = true;
+                }
+
+                if (changed) {
+                    result = contained;
+                }
+            }
+            return result;
+
+        }
+
+        public void initCategoricalParameters(String attName, List<String> values) {
+            ArrayList<String> list = new ArrayList<String>();
+            for (String s : values) {
+                list.add(s);
+            }
+            categories.put(attName, list);
+        }
+
+        public void initIntervalParameterRange(String attName, double[] values) {
+            intervals.put(attName, values);
+        }
+    };
     static {
         deleteDirContents("/home/gsim/tmp/agentsrv-logging");
         deleteDirContents("/home/gsim/tmp/facts");

@@ -93,6 +93,7 @@ public class FactHandler {
 
     }
 
+
     public Fact addStateFactCat(Rete rete, Fact oldFact, String stateFactName, String name, String attrName, String categoryValue)
             throws JessException {
 
@@ -189,7 +190,7 @@ public class FactHandler {
 
         int uid = UniqueIDGenerator.getNext();
         f.setSlotValue("name", new Value(parentName.split("_")[0] + "_" + depth + "" + uid, RU.STRING));
-        f.setSlotValue("ctx", new Value(ctx, RU.STRING));
+        f.setSlotValue("context", new Value(ctx, RU.STRING));
         f.setSlotValue("parent", new Value(parentName, RU.STRING));
         f.setSlotValue("created", new Value((double) time, RU.FLOAT));
         f.setSlotValue("last-activation", new Value(oldFact.getSlotValue("last-activation").floatValue(rete.getGlobalContext()), RU.FLOAT));
@@ -217,7 +218,7 @@ public class FactHandler {
         }
         f.setSlotValue("expansion", new Value(v3, RU.LIST));
 
-        f.setSlotValue("rule", new Value(oldFact.getSlotValue("rule").stringValue(rete.getGlobalContext())));
+        f.setSlotValue("rule", new Value(oldFact.getSlotValue("rule").stringValue(rete.getGlobalContext()), RU.STRING));
 
         rete.assertFact(f);
 

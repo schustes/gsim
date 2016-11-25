@@ -108,6 +108,8 @@ public class Expand0 extends DynamicRuleBuilder implements java.io.Serializable 
 			}
 
 			context.getEngine().assertFact(stateFactElem_1);
+			
+
 			//
 
 			// insert the - constant - remaining rest of the original state
@@ -134,6 +136,8 @@ public class Expand0 extends DynamicRuleBuilder implements java.io.Serializable 
 				Fact stateFactElem_2 = super.addStateFactCategoryElem(newStateFactSplit_2,
 						toExpand.getSlotValue("param-name").stringValue(context), cat2, context);
 				context.getEngine().assertFact(stateFactElem_2);
+				
+//System.out.println(stateFactElem_2);
 			}
 
 			// original rule
@@ -162,8 +166,8 @@ public class Expand0 extends DynamicRuleBuilder implements java.io.Serializable 
 				String newRule2 = createNewExperimentalRuleCat(b, r0, stateNameExpanded_Siblings, unexpandedElemsSpec.attributeSpec,
 						fillersOfSiblingAttributes, remaining, context);
 				context.getEngine().executeCommand(newRule2);
-				System.out.println("===============\n" + newRule1);
-				System.out.println(newRule2 + "==================\n");
+				//System.out.println("===============\n" + newRule1);
+				//System.out.println(newRule2 + "==================\n");
 				logger.debug(newRule1);
 				logger.debug(newRule2);
 			}
@@ -178,6 +182,10 @@ public class Expand0 extends DynamicRuleBuilder implements java.io.Serializable 
 			// context.getEngine().assertFact(stateFact);
 
 			// recursivelyAddNewAttribute();
+			
+//			System.out.println(stateFactElem_1);
+//			System.out.println(newStateFactSplit_1);
+//			System.out.println(newStateFactSplit_2);
 
 			logger.debug("=======END EXPAND AGENT:" + agent.getName() + "=================");
 
@@ -248,6 +256,8 @@ public class Expand0 extends DynamicRuleBuilder implements java.io.Serializable 
 
 			context.getEngine().assertFact(stateFact_split1);
 			context.getEngine().assertFact(stateFact_split2);
+			System.out.println(stateFact_split1);
+			System.out.println(stateFact_split2);
 
 			insertNewActionNodes(context, stateFactName, newStateName1);
 			insertNewActionNodes(context, stateFactName, newStateName2);
