@@ -174,14 +174,6 @@ public class RLRulesBuilder {
 
         String condStr = createConditions(c, objRefs);
 
-        UserRule[] shortcuts = c.getShortSelectionRules();
-        for (int i = 0; i < shortcuts.length; i++) {
-            res += general.createShortcut(c, shortcuts[i], stateName, condStr, objRefs);
-        }
-
-        if (shortcuts.length > 0) {
-            res += "\n" + createShortcutSelectionRule(c);
-        }
         return res;
     }
 
