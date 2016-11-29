@@ -30,6 +30,48 @@ public class DynamicRuleBuilder {
 		super();
 	}
 
+	public String increaseIntervalRangeInExperimentalRule(TreeExpansionBuilder b, RuntimeAgent a, RLRule r, String stateName,
+	        Fact[] statefactelems, String domainAttr, double min, double max, Context context) throws JessException {
+
+		Attribute2ValuesMap consts = new Attribute2ValuesMap();
+
+		for (int i = 0; i < statefactelems.length; i++) {
+			String s = statefactelems[i].getDeftemplate().getBaseName();
+			String pm = statefactelems[i].getSlotValue("param-name").stringValue(context);
+
+			if (s.equals("state-fact-element")) {
+				double[] interval = consts.getInterval(pm);
+				double m = statefactelems[i].getSlotValue("from").floatValue(context);
+				double x = statefactelems[i].getSlotValue("to").floatValue(context);
+				if (interval != null) {
+					if (min < m) {
+						m = x;
+					}
+					if (max > m) {
+						x = max;
+					}
+
+				}
+				consts.setIntervalAttributes(pm, m, x);
+
+			} else {
+				List<String> f = consts.getFillers(pm);
+				consts.setSetAttributes(pm, f);
+			}
+		}
+
+		String n = "";
+		try {
+			n = b.buildExperimentationRule(r, stateName, consts);
+			Logger.getLogger(DynamicRuleBuilder.class).debug("New rule after dynamic attribute add:\n" + n);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return n;
+
+	}
+
 	public String addCategoryToExperimentalRule(TreeExpansionBuilder b, RuntimeAgent a, RLRule r, String stateName, Fact[] statefactelems,
 			String domainAttr, String newFiller, Context context) throws JessException {
 

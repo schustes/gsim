@@ -105,10 +105,10 @@ public abstract class RLRulesUpdate {
 				Fact[] elems = getStateElems(stateName, context);
 
 				// to do add interval equivalent
-				String newRule = builder.addCategoryToExperimentalRule(treeBuilder, agent, baseRule, stateName, elems,
-				        resolvedAttributeName, "", context);
+				String newRule = builder.increaseIntervalRangeInExperimentalRule(treeBuilder, agent, baseRule, stateName, elems,
+				        resolvedAttributeName, min, max, context);
 
-				builder.addStateFactCategoryElem(state, resolvedAttributeName, "", context);
+				builder.addStateFactIntervalElem(resolvedAttributeName, state, min, max, context);
 
 				Rete rete = context.getEngine();
 

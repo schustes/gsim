@@ -113,93 +113,93 @@ public class JessHandler implements java.io.Serializable {
 	public void checkRLParams() {
 		for (RLRule r : owner.getBehaviour().getRLRules()) {
 			for (ExpansionDef e : r.getExpansions()) {
-				
+
 				Path<Attribute> instancePath = Path.attributePath(e.getParameterName().split("/"));
 				Path<DomainAttribute> framePath = Path.attributePath(e.getParameterName().split("/"));
 				DomainAttribute domainAttribute = owner.getDefinition().resolvePath(framePath);
 				Attribute attribute = owner.resolvePath(instancePath);
-				
+
 				if (domainAttribute.getType() == AttributeType.SET) {
-					
+
 					SetAttribute current = (SetAttribute) attribute;
 					List<String> modifiedSet = rlRanges.getNewCategoricalParameterValues(e.getParameterName(), current.getFillersAndEntries());
-					
+
 					for (String newFiller : modifiedSet) {
 						logger.debug("Modified set, att=" + e.getParameterName() + ", new=" + newFiller);
 						RLRulesUpdate.update(owner, r.getName(), domainAttribute.getName(), newFiller, rete.getGlobalContext());
 					}
-				} else if (a.getType() == AttributeType.INTERVAL) {
-					double currentMin = Double.parseDouble(a.getFillers().get(0));
-					double currentMax = Double.parseDouble(a.getFillers().get(1));
-					NumericalAttribute c = (NumericalAttribute) owner.resolvePath(Path.attributePath(path.split("/")));
+				} else if (domainAttribute.getType() == AttributeType.INTERVAL) {
+					double currentMin = Double.parseDouble(domainAttribute.getFillers().get(0));
+					double currentMax = Double.parseDouble(domainAttribute.getFillers().get(1));
+					NumericalAttribute c = (NumericalAttribute) attribute;
 					double currentVal = c.getValue();
 					double[] modifiedRange;
 					if (currentVal > currentMax) {
-						modifiedRange = rlRanges.getNewIntervalParameterRange(path, new double[] { currentMin, currentVal });
+						modifiedRange = rlRanges.getNewIntervalParameterRange(e.getParameterName(),
+						        new double[] { currentMin, currentVal });
 					} else if (currentVal < currentMin) {
-						modifiedRange = rlRanges.getNewIntervalParameterRange(path, new double[] { currentVal, currentMax });
+						modifiedRange = rlRanges.getNewIntervalParameterRange(e.getParameterName(),
+						        new double[] { currentVal, currentMax });
 					} else {
-						modifiedRange = rlRanges.getNewIntervalParameterRange(path, new double[] { currentMin, currentMax });
+						modifiedRange = rlRanges.getNewIntervalParameterRange(e.getParameterName(),
+						        new double[] { currentMin, currentMax });
 					}
 
 					if (modifiedRange != null) {
-						System.out.println("modified interval att=" + path + ", new range=" + modifiedRange[0] + "-" + modifiedRange[1]);
-						
-						RLRulesUpdate rlUpdate = new RLRulesUpdate(owner, debugDir);
-						for (String n : modifiedSet) {
-							logger.debug("Modified set, att=" + path + ", new=" + n);
-							rlUpdate.up
-						}
-						
+						System.out.println("modified interval att=" + e.getParameterName() + ", new range=" + modifiedRange[0] + "-"
+						        + modifiedRange[1]);
+
+						RLRulesUpdate.update(owner, r.getName(), domainAttribute.getName(), modifiedRange[0], modifiedRange[1],
+						        rete.getGlobalContext());
 					}
 				}
 			}
 		}
 	}
-	
-//	public void checkRLParams() {
-//		for (RLRule r : owner.getBehaviour().getRLRules()) {
-//			for (ExpansionDef e : r.getExpansions()) {
-//				String path = e.getParameterName();
-//				DomainAttribute a = extractAtt(path);// (DomainAttribute) this.owner.getDefinition().resolveName(path.split("/"));
-//				if (a.getType() == AttributeType.SET) {
-//					Path<Attribute> instancePath = Path.attributePath(path.split("/"));
-//					SetAttribute current = (SetAttribute) owner.resolvePath(Path.attributePath(path.split("/")));
-//					ArrayList<String> modifiedSet = rlRanges.getNewCategoricalParameterValues(path, current.getFillersAndEntries());
-//					RLRulesUpdate rlUpdate = new RLRulesUpdate(owner, debugDir);
-//					for (String n : modifiedSet) {
-//						logger.debug("Modified set, att=" + path + ", new=" + n);
-//						RLRulesUpdate.update(a, instancePath, n, rete.getGlobalContext());
-//						rlUpdate.update(a, n, rete.getGlobalContext());
-//					}
-//				} else if (a.getType() == AttributeType.INTERVAL) {
-//					double currentMin = Double.parseDouble(a.getFillers().get(0));
-//					double currentMax = Double.parseDouble(a.getFillers().get(1));
-//					NumericalAttribute c = (NumericalAttribute) owner.resolvePath(Path.attributePath(path.split("/")));
-//					double currentVal = c.getValue();
-//					double[] modifiedRange;
-//					if (currentVal > currentMax) {
-//						modifiedRange = rlRanges.getNewIntervalParameterRange(path, new double[] { currentMin, currentVal });
-//					} else if (currentVal < currentMin) {
-//						modifiedRange = rlRanges.getNewIntervalParameterRange(path, new double[] { currentVal, currentMax });
-//					} else {
-//						modifiedRange = rlRanges.getNewIntervalParameterRange(path, new double[] { currentMin, currentMax });
-//					}
-//
-//					if (modifiedRange != null) {
-//						System.out.println("modified interval att=" + path + ", new range=" + modifiedRange[0] + "-" + modifiedRange[1]);
-//						
-//						RLRulesUpdate rlUpdate = new RLRulesUpdate(owner, debugDir);
-//						for (String n : modifiedSet) {
-//							logger.debug("Modified set, att=" + path + ", new=" + n);
-//							rlUpdate.up
-//						}
-//						
-//					}
-//				}
-//			}
-//		}
-//	}
+
+	// public void checkRLParams() {
+	// for (RLRule r : owner.getBehaviour().getRLRules()) {
+	// for (ExpansionDef e : r.getExpansions()) {
+	// String path = e.getParameterName();
+	// DomainAttribute a = extractAtt(path);// (DomainAttribute) this.owner.getDefinition().resolveName(path.split("/"));
+	// if (a.getType() == AttributeType.SET) {
+	// Path<Attribute> instancePath = Path.attributePath(path.split("/"));
+	// SetAttribute current = (SetAttribute) owner.resolvePath(Path.attributePath(path.split("/")));
+	// ArrayList<String> modifiedSet = rlRanges.getNewCategoricalParameterValues(path, current.getFillersAndEntries());
+	// RLRulesUpdate rlUpdate = new RLRulesUpdate(owner, debugDir);
+	// for (String n : modifiedSet) {
+	// logger.debug("Modified set, att=" + path + ", new=" + n);
+	// RLRulesUpdate.update(a, instancePath, n, rete.getGlobalContext());
+	// rlUpdate.update(a, n, rete.getGlobalContext());
+	// }
+	// } else if (a.getType() == AttributeType.INTERVAL) {
+	// double currentMin = Double.parseDouble(a.getFillers().get(0));
+	// double currentMax = Double.parseDouble(a.getFillers().get(1));
+	// NumericalAttribute c = (NumericalAttribute) owner.resolvePath(Path.attributePath(path.split("/")));
+	// double currentVal = c.getValue();
+	// double[] modifiedRange;
+	// if (currentVal > currentMax) {
+	// modifiedRange = rlRanges.getNewIntervalParameterRange(path, new double[] { currentMin, currentVal });
+	// } else if (currentVal < currentMin) {
+	// modifiedRange = rlRanges.getNewIntervalParameterRange(path, new double[] { currentVal, currentMax });
+	// } else {
+	// modifiedRange = rlRanges.getNewIntervalParameterRange(path, new double[] { currentMin, currentMax });
+	// }
+	//
+	// if (modifiedRange != null) {
+	// System.out.println("modified interval att=" + path + ", new range=" + modifiedRange[0] + "-" + modifiedRange[1]);
+	//
+	// RLRulesUpdate rlUpdate = new RLRulesUpdate(owner, debugDir);
+	// for (String n : modifiedSet) {
+	// logger.debug("Modified set, att=" + path + ", new=" + n);
+	// rlUpdate.up
+	// }
+	//
+	// }
+	// }
+	// }
+	// }
+	// }
 
 	public void destroy() {
 		try {
