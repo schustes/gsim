@@ -2,6 +2,7 @@ package de.s2.gsim.sim.behaviour.impl;
 
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import de.s2.gsim.api.sim.agent.impl.RuntimeAgent;
@@ -14,7 +15,6 @@ import de.s2.gsim.environment.Instance;
 import de.s2.gsim.environment.RLRule;
 import de.s2.gsim.environment.Unit;
 import de.s2.gsim.objects.Path;
-import de.s2.gsim.objects.attribute.AttributeConstants;
 import de.s2.gsim.objects.attribute.AttributeType;
 import de.s2.gsim.objects.attribute.DomainAttribute;
 import de.s2.gsim.sim.GSimEngineException;
@@ -80,9 +80,9 @@ public class RLParser {
             String res = "";
 
             BehaviourDef b = agent.getBehaviour();
-            RLRule[] r = b.getRLRules();
+			List<RLRule> r = b.getRLRules();
 
-            if (r.length == 0) {
+			if (r.size() == 0) {
                 return "";
             }
 
@@ -91,44 +91,44 @@ public class RLParser {
             String s = "";
 
             boolean hasExpansion = false;
-            for (int i = 0; i < r.length; i++) {
-                if (r[i].isActivated() && !r[i].containsAttribute("equivalent-actionset")) {
+			for (int i = 0; i < r.size(); i++) {
+				if (r.get(i).isActivated() && !r.get(i).containsAttribute("equivalent-actionset")) {
 
-                    if (!r[i].hasExpansions()) {
-                        String expRuleFinal = rlBuilder.createRLRuleSet(r[i]);
+					if (!r.get(i).hasExpansions()) {
+						String expRuleFinal = rlBuilder.createRLRuleSet(r.get(i));
                         res += expRuleFinal + "\n";
-                    } else if (r[i].hasExpansions()) {
-                        String initialStateName = r[i].getName() + "_0" + "0";
+					} else if (r.get(i).hasExpansions()) {
+						String initialStateName = r.get(i).getName() + "_0" + "0";
                         Attribute2ValuesMap exp = new Attribute2ValuesMap();
 
-                        extractConditionRefs(r[i], exp);
+						extractConditionRefs(r.get(i), exp);
 
-                        res += rlBuilder.createRLHelpRuleSetOnly(r[i]);
-                        res += tBuilder.buildInitialRule(r[i], initialStateName, exp);
+						res += rlBuilder.createRLHelpRuleSetOnly(r.get(i));
+						res += tBuilder.buildInitialRule(r.get(i), initialStateName, exp);
 
                     }
 
-                    updateRules.put(r[i].getEvaluationFunction().getParameterName(),
-                            rlBuilder.buildExperimentationUpdateRule(r[i], r[i].getEvaluationFunction()));
-                    updateRules.put(r[i].getEvaluationFunction().getParameterName() + "avg",
-                            rlBuilder.buildAvgRule(r[i], r[i].getEvaluationFunction()));
+					updateRules.put(r.get(i).getEvaluationFunction().getParameterName(),
+					        rlBuilder.buildExperimentationUpdateRule(r.get(i), r.get(i).getEvaluationFunction()));
+					updateRules.put(r.get(i).getEvaluationFunction().getParameterName() + "avg",
+					        rlBuilder.buildAvgRule(r.get(i), r.get(i).getEvaluationFunction()));
                 }
 
             }
 
             Map<String, Unit> expansionMap = new HashMap<String, Unit>();
 
-            for (int i = 0; i < r.length; i++) {
+			for (int i = 0; i < r.size(); i++) {
 
-                if (r[i].isActivated() && r[i].containsAttribute("equivalent-actionset")) {
+				if (r.get(i).isActivated() && r.get(i).containsAttribute("equivalent-actionset")) {
 
-                    String expRuleFinal = rlBuilder.buildIntermediateRule(r[i]);
+					String expRuleFinal = rlBuilder.buildIntermediateRule(r.get(i));
                     res += expRuleFinal + "\n";
 
                 }
 
-                if (r[i].hasExpansions()) {
-                    String roleName = ParsingUtils.getDefiningRoleForRLRule(agent, r[i].getName());
+				if (r.get(i).hasExpansions()) {
+					String roleName = ParsingUtils.getDefiningRoleForRLRule(agent, r.get(i).getName());
                     expansionMap.put(roleName, agent.getBehaviour());
 
                     Instance inst = agent;

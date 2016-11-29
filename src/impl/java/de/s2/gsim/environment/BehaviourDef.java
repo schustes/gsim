@@ -1,5 +1,6 @@
 package de.s2.gsim.environment;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import de.s2.gsim.objects.attribute.NumericalAttribute;
@@ -162,16 +163,10 @@ public class BehaviourDef extends Instance {
     }
 
     public RLRule getRLRule(String name) {
-        RLRule[] frs = getRLRules();
-        for (int i = 0; i < frs.length; i++) {
-            if (frs[i].getName().equals(name)) {
-                return frs[i];
-            }
-        }
-        return null;
+		return getRLRules().stream().filter(r -> r.getName().equals(name)).findAny().get();
     }
 
-    public RLRule[] getRLRules() {
+	public RLRule[] getRLRulesOLD() {
         List<Instance> rules = getChildInstances(BehaviourFrame.RL_LIST);
         RLRule[] userRules = new RLRule[rules.size()];
         for (int i = 0; i < rules.size(); i++) {
@@ -179,6 +174,15 @@ public class BehaviourDef extends Instance {
         }
         return userRules;
     }
+
+	public List<RLRule> getRLRules() {
+		List<Instance> rules = getChildInstances(BehaviourFrame.RL_LIST);
+		List<RLRule> userRules = new ArrayList<RLRule>();
+		for (Instance rule : rules) {
+			userRules.add(RLRule.fromInstance(rule));
+		}
+		return userRules;
+	}
 
     /**
      * Get a rule with a certain name.

@@ -714,11 +714,11 @@ public class FactHandler {
     private String[] getEvaluationFunctionNames(RuntimeAgent a) {
         HashSet<String> set = new HashSet<String>();
         BehaviourDef b = a.getBehaviour();
-        RLRule[] r = b.getRLRules();
-        for (int i = 0; i < r.length; i++) {
-            ActionDef[] c = r[i].getConsequents();
+		List<RLRule> rules = b.getRLRules();
+		for (RLRule r : rules) {
+			ActionDef[] c = r.getConsequents();
             for (int j = 0; j < c.length; j++) {
-                set.add(r[i].getEvaluationFunction().getParameterName());
+				set.add(r.getEvaluationFunction().getParameterName());
             }
         }
         String[] ret = new String[set.size()];

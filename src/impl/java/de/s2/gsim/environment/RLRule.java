@@ -2,6 +2,7 @@ package de.s2.gsim.environment;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
 
@@ -87,13 +88,18 @@ public class RLRule extends UserRule {
 
     }
 
-    public ExpansionDef[] getExpansions() {
+	public ExpansionDef[] getExpansionsOLD() {
+		List<Instance> f = getChildInstances(RLRuleFrame.INST_LIST_EXP);
+		ExpansionDef[] e = new ExpansionDef[f.size()];
+		for (int i = 0; i < f.size(); i++) {
+			e[i] = new ExpansionDef(f.get(i));
+		}
+		return e;
+	}
+
+	public List<ExpansionDef> getExpansions() {
         List<Instance> f = getChildInstances(RLRuleFrame.INST_LIST_EXP);
-        ExpansionDef[] e = new ExpansionDef[f.size()];
-        for (int i = 0; i < f.size(); i++) {
-            e[i] = new ExpansionDef(f.get(i));
-        }
-        return e;
+		return f.stream().map(inst -> new ExpansionDef(inst)).collect(Collectors.toList());
     }
 
     public String getMethod() {

@@ -1,5 +1,7 @@
 package de.s2.gsim.api.objects.impl.behaviour;
 
+import java.util.List;
+
 import de.s2.gsim.GSimException;
 import de.s2.gsim.api.objects.impl.UnitWrapper;
 import de.s2.gsim.environment.ActionDef;
@@ -115,10 +117,10 @@ public class BehaviourInstance implements Behaviour, UnitWrapper {
 
     @Override
     public RLActionNode[] getRLActionNodes() {
-        RLRule[] f = real.getRLRules();
-        RLActionNodeInstance[] r = new RLActionNodeInstance[f.length];
-        for (int i = 0; i < f.length; i++) {
-            r[i] = new RLActionNodeInstance(this, f[i]);
+		List<RLRule> f = real.getRLRules();
+		RLActionNodeInstance[] r = new RLActionNodeInstance[f.size()];
+		for (int i = 0; i < f.size(); i++) {
+			r[i] = new RLActionNodeInstance(this, f.get(i));
         }
         return r;
     }

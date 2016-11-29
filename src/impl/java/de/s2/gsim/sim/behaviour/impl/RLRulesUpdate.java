@@ -4,9 +4,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 
 import de.s2.gsim.api.sim.agent.impl.RuntimeAgent;
 import de.s2.gsim.environment.ExpansionDef;
+import de.s2.gsim.environment.GSimDefException;
 import de.s2.gsim.environment.RLRule;
 import de.s2.gsim.objects.Path;
 import de.s2.gsim.objects.attribute.Attribute;
@@ -19,245 +21,285 @@ import jess.Fact;
 import jess.JessException;
 import jess.Rete;
 
-public class RLRulesUpdate {
+public abstract class RLRulesUpdate {
 
-    private RuntimeAgent agent = null;
+	private static String debugDir = "/home/gsim/tmp/trees";
 
-    private String debugDir;
+	/**
+	 * Modify rules, statefacts and statefact category values with new filler
+	 * 
+	 * @param agent owning agent
+	 * @param pathToParameter the path to the referenced attribute that changed its value range
+	 * @param newFiller the new value in the value range
+	 * @param ctx rete context
+	 */
+	public static void update(RuntimeAgent agent, String baseRuleName, String resolvedAttributeName, String newFiller, Context context) {
 
-    public RLRulesUpdate(RuntimeAgent agent, String debugDir) {
-        this.agent = agent;
-        this.debugDir = debugDir;
-    }
+		DynamicRuleBuilder builder = new DynamicRuleBuilder();
+		TreeExpansionBuilder treeBuilder = new TreeExpansionBuilder(agent);
 
-    // RIGHT is other, LEFT is expanded
+		try {
 
-    public void update(DomainAttribute domainAttr, String newFiller, Context ctx) {
-        for (RLRule r : agent.getBehaviour().getRLRules()) {
-            for (ExpansionDef ex : r.getExpansions()) {
-                // ok, because only attribute, not filler must be named in Expansion
-                // object
+			ArrayList<Fact> allStates = getStateFactsForRootRule(baseRuleName, context);
+			List<Fact> selectedStates = chooseStates(allStates, context);
 
-                Attribute specified = (Attribute) agent.resolvePath(Path.attributePath(ex.getParameterName().split("/")));
+			for (Fact state : selectedStates) {
 
-                if (specified.getName().equals(domainAttr.getName())) {
-                    this.update(r.getName(), domainAttr, newFiller, ex.getParameterName(), ctx);
-                    return;
-                }
+				String stateName = state.getSlotValue("name").stringValue(context);
 
-            }
-        }
+				String expansionRuleName = "experimental_rule_" + baseRuleName + "@" + stateName + "@";
+				RLRule baseRule = agent.getBehaviour().getRLRule(baseRuleName);
 
-    }
+				Fact[] elems = getStateElems(stateName, context);
 
-    public void update(String baseRuleName, DomainAttribute domain, String newFiller, String spec, Context context) {
+				// clone the rule associated with the state, but only if the rule belongs to the set of rules to which the new category is
+				// added
+				// (1 rule <-> 1 state)
+				String newRule = builder.addCategoryToExperimentalRule(treeBuilder, agent, baseRule, stateName, elems,
+				        resolvedAttributeName, newFiller, context);
+				// add the new element to this state (exactly 1 at a time)
+				builder.addStateFactCategoryElem(state, resolvedAttributeName, newFiller, context);
 
-        DynamicRuleBuilder builder = new DynamicRuleBuilder();
-        TreeExpansionBuilder treeBuilder = new TreeExpansionBuilder(agent);
+				Rete rete = context.getEngine();
 
-        try {
+				CollectiveTreeDBWriter f = new CollectiveTreeDBWriter();
+				f.output("before_deepening", rete, debugDir);
 
-            ArrayList<Fact> allStates = getStateFactsForRootRule(baseRuleName, context);
-            List<Fact> selectedStates = chooseStates(allStates, context);
+				// delete rule on current level
+				deleteRule(expansionRuleName, context);
+				context.getEngine().executeCommand(newRule);
 
-            // this iterates over all state-facts and state-fact-elems in the
-            // hierarchy
-            for (Fact state : selectedStates) {
+				// make new expansion one level deeper - why?
+				double depth = state.getSlotValue("depth").floatValue(context);
+				if (depth > 0) {
+					// System.out.println(">>>>>>>>>EXPANDDD>>>>>>>>>>>>>>>>");
+					// expandOriginalNodeToDeeperLevel(stateName, newFiller, context);
+				}
+				f = new CollectiveTreeDBWriter();
+				f.output("after_deepening", rete, debugDir);
+			}
 
-                String stateName = state.getSlotValue("name").stringValue(context);
+		} catch (JessException e) {
+			e.printStackTrace();
+		}
+	}
 
-                String expansionRuleName = "experimental_rule_" + baseRuleName + "@" + stateName + "@";
-                RLRule baseRule = agent.getBehaviour().getRLRule(baseRuleName);
+	public static void update(RuntimeAgent agent, String baseRuleName, String resolvedAttributeName, double min, double max,
+	        Context context) {
 
-                // first find elems:
-                Fact[] elems = getStateElemFacts(stateName, context);
+		DynamicRuleBuilder builder = new DynamicRuleBuilder();
+		TreeExpansionBuilder treeBuilder = new TreeExpansionBuilder(agent);
 
-                // clone the rule associated with the state, but only if the rule
-                // belongs
-                // to the set of rules to which the new category is added
-                // (1 rule <-> 1 state)
-                String newRule = builder.addCategoryToExperimentalRule(treeBuilder, agent, baseRule, stateName, elems, domain.getName(), newFiller,
-                        context);
-//System.out.println("-------------------\n" + newRule+"\n---------------");
-                // add the new element to this state (exactly 1 at a time)
-                builder.addStateFactCategoryElem(state, spec, newFiller, context);
+		try {
 
-                Rete rete = context.getEngine();
-                CollectiveTreeDBWriter f = new CollectiveTreeDBWriter();
-                f.output("before_deepening", rete, debugDir);
+			ArrayList<Fact> allStates = getStateFactsForRootRule(baseRuleName, context);
+			List<Fact> selectedStates = chooseStates(allStates, context);
 
-                // delete rule on current level
-                deleteRule(expansionRuleName, context);
-                // don't forget to add the modified rules
-                context.getEngine().executeCommand(newRule);
+			for (Fact state : selectedStates) {
 
-                // make new expansion one level deeper - why? 
-                double depth = state.getSlotValue("depth").floatValue(context);
-                if (depth > 0) {
-                	//System.out.println(">>>>>>>>>EXPANDDD>>>>>>>>>>>>>>>>");
-                   // expandOriginalNodeToDeeperLevel(stateName, newFiller, context);
-                }
-                f = new CollectiveTreeDBWriter();
-                f.output("after_deepening", rete, debugDir);
+				String stateName = state.getSlotValue("name").stringValue(context);
 
+				String expansionRuleName = "experimental_rule_" + baseRuleName + "@" + stateName + "@";
+				RLRule baseRule = agent.getBehaviour().getRLRule(baseRuleName);
 
-            }
+				Fact[] elems = getStateElems(stateName, context);
 
-        } catch (JessException e) {
-            e.printStackTrace();
-        }
-    }
+				// to do add interval equivalent
+				String newRule = builder.addCategoryToExperimentalRule(treeBuilder, agent, baseRule, stateName, elems,
+				        resolvedAttributeName, "", context);
 
-    // select the state-fact-elems to which the new category is appended
-    private ArrayList<Fact> chooseStates(ArrayList<Fact> states, Context context) {
+				builder.addStateFactCategoryElem(state, resolvedAttributeName, "", context);
 
-        ArrayList<Fact> set = new ArrayList<Fact>();
+				Rete rete = context.getEngine();
 
-        try {
+				CollectiveTreeDBWriter f = new CollectiveTreeDBWriter();
+				f.output("before_deepening", rete, debugDir);
 
-            HashMap<Fact, Integer> map = new HashMap<Fact, Integer>();
+				deleteRule(expansionRuleName, context);
+				context.getEngine().executeCommand(newRule);
 
-            int depth = -1;
+				f = new CollectiveTreeDBWriter();
+				f.output("after_deepening", rete, debugDir);
+			}
 
-            for (Fact state : states) {
+		} catch (JessException e) {
+			e.printStackTrace();
+		}
+	}
 
-                double active = state.getSlotValue("active").floatValue(context);
+	// select the state-fact-elems to which the new category is appended
+	private static ArrayList<Fact> chooseStates(ArrayList<Fact> states, Context context) {
 
-                if (active > 0) {
+		ArrayList<Fact> set = new ArrayList<Fact>();
 
-                    String stateName = state.getSlotValue("name").stringValue(context);
+		try {
 
-                    Fact[] elems = getStateElemFacts(stateName, context);
+			HashMap<Fact, Integer> map = new HashMap<Fact, Integer>();
 
-                    int d = (int) Double.parseDouble(state.getSlotValue("depth").stringValue(context));
+			int depth = -1;
 
-                    if (d > depth) {
-                        // map with state-name:elemcount
+			for (Fact state : states) {
 
-                        if (map.containsKey(stateName)) {
-                            if (map.get(state) < elems.length) {
-                                map.put(state, elems.length);
-                            }
-                        } else {
-                            map.put(state, elems.length);
-                        }
-                    }
-                }
-            }
+				double active = state.getSlotValue("active").floatValue(context);
 
-            Fact selected = null;
-            int random = cern.jet.random.Uniform.staticNextIntFromTo(0, map.size() - 1);
-            ArrayList<Fact> list = new ArrayList<Fact>();
-            list.addAll(map.keySet());
-            selected = list.get(random);
-            /*
-             * for (Fact state : map.keySet()) { int len = map.get(state); if (len > maxLen) { maxLen = len; selected = state; } }
-             */
+				if (active > 0) {
 
-            rekAdd(set, context, selected, states);
+					String stateName = state.getSlotValue("name").stringValue(context);
 
-            set.add(selected);
+					Fact[] elems = getStateElems(stateName, context);
 
-        } catch (JessException e) {
-            e.printStackTrace();
-        }
+					int d = (int) Double.parseDouble(state.getSlotValue("depth").stringValue(context));
 
-        return set;
-    }
+					if (d > depth) {
+						// map with state-name:elemcount
 
-    private void deleteRule(String ruleName, Context context) {
-        try {
-            context.getEngine().executeCommand("(undefrule " + ruleName + ")");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+						if (map.containsKey(stateName)) {
+							if (map.get(state) < elems.length) {
+								map.put(state, elems.length);
+							}
+						} else {
+							map.put(state, elems.length);
+						}
+					}
+				}
+			}
 
-    }
+			Fact selected = null;
+			int random = cern.jet.random.Uniform.staticNextIntFromTo(0, map.size() - 1);
+			ArrayList<Fact> list = new ArrayList<Fact>();
+			list.addAll(map.keySet());
+			selected = list.get(random);
+			/*
+			 * for (Fact state : map.keySet()) { int len = map.get(state); if (len > maxLen) { maxLen = len; selected = state; } }
+			 */
 
-    private void expandOriginalNodeToDeeperLevel(String stateName, String newCategory, Context context) throws JessException {
-        Expand0 impl = new Expand0();
+			rekAdd(set, context, selected, states);
 
-        ArrayList<Fact> allStateFactElems = FactHandler.getInstance().getStateFactElems(stateName, context);
+			set.add(selected);
 
-        Fact stateFact = FactHandler.getInstance().getStateFact(stateName, context);
+		} catch (JessException e) {
+			e.printStackTrace();
+		}
 
-        Fact elemToExpand = null;
-        int depth = -1;
-        for (Fact f : allStateFactElems) {
-            String cName = f.getSlotValue("category").stringValue(context);
-            Fact sf = FactHandler.getInstance().getStateFact(f.getSlotValue("state-fact-name").stringValue(context), context);
+		return set;
+	}
 
-            double d = sf.getSlotValue("depth").floatValue(context);
-            if (cName.equals(newCategory) && d > depth) {
-                elemToExpand = f;
-                depth = (int) d;
-            }
-        }
+	private static void deleteRule(String ruleName, Context context) {
+		try {
+			context.getEngine().executeCommand("(undefrule " + ruleName + ")");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
-        try {
-            impl.createNextStatesCat(agent, stateFact, elemToExpand, allStateFactElems, context, false);
-            
-        } catch (Exception e) {
-            throw new JessException("", "", e);
-        }
+	}
 
-    }
+	private static void expandOriginalNodeToDeeperLevel(RuntimeAgent agent, String stateName, String newCategory, Context context)
+	        throws JessException {
+		Expand0 impl = new Expand0();
 
-    private Fact[] getStateElemFacts(String parentName, Context context) {
+		ArrayList<Fact> allStateFactElems = FactHandler.getInstance().getStateFactElems(stateName, context);
 
-        ArrayList<Fact> ret = new ArrayList<Fact>();
+		Fact stateFact = FactHandler.getInstance().getStateFact(stateName, context);
 
-        try {
-            Iterator iter = context.getEngine().listFacts();
-            while (iter.hasNext()) {
-                Fact f = (Fact) iter.next();
-                if (f.getDeftemplate().getBaseName().equals("state-fact-category")) {
-                    String s1 = f.getSlotValue("state-fact-name").stringValue(context);
-                    if (s1.equals(parentName)) {
-                        ret.add(f);
-                    }
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+		Fact elemToExpand = null;
+		int depth = -1;
+		for (Fact f : allStateFactElems) {
+			String cName = f.getSlotValue("category").stringValue(context);
+			Fact sf = FactHandler.getInstance().getStateFact(f.getSlotValue("state-fact-name").stringValue(context), context);
 
-        return ret.toArray(new Fact[ret.size()]);
-    }
+			double d = sf.getSlotValue("depth").floatValue(context);
+			if (cName.equals(newCategory) && d > depth) {
+				elemToExpand = f;
+				depth = (int) d;
+			}
+		}
 
-    private ArrayList<Fact> getStateFactsForRootRule(String name, Context context) {
-        ArrayList<Fact> ret = new ArrayList<Fact>();
-        try {
-            Iterator iter = context.getEngine().listFacts();
-            while (iter.hasNext()) {
-                Fact f = (Fact) iter.next();
-                if (f.getDeftemplate().getBaseName().equals("state-fact")) {
-                    String s1 = f.getSlotValue("name").stringValue(context);
-                    if (s1.startsWith(name)) {
-                        ret.add(f);
-                    }
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+		try {
+			impl.createNextStatesCat(agent, stateFact, elemToExpand, allStateFactElems, context, false);
 
-        return ret;
-    }
+		} catch (Exception e) {
+			throw new JessException("", "", e);
+		}
 
-    private void rekAdd(List<Fact> result, Context ctx, Fact fact, List<Fact> allStates) {
-        try {
-            String parentName = fact.getSlotValue("parent").stringValue(ctx);
-            for (Fact state : allStates) {
-                String name = state.getSlotValue("name").stringValue(ctx);
-                if (name.equals(parentName)) {
-                    result.add(state);
-                    rekAdd(result, ctx, state, allStates);
-                }
-            }
-        } catch (JessException e) {
-            e.printStackTrace();
-        }
-    }
+	}
+
+	private static Fact[] getStateElems(String parentName, Context context) {
+
+		ArrayList<Fact> ret = new ArrayList<Fact>();
+
+		try {
+			Iterator iter = context.getEngine().listFacts();
+			while (iter.hasNext()) {
+				Fact f = (Fact) iter.next();
+				if (f.getDeftemplate().getBaseName().equals("state-fact-category")) {
+					String s1 = f.getSlotValue("state-fact-name").stringValue(context);
+					if (s1.equals(parentName)) {
+						ret.add(f);
+					}
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return ret.toArray(new Fact[ret.size()]);
+	}
+
+	private static Fact[] getStateFactsElems(String parentName, Context context) {
+
+		ArrayList<Fact> ret = new ArrayList<Fact>();
+
+		try {
+			Iterator iter = context.getEngine().listFacts();
+			while (iter.hasNext()) {
+				Fact f = (Fact) iter.next();
+				if (f.getDeftemplate().getBaseName().equals("state-fact-element")) {
+					String s1 = f.getSlotValue("state-fact-name").stringValue(context);
+					if (s1.equals(parentName)) {
+						ret.add(f);
+					}
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return ret.toArray(new Fact[ret.size()]);
+	}
+
+	private static ArrayList<Fact> getStateFactsForRootRule(String name, Context context) {
+		ArrayList<Fact> ret = new ArrayList<Fact>();
+		try {
+			Iterator iter = context.getEngine().listFacts();
+			while (iter.hasNext()) {
+				Fact f = (Fact) iter.next();
+				if (f.getDeftemplate().getBaseName().equals("state-fact")) {
+					String s1 = f.getSlotValue("name").stringValue(context);
+					if (s1.startsWith(name)) {
+						ret.add(f);
+					}
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return ret;
+	}
+
+	private static void rekAdd(List<Fact> result, Context ctx, Fact fact, List<Fact> allStates) {
+		try {
+			String parentName = fact.getSlotValue("parent").stringValue(ctx);
+			for (Fact state : allStates) {
+				String name = state.getSlotValue("name").stringValue(ctx);
+				if (name.equals(parentName)) {
+					result.add(state);
+					rekAdd(result, ctx, state, allStates);
+				}
+			}
+		} catch (JessException e) {
+			e.printStackTrace();
+		}
+	}
 
 }

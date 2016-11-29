@@ -2,7 +2,6 @@ package de.s2.gsim.api.sim.agent.impl;
 
 import java.util.HashMap;
 import java.util.Optional;
-import java.util.function.Supplier;
 
 import org.apache.log4j.Logger;
 
@@ -11,6 +10,7 @@ import de.s2.gsim.environment.ActionDef;
 import de.s2.gsim.environment.GenericAgent;
 import de.s2.gsim.environment.GenericAgentClass;
 import de.s2.gsim.environment.Instance;
+import de.s2.gsim.environment.RLRule;
 import de.s2.gsim.environment.UserRule;
 import de.s2.gsim.objects.AgentInstance;
 import de.s2.gsim.sim.agent.ApplicationAgent;
@@ -282,7 +282,7 @@ public class RuntimeAgent extends GenericAgent implements AgentType, RtAgent {
 
 		String res = findActionByClassName(super.getBehaviour().getRules(), clsName);
 		if (res == null) {
-			return findActionByClassName(super.getBehaviour().getRLRules(), clsName);
+			return findActionByClassName(super.getBehaviour().getRLRules().toArray(new RLRule[0]), clsName);
 		}
 		return res;
 

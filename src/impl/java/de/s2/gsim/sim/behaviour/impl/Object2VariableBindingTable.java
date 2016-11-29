@@ -2,6 +2,7 @@ package de.s2.gsim.sim.behaviour.impl;
 
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 
 import cern.jet.random.Uniform;
 import de.s2.gsim.environment.ActionDef;
@@ -87,7 +88,7 @@ public class Object2VariableBindingTable {
      * 
      * @param expansions
      */
-    private void addExpansionRefs(ExpansionDef[] expansions) {
+	private void addExpansionRefs(List<ExpansionDef> expansions) {
         for (ExpansionDef c : expansions) {
             if (c.getParameterName().contains("::")) {
                 String pn = c.getParameterName();

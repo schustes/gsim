@@ -1,5 +1,7 @@
 package de.s2.gsim.api.objects.impl.behaviour;
 
+import java.util.List;
+
 import de.s2.gsim.GSimException;
 import de.s2.gsim.api.objects.impl.UnitWrapper;
 import de.s2.gsim.environment.ActionDef;
@@ -92,10 +94,10 @@ public class RLActionNodeInstance extends RuleInstance implements RLActionNode, 
 
     @Override
     public Expansion[] getExpansions() {
-        ExpansionDef[] f = ((RLRule) real).getExpansions();
-        Expansion[] ff = new Expansion[f.length];
-        for (int i = 0; i < f.length; i++) {
-            ff[i] = new ExpansionInstance(this, f[i]);
+		List<ExpansionDef> f = ((RLRule) real).getExpansions();
+		Expansion[] ff = new Expansion[f.size()];
+		for (int i = 0; i < f.size(); i++) {
+			ff[i] = new ExpansionInstance(this, f.get(i));
         }
         return ff;
     }

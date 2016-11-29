@@ -6,6 +6,7 @@ import static org.hamcrest.Matchers.lessThanOrEqualTo;
 import static org.hamcrest.Matchers.not;
 
 import java.util.HashMap;
+import java.util.Random;
 import java.util.concurrent.Semaphore;
 
 import org.junit.Before;
@@ -334,6 +335,71 @@ public class SimTest {
 		//	assertThat("Count of test action must be significantly over 2/3 of all actions or so", expectedIntuitive, lessThanOrEqualTo(counterAction));
 		}
 	}
+
+	@Test
+	public void bra_expansion_should_extend_interval() throws Exception {
+
+		int samples = 1;
+		int steps = 20;
+		int expandInterval = 2;
+		double alpha = 0.1;
+
+		env.createAgentClass(AGENT_CLASS_NAME, null);
+
+		AgentClass agentClass = createBaseTestAgent();
+
+		Behaviour behaviour = agentClass.getBehaviour();
+		Action action1 = behaviour.createAction(action0Name, TestAction0.class.getName());
+		Action action2 = behaviour.createAction(action1Name, TestAction1.class.getName());
+
+		RLActionNode rule = behaviour.createRLActionNode("RL");
+
+		rule.addOrSetConsequent(action1);
+		rule.addOrSetConsequent(action2);
+
+		Rule rewardRule = behaviour.createRule("reward-rule");
+		Action rewardAction = behaviour.createAction("rewardAction", RewardComputation.class.getName());
+		rewardRule.addOrSetConsequent(rewardAction);
+
+		// first param is reward variable, and last is alpha!
+		rule.createEvaluator(ATTR_LIST + "/" + EVAL_ATTR, alpha);
+		agentClass.setBehaviour(behaviour);
+
+		DomainAttribute interval1 = new DomainAttribute("wealth", AttributeType.INTERVAL);
+		interval1.addFiller("0");
+		interval1.addFiller("10");
+		interval1.setDefault("4");
+		agentClass.addAttribute(ATTR_LIST, interval1);
+
+		Expansion expansion = rule.createExpansion(ATTR_LIST + "/wealth", "0", "10");
+		expansion.setMin("0");
+		expansion.setMax("10");
+		expansion.addFiller("0");
+		expansion.addFiller("10");
+		rule.addOrSetExpansion(expansion);
+
+		Action action = behaviour.createAction("Test-Action", AddNewNumberAction.class.getName());
+		Rule rrule = behaviour.createRule("Test-Rule");
+		rrule.addOrSetConsequent(action);
+		rrule.createCondition(ATTR_LIST + "/" + COUNTER0, ">", "4");
+
+		behaviour.setMaxNodes(10);
+		behaviour.setRevaluationProb(0.3);
+		behaviour.setUpdateInterval(expandInterval);
+		behaviour.setRevisitCostFraction(0.5);
+		agentClass.setBehaviour(behaviour);
+
+		AgentInstance agent = env.instanciateAgent(agentClass, AGENT_NAME);
+
+		for (int i = 0; i < samples; i++) {
+			double counterAction = runRLsimulation(agent, alpha, steps);
+			// get handle of runtime agent, check fact base
+			// check: Action on for sf with sf-cat X is executed most of the time
+			// assertThat("Count of test action must be significantly over 2/3 of all actions or so", expectedIntuitive,
+			// lessThanOrEqualTo(counterAction));
+		}
+	}
+
 	@SuppressWarnings("unused")
 	private void scientific_rl_rule_test() throws Exception {
 
@@ -558,6 +624,20 @@ public class SimTest {
 		}
 
 	}
+
+	public static class AddNewNumberAction extends SimAction {
+		private static final long serialVersionUID = 1L;
+
+		public Object execute() {
+			RuntimeAgent agent = super.getContext().getAgent();
+			NumericalAttribute att = (NumericalAttribute) agent.getAttribute("wealth");
+			att.setValue(new Random().nextInt(100));
+			agent.addOrSetAttribute(ATTR_LIST, att);
+			return null;
+		}
+
+	}
+
 	private static void shuffleAttributes(RuntimeAgent agent) {
 		Generator.randomiseUniformDistributedAttributeValues(agent, VAL_LIST);
 	}
