@@ -13,13 +13,13 @@ repositories {
         url 'https://plugins.gradle.org/m2/'
     }	
     maven {
-		url 'http://176.94.74.31:7002/nexus/content/repositories/snapshots/'
+		url 'http://nexus.measurementsolutions.de/nexus/content/repositories/snapshots/'
 	}    
     maven {
-		url 'http://176.94.74.31:7002/nexus/content/repositories/releases/'
+		url 'http://nexus.measurementsolutions.de/nexus/content/repositories/releases/'
 	}    
     maven {
-		url 'http://176.94.74.31:7002/nexus/content/repositories/thirdparty/'
+		url 'http://nexus.measurementsolutions.de/nexus/content/repositories/thirdparty/'
 	}    
 }
 
@@ -110,7 +110,7 @@ jacocoTestReport {
 uploadArchives {
     repositories {
         mavenDeployer {
-			repository(url: "http://176.94.74.31:7002/nexus/content/repositories/snapshots") {
+			repository(url: "http://nexus.measurementsolutions.de/nexus/content/repositories/snapshots") {
 				authentication(userName: "ems", password: "18e1042ms")
 			}
 
