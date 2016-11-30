@@ -111,51 +111,51 @@ public class BRAEngine implements java.io.Serializable {
         initRLRanges();
     }
 
+	// public void checkRLParams() {
+	// for (RLRule r : owner.getBehaviour().getRLRules()) {
+	// for (ExpansionDef e : r.getExpansions()) {
+	//
+	// Path<Attribute> instancePath = Path.attributePath(e.getParameterName().split("/"));
+	// Path<DomainAttribute> framePath = Path.attributePath(e.getParameterName().split("/"));
+	// DomainAttribute domainAttribute = owner.getDefinition().resolvePath(framePath);
+	// Attribute attribute = owner.resolvePath(instancePath);
+	//
+	// if (domainAttribute.getType() == AttributeType.SET) {
+	//
+	// SetAttribute current = (SetAttribute) attribute;
+	// List<String> modifiedSet = rlRanges.getNewCategoricalParameterValues(e.getParameterName(), current.getFillersAndEntries());
+	//
+	// for (String newFiller : modifiedSet) {
+	// logger.debug("Modified set, att=" + e.getParameterName() + ", new=" + newFiller);
+	// RLRulesUpdate.update(owner, r.getName(), domainAttribute.getName(), newFiller, rete.getGlobalContext());
+	// }
+	// } else if (domainAttribute.getType() == AttributeType.INTERVAL) {
+	// double currentMin = Double.parseDouble(domainAttribute.getFillers().get(0));
+	// double currentMax = Double.parseDouble(domainAttribute.getFillers().get(1));
+	// NumericalAttribute c = (NumericalAttribute) attribute;
+	// double currentVal = c.getValue();
+	// double[] modifiedRange;
+	// if (currentVal > currentMax) {
+	// modifiedRange = rlRanges.getNewIntervalParameterRange(e.getParameterName(), new double[] { currentMin, currentVal });
+	// } else if (currentVal < currentMin) {
+	// modifiedRange = rlRanges.getNewIntervalParameterRange(e.getParameterName(), new double[] { currentVal, currentMax });
+	// } else {
+	// modifiedRange = rlRanges.getNewIntervalParameterRange(e.getParameterName(), new double[] { currentMin, currentMax });
+	// }
+	//
+	// if (modifiedRange != null) {
+	// System.out.println(
+	// "modified interval att=" + e.getParameterName() + ", new range=" + modifiedRange[0] + "-" + modifiedRange[1]);
+	//
+	// RLRulesUpdate.update(owner, r.getName(), domainAttribute.getName(), modifiedRange[0], modifiedRange[1],
+	// rete.getGlobalContext());
+	// }
+	// }
+	// }
+	// }
+	// }
+
     public void checkRLParams() {
-        for (RLRule r : owner.getBehaviour().getRLRules()) {
-            for (ExpansionDef e : r.getExpansions()) {
-
-                Path<Attribute> instancePath = Path.attributePath(e.getParameterName().split("/"));
-                Path<DomainAttribute> framePath = Path.attributePath(e.getParameterName().split("/"));
-                DomainAttribute domainAttribute = owner.getDefinition().resolvePath(framePath);
-                Attribute attribute = owner.resolvePath(instancePath);
-
-                if (domainAttribute.getType() == AttributeType.SET) {
-
-                    SetAttribute current = (SetAttribute) attribute;
-                    List<String> modifiedSet = rlRanges.getNewCategoricalParameterValues(e.getParameterName(), current.getFillersAndEntries());
-
-                    for (String newFiller : modifiedSet) {
-                        logger.debug("Modified set, att=" + e.getParameterName() + ", new=" + newFiller);
-                        RLRulesUpdate.update(owner, r.getName(), domainAttribute.getName(), newFiller, rete.getGlobalContext());
-                    }
-                } else if (domainAttribute.getType() == AttributeType.INTERVAL) {
-                    double currentMin = Double.parseDouble(domainAttribute.getFillers().get(0));
-                    double currentMax = Double.parseDouble(domainAttribute.getFillers().get(1));
-                    NumericalAttribute c = (NumericalAttribute) attribute;
-                    double currentVal = c.getValue();
-                    double[] modifiedRange;
-                    if (currentVal > currentMax) {
-                        modifiedRange = rlRanges.getNewIntervalParameterRange(e.getParameterName(), new double[] { currentMin, currentVal });
-                    } else if (currentVal < currentMin) {
-                        modifiedRange = rlRanges.getNewIntervalParameterRange(e.getParameterName(), new double[] { currentVal, currentMax });
-                    } else {
-                        modifiedRange = rlRanges.getNewIntervalParameterRange(e.getParameterName(), new double[] { currentMin, currentMax });
-                    }
-
-                    if (modifiedRange != null) {
-                        System.out.println(
-                                "modified interval att=" + e.getParameterName() + ", new range=" + modifiedRange[0] + "-" + modifiedRange[1]);
-
-                        RLRulesUpdate.update(owner, r.getName(), domainAttribute.getName(), modifiedRange[0], modifiedRange[1],
-                                rete.getGlobalContext());
-                    }
-                }
-            }
-        }
-    }
-
-    public void checkRLParams_New() {
         for (RLRule r : owner.getBehaviour().getRLRules()) {
             for (ExpansionDef e : r.getExpansions()) {
 
@@ -164,43 +164,6 @@ public class BRAEngine implements java.io.Serializable {
                 DynamicValueRangeUpdateStrategy strategy = DynamicValueRangeUpdateStrategy.getStrategyForAttributeType(domainAttribute.getType());
                 strategy.update(owner, r.getName(), e, rlRanges, rete.getGlobalContext());
 
-                
-                
-                
-                Path<Attribute> instancePath = Path.attributePath(e.getParameterName().split("/"));
-                Attribute attribute = owner.resolvePath(instancePath);
-
-                if (domainAttribute.getType() == AttributeType.SET) {
-
-                    SetAttribute current = (SetAttribute) attribute;
-                    List<String> modifiedSet = rlRanges.getNewCategoricalParameterValues(e.getParameterName(), current.getFillersAndEntries());
-
-                    for (String newFiller : modifiedSet) {
-                        logger.debug("Modified set, att=" + e.getParameterName() + ", new=" + newFiller);
-                        RLRulesUpdate.update(owner, r.getName(), domainAttribute.getName(), newFiller, rete.getGlobalContext());
-                    }
-                } else if (domainAttribute.getType() == AttributeType.INTERVAL) {
-                    double currentMin = Double.parseDouble(domainAttribute.getFillers().get(0));
-                    double currentMax = Double.parseDouble(domainAttribute.getFillers().get(1));
-                    NumericalAttribute c = (NumericalAttribute) attribute;
-                    double currentVal = c.getValue();
-                    double[] modifiedRange;
-                    if (currentVal > currentMax) {
-                        modifiedRange = rlRanges.getNewIntervalParameterRange(e.getParameterName(), new double[] { currentMin, currentVal });
-                    } else if (currentVal < currentMin) {
-                        modifiedRange = rlRanges.getNewIntervalParameterRange(e.getParameterName(), new double[] { currentVal, currentMax });
-                    } else {
-                        modifiedRange = rlRanges.getNewIntervalParameterRange(e.getParameterName(), new double[] { currentMin, currentMax });
-                    }
-
-                    if (modifiedRange != null) {
-                        System.out.println(
-                                "modified interval att=" + e.getParameterName() + ", new range=" + modifiedRange[0] + "-" + modifiedRange[1]);
-
-                        RLRulesUpdate.update(owner, r.getName(), domainAttribute.getName(), modifiedRange[0], modifiedRange[1],
-                                rete.getGlobalContext());
-                    }
-                }
             }
         }
     }

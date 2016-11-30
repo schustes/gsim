@@ -1,5 +1,7 @@
 package de.s2.gsim.sim.behaviour.impl;
 
+import static de.s2.gsim.sim.behaviour.impl.ReteHelper.*;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -78,50 +80,7 @@ public abstract class RLRulesUpdate {
 		}
 	}
 
-	public static void update(RuntimeAgent agent, String baseRuleName, String resolvedAttributeName, double min, double max,
-	        Context context) {
 
-		DynamicRuleBuilder builder = new DynamicRuleBuilder();
-		TreeExpansionBuilder treeBuilder = new TreeExpansionBuilder(agent);
-
-		try {
-
-			ArrayList<Fact> allStates = getStateFactsForRootRule(baseRuleName, context);
-			List<Fact> selectedStates = chooseStates(allStates, context);
-
-			for (Fact state : selectedStates) {
-
-				String stateName = state.getSlotValue("name").stringValue(context);
-
-				String expansionRuleName = "experimental_rule_" + baseRuleName + "@" + stateName + "@";
-				RLRule baseRule = agent.getBehaviour().getRLRule(baseRuleName);
-
-				Fact[] elems = getStateElems(stateName, context);
-
-				// to do add interval equivalent
-				String newRule = builder.increaseIntervalRangeInExperimentalRule(treeBuilder, agent, baseRule, stateName, elems,
-				        resolvedAttributeName, min, max, context);
-
-                // builder.addStateFactIntervalElemFromParentElem(resolvedAttributeName, state, min, max, context);
-                builder.addStateFactIntervalElemFromStatefact(stateName, resolvedAttributeName, state, min, max, context);
-                // builder.addStateFactIntervalElemFromStatefact(resolvedAttributeName, state, min, max, context);
-
-				Rete rete = context.getEngine();
-
-				CollectiveTreeDBWriter f = new CollectiveTreeDBWriter();
-				f.output("before_deepening", rete, debugDir);
-
-				deleteRule(expansionRuleName, context);
-				context.getEngine().executeCommand(newRule);
-
-				f = new CollectiveTreeDBWriter();
-				f.output("after_deepening", rete, debugDir);
-			}
-
-		} catch (JessException e) {
-			e.printStackTrace();
-		}
-	}
 
 	// select the state-fact-elems to which the new category is appended
 	private static ArrayList<Fact> chooseStates(ArrayList<Fact> states, Context context) {
@@ -186,15 +145,15 @@ public abstract class RLRulesUpdate {
 	        throws JessException {
 		Expand0 impl = new Expand0();
 
-        ArrayList<Fact> allStateFactElems = ReteHelper.getInstance().getStateFactElems(stateName, context);
+		ArrayList<Fact> allStateFactElems = ReteHelper.getStateFactElems(stateName, context);
 
-        Fact stateFact = ReteHelper.getInstance().getStateFact(stateName, context);
+		Fact stateFact = ReteHelper.getStateFact(stateName, context);
 
 		Fact elemToExpand = null;
 		int depth = -1;
 		for (Fact f : allStateFactElems) {
 			String cName = f.getSlotValue("category").stringValue(context);
-            Fact sf = ReteHelper.getInstance().getStateFact(f.getSlotValue("state-fact-name").stringValue(context), context);
+			Fact sf = ReteHelper.getStateFact(f.getSlotValue("state-fact-name").stringValue(context), context);
 
 			double d = sf.getSlotValue("depth").floatValue(context);
 			if (cName.equals(newCategory) && d > depth) {
