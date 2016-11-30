@@ -43,7 +43,7 @@ public class RLParser {
 
             rete.executeCommand(rules);
 
-            FactHandler.getInstance().parseAndInsertGlobalRLFacts(agent, rete);
+            ReteHelper.parseAndInsertGlobalRLFacts(agent, rete);
 
             int n = countStateFactElems(rete);
             rete.executeCommand("(defglobal ?*state-elem-count* = " + n + ")");

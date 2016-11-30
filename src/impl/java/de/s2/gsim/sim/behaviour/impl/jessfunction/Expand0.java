@@ -12,7 +12,7 @@ import org.apache.log4j.Logger;
 import de.s2.gsim.api.sim.agent.impl.RuntimeAgent;
 import de.s2.gsim.environment.RLRule;
 import de.s2.gsim.sim.behaviour.GSimBehaviourException;
-import de.s2.gsim.sim.behaviour.impl.FactHandler;
+import de.s2.gsim.sim.behaviour.impl.ReteHelper;
 import de.s2.gsim.sim.behaviour.impl.TreeExpansionBuilder;
 import jess.Context;
 import jess.Fact;
@@ -85,7 +85,7 @@ public class Expand0 extends DynamicRuleBuilder implements java.io.Serializable 
 			String stateNameExpanded_New = newStateFactSplit_1.getSlotValue("name").stringValue(context);
 
 			// the extracted value (=1 elem)
-			Fact stateFactElem_1 = super.addStateFactCategoryElem(newStateFactSplit_1,
+			Fact stateFactElem_1 = super.addStateFactCategoryElemFromStatefact(newStateFactSplit_1,
 					toExpand.getSlotValue("param-name").stringValue(context), cat1, context);
 
 			// StateFacts of other, non-selected attributes
@@ -107,7 +107,7 @@ public class Expand0 extends DynamicRuleBuilder implements java.io.Serializable 
 				// as spec holds the rest, stateFactElem_2 holds the elements disjunct
 				// from the parameter value specified in stateFactElem_1. The union is the
 				// set of parameter values defined by the parent state.
-				Fact stateFactElem_2 = super.addStateFactCategoryElem(newStateFactSplit_2,
+				Fact stateFactElem_2 = super.addStateFactCategoryElemFromStatefact(newStateFactSplit_2,
 						toExpand.getSlotValue("param-name").stringValue(context), cat2, context);
 				context.getEngine().assertFact(stateFactElem_2);
 			}
@@ -179,8 +179,8 @@ public class Expand0 extends DynamicRuleBuilder implements java.io.Serializable 
 			String newStateName1 = stateFact_split1.getSlotValue("name").stringValue(context);
 			String newStateName2 = stateFact_split2.getSlotValue("name").stringValue(context);
 
-			Fact stateFactElem_split1 = addStateFactIntervalElem(newStateName1, toExpand, from, from + dist / 2d, context);
-			Fact stateFactElem_split2 = addStateFactIntervalElem(newStateName2, toExpand, from + dist / 2d, to, context);
+			Fact stateFactElem_split1 = addStateFactIntervalElemFromParentElem(newStateName1, toExpand, from, from + dist / 2d, context);
+			Fact stateFactElem_split2 = addStateFactIntervalElemFromParentElem(newStateName2, toExpand, from + dist / 2d, to, context);
 
 			if (existsEquivalent(stateFact, new Fact[] { stateFactElem_split1 }, context)) {
 				return;
@@ -236,7 +236,7 @@ public class Expand0 extends DynamicRuleBuilder implements java.io.Serializable 
 			String attributeName = f.getSlotValue("param-name").stringValue(context);
 			String categoryValue = f.getSlotValue("category").stringValue(context);
 			String name = attributeName + "->" + String.valueOf(categoryValue);
-			FactHandler.getInstance().addStateFactCat(context.getEngine(), stateFactName, name, attributeName, categoryValue);
+            ReteHelper.addStateFactCat(context.getEngine(), stateFactName, name, attributeName, categoryValue);
 		} catch (JessException e) {
 			throw new GSimBehaviourException(e);
 		}
@@ -249,7 +249,7 @@ public class Expand0 extends DynamicRuleBuilder implements java.io.Serializable 
 			String from = f.getSlotValue("from").stringValue(context);
 			String to = f.getSlotValue("to").stringValue(context);
 			String name = attributeName + "->" + String.valueOf(from) + ":" + String.valueOf(to);
-			FactHandler.getInstance().addStateFactElement(context.getEngine(), stateFactName, name, attributeName,
+            ReteHelper.addStateFactElement(context.getEngine(), stateFactName, name, attributeName,
 					Double.parseDouble(from), Double.parseDouble(to));
 		} catch (JessException e) {
 			throw new GSimBehaviourException(e);
@@ -283,17 +283,17 @@ public class Expand0 extends DynamicRuleBuilder implements java.io.Serializable 
 		try {
 			String parentSfn = parent.getSlotValue("name").stringValue(ctx);
 			ValueVector v = parent.getSlotValue("expansion").listValue(ctx);
-			ArrayList<Fact> facts = FactHandler.getInstance().getStateFactElems(parentSfn, ctx);
+            ArrayList<Fact> facts = ReteHelper.getStateFactElems(parentSfn, ctx);
 			for (Fact f : sfes) {
 				facts.add(f);
 			}
-			ArrayList<Fact> all = FactHandler.getInstance().getAllStateFacts(ctx);
+            ArrayList<Fact> all = ReteHelper.getAllStateFacts(ctx);
 
 			for (Fact sf : all) {
 				ValueVector v1 = sf.getSlotValue("expansion").listValue(ctx);
 
 				if (this.equals(v1, v)) {
-					ArrayList<Fact> f0 = FactHandler.getInstance().getStateFactElems(sf.getSlotValue("name").stringValue(ctx), ctx);
+                    ArrayList<Fact> f0 = ReteHelper.getStateFactElems(sf.getSlotValue("name").stringValue(ctx), ctx);
 
 					for (int i = 0; i < v1.size(); i++) {
 
@@ -369,9 +369,9 @@ public class Expand0 extends DynamicRuleBuilder implements java.io.Serializable 
 		int t = getTime(context.getEngine());
 		Fact f1 = null;
 		if (!copy) {
-			f1 = FactHandler.getInstance().addStateFact(context.getEngine(), oldDesc, rootRuleName, paramName, depth, t);
+            f1 = ReteHelper.addStateFact(context.getEngine(), oldDesc, rootRuleName, paramName, depth, t);
 		} else {
-			f1 = FactHandler.getInstance().copyStateFact(context.getEngine(), oldDesc, paramName, depth, t);
+            f1 = ReteHelper.copyStateFact(context.getEngine(), oldDesc, paramName, depth, t);
 		}
 		return f1;
 

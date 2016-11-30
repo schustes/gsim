@@ -23,28 +23,22 @@ import jess.Rete;
 import jess.Value;
 import jess.ValueVector;
 
-public class FactHandler {
+public abstract class ReteHelper {
 
-    private static FactHandler me = new FactHandler();
-
-    private FactHandler() {
+    private ReteHelper() {
+        // empty
     }
 
-    /**
-     * 
-     * @param rete
-     * @param oldFact
-     * @param param
-     *            the base name (rule-name)
-     * @param depth
-     *            identifier for depth
-     * @param where
-     *            identifier for sibling (left or right)
-     * @param time
-     * @return
-     * @throws JessException
-     */
-    public Fact addStateFact(Rete rete, Fact oldFact, String rootRuleName, String param, int depth, int time) throws JessException {
+    public static void deleteRule(String ruleName, Context context) {
+        try {
+            context.getEngine().executeCommand("(undefrule " + ruleName + ")");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    public static Fact addStateFact(Rete rete, Fact oldFact, String rootRuleName, String param, int depth, int time) throws JessException {
 
         Deftemplate p = rete.findDeftemplate("state-fact");
         Fact f = new Fact(p);
@@ -94,7 +88,7 @@ public class FactHandler {
     }
 
 
-    public Fact addStateFactCat(Rete rete, Fact oldFact, String stateFactName, String name, String attrName, String categoryValue)
+    public static Fact addStateFactCat(Rete rete, Fact oldFact, String stateFactName, String name, String attrName, String categoryValue)
             throws JessException {
 
         Deftemplate p = rete.findDeftemplate("state-fact-category");
@@ -124,7 +118,7 @@ public class FactHandler {
      * @return
      * @throws JessException
      */
-    public Fact addStateFactCat(Rete rete, String stateFactName, String name, String attrName, String categoryValue) throws JessException {
+    public static Fact addStateFactCat(Rete rete, String stateFactName, String name, String attrName, String categoryValue) throws JessException {
 
         Deftemplate p = rete.findDeftemplate("state-fact-category");
 
@@ -141,7 +135,7 @@ public class FactHandler {
         return f;
     }
 
-    public Fact addStateFactElement(Rete rete, Fact oldFact, String stateFactName, String name, String param, double from, double to)
+    public static Fact addStateFactElement(Rete rete, Fact elemParent, String stateFactName, String name, String param, double from, double to)
             throws JessException {
 
         Deftemplate p = rete.findDeftemplate("state-fact-element");
@@ -150,7 +144,7 @@ public class FactHandler {
         f.setSlotValue("name", new Value(name, RU.STRING));
         f.setSlotValue("param-name", new Value(param, RU.STRING));
         f.setSlotValue("state-fact-name", new Value(stateFactName, RU.STRING));
-        f.setSlotValue("elem-parent", new Value(oldFact.getSlotValue("name").stringValue(rete.getGlobalContext()), RU.STRING));
+        f.setSlotValue("elem-parent", new Value(elemParent.getSlotValue("name").stringValue(rete.getGlobalContext()), RU.STRING));
         f.setSlotValue("value", new Value(0.0, RU.FLOAT));
         f.setSlotValue("from", new Value(from, RU.FLOAT));
         f.setSlotValue("to", new Value(to, RU.FLOAT));
@@ -160,14 +154,15 @@ public class FactHandler {
         return f;
     }
 
-    public Fact addStateFactElement(Rete rete, String stateFactName, String name, String attrName, double from, double to) throws JessException {
+    public static Fact addStateFactElement(Rete rete, String stateFactName, String name, String paramName, double from, double to)
+            throws JessException {
 
         Deftemplate p = rete.findDeftemplate("state-fact-element");
 
         Fact f = new Fact(p);
 
         f.setSlotValue("name", new Value(name, RU.STRING));
-        f.setSlotValue("param-name", new Value(attrName, RU.STRING));
+        f.setSlotValue("param-name", new Value(paramName, RU.STRING));
         f.setSlotValue("state-fact-name", new Value(stateFactName, RU.STRING));
         f.setSlotValue("value", new Value(0.0, RU.FLOAT));
         f.setSlotValue("from", new Value(from, RU.FLOAT));
@@ -179,7 +174,7 @@ public class FactHandler {
     }
 
     // creates a new statefact, but keeps the values of the original one.
-    public Fact copyStateFact(Rete rete, Fact oldFact, String param, int depth, int time) throws JessException {
+    public static Fact copyStateFact(Rete rete, Fact oldFact, String param, int depth, int time) throws JessException {
 
         Deftemplate p = rete.findDeftemplate("state-fact");
         Fact f = new Fact(p);
@@ -226,7 +221,7 @@ public class FactHandler {
 
     }
 
-    public Fact createActionFact(Rete rete, String name, String evalFunc, double alpha, ValueVector args, String sfn) throws JessException {
+    public static Fact createActionFact(Rete rete, String name, String evalFunc, double alpha, ValueVector args, String sfn) throws JessException {
 
         Deftemplate p = rete.findDeftemplate("rl-action-node");
         Fact f = new Fact(p);
@@ -247,7 +242,7 @@ public class FactHandler {
     }
 
     @SuppressWarnings("unchecked")
-    public List<Fact> getActionsByNonMatchingArgs(String actionClassName, List<String> params, Context context) {
+    public static List<Fact> getActionsByNonMatchingArgs(String actionClassName, List<String> params, Context context) {
         List<Fact> result = new ArrayList<Fact>();
         try {
             Iterator<Fact> iter = context.getEngine().listFacts();
@@ -279,7 +274,7 @@ public class FactHandler {
 
     }
 
-    public ArrayList<Fact> getAllStateFacts(Context context) {
+    public static ArrayList<Fact> getAllStateFacts(Context context) {
 
         ArrayList<Fact> list = new ArrayList<Fact>();
         try {
@@ -297,7 +292,7 @@ public class FactHandler {
         return list;
     }
 
-    public Fact getFact(String defName, String name, Context context) {
+    public static Fact getFact(String defName, String name, Context context) {
 
         try {
             Iterator iter = context.getEngine().listFacts();
@@ -317,7 +312,7 @@ public class FactHandler {
         return null;
     }
 
-    public ArrayList<Fact> getFacts(String defName, String sfn, Context context) {
+    public static ArrayList<Fact> getFacts(String defName, String sfn, Context context) {
 
         ArrayList<Fact> list = new ArrayList<Fact>();
         try {
@@ -338,7 +333,7 @@ public class FactHandler {
         return list;
     }
 
-    public Fact getStateFact(String sfn, Context context) {
+    public static Fact getStateFact(String sfn, Context context) {
 
         HashSet<Fact> list = new HashSet<Fact>();
 
@@ -364,7 +359,7 @@ public class FactHandler {
     }
 
     // get the fact-elem, if not eq by name, look up the tree
-    public ArrayList<Fact> getStateFactElems(String sfn, Context context) {
+    public static ArrayList<Fact> getStateFactElems(String sfn, Context context) {
 
         HashSet<Fact> list = new HashSet<Fact>();
         HashSet<Fact> rootElems = new HashSet<Fact>();// (this.getRootElemFacts(context));
@@ -397,7 +392,7 @@ public class FactHandler {
 
     }
 
-    public ArrayList<Fact> getStateFactElems(String sfn, String paramName, Context context, ArrayList<Fact> list) {
+    public static ArrayList<Fact> getStateFactElems(String sfn, String paramName, Context context, ArrayList<Fact> list) {
 
         String nextParent = null;
         try {
@@ -414,14 +409,14 @@ public class FactHandler {
                                 list.add(f);
                             }
                         } else {
-                            Fact state = FactHandler.getInstance().getFact("state-fact", sfn, context);
+                            Fact state = getFact("state-fact", sfn, context);
                             nextParent = state.getSlotValue("parent").stringValue(context);
                         }
                     }
                 }
             }
             if (nextParent != null && list.isEmpty()) {
-                return this.getStateFactElems(nextParent, paramName, context, list);
+                return getStateFactElems(nextParent, paramName, context, list);
             } else {
                 return list;
             }
@@ -433,7 +428,7 @@ public class FactHandler {
 
     }
 
-    public void insertGlobalAvgFacts(RLRule r, String[] evalFuncNames, Rete rete) throws JessException {
+    public static void insertGlobalAvgFacts(RLRule r, String[] evalFuncNames, Rete rete) throws JessException {
         String[] s = evalFuncNames;// getEvaluationFuncNames(agent);
 
         for (int i = 0; i < s.length; i++) {
@@ -448,7 +443,7 @@ public class FactHandler {
         }
     }
 
-    public void insertInitialStateFact(Rete rete, RuntimeAgent owner, RLRule r) throws JessException, GSimEngineException {
+    public static void insertInitialStateFact(Rete rete, RuntimeAgent owner, RLRule r) throws JessException, GSimEngineException {
 
         Deftemplate p = rete.findDeftemplate("state-fact");
 
@@ -485,12 +480,12 @@ public class FactHandler {
             Fact sf = null;
 
             if (Utils.isNumericalAttribute(owner, cond.getParameterName())) {
-                sf = this.addStateFactElement(rete, stateName, cond.getParameterName() + "->" + from + ":" + to, cond.getParameterName(),
+                sf = addStateFactElement(rete, stateName, cond.getParameterName() + "->" + from + ":" + to, cond.getParameterName(),
                         cond.getMin(), cond.getMax());
                 rete.assertFact(sf);
             } else {
                 for (String filler : cond.getFillers()) {
-                    sf = this.addStateFactCat(rete, stateName, cond.getParameterName() + "->" + filler, cond.getParameterName(), filler);
+                    sf = addStateFactCat(rete, stateName, cond.getParameterName() + "->" + filler, cond.getParameterName(), filler);
                     rete.assertFact(sf);
                 }
             }
@@ -502,7 +497,7 @@ public class FactHandler {
 
     }
 
-    public void insertListFact(RLRule r, Rete rete) throws JessException {
+    public static void insertListFact(RLRule r, Rete rete) throws JessException {
         String ident = createRuleIdentifier(r);// +"@"+createRuleIdentifier(r);
         Deftemplate p = rete.findDeftemplate("list");
         Fact f = new Fact(p);
@@ -511,7 +506,7 @@ public class FactHandler {
         rete.assertFact(f);
     }
 
-    public void insertNonExistentExecutedFinalFacts(Rete rete, RuntimeAgent agent, RLRule r, String sfn) throws JessException {
+    public static void insertNonExistentExecutedFinalFacts(Rete rete, RuntimeAgent agent, RLRule r, String sfn) throws JessException {
 
         // String ruleName = "experimental_rule_"+r.getName() + "@"+sfn+"@";
 
@@ -593,12 +588,12 @@ public class FactHandler {
         }
     }
 
-    public void parseAndInsertGlobalRLFacts(RuntimeAgent agent, Rete rete) {
+    public static void parseAndInsertGlobalRLFacts(RuntimeAgent agent, Rete rete) {
         try {
             for (RLRule g : agent.getBehaviour().getRLRules()) {
                 if (g.isActivated()) {
                     String sfn = g.getName() + "_0" + 0;
-                    FactHandler.getInstance().insertNonExistentExecutedFinalFacts(rete, agent, g, sfn);
+                    insertNonExistentExecutedFinalFacts(rete, agent, g, sfn);
 
                     if (!g.containsAttribute("equivalent-state")  && !g.containsAttribute("equivalent-actionset") ) {
                         insertGlobalAvgFacts(g, getEvaluationFunctionNames(agent), rete);
@@ -617,7 +612,95 @@ public class FactHandler {
         }
     }
 
-    private boolean contains(List<Fact> list, Fact f, Context context) {
+    public static Fact[] getStateElems(String parentName, Context context) {
+
+        ArrayList<Fact> ret = new ArrayList<Fact>();
+
+        try {
+            Iterator<?> iter = context.getEngine().listFacts();
+            while (iter.hasNext()) {
+                Fact f = (Fact) iter.next();
+                if (f.getDeftemplate().getBaseName().equals("state-fact-category")) {
+                    String s1 = f.getSlotValue("state-fact-name").stringValue(context);
+                    if (s1.equals(parentName)) {
+                        ret.add(f);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return ret.toArray(new Fact[ret.size()]);
+    }
+
+    /**
+     * Adds all ancestors of the given list of states to the given result list. This happens recursively by looking at the parent slot of the
+     * respective statefact.
+     * 
+     * @param result the list with the ancestors
+     * @param ctx rete context
+     * @param fact the current fact
+     * @param allStates all facts to look at
+     */
+    public static void addAllStateAncestors(List<Fact> result, Context ctx, Fact fact, List<Fact> allStates) {
+        try {
+            String parentName = fact.getSlotValue("parent").stringValue(ctx);
+            for (Fact state : allStates) {
+                String name = state.getSlotValue("name").stringValue(ctx);
+                if (name.equals(parentName)) {
+                    result.add(state);
+                    addAllStateAncestors(result, ctx, state, allStates);
+                }
+            }
+        } catch (JessException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static Fact[] getStateFactsElems(String parentName, Context context) {
+
+        ArrayList<Fact> ret = new ArrayList<Fact>();
+
+        try {
+            Iterator<?> iter = context.getEngine().listFacts();
+            while (iter.hasNext()) {
+                Fact f = (Fact) iter.next();
+                if (f.getDeftemplate().getBaseName().equals("state-fact-element")) {
+                    String s1 = f.getSlotValue("state-fact-name").stringValue(context);
+                    if (s1.equals(parentName)) {
+                        ret.add(f);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return ret.toArray(new Fact[ret.size()]);
+    }
+
+    public static List<Fact> getStateFactsForRootRule(String ruleName, Context context) {
+        ArrayList<Fact> ret = new ArrayList<Fact>();
+        try {
+            Iterator<?> iter = context.getEngine().listFacts();
+            while (iter.hasNext()) {
+                Fact f = (Fact) iter.next();
+                if (f.getDeftemplate().getBaseName().equals("state-fact")) {
+                    String s1 = f.getSlotValue("name").stringValue(context);
+                    if (s1.startsWith(ruleName)) {
+                        ret.add(f);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return ret;
+    }
+
+    private static boolean contains(List<Fact> list, Fact f, Context context) {
         try {
             for (Fact a : list) {
                 if (f.getDeftemplate().getBaseName().equals("state-fact-category")) {
@@ -642,7 +725,7 @@ public class FactHandler {
         return false;
     }
 
-    private Fact createActionNode(Rete rete, String sfn, String[] args, String evaluator, ActionDef action) throws JessException {
+    private static Fact createActionNode(Rete rete, String sfn, String[] args, String evaluator, ActionDef action) throws JessException {
 
         Deftemplate p = rete.findDeftemplate("rl-action-node");
 
@@ -670,18 +753,7 @@ public class FactHandler {
         return f;
     }
 
-    /*
-     * private ArrayList<Fact> getRootElemFacts(Context context) {
-     * 
-     * ArrayList<Fact> list = new ArrayList<Fact>(); try { Iterator iter = context.getEngine().listFacts(); while (iter.hasNext()) { Fact f = (Fact)
-     * iter.next(); if (f.getDeftemplate().getBaseName().equals( "state-fact-element") || f.getDeftemplate().getBaseName().equals(
-     * "state-fact-category")) { String s1 = f.getSlotValue("elem-parent").stringValue( context); if (s1.equals("nil")) { list.add(f); } } } } catch
-     * (Exception e) { e.printStackTrace(); }
-     * 
-     * return list; }
-     */
-
-    private String createRuleIdentifier(Instance inst) {
+    private static String createRuleIdentifier(Instance inst) {
         String x = inst.getName();
         x = x.replace(' ', '_');
         x = x.replace('/', '_');
@@ -691,7 +763,7 @@ public class FactHandler {
         return x;
     }
 
-    private boolean equals(ValueVector v1, ValueVector v2) {
+    private static boolean equals(ValueVector v1, ValueVector v2) {
         try {
             for (int i = 0; i < v1.size(); i++) {
                 boolean eq = false;
@@ -711,7 +783,7 @@ public class FactHandler {
         return false;
     }
 
-    private String[] getEvaluationFunctionNames(RuntimeAgent a) {
+    private static String[] getEvaluationFunctionNames(RuntimeAgent a) {
         HashSet<String> set = new HashSet<String>();
         BehaviourDef b = a.getBehaviour();
 		List<RLRule> rules = b.getRLRules();
@@ -726,7 +798,7 @@ public class FactHandler {
         return ret;
     }
 
-    private boolean ruleBaseContainsExecutedFact(Rete rete, Fact fact) {
+    private static boolean ruleBaseContainsExecutedFact(Rete rete, Fact fact) {
 
         try {
             Iterator iter = rete.listFacts();
@@ -740,7 +812,7 @@ public class FactHandler {
                     ValueVector s1 = f.getSlotValue("arg").listValue(rete.getGlobalContext());
                     ValueVector s2 = fact.getSlotValue("arg").listValue(rete.getGlobalContext());
 
-                    if (this.equals(s1, s2) && actionType.equals(actionType2) && stateName1.equals(stateName2)) {
+                    if (equals(s1, s2) && actionType.equals(actionType2) && stateName1.equals(stateName2)) {
                         return true;
                     }
                 }
@@ -750,10 +822,6 @@ public class FactHandler {
         }
 
         return false;
-    }
-
-    public static FactHandler getInstance() {
-        return me;
     }
 
     private static class UniqueIDGenerator {

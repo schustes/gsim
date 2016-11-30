@@ -15,7 +15,7 @@ import de.s2.gsim.environment.UserRule;
 import de.s2.gsim.objects.AgentInstance;
 import de.s2.gsim.sim.agent.ApplicationAgent;
 import de.s2.gsim.sim.agent.RtAgent;
-import de.s2.gsim.sim.behaviour.impl.JessHandler;
+import de.s2.gsim.sim.behaviour.impl.BRAEngine;
 import de.s2.gsim.sim.communication.AgentType;
 import de.s2.gsim.sim.communication.Communicator;
 
@@ -33,7 +33,7 @@ public class RuntimeAgent extends GenericAgent implements AgentType, RtAgent {
 
 	private HashMap<String, RtExecutionContextImpl> roles = new HashMap<String, RtExecutionContextImpl>();
 
-	private transient JessHandler ruleBase = null;
+	private transient BRAEngine ruleBase = null;
 
 	private int time = 0;
 
@@ -213,7 +213,7 @@ public class RuntimeAgent extends GenericAgent implements AgentType, RtAgent {
 		this.ns = ns;
 	}
 
-	public void setRuleHandler(JessHandler h) {
+	public void setRuleHandler(BRAEngine h) {
 		ruleBase = h;
 	}
 

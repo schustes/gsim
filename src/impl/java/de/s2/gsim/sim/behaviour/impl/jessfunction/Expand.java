@@ -3,8 +3,8 @@ package de.s2.gsim.sim.behaviour.impl.jessfunction;
 import java.util.ArrayList;
 
 import de.s2.gsim.api.sim.agent.impl.RuntimeAgent;
-import de.s2.gsim.sim.behaviour.impl.FactHandler;
 import de.s2.gsim.sim.behaviour.impl.ParsingUtils;
+import de.s2.gsim.sim.behaviour.impl.ReteHelper;
 import jess.Context;
 import jess.Fact;
 import jess.JessException;
@@ -27,7 +27,7 @@ public class Expand extends DynamicRuleBuilder implements Userfunction, java.io.
         Fact stateFact = val.factValue(context);
 
         String sfn = stateFact.getSlotValue("name").stringValue(context);
-        ArrayList<Fact> allStateFactElems = FactHandler.getInstance().getStateFactElems(sfn, context); // this.getFacts("state-fact-element",
+        ArrayList<Fact> allStateFactElems = ReteHelper.getStateFactElems(sfn, context); // this.getFacts("state-fact-element",
         // sfn, context);
 
         if (allStateFactElems.size() == 0) {

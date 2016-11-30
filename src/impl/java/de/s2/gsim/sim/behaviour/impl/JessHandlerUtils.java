@@ -2,14 +2,8 @@ package de.s2.gsim.sim.behaviour.impl;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
-
-import jess.Deftemplate;
-import jess.Fact;
-import jess.JessException;
-import jess.RU;
-import jess.Rete;
-import jess.Value;
 
 import org.apache.log4j.Logger;
 
@@ -27,10 +21,16 @@ import de.s2.gsim.objects.Path;
 import de.s2.gsim.objects.attribute.Attribute;
 import de.s2.gsim.objects.attribute.IntervalAttribute;
 import de.s2.gsim.util.Utils;
+import jess.Deftemplate;
+import jess.Fact;
+import jess.JessException;
+import jess.RU;
+import jess.Rete;
+import jess.Value;
 
 public class JessHandlerUtils {
 
-    private static Logger logger = Logger.getLogger(JessHandler.class);
+    private static Logger logger = Logger.getLogger(BRAEngine.class);
 
     public static void addUserParams(Rete rete, RuntimeAgent owner) {
         for (ActionDef r : owner.getBehaviour().getAvailableActions()) {
@@ -74,10 +74,9 @@ public class JessHandlerUtils {
 
     }
 
-    @SuppressWarnings("unchecked")
     public static HashSet<String> buildCurrentState(Rete rete, RuntimeAgent owner) throws JessException {
 
-        ArrayList res = new ArrayList();
+        List<String> res = new ArrayList<>();
         BehaviourDef b = owner.getBehaviour();
 
         for (ActionDef a : b.getAvailableActions()) {
@@ -130,10 +129,8 @@ public class JessHandlerUtils {
 
             }
             for (Instance eval : r.getChildInstances(RLRuleFrame.INST_LIST_LEARNING)) {
-                String s = eval.getName();
                 if (!eval.getName().startsWith("{")) {
                     ConditionDef c = new ConditionDef(eval);
-                    s = c.getParameterName();
                     uniqueConditions.add(c.getParameterName());
                     uniqueConditions.add(c.getParameterValue());
                 }
@@ -141,7 +138,7 @@ public class JessHandlerUtils {
 
             long h = System.currentTimeMillis();
             String sfn = r.getName() + "_0" + 0;
-            FactHandler.getInstance().insertNonExistentExecutedFinalFacts(rete, owner, RLRule.fromInstance(r), sfn);
+            ReteHelper.insertNonExistentExecutedFinalFacts(rete, owner, RLRule.fromInstance(r), sfn);
             double g = (System.currentTimeMillis() - h) / 1000d;
 
             logger.debug("NEW FINAL FACTS: " + (g));
@@ -188,12 +185,12 @@ public class JessHandlerUtils {
     private static Set<String> buildReplaceConstants(Rete rete, Instance owner, String n) {
 
         if (n.contains("::")) {
-            return new HashSet(0);
+            return new HashSet<String>();
         }
 
         if (!n.contains("/")) {
             // This is what I call an 'Atom' (it is a numerical constant value)
-            return new HashSet(0);
+            return new HashSet<String>();
         }
 
         String list = n.split("/")[0];
@@ -206,9 +203,9 @@ public class JessHandlerUtils {
         return buildReplaceConstantsAttRef(rete, owner, n);
     }
 
-    private static HashSet buildReplaceConstantsAttRef(Rete rete, Instance owner, String n) {
+    private static Set<String> buildReplaceConstantsAttRef(Rete rete, Instance owner, String n) {
 
-        HashSet list = new HashSet();
+        Set<String> list = new HashSet<>();
         String att = ParsingUtils.resolveAttribute(n);
 
         if (n.contains("{")) {
@@ -250,9 +247,9 @@ public class JessHandlerUtils {
         return list;
     }
 
-    private static HashSet buildReplaceVariablesSC(Rete rete, Instance owner, String n) {
+    private static Set<String> buildReplaceVariablesSC(Rete rete, Instance owner, String n) {
 
-        HashSet list = new HashSet();
+        Set<String> list = new HashSet<>();
 
         String listName = ParsingUtils.resolveList(n);
         String att = ParsingUtils.resolveAttribute(n);

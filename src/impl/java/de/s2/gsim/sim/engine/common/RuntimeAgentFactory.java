@@ -17,7 +17,7 @@ import de.s2.gsim.environment.GSimDefException;
 import de.s2.gsim.environment.GenericAgent;
 import de.s2.gsim.sim.DataHandler;
 import de.s2.gsim.sim.GSimEngineException;
-import de.s2.gsim.sim.behaviour.impl.JessHandler;
+import de.s2.gsim.sim.behaviour.impl.BRAEngine;
 
 public class RuntimeAgentFactory {
 
@@ -135,7 +135,7 @@ public class RuntimeAgentFactory {
 
                 // only possible after all rtcontexts have been created!
 
-                JessHandler handler = new JessHandler(owner, props);// RulebasePool.getInstance().get();
+                BRAEngine handler = new BRAEngine(owner, props);// RulebasePool.getInstance().get();
                 owner.setRuleHandler(handler);
 
                 agentList.add(owner);
@@ -194,7 +194,7 @@ public class RuntimeAgentFactory {
                 }
             }
 
-            JessHandler handler = new JessHandler(owner, props);
+            BRAEngine handler = new BRAEngine(owner, props);
             owner.setRuleHandler(handler);
 
             return owner;

@@ -22,6 +22,7 @@ import de.s2.gsim.objects.AgentClass;
 import de.s2.gsim.objects.AgentInstance;
 import de.s2.gsim.objects.Behaviour;
 import de.s2.gsim.objects.Expansion;
+import de.s2.gsim.objects.ObjectClass;
 import de.s2.gsim.objects.RLActionNode;
 import de.s2.gsim.objects.Rule;
 import de.s2.gsim.objects.attribute.AttributeType;
@@ -365,13 +366,19 @@ public class SimTest {
 		rule.createEvaluator(ATTR_LIST + "/" + EVAL_ATTR, alpha);
 		agentClass.setBehaviour(behaviour);
 
+        ObjectClass objectClass = env.createObjectClass("test", null);
+
+        agentClass.addOrSetObject("object-list", objectClass);
+
 		DomainAttribute interval1 = new DomainAttribute("wealth", AttributeType.INTERVAL);
 		interval1.addFiller("0");
 		interval1.addFiller("10");
 		interval1.setDefault("4");
-		agentClass.addAttribute(ATTR_LIST, interval1);
+        objectClass.addAttribute(ATTR_LIST, interval1);
+        // agentClass.addAttribute(ATTR_LIST, interval1);
 
-		Expansion expansion = rule.createExpansion(ATTR_LIST + "/wealth", "0", "10");
+        Expansion expansion = rule.createExpansion("object-list/test:: " + ATTR_LIST + "/wealth", "0", "10");
+        // Expansion expansion = rule.createExpansion("object-list/test/ " + ATTR_LIST + "/wealth", "0", "10");
 		expansion.setMin("0");
 		expansion.setMax("10");
 		expansion.addFiller("0");

@@ -4,15 +4,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Optional;
 
 import de.s2.gsim.api.sim.agent.impl.RuntimeAgent;
-import de.s2.gsim.environment.ExpansionDef;
-import de.s2.gsim.environment.GSimDefException;
 import de.s2.gsim.environment.RLRule;
-import de.s2.gsim.objects.Path;
-import de.s2.gsim.objects.attribute.Attribute;
-import de.s2.gsim.objects.attribute.DomainAttribute;
 import de.s2.gsim.sim.behaviour.impl.jessfunction.DynamicRuleBuilder;
 import de.s2.gsim.sim.behaviour.impl.jessfunction.Expand0;
 import de.s2.gsim.sim.behaviour.util.CollectiveTreeDBWriter;
@@ -58,7 +52,7 @@ public abstract class RLRulesUpdate {
 				String newRule = builder.addCategoryToExperimentalRule(treeBuilder, agent, baseRule, stateName, elems,
 				        resolvedAttributeName, newFiller, context);
 				// add the new element to this state (exactly 1 at a time)
-				builder.addStateFactCategoryElem(state, resolvedAttributeName, newFiller, context);
+				builder.addStateFactCategoryElemFromStatefact(state, resolvedAttributeName, newFiller, context);
 
 				Rete rete = context.getEngine();
 
@@ -108,7 +102,9 @@ public abstract class RLRulesUpdate {
 				String newRule = builder.increaseIntervalRangeInExperimentalRule(treeBuilder, agent, baseRule, stateName, elems,
 				        resolvedAttributeName, min, max, context);
 
-				builder.addStateFactIntervalElem(resolvedAttributeName, state, min, max, context);
+                // builder.addStateFactIntervalElemFromParentElem(resolvedAttributeName, state, min, max, context);
+                builder.addStateFactIntervalElemFromStatefact(stateName, resolvedAttributeName, state, min, max, context);
+                // builder.addStateFactIntervalElemFromStatefact(resolvedAttributeName, state, min, max, context);
 
 				Rete rete = context.getEngine();
 
@@ -173,7 +169,7 @@ public abstract class RLRulesUpdate {
 			 * for (Fact state : map.keySet()) { int len = map.get(state); if (len > maxLen) { maxLen = len; selected = state; } }
 			 */
 
-			rekAdd(set, context, selected, states);
+            addAllStateAncestors(set, context, selected, states);
 
 			set.add(selected);
 
@@ -184,28 +180,21 @@ public abstract class RLRulesUpdate {
 		return set;
 	}
 
-	private static void deleteRule(String ruleName, Context context) {
-		try {
-			context.getEngine().executeCommand("(undefrule " + ruleName + ")");
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
 
-	}
 
 	private static void expandOriginalNodeToDeeperLevel(RuntimeAgent agent, String stateName, String newCategory, Context context)
 	        throws JessException {
 		Expand0 impl = new Expand0();
 
-		ArrayList<Fact> allStateFactElems = FactHandler.getInstance().getStateFactElems(stateName, context);
+        ArrayList<Fact> allStateFactElems = ReteHelper.getInstance().getStateFactElems(stateName, context);
 
-		Fact stateFact = FactHandler.getInstance().getStateFact(stateName, context);
+        Fact stateFact = ReteHelper.getInstance().getStateFact(stateName, context);
 
 		Fact elemToExpand = null;
 		int depth = -1;
 		for (Fact f : allStateFactElems) {
 			String cName = f.getSlotValue("category").stringValue(context);
-			Fact sf = FactHandler.getInstance().getStateFact(f.getSlotValue("state-fact-name").stringValue(context), context);
+            Fact sf = ReteHelper.getInstance().getStateFact(f.getSlotValue("state-fact-name").stringValue(context), context);
 
 			double d = sf.getSlotValue("depth").floatValue(context);
 			if (cName.equals(newCategory) && d > depth) {
@@ -287,19 +276,5 @@ public abstract class RLRulesUpdate {
 		return ret;
 	}
 
-	private static void rekAdd(List<Fact> result, Context ctx, Fact fact, List<Fact> allStates) {
-		try {
-			String parentName = fact.getSlotValue("parent").stringValue(ctx);
-			for (Fact state : allStates) {
-				String name = state.getSlotValue("name").stringValue(ctx);
-				if (name.equals(parentName)) {
-					result.add(state);
-					rekAdd(result, ctx, state, allStates);
-				}
-			}
-		} catch (JessException e) {
-			e.printStackTrace();
-		}
-	}
 
 }
