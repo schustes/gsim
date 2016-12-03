@@ -1,4 +1,4 @@
-package de.s2.gsim.sim.behaviour.jessfunction;
+package de.s2.gsim.sim.behaviour.bra;
 
 import de.s2.gsim.environment.Frame;
 import de.s2.gsim.environment.Instance;

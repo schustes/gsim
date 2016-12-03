@@ -1,4 +1,4 @@
-package de.s2.gsim.sim.behaviour;
+package de.s2.gsim.sim.behaviour.builder;
 
 import de.s2.gsim.api.sim.agent.impl.RuntimeAgent;
 import de.s2.gsim.environment.ConditionDef;

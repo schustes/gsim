@@ -1,4 +1,4 @@
-package de.s2.gsim.sim.behaviour;
+package de.s2.gsim.sim.behaviour.builder;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -12,6 +12,8 @@ import de.s2.gsim.environment.Instance;
 import de.s2.gsim.environment.RLRule;
 import de.s2.gsim.environment.UserRule;
 import de.s2.gsim.sim.GSimEngineException;
+import de.s2.gsim.sim.behaviour.Context;
+import de.s2.gsim.sim.behaviour.SimAction;
 import de.s2.gsim.util.Utils;
 
 public class RLRulesBuilder {

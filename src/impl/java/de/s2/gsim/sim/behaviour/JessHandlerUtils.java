@@ -20,6 +20,8 @@ import de.s2.gsim.environment.UserRuleFrame;
 import de.s2.gsim.objects.Path;
 import de.s2.gsim.objects.attribute.Attribute;
 import de.s2.gsim.objects.attribute.IntervalAttribute;
+import de.s2.gsim.sim.behaviour.builder.ParsingUtils;
+import de.s2.gsim.sim.behaviour.util.ReteHelper;
 import de.s2.gsim.util.Utils;
 import jess.Deftemplate;
 import jess.Fact;

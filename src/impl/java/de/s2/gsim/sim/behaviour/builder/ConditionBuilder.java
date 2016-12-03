@@ -1,4 +1,4 @@
-package de.s2.gsim.sim.behaviour;
+package de.s2.gsim.sim.behaviour.builder;
 
 import java.io.FileInputStream;
 import java.util.HashMap;

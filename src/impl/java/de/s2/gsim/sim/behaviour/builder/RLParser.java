@@ -1,4 +1,4 @@
-package de.s2.gsim.sim.behaviour;
+package de.s2.gsim.sim.behaviour.builder;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -18,6 +18,7 @@ import de.s2.gsim.objects.Path;
 import de.s2.gsim.objects.attribute.AttributeType;
 import de.s2.gsim.objects.attribute.DomainAttribute;
 import de.s2.gsim.sim.GSimEngineException;
+import de.s2.gsim.sim.behaviour.util.ReteHelper;
 import jess.Fact;
 import jess.JessException;
 import jess.Rete;

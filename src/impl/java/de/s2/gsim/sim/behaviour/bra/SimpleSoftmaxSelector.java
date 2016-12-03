@@ -1,4 +1,4 @@
-package de.s2.gsim.sim.behaviour.jessfunction;
+package de.s2.gsim.sim.behaviour.bra;
 
 import java.util.ArrayList;
 import java.util.Iterator;

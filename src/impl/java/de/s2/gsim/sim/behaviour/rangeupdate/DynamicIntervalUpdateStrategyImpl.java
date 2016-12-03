@@ -1,10 +1,12 @@
-package de.s2.gsim.sim.behaviour;
+package de.s2.gsim.sim.behaviour.rangeupdate;
 
-import static de.s2.gsim.sim.behaviour.FactHelper.getFloatSlotValue;
-import static de.s2.gsim.sim.behaviour.FactHelper.getStringSlotValue;
-import static de.s2.gsim.sim.behaviour.ReteHelper.deleteRule;
-import static de.s2.gsim.sim.behaviour.ReteHelper.getStateElems;
-import static de.s2.gsim.sim.behaviour.ReteHelper.getStateFactsForRootRule;
+import static de.s2.gsim.sim.behaviour.rangeupdate.DynamicValueRangeExtensionFactHelper.addStateFactIntervalElemFromStatefact;
+import static de.s2.gsim.sim.behaviour.rangeupdate.DynamicValueRangeExtensionRuleBuilder.increaseIntervalRangeInExperimentalRule;
+import static de.s2.gsim.sim.behaviour.util.FactHelper.getFloatSlotValue;
+import static de.s2.gsim.sim.behaviour.util.FactHelper.getStringSlotValue;
+import static de.s2.gsim.sim.behaviour.util.ReteHelper.deleteRule;
+import static de.s2.gsim.sim.behaviour.util.ReteHelper.getStateElems;
+import static de.s2.gsim.sim.behaviour.util.ReteHelper.getStateFactsForRootRule;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -17,7 +19,8 @@ import de.s2.gsim.objects.attribute.Attribute;
 import de.s2.gsim.objects.attribute.DomainAttribute;
 import de.s2.gsim.objects.attribute.NumericalAttribute;
 import de.s2.gsim.sim.behaviour.BehaviourEngine.RLParameterRanges;
-import de.s2.gsim.sim.behaviour.jessfunction.DynamicRuleBuilder;
+import de.s2.gsim.sim.behaviour.GSimBehaviourException;
+import de.s2.gsim.sim.behaviour.builder.TreeExpansionBuilder;
 import de.s2.gsim.sim.behaviour.util.CollectiveTreeDBWriter;
 import jess.Context;
 import jess.Fact;
@@ -35,50 +38,53 @@ public class DynamicIntervalUpdateStrategyImpl implements DynamicValueRangeUpdat
     private static String debugDir = "/home/gsim/tmp/trees";
 
     @Override
-    public void update(RuntimeAgent agent, String baseRuleName, ExpansionDef e, RLParameterRanges rlRanges, Context context) {
+    public void apply(RuntimeAgent agent, String baseRuleName, ExpansionDef expansion, RLParameterRanges rlRanges, Context context) {
 
-        DynamicRuleBuilder builder = new DynamicRuleBuilder();
-        TreeExpansionBuilder treeBuilder = new TreeExpansionBuilder(agent);
 
-        double[] modifiedRange = determineInterval(agent, e, rlRanges);
+        double[] modifiedRange = determineInterval(agent, expansion, rlRanges);
 
         if (modifiedRange == null) {
             return;
         }
 
         try {
-
-            List<Fact> allStates = getStateFactsForRootRule(baseRuleName, context);
-            List<Fact> selectedStateFactElems = findAllAffectedStateFactElems(allStates, modifiedRange[0], modifiedRange[1], context);
-
-            for (Fact stateFactElem : selectedStateFactElems) {
-
-                String stateName = getStringSlotValue(stateFactElem, "state-fact-name", context);
-
-                String expansionRuleName = "experimental_rule_" + baseRuleName + "@" + stateName + "@";
-                RLRule baseRule = agent.getBehaviour().getRLRule(baseRuleName);
-
-                String newRule = builder.increaseIntervalRangeInExperimentalRule(treeBuilder, agent, baseRule, stateName, stateFactElem,
-                        modifiedRange[0], modifiedRange[1], context);
-
-
-                builder.addStateFactIntervalElemFromStatefact(stateName, e.getParameterName(), stateFactElem, modifiedRange[0], modifiedRange[1],
-                        context);
-
-                Rete rete = context.getEngine();
-
-                CollectiveTreeDBWriter f = new CollectiveTreeDBWriter();
-                f.output("before_deepening", rete, debugDir);
-
-                deleteRule(expansionRuleName, context);
-                context.getEngine().executeCommand(newRule);
-
-                f = new CollectiveTreeDBWriter();
-                f.output("after_deepening", rete, debugDir);
-            }
-
+            update(agent, baseRuleName, expansion.getParameterName(), modifiedRange, context);
         } catch (JessException ex) {
-            ex.printStackTrace();
+            throw new GSimBehaviourException(ex);
+        }
+    }
+
+    private void update(RuntimeAgent agent, String baseRuleName, String attributeRef, double[] modifiedRange, Context context) throws JessException {
+
+        TreeExpansionBuilder treeBuilder = new TreeExpansionBuilder(agent);
+
+        List<Fact> allStates = getStateFactsForRootRule(baseRuleName, context);
+        List<Fact> selectedStateFactElems = findAllAffectedStateFactElems(allStates, modifiedRange[0], modifiedRange[1], context);
+
+        for (Fact stateFactElem : selectedStateFactElems) {
+
+            String stateName = getStringSlotValue(stateFactElem, "state-fact-name", context);
+
+            String expansionRuleName = "experimental_rule_" + baseRuleName + "@" + stateName + "@";
+            RLRule baseRule = agent.getBehaviour().getRLRule(baseRuleName);
+
+            String newRule = increaseIntervalRangeInExperimentalRule(treeBuilder, agent, baseRule, stateName, stateFactElem,
+                    modifiedRange[0], modifiedRange[1], context);
+
+
+            addStateFactIntervalElemFromStatefact(stateName, attributeRef, stateFactElem, modifiedRange[0], modifiedRange[1],
+                    context);
+
+            Rete rete = context.getEngine();
+
+            CollectiveTreeDBWriter f = new CollectiveTreeDBWriter();
+            f.output("before_deepening", rete, debugDir);
+
+            deleteRule(expansionRuleName, context);
+            context.getEngine().executeCommand(newRule);
+
+            f = new CollectiveTreeDBWriter();
+            f.output("after_deepening", rete, debugDir);
         }
     }
 

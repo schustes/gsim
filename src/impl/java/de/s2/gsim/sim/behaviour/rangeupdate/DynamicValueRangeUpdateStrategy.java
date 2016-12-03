@@ -1,8 +1,9 @@
-package de.s2.gsim.sim.behaviour;
+package de.s2.gsim.sim.behaviour.rangeupdate;
 
 import de.s2.gsim.api.sim.agent.impl.RuntimeAgent;
 import de.s2.gsim.environment.ExpansionDef;
 import de.s2.gsim.objects.attribute.AttributeType;
+import de.s2.gsim.sim.behaviour.BehaviourEngine;
 import de.s2.gsim.sim.behaviour.BehaviourEngine.RLParameterRanges;
 import jess.Context;
 
@@ -18,7 +19,7 @@ public interface DynamicValueRangeUpdateStrategy {
      * @param ranges the current value ranges in the rulebase
      * @param context rete context
      */
-    void update(RuntimeAgent agent, String baseRuleName, ExpansionDef exp, RLParameterRanges ranges, Context context);
+    void apply(RuntimeAgent agent, String baseRuleName, ExpansionDef exp, RLParameterRanges ranges, Context context);
 
     static DynamicValueRangeUpdateStrategy getStrategyForAttributeType(AttributeType type) {
         switch (type) {

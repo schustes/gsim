@@ -30,12 +30,18 @@ import de.s2.gsim.objects.attribute.AttributeType;
 import de.s2.gsim.objects.attribute.DomainAttribute;
 import de.s2.gsim.objects.attribute.IntervalAttribute;
 import de.s2.gsim.sim.GSimEngineException;
-import de.s2.gsim.sim.behaviour.jessfunction.Expand;
-import de.s2.gsim.sim.behaviour.jessfunction.RandomStrategy;
-import de.s2.gsim.sim.behaviour.jessfunction.SimpleSoftmaxSelector;
-import de.s2.gsim.sim.behaviour.jessfunction.ToInstPath;
+import de.s2.gsim.sim.behaviour.bra.Expand;
+import de.s2.gsim.sim.behaviour.bra.SimpleSoftmaxSelector;
+import de.s2.gsim.sim.behaviour.bra.ToInstPath;
+import de.s2.gsim.sim.behaviour.builder.ConditionBuilder;
+import de.s2.gsim.sim.behaviour.builder.GlobalsBuilder;
+import de.s2.gsim.sim.behaviour.builder.ParsingUtils;
+import de.s2.gsim.sim.behaviour.builder.RLParser;
+import de.s2.gsim.sim.behaviour.builder.ReactiveRuleBuilder;
+import de.s2.gsim.sim.behaviour.rangeupdate.DynamicValueRangeUpdateStrategy;
 import de.s2.gsim.sim.behaviour.util.CollectiveTreeDBWriter;
 import de.s2.gsim.sim.behaviour.util.IndividualTreeDBWriter;
+import de.s2.gsim.sim.behaviour.util.ReteHelper;
 import jess.Deftemplate;
 import jess.Fact;
 import jess.JessException;
@@ -61,10 +67,6 @@ public class BehaviourEngine implements java.io.Serializable {
     private boolean dirty = false;
 
     private int episodeStart = -1;
-
-    private boolean instanceChanged = true;
-
-    // private BuilderUtils builder = new BuilderUtils();
 
     private HashSet<String> objectParams = new HashSet<String>();
 
@@ -103,54 +105,9 @@ public class BehaviourEngine implements java.io.Serializable {
         }
         clean();
         createEngine(ownerAgent, props);
-        // ownerAgent.getBehaviour().setFrame(null);
         rlRanges = new RLParameterRanges();
         initRLRanges();
     }
-
-	// public void checkRLParams() {
-	// for (RLRule r : owner.getBehaviour().getRLRules()) {
-	// for (ExpansionDef e : r.getExpansions()) {
-	//
-	// Path<Attribute> instancePath = Path.attributePath(e.getParameterName().split("/"));
-	// Path<DomainAttribute> framePath = Path.attributePath(e.getParameterName().split("/"));
-	// DomainAttribute domainAttribute = owner.getDefinition().resolvePath(framePath);
-	// Attribute attribute = owner.resolvePath(instancePath);
-	//
-	// if (domainAttribute.getType() == AttributeType.SET) {
-	//
-	// SetAttribute current = (SetAttribute) attribute;
-	// List<String> modifiedSet = rlRanges.getNewCategoricalParameterValues(e.getParameterName(), current.getFillersAndEntries());
-	//
-	// for (String newFiller : modifiedSet) {
-	// logger.debug("Modified set, att=" + e.getParameterName() + ", new=" + newFiller);
-	// RLRulesUpdate.update(owner, r.getName(), domainAttribute.getName(), newFiller, rete.getGlobalContext());
-	// }
-	// } else if (domainAttribute.getType() == AttributeType.INTERVAL) {
-	// double currentMin = Double.parseDouble(domainAttribute.getFillers().get(0));
-	// double currentMax = Double.parseDouble(domainAttribute.getFillers().get(1));
-	// NumericalAttribute c = (NumericalAttribute) attribute;
-	// double currentVal = c.getValue();
-	// double[] modifiedRange;
-	// if (currentVal > currentMax) {
-	// modifiedRange = rlRanges.getNewIntervalParameterRange(e.getParameterName(), new double[] { currentMin, currentVal });
-	// } else if (currentVal < currentMin) {
-	// modifiedRange = rlRanges.getNewIntervalParameterRange(e.getParameterName(), new double[] { currentVal, currentMax });
-	// } else {
-	// modifiedRange = rlRanges.getNewIntervalParameterRange(e.getParameterName(), new double[] { currentMin, currentMax });
-	// }
-	//
-	// if (modifiedRange != null) {
-	// System.out.println(
-	// "modified interval att=" + e.getParameterName() + ", new range=" + modifiedRange[0] + "-" + modifiedRange[1]);
-	//
-	// RLRulesUpdate.update(owner, r.getName(), domainAttribute.getName(), modifiedRange[0], modifiedRange[1],
-	// rete.getGlobalContext());
-	// }
-	// }
-	// }
-	// }
-	// }
 
     public void checkRLParams() {
         for (RLRule r : owner.getBehaviour().getRLRules()) {
@@ -158,54 +115,11 @@ public class BehaviourEngine implements java.io.Serializable {
                 Path<DomainAttribute> framePath = Path.attributePath(e.getParameterName().split("/"));
                 DomainAttribute domainAttribute = owner.getDefinition().resolvePath(framePath);
                 DynamicValueRangeUpdateStrategy strategy = DynamicValueRangeUpdateStrategy.getStrategyForAttributeType(domainAttribute.getType());
-                strategy.update(owner, r.getName(), e, rlRanges, rete.getGlobalContext());
+                strategy.apply(owner, r.getName(), e, rlRanges, rete.getGlobalContext());
             }
         }
     }
 
-    // public void checkRLParams() {
-    // for (RLRule r : owner.getBehaviour().getRLRules()) {
-    // for (ExpansionDef e : r.getExpansions()) {
-    // String path = e.getParameterName();
-    // DomainAttribute a = extractAtt(path);// (DomainAttribute) this.owner.getDefinition().resolveName(path.split("/"));
-    // if (a.getType() == AttributeType.SET) {
-    // Path<Attribute> instancePath = Path.attributePath(path.split("/"));
-    // SetAttribute current = (SetAttribute) owner.resolvePath(Path.attributePath(path.split("/")));
-    // ArrayList<String> modifiedSet = rlRanges.getNewCategoricalParameterValues(path, current.getFillersAndEntries());
-    // RLRulesUpdate rlUpdate = new RLRulesUpdate(owner, debugDir);
-    // for (String n : modifiedSet) {
-    // logger.debug("Modified set, att=" + path + ", new=" + n);
-    // RLRulesUpdate.update(a, instancePath, n, rete.getGlobalContext());
-    // rlUpdate.update(a, n, rete.getGlobalContext());
-    // }
-    // } else if (a.getType() == AttributeType.INTERVAL) {
-    // double currentMin = Double.parseDouble(a.getFillers().get(0));
-    // double currentMax = Double.parseDouble(a.getFillers().get(1));
-    // NumericalAttribute c = (NumericalAttribute) owner.resolvePath(Path.attributePath(path.split("/")));
-    // double currentVal = c.getValue();
-    // double[] modifiedRange;
-    // if (currentVal > currentMax) {
-    // modifiedRange = rlRanges.getNewIntervalParameterRange(path, new double[] { currentMin, currentVal });
-    // } else if (currentVal < currentMin) {
-    // modifiedRange = rlRanges.getNewIntervalParameterRange(path, new double[] { currentVal, currentMax });
-    // } else {
-    // modifiedRange = rlRanges.getNewIntervalParameterRange(path, new double[] { currentMin, currentMax });
-    // }
-    //
-    // if (modifiedRange != null) {
-    // System.out.println("modified interval att=" + path + ", new range=" + modifiedRange[0] + "-" + modifiedRange[1]);
-    //
-    // RLRulesUpdate rlUpdate = new RLRulesUpdate(owner, debugDir);
-    // for (String n : modifiedSet) {
-    // logger.debug("Modified set, att=" + path + ", new=" + n);
-    // rlUpdate.up
-    // }
-    //
-    // }
-    // }
-    // }
-    // }
-    // }
 
     public void destroy() {
         try {
@@ -283,15 +197,9 @@ public class BehaviourEngine implements java.io.Serializable {
                 }
                 rulesChanged = false;
             } else {
-                // if no new rules, rl-facts can only change if new instances
-                // referenced as action-arguments have been added.
                 JessHandlerUtils.buildCurrentState(rete, owner, currentConditionSet);
-                // if (this.instanceChanged) {
-
                 addNewActions();
                 retractObsoleteActions();
-                instanceChanged = false;
-                // }
             }
 
             logger.debug("build state: " + ((System.currentTimeMillis() - l) / 1000d));
@@ -310,9 +218,6 @@ public class BehaviourEngine implements java.io.Serializable {
                 }
             }
 
-            // int expandInterval = owner.getBehaviour().getStateUpdateInterval();
-            // int deleteInterval = (expandInterval - (int)(((double)expandInterval/4d)));
-            // if (hasShortcuts(role) || expandInterval%this.time==0 || deleteInterval%this.time==0) {
             if (DEBUG) {
                 printFacts("****** FACTS BEFORE SHORT ******");
             }
@@ -383,19 +288,6 @@ public class BehaviourEngine implements java.io.Serializable {
                     rlRanges.initIntervalParameterRange(path,
                             new double[] { Double.parseDouble(a.getFillers().get(0)), Double.parseDouble(a.getFillers().get(1)) });
                 }
-            }
-        }
-    }
-
-    public void instanceChanged(String name) {
-        if (objectParams.isEmpty()) {
-            instanceChanged = true;
-            return;
-        }
-
-        for (String s : objectParams) {
-            if (name.equals(s)) {
-                instanceChanged = true;
             }
         }
     }
@@ -670,15 +562,9 @@ public class BehaviourEngine implements java.io.Serializable {
         }
 
         // rete.addUserfunction(new ComparisonSelector());
-        try {
-            rete.setStrategy(new RandomStrategy());
-        } catch (JessException e) {
-            e.printStackTrace();
-        }
         rete.addUserfunction(new SimpleSoftmaxSelector(maxReward));
         rete.addUserfunction(new ToInstPath());
         rete.addUserfunction(new Expand());
-        // rete.addUserfunction(new Contract());
 
     }
 

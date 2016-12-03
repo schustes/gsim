@@ -1,4 +1,4 @@
-package de.s2.gsim.sim.behaviour;
+package de.s2.gsim.sim.behaviour.builder;
 
 import cern.jet.random.Uniform;
 import de.s2.gsim.api.sim.agent.impl.RuntimeAgent;
@@ -7,6 +7,8 @@ import de.s2.gsim.environment.ConditionDef;
 import de.s2.gsim.environment.Instance;
 import de.s2.gsim.environment.UserRule;
 import de.s2.gsim.sim.GSimEngineException;
+import de.s2.gsim.sim.behaviour.Context;
+import de.s2.gsim.sim.behaviour.SimAction;
 import jess.JessException;
 import jess.Rete;
 

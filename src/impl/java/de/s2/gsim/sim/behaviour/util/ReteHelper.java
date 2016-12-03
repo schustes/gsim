@@ -1,4 +1,4 @@
-package de.s2.gsim.sim.behaviour;
+package de.s2.gsim.sim.behaviour.util;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -12,6 +12,7 @@ import de.s2.gsim.environment.ExpansionDef;
 import de.s2.gsim.environment.Instance;
 import de.s2.gsim.environment.RLRule;
 import de.s2.gsim.sim.GSimEngineException;
+import de.s2.gsim.sim.behaviour.builder.ParsingUtils;
 import de.s2.gsim.util.CombinationGenerator;
 import de.s2.gsim.util.Utils;
 import jess.Context;
@@ -634,29 +635,7 @@ public abstract class ReteHelper {
         return ret.toArray(new Fact[ret.size()]);
     }
 
-    /**
-     * Adds all ancestors of the given list of states to the given result list. This happens recursively by looking at the parent slot of the
-     * respective statefact.
-     * 
-     * @param result the list with the ancestors
-     * @param ctx rete context
-     * @param fact the current fact
-     * @param allStates all facts to look at
-     */
-    public static void addAllStateAncestors(List<Fact> result, Context ctx, Fact fact, List<Fact> allStates) {
-        try {
-            String parentName = fact.getSlotValue("parent").stringValue(ctx);
-            for (Fact state : allStates) {
-                String name = state.getSlotValue("name").stringValue(ctx);
-                if (name.equals(parentName)) {
-                    result.add(state);
-                    addAllStateAncestors(result, ctx, state, allStates);
-                }
-            }
-        } catch (JessException e) {
-            e.printStackTrace();
-        }
-    }
+
 
     public static Fact[] getStateFactsElems(String parentName, Context context) {
 

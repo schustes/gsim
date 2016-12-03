@@ -61,14 +61,6 @@ public class RuntimeAgent extends GenericAgent implements AgentType, RtAgent {
 		super(base.getName(), (GenericAgentClass) base.getDefinition());
 	}
 
-	@Override
-	public void addChildInstance(String list, Instance inst) {
-		super.addChildInstance(list, inst);
-		if (ruleBase != null) {
-			ruleBase.instanceChanged(list + "/" + inst.getDefinition().getName());
-		}
-	}
-
 	public void addOrSetExecutionContext(String name, RtExecutionContextImpl r) {
 
 		if (roles.containsKey(name)) {
