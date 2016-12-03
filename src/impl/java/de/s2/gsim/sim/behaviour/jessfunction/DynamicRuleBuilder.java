@@ -1,4 +1,4 @@
-package de.s2.gsim.sim.behaviour.impl.jessfunction;
+package de.s2.gsim.sim.behaviour.jessfunction;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -10,9 +10,9 @@ import de.s2.gsim.api.sim.agent.impl.RuntimeAgent;
 import de.s2.gsim.environment.RLRule;
 import de.s2.gsim.objects.Path;
 import de.s2.gsim.objects.attribute.DomainAttribute;
-import de.s2.gsim.sim.behaviour.impl.Attribute2ValuesMap;
-import de.s2.gsim.sim.behaviour.impl.ReteHelper;
-import de.s2.gsim.sim.behaviour.impl.TreeExpansionBuilder;
+import de.s2.gsim.sim.behaviour.Attribute2ValuesMap;
+import de.s2.gsim.sim.behaviour.ReteHelper;
+import de.s2.gsim.sim.behaviour.TreeExpansionBuilder;
 import jess.Context;
 import jess.Fact;
 import jess.JessException;

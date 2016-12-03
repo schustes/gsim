@@ -1,4 +1,4 @@
-package de.s2.gsim.sim.behaviour.impl.jessfunction;
+package de.s2.gsim.sim.behaviour.jessfunction;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -12,8 +12,8 @@ import org.apache.log4j.Logger;
 import de.s2.gsim.api.sim.agent.impl.RuntimeAgent;
 import de.s2.gsim.environment.RLRule;
 import de.s2.gsim.sim.behaviour.GSimBehaviourException;
-import de.s2.gsim.sim.behaviour.impl.ReteHelper;
-import de.s2.gsim.sim.behaviour.impl.TreeExpansionBuilder;
+import de.s2.gsim.sim.behaviour.ReteHelper;
+import de.s2.gsim.sim.behaviour.TreeExpansionBuilder;
 import jess.Context;
 import jess.Fact;
 import jess.JessException;

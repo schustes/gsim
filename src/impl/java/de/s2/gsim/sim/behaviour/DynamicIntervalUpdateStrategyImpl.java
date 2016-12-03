@@ -1,10 +1,10 @@
-package de.s2.gsim.sim.behaviour.impl;
+package de.s2.gsim.sim.behaviour;
 
-import static de.s2.gsim.sim.behaviour.impl.FactHelper.getFloatSlotValue;
-import static de.s2.gsim.sim.behaviour.impl.FactHelper.getStringSlotValue;
-import static de.s2.gsim.sim.behaviour.impl.ReteHelper.deleteRule;
-import static de.s2.gsim.sim.behaviour.impl.ReteHelper.getStateElems;
-import static de.s2.gsim.sim.behaviour.impl.ReteHelper.getStateFactsForRootRule;
+import static de.s2.gsim.sim.behaviour.FactHelper.getFloatSlotValue;
+import static de.s2.gsim.sim.behaviour.FactHelper.getStringSlotValue;
+import static de.s2.gsim.sim.behaviour.ReteHelper.deleteRule;
+import static de.s2.gsim.sim.behaviour.ReteHelper.getStateElems;
+import static de.s2.gsim.sim.behaviour.ReteHelper.getStateFactsForRootRule;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -16,8 +16,8 @@ import de.s2.gsim.objects.Path;
 import de.s2.gsim.objects.attribute.Attribute;
 import de.s2.gsim.objects.attribute.DomainAttribute;
 import de.s2.gsim.objects.attribute.NumericalAttribute;
-import de.s2.gsim.sim.behaviour.impl.BRAEngine.RLParameterRanges;
-import de.s2.gsim.sim.behaviour.impl.jessfunction.DynamicRuleBuilder;
+import de.s2.gsim.sim.behaviour.BehaviourEngine.RLParameterRanges;
+import de.s2.gsim.sim.behaviour.jessfunction.DynamicRuleBuilder;
 import de.s2.gsim.sim.behaviour.util.CollectiveTreeDBWriter;
 import jess.Context;
 import jess.Fact;

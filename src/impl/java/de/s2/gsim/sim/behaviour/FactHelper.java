@@ -1,6 +1,5 @@
-package de.s2.gsim.sim.behaviour.impl;
+package de.s2.gsim.sim.behaviour;
 
-import de.s2.gsim.sim.behaviour.GSimBehaviourException;
 import jess.Context;
 import jess.Fact;
 import jess.JessException;

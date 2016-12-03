@@ -1,10 +1,10 @@
-package de.s2.gsim.sim.behaviour.impl.jessfunction;
+package de.s2.gsim.sim.behaviour.jessfunction;
 
 import java.util.ArrayList;
 
 import de.s2.gsim.api.sim.agent.impl.RuntimeAgent;
-import de.s2.gsim.sim.behaviour.impl.ParsingUtils;
-import de.s2.gsim.sim.behaviour.impl.ReteHelper;
+import de.s2.gsim.sim.behaviour.ParsingUtils;
+import de.s2.gsim.sim.behaviour.ReteHelper;
 import jess.Context;
 import jess.Fact;
 import jess.JessException;

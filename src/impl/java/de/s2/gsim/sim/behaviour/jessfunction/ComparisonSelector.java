@@ -1,4 +1,4 @@
-package de.s2.gsim.sim.behaviour.impl.jessfunction;
+package de.s2.gsim.sim.behaviour.jessfunction;
 
 import jess.JessException;
 import jess.Userfunction;

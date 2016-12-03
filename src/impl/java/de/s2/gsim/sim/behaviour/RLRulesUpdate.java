@@ -1,6 +1,6 @@
-package de.s2.gsim.sim.behaviour.impl;
+package de.s2.gsim.sim.behaviour;
 
-import static de.s2.gsim.sim.behaviour.impl.ReteHelper.*;
+import static de.s2.gsim.sim.behaviour.ReteHelper.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -9,8 +9,8 @@ import java.util.List;
 
 import de.s2.gsim.api.sim.agent.impl.RuntimeAgent;
 import de.s2.gsim.environment.RLRule;
-import de.s2.gsim.sim.behaviour.impl.jessfunction.DynamicRuleBuilder;
-import de.s2.gsim.sim.behaviour.impl.jessfunction.Expand0;
+import de.s2.gsim.sim.behaviour.jessfunction.DynamicRuleBuilder;
+import de.s2.gsim.sim.behaviour.jessfunction.Expand0;
 import de.s2.gsim.sim.behaviour.util.CollectiveTreeDBWriter;
 import jess.Context;
 import jess.Fact;

@@ -1,8 +1,8 @@
-package de.s2.gsim.sim.behaviour.impl;
+package de.s2.gsim.sim.behaviour;
 
 import de.s2.gsim.api.sim.agent.impl.RuntimeAgent;
 import de.s2.gsim.environment.ExpansionDef;
-import de.s2.gsim.sim.behaviour.impl.BRAEngine.RLParameterRanges;
+import de.s2.gsim.sim.behaviour.BehaviourEngine.RLParameterRanges;
 import jess.Context;
 
 public class DynamicCategoryUpdateStrategyImpl implements DynamicValueRangeUpdateStrategy {

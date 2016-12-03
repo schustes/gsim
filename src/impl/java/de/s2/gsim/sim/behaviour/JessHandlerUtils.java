@@ -1,4 +1,4 @@
-package de.s2.gsim.sim.behaviour.impl;
+package de.s2.gsim.sim.behaviour;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -30,7 +30,7 @@ import jess.Value;
 
 public class JessHandlerUtils {
 
-    private static Logger logger = Logger.getLogger(BRAEngine.class);
+    private static Logger logger = Logger.getLogger(BehaviourEngine.class);
 
     public static void addUserParams(Rete rete, RuntimeAgent owner) {
         for (ActionDef r : owner.getBehaviour().getAvailableActions()) {

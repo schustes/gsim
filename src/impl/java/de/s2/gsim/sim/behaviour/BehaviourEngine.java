@@ -1,4 +1,4 @@
-package de.s2.gsim.sim.behaviour.impl;
+package de.s2.gsim.sim.behaviour;
 
 
 import java.io.File;
@@ -29,14 +29,11 @@ import de.s2.gsim.objects.attribute.Attribute;
 import de.s2.gsim.objects.attribute.AttributeType;
 import de.s2.gsim.objects.attribute.DomainAttribute;
 import de.s2.gsim.objects.attribute.IntervalAttribute;
-import de.s2.gsim.objects.attribute.NumericalAttribute;
-import de.s2.gsim.objects.attribute.SetAttribute;
 import de.s2.gsim.sim.GSimEngineException;
-import de.s2.gsim.sim.behaviour.GSimBehaviourException;
-import de.s2.gsim.sim.behaviour.impl.jessfunction.Expand;
-import de.s2.gsim.sim.behaviour.impl.jessfunction.RandomStrategy;
-import de.s2.gsim.sim.behaviour.impl.jessfunction.SimpleSoftmaxSelector;
-import de.s2.gsim.sim.behaviour.impl.jessfunction.ToInstPath;
+import de.s2.gsim.sim.behaviour.jessfunction.Expand;
+import de.s2.gsim.sim.behaviour.jessfunction.RandomStrategy;
+import de.s2.gsim.sim.behaviour.jessfunction.SimpleSoftmaxSelector;
+import de.s2.gsim.sim.behaviour.jessfunction.ToInstPath;
 import de.s2.gsim.sim.behaviour.util.CollectiveTreeDBWriter;
 import de.s2.gsim.sim.behaviour.util.IndividualTreeDBWriter;
 import jess.Deftemplate;
@@ -47,9 +44,9 @@ import jess.Rete;
 import jess.Value;
 import jess.ValueVector;
 
-public class BRAEngine implements java.io.Serializable {
+public class BehaviourEngine implements java.io.Serializable {
 
-    private static Logger logger = Logger.getLogger(BRAEngine.class);
+    private static Logger logger = Logger.getLogger(BehaviourEngine.class);
 
     private static final long serialVersionUID = 1L;
 
@@ -83,11 +80,11 @@ public class BRAEngine implements java.io.Serializable {
 
     private int writeTreeToDB = -1;
 
-    public BRAEngine() {
+    public BehaviourEngine() {
         clean();
     }
 
-    public BRAEngine(RuntimeAgent ownerAgent, Map props) throws GSimEngineException {
+    public BehaviourEngine(RuntimeAgent ownerAgent, Map props) throws GSimEngineException {
         String s = System.getProperty("debugJess");
         String treeDB = System.getProperty("writeTreeDBInterval");
         String treeFile = System.getProperty("writeTreeFile");
@@ -158,12 +155,10 @@ public class BRAEngine implements java.io.Serializable {
     public void checkRLParams() {
         for (RLRule r : owner.getBehaviour().getRLRules()) {
             for (ExpansionDef e : r.getExpansions()) {
-
                 Path<DomainAttribute> framePath = Path.attributePath(e.getParameterName().split("/"));
                 DomainAttribute domainAttribute = owner.getDefinition().resolvePath(framePath);
                 DynamicValueRangeUpdateStrategy strategy = DynamicValueRangeUpdateStrategy.getStrategyForAttributeType(domainAttribute.getType());
                 strategy.update(owner, r.getName(), e, rlRanges, rete.getGlobalContext());
-
             }
         }
     }
