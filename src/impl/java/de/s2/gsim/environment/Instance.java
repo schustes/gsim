@@ -670,7 +670,7 @@ public class Instance extends Unit<Instance, Attribute> {
 	}
 
 	public boolean removeChildInstanceList(Path<TypedList<Instance>> objectListPath) {
-		Path<Instance> containingInstancePath = Path.withoutLastList(objectListPath);
+		Path<Instance> containingInstancePath = Path.withoutLast(objectListPath);
 
 		TypedList<Instance> list = this.resolvePath(objectListPath);
 		Instance containingInstance = this.resolvePath(containingInstancePath);

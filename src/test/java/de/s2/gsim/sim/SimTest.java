@@ -377,7 +377,7 @@ public class SimTest {
         objectClass.addAttribute(ATTR_LIST, interval1);
         // agentClass.addAttribute(ATTR_LIST, interval1);
 
-        Expansion expansion = rule.createExpansion("object-list/test:: " + ATTR_LIST + "/wealth", "0", "10");
+		Expansion expansion = rule.createExpansion("object-list/test::" + ATTR_LIST + "/wealth", "0", "10");
         // Expansion expansion = rule.createExpansion("object-list/test/ " + ATTR_LIST + "/wealth", "0", "10");
 		expansion.setMin("0");
 		expansion.setMax("10");

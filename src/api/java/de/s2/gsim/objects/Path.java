@@ -103,16 +103,27 @@ public class Path<T> {
 
 	}
 
-	public static <M extends V, T, V> Path<M> withoutLastList(Path<T> path) {
+	/**
+	 * Cuts the last path part from this path.
+	 * 
+	 * @param path the path
+	 * @return the cut path or null if there is nothing left to remove
+	 */
+	public static <M extends V, T, V> Path<M> withoutLast(Path<T> path) {
 
 		Path<?> p = path;
-		Path<M> p1 = new Path<>(path.getName(), Type.OBJECT);
+		String s = p.toString();
+		Path<M> p1 = new Path<>(path.getName(), path.getType());
 
 		while (p != null) {
 			p = p.next();
-			if (p.next() != null) {
-				p1.appendToSelf(p);
+			if (p != null && p.next() != null) {
+				p1.appendToSelf(new Path<M>(p.name, p.type));
 			}
+		}
+
+		if (s.equals(p1.toString())) {
+			return null;
 		}
 
 		return p1;

@@ -12,6 +12,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import android.annotation.Nullable;
+import de.s2.gsim.objects.ObjectClass;
 import de.s2.gsim.objects.Path;
 import de.s2.gsim.objects.attribute.Attribute;
 import de.s2.gsim.objects.attribute.AttributeFactory;
@@ -146,11 +147,11 @@ public class AgentClassOperations {
 	public BehaviourFrame activateBehaviourRule(BehaviourFrame fr, UserRuleFrame ur, boolean activated) {
 
 		container.getBehaviourClasses().stream()
-				.filter(bf -> bf.getName().equals(fr.getName()) || bf.isSuccessor(fr.getName())).forEach(bf -> {
-					UserRuleFrame g = bf.getRule(ur.getName());
-					g.setActivated(activated);
-					bf.addOrSetRule(g);
-				});
+		        .filter(bf -> bf.getName().equals(fr.getName()) || bf.isSuccessor(fr.getName())).forEach(bf -> {
+			        UserRuleFrame g = bf.getRule(ur.getName());
+			        g.setActivated(activated);
+			        bf.addOrSetRule(g);
+		        });
 
 		return this.findBehaviourClass(fr).clone();
 
@@ -186,8 +187,9 @@ public class AgentClassOperations {
 		if (!existsPath(newLocalRef, path) && path.isTerminal()) {
 			newLocalRef.defineAttributeList(path.getName());
 		} else if (!existsPath(newLocalRef, path) && !path.isTerminal()) {
-			throw new GSimDefException(
-					"Path " + path + " does not exist and is not terminal, so no list can be created!");
+			createNecessaryLists(newLocalRef, path);
+			// throw new GSimDefException(
+			// "Path " + path + " does not exist and is not terminal, so no list can be created!");
 		}
 
 		newLocalRef.addChildAttribute(path, a);
@@ -216,6 +218,23 @@ public class AgentClassOperations {
 		return (GenericAgentClass) newLocalRef.clone();
 	}
 
+	// TODO this might be not enough, if the hierarchy is deeper
+	private void createNecessaryLists(GenericAgentClass newLocalRef, Path<List<DomainAttribute>> path) {
+
+		Path<Frame> p = Path.withoutLast(path);
+		String listname = path.lastAsString();
+		while (!p.isTerminal()) {
+			if (existsPath(newLocalRef, p)) {
+				Object o = newLocalRef.resolvePath(p);
+				if (o instanceof Frame) {
+					((Frame) o).defineAttributeList(listname);
+				}
+			}
+			p = Path.withoutLast(p);
+			listname = p.lastAsString();
+		}
+
+	}
 
 	public GenericAgentClass addAgentClassRule(GenericAgentClass cls, UserRuleFrame f) {
 
@@ -234,9 +253,9 @@ public class AgentClassOperations {
 			if (subClass.isSuccessor(cls.getName())) {
 				BehaviourFrame beh = subClass.getBehaviour();
 				if (!(f instanceof RLRuleFrame)) {
-                    beh.addOrSetRule(UserRuleFrame.inheritFromUserRuleFrames(Arrays.asList(f), f.getName(), f.getCategory()));
+					beh.addOrSetRule(UserRuleFrame.inheritFromUserRuleFrames(Arrays.asList(f), f.getName(), f.getCategory()));
 				} else {
-                    beh.addRLRule(RLRuleFrame.inheritFromRLRuleFrames(Arrays.asList(f), f.getName(), f.getCategory()));
+					beh.addRLRule(RLRuleFrame.inheritFromRLRuleFrames(Arrays.asList(f), f.getName(), f.getCategory()));
 				}
 
 				subClass.replaceAncestor(here);
@@ -287,11 +306,10 @@ public class AgentClassOperations {
 		container.getAgentSubClasses().stream().forEach(agent -> {
 			for (String listName : agent.getDeclaredFrameListNames()) {
 				agent.getChildFrames(listName).stream()
-						.filter(child -> child.isSuccessor(here.getName()) || child.getName().equals(here.getName()))
-						.forEach(child -> {
-							Path<TypedList<Frame>> p = Path.objectListPath(listName, child.getName()).append(path);
-							addChildObject(agent, p, addedObject);
-						});
+				        .filter(child -> child.isSuccessor(here.getName()) || child.getName().equals(here.getName())).forEach(child -> {
+					        Path<TypedList<Frame>> p = Path.objectListPath(listName, child.getName()).append(path);
+					        addChildObject(agent, p, addedObject);
+				        });
 			}
 		});
 	}
@@ -631,12 +649,12 @@ public class AgentClassOperations {
 	public GenericAgentClass removeAgentClassAttribute(GenericAgentClass cls, Path<DomainAttribute> path) {
 		GenericAgentClass here = this.findGenericAgentClass(cls);
 		container.getAgentSubClasses().stream().filter(agentClass -> agentClass.isSuccessor(cls.getName()))
-				.forEach(agentClass -> {
-					agentClass.replaceAncestor(here);
-					container.getInstancesOfClass(agentClass, Instance.class).forEach(inst -> {
-						inst.setFrame(agentClass);
-					});
-				});
+		        .forEach(agentClass -> {
+			        agentClass.replaceAncestor(here);
+			        container.getInstancesOfClass(agentClass, Instance.class).forEach(inst -> {
+				        inst.setFrame(agentClass);
+			        });
+		        });
 
 		container.getInstancesOfClass(here, Instance.class).forEach(member -> {
 			Path<Attribute> instancePath = Path.attributePath(path.toStringArray());
@@ -743,8 +761,7 @@ public class AgentClassOperations {
 			for (String listname : agentClass.getDeclaredFrameListNames()) {
 				for (Frame f : agentClass.getChildFrames(listname)) {
 					if (f.isSuccessor(here.getName()) || f.getName().equals(here.getName())) {
-						Path<List<DomainAttribute>> newPath = Path.attributeListPath(listname, f.getName())
-								.append(path);
+						Path<List<DomainAttribute>> newPath = Path.attributeListPath(listname, f.getName()).append(path);
 						addAgentClassAttribute(agentClass, newPath, added);
 					}
 				}

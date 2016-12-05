@@ -969,7 +969,7 @@ public class Frame extends Unit<Frame , DomainAttribute> {
 	}
 
 	public boolean removeChildFrameList(Path<TypedList<Frame>> frameListPath) {
-		Path<Frame> containingFramePath = Path.withoutLastList(frameListPath);
+		Path<Frame> containingFramePath = Path.withoutLast(frameListPath);
 
 		TypedList<Frame> list = this.resolvePath(frameListPath);
 		Frame containingFrame = this.resolvePath(containingFramePath);
