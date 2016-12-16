@@ -101,7 +101,7 @@ public class ReactiveRuleBuilder {
                         // HashMap<String, Integer> p =
                         // utils.buildObjectRefTable(conditions);
 
-                        Object2VariableBindingTable p = new Object2VariableBindingTable();
+						Object2VariableBindingTable p = new Object2VariableBindingTable(agent);
                         p.build(rule);
 
                         for (int k = 0; k < conditions.length; k++) {
@@ -109,7 +109,7 @@ public class ReactiveRuleBuilder {
                             if (isConstant(cond.getParameterValue()) && !isExistQuantified(cond) && cond.getParameterValue().indexOf("{") < 0) {
                                 nRule += " " + utils.createFixedAtomCondition(cond, p, nRule);
                             } else if (isConstant(cond.getParameterValue()) && isExistQuantified(cond)) {
-                                nRule += "" + utils.createExistsQuantifiedCondition(cond, p);
+								nRule += "" + utils.createExistsQuantifiedCondition(agent, cond, p);
                             } else if (isConstant(cond.getParameterValue())) {
                                 nRule += " " + utils.createAttributeCondition(cond, p, nRule);
                             } else if (!isConstant(cond.getParameterValue())) {
@@ -146,7 +146,7 @@ public class ReactiveRuleBuilder {
         try {
             String ctxString = "";
 
-            Object2VariableBindingTable params = new Object2VariableBindingTable();
+			Object2VariableBindingTable params = new Object2VariableBindingTable(agent);
             params.build(rule);
             // HashMap<String, Integer> params =
             // utils.buildObjectRefTable(conditions);
@@ -174,7 +174,7 @@ public class ReactiveRuleBuilder {
                 if (isConstant(cond.getParameterValue()) && !isExistQuantified(cond) && cond.getParameterValue().indexOf("{") < 0) {
                     nRule += "" + utils.createFixedAtomCondition(cond, params, nRule);
                 } else if (isExistQuantified(cond)) {
-                    nRule += "" + utils.createExistsQuantifiedCondition(cond, params);
+					nRule += "" + utils.createExistsQuantifiedCondition(agent, cond, params);
                 } else if (isConstant(cond.getParameterValue()) && !isExistQuantified(cond)) {
                     nRule += "" + utils.createAttributeCondition(cond, params, nRule);
                 } else if (!isConstant(cond.getParameterValue()) && !isExistQuantified(cond)) {

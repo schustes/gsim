@@ -147,7 +147,7 @@ public class ConditionBuilder {
         if (isConstant(cond.getParameterValue()) && !isExistQuantified(cond) && cond.getParameterValue().indexOf("{") < 0) {
             n = "" + createFixedAtomCondition(cond, objRefs, n);
         } else if (isExistQuantified(cond)) {
-            n = createExistsQuantifiedCondition(cond, objRefs);
+			n = createExistsQuantifiedCondition(agent, cond, objRefs);
         } else if (isConstant(cond.getParameterValue()) && !isExistQuantified(cond)) {
             n = createAttributeCondition(cond, objRefs, n);
         } else if (!isConstant(cond.getParameterValue()) && !isExistQuantified(cond)) {
@@ -225,11 +225,12 @@ public class ConditionBuilder {
      * @param refs
      * @return
      */
-    public String createExistsQuantifiedCondition(ConditionDef cond, Object2VariableBindingTable refs) {
+	public String createExistsQuantifiedCondition(Instance agent, ConditionDef cond, Object2VariableBindingTable refs) {
 
         String objectPath = resolveObjectClass(cond.getParameterName());
         String attPath = null;
-        if (cond.getParameterName().contains("::")) {
+		if (ParsingUtils.referencesChildInstance(agent, cond.getParameterName())) {
+			// if (cond.getParameterName().contains("::")) {
             attPath = resolveAttribute(cond.getParameterName());
         }
 
@@ -258,10 +259,6 @@ public class ConditionBuilder {
             s += "  (and (object-parameter (object-class \"" + objPath + "\") (instance-name " + binding + "))\n";
             s += "  (parameter (name ?n&:(eq ?n (str-cat \"" + list + "/\"" + " " + binding + " " + " \"/" + remainingPath + "\"))) "
                     + " (value ?exparam" + (k + 1) + "))\n"; // two
-            // missing
-            // brackets
-            // added
-            // below!
             value = "?exparam" + (k + 1);
         } else if (!isConstant(value) && !negated) {
 
@@ -292,6 +289,8 @@ public class ConditionBuilder {
             value = "?exparam" + (k + 7012);
         }
 
+		// is part above unnecessary?
+
         String list = resolveList(cond.getParameterName().split("/")[0].trim());
 
         if (!negated) {
@@ -317,8 +316,8 @@ public class ConditionBuilder {
             if (attPath == null) {
                 s = " (not (exists (object-parameter (object-class \"" + objectPath + "\"))))\n";
             } else {
-
-                s += "  (not (parameter (name ?m&:(and (call (new java.lang.String ?m) contains  \"" + list + "\") "
+				// was s += ...
+				s = "  (not (parameter (name ?m&:(and (call (new java.lang.String ?m) contains  \"" + list + "\") "
                         + " (call (new java.lang.String ?m) contains  \"" + attPath + "\"))) ";
 
                 if (cond.getParameterValue().length() > 0) {

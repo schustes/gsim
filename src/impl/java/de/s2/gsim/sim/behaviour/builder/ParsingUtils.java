@@ -1,12 +1,15 @@
 package de.s2.gsim.sim.behaviour.builder;
 
+import java.util.NoSuchElementException;
+
 import de.s2.gsim.api.sim.agent.impl.RuntimeAgent;
 import de.s2.gsim.environment.Frame;
+import de.s2.gsim.environment.GSimDefException;
 import de.s2.gsim.environment.GenericAgentClass;
 import de.s2.gsim.environment.Instance;
+import de.s2.gsim.environment.TypedList;
 import de.s2.gsim.objects.Path;
 import de.s2.gsim.objects.attribute.Attribute;
-import de.s2.gsim.objects.attribute.AttributeConstants;
 import de.s2.gsim.objects.attribute.AttributeType;
 import de.s2.gsim.objects.attribute.DomainAttribute;
 import de.s2.gsim.objects.attribute.IntervalAttribute;
@@ -113,6 +116,7 @@ public class ParsingUtils {
 
 	}
 
+	@Deprecated
 	public static String resolveObjectClass(String s) {
 		String[] a = s.split("/");
 
@@ -155,6 +159,59 @@ public class ParsingUtils {
 		}
 		return object;
 
+	}
+
+	public static boolean referencesChildInstance(Instance owningAgent, String pathString) {
+		Path<Attribute> path = Path.attributePath(pathString.split("/"));
+		Path<?> p = path;
+		while (p != null) {
+			try {
+			if ((owningAgent.resolvePath(p) instanceof Instance)) {
+				return true;
+			}
+			} catch (NoSuchElementException e) {
+				return false;
+			}
+			p = p.next();
+		}
+		return false;
+	}
+
+	public static boolean referencesChildFrame(Frame owningAgent, String pathString) {
+		Path<Attribute> path = Path.attributePath(pathString.split("/"));
+		Path<?> p = path;
+		while (p != null) {
+			try {
+				Object o = owningAgent.resolvePath(p);
+				if ((o instanceof TypedList)) {
+					return true;
+				}
+			} catch (NoSuchElementException e) {
+				return false;
+			}
+			p = p.next();
+		}
+		return false;
+	}
+
+	public static String resolveChildFrameWithList(Frame owningAgent, String pathString) {
+		Path<Attribute> path = Path.attributePath(pathString.split("/"));
+		Path<?> p = path;
+		Path<?> pn = new Path(p.getName(), p.getType());
+		while (p != null) {
+			try {
+				Object o = owningAgent.resolvePath(pn);
+				if ((o instanceof TypedList)) {
+					TypedList<Frame> list = (TypedList<Frame>) o;
+					return pn.getName() + "/" + list.getType().getName();
+				}
+			} catch (GSimDefException e) {
+				return null;
+			}
+			p = p.next();
+			pn.append(new Path(p.getName(), p.getType()));
+		}
+		return null;
 	}
 
 }

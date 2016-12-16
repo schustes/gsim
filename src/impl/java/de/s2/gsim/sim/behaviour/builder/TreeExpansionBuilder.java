@@ -14,7 +14,7 @@ public class TreeExpansionBuilder {
 
     private GeneralRLBuilder general;
 
-    private Object2VariableBindingTable refTable = new Object2VariableBindingTable();
+	private Object2VariableBindingTable refTable = new Object2VariableBindingTable(agent);
 
     public TreeExpansionBuilder(RuntimeAgent a) {
         agent = a;

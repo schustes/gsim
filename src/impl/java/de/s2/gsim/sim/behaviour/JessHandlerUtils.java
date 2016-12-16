@@ -161,6 +161,7 @@ public class JessHandlerUtils {
 
     public static HashSet<String> buildCurrentState(Rete rete, RuntimeAgent owner, HashSet<String> uniqueConditions) throws JessException {
         for (String s : uniqueConditions) {
+			// TODO this check has to be replaced
             if (s.contains("::")) {
                 JessHandlerUtils.buildReplaceVariablesSC(rete, owner, s);
             }

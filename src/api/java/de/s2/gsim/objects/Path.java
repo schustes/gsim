@@ -118,7 +118,7 @@ public class Path<T> {
 		while (p != null) {
 			p = p.next();
 			if (p != null && p.next() != null) {
-				p1.appendToSelf(new Path<M>(p.name, p.type));
+				p1.append(new Path<M>(p.name, p.type));
 			}
 		}
 
@@ -201,14 +201,15 @@ public class Path<T> {
 		return p.name;
 	}
 
-	public Path<?> last() {
+	@SuppressWarnings("unchecked")
+	public <V> Path<V> last() {
 		Path<?> p = next;
 		Path<?> ret = this;
 		while (p!=null) {
 			ret = p;
 			p = p.next;
 		}
-		return ret;
+		return (Path<V>) ret;
 	}
 
 

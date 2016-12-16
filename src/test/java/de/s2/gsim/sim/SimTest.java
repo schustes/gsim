@@ -23,8 +23,10 @@ import de.s2.gsim.objects.AgentInstance;
 import de.s2.gsim.objects.Behaviour;
 import de.s2.gsim.objects.Expansion;
 import de.s2.gsim.objects.ObjectClass;
+import de.s2.gsim.objects.Path;
 import de.s2.gsim.objects.RLActionNode;
 import de.s2.gsim.objects.Rule;
+import de.s2.gsim.objects.attribute.Attribute;
 import de.s2.gsim.objects.attribute.AttributeType;
 import de.s2.gsim.objects.attribute.DomainAttribute;
 import de.s2.gsim.objects.attribute.NumericalAttribute;
@@ -377,8 +379,8 @@ public class SimTest {
         objectClass.addAttribute(ATTR_LIST, interval1);
         // agentClass.addAttribute(ATTR_LIST, interval1);
 
-		Expansion expansion = rule.createExpansion("object-list/test::" + ATTR_LIST + "/wealth", "0", "10");
-        // Expansion expansion = rule.createExpansion("object-list/test/ " + ATTR_LIST + "/wealth", "0", "10");
+		// Expansion expansion = rule.createExpansion("object-list/test::" + ATTR_LIST + "/wealth", "0", "10");
+		Expansion expansion = rule.createExpansion("object-list/test/" + ATTR_LIST + "/wealth", "0", "10");
 		expansion.setMin("0");
 		expansion.setMax("10");
 		expansion.addFiller("0");
@@ -388,7 +390,7 @@ public class SimTest {
 		Action action = behaviour.createAction("Test-Action", AddNewNumberAction.class.getName());
 		Rule rrule = behaviour.createRule("Test-Rule");
 		rrule.addOrSetConsequent(action);
-		rrule.createCondition(ATTR_LIST + "/" + COUNTER0, ">", "4");
+		// rrule.createCondition(ATTR_LIST + "/" + COUNTER0, ">", "4");
 
 		behaviour.setMaxNodes(10);
 		behaviour.setRevaluationProb(0.3);
@@ -619,6 +621,30 @@ public class SimTest {
 
 	}
 
+	public static class TestAction1a extends SimAction {
+		private static final long serialVersionUID = 1L;
+
+		static String newValue = "Test2";
+
+		public Object execute() {
+			RuntimeAgent agent = super.getContext().getAgent();
+			StringAttribute instanciated = (StringAttribute)agent.getAttribute(ATTR_NAME_1);
+			instanciated.setValue(newValue);
+			agent.addOrSetAttribute(ATTR_LIST, instanciated);
+
+			NumericalAttribute counter = (NumericalAttribute) agent.getAttribute(COUNTER1);
+			counter.setValue(counter.getValue() + 1);
+			agent.addOrSetAttribute(ATTR_LIST, instanciated);
+
+			shuffleAttributes(agent);
+			
+			NumericalAttribute a = (NumericalAttribute) agent.resolvePath(Path.attributePath("object-list", "test", ATTR_LIST, "wealth"));
+			a.setValue(new Random().doubles(1, 20, 30).reduce(0, (x, y) -> x));
+			return null;			
+		}
+
+	}
+
 	public static class AddNewCatAction extends SimAction {
 		private static final long serialVersionUID = 1L;
 		public Object execute() {
@@ -637,9 +663,15 @@ public class SimTest {
 
 		public Object execute() {
 			RuntimeAgent agent = super.getContext().getAgent();
-			NumericalAttribute att = (NumericalAttribute) agent.getAttribute("wealth");
-			att.setValue(new Random().nextInt(100));
-			agent.addOrSetAttribute(ATTR_LIST, att);
+			// NumericalAttribute att = (NumericalAttribute) agent.getAttribute("wealth");
+
+			Path<Attribute> p = Path.attributePath("object-list", "test", ATTR_LIST, "wealth");
+			NumericalAttribute a = (NumericalAttribute) agent.resolvePath(p);
+			a.setValue(new Random().doubles(1, 20, 30).reduce(0, (x, y) -> y));
+
+			// att.setValue(new Random().nextInt(100));
+			// agent.addOrSetAttribute(ATTR_LIST, a);
+			agent.replaceChildAttribute(p, a);
 			return null;
 		}
 

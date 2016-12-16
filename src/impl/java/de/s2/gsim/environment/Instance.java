@@ -558,7 +558,7 @@ public class Instance extends Unit<Instance, Attribute> {
 	 * @return true if the attribute was replaced, false if this was not possible because it does not exist
 	 */
 	public boolean replaceChildAttribute(Path<Attribute> path, Attribute newValue) {
-		Path<List<Attribute>> p = Path.withoutLastAttributeOrObject(path, Path.Type.LIST);
+		Path<List<Attribute>> p = Path.withoutLast(path);
 		ListIterator<Attribute> attIter = this.resolvePath(p).listIterator();
 		while (attIter.hasNext()) {
 			if (attIter.next().getName().equals(newValue.getName())) {

@@ -8,6 +8,7 @@ import cern.jet.random.Uniform;
 import de.s2.gsim.environment.ActionDef;
 import de.s2.gsim.environment.ConditionDef;
 import de.s2.gsim.environment.ExpansionDef;
+import de.s2.gsim.environment.Instance;
 import de.s2.gsim.environment.RLRule;
 import de.s2.gsim.environment.UserRule;
 
@@ -19,16 +20,22 @@ import de.s2.gsim.environment.UserRule;
  */
 public class Object2VariableBindingTable {
 
+	private Instance agent;
+
     private HashMap<String, String> map = new HashMap<String, String>();
 
     private int runningIdx = 0;
+
+	public Object2VariableBindingTable(Instance agent) {
+		this.agent = agent;
+	}
 
     /**
      * Builds the table from a rule
      * 
      * @param rule
      */
-    public void build(UserRule rule) {
+	public void build(UserRule rule) {
         map.clear();
         runningIdx = Uniform.staticNextIntFromTo(0, 1000);
         addConditionsRefs(rule.getConditions());
@@ -70,11 +77,13 @@ public class Object2VariableBindingTable {
      */
     private void addConditionsRefs(ConditionDef[] conditions) {
         for (ConditionDef c : conditions) {
-            if (c.getParameterName().contains("::")) {
-                String object = resolveObjectClass(c.getParameterName());
+			if (ParsingUtils.referencesChildFrame(agent.getDefinition(), c.getParameterName())) {
+				// if (c.getParameterName().contains("::")) {
+                String object = resolveObjectClassWithList(c.getParameterName());
                 addObjectClass(object);
-            } else if (c.getParameterValue().contains("::")) {
-                String object = resolveObjectClass(c.getParameterValue());
+			} else if (ParsingUtils.referencesChildFrame(agent.getDefinition(), c.getParameterValue())) {
+				// } else if (c.getParameterValue().contains("::")) {
+                String object = resolveObjectClassWithList(c.getParameterValue());
                 addObjectClass(object);
             } else {
                 String object = c.getParameterName();
@@ -90,9 +99,10 @@ public class Object2VariableBindingTable {
      */
 	private void addExpansionRefs(List<ExpansionDef> expansions) {
         for (ExpansionDef c : expansions) {
-            if (c.getParameterName().contains("::")) {
+			if (ParsingUtils.referencesChildFrame(agent.getDefinition(), c.getParameterName())) {
+				// if (c.getParameterName().contains("::")) {
                 String pn = c.getParameterName();
-                String object = resolveObjectClass(pn);
+                String object = resolveObjectClassWithList(pn);
                 addObjectClass(object);
             }
         }
@@ -114,7 +124,11 @@ public class Object2VariableBindingTable {
         }
     }
 
-    private String resolveObjectClass(String s) {
+    private String resolveObjectClassWithList(String s) {
+		return ParsingUtils.resolveChildFrameWithList(agent.getDefinition(), s);
+	}
+
+	private String resolveObjectClassOld(String s) {
         String[] a = s.split("/");
 
         String list = a[0];
