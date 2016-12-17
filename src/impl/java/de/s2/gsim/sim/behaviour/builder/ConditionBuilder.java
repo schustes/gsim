@@ -1,22 +1,15 @@
 package de.s2.gsim.sim.behaviour.builder;
 
-import java.io.FileInputStream;
-import java.util.HashMap;
 import java.util.List;
 
 import cern.jet.random.Uniform;
-import de.s2.gsim.GSimCore;
-import de.s2.gsim.GSimCoreFactory;
-import de.s2.gsim.def.ModelDefinitionEnvironment;
 import de.s2.gsim.environment.ConditionDef;
 import de.s2.gsim.environment.ExpansionDef;
 import de.s2.gsim.environment.Instance;
-import de.s2.gsim.objects.AgentClass;
 import de.s2.gsim.objects.Path;
 import de.s2.gsim.objects.attribute.Attribute;
 import de.s2.gsim.objects.attribute.NumericalAttribute;
 import de.s2.gsim.sim.GSimEngineException;
-import de.s2.gsim.sim.SimulationController;
 import de.s2.gsim.util.Utils;
 
 /**
@@ -147,7 +140,7 @@ public class ConditionBuilder {
         if (isConstant(cond.getParameterValue()) && !isExistQuantified(cond) && cond.getParameterValue().indexOf("{") < 0) {
             n = "" + createFixedAtomCondition(cond, objRefs, n);
         } else if (isExistQuantified(cond)) {
-			n = createExistsQuantifiedCondition(agent, cond, objRefs);
+            n = createExistsQuantifiedCondition(agent, cond, objRefs);
         } else if (isConstant(cond.getParameterValue()) && !isExistQuantified(cond)) {
             n = createAttributeCondition(cond, objRefs, n);
         } else if (!isConstant(cond.getParameterValue()) && !isExistQuantified(cond)) {
@@ -225,12 +218,11 @@ public class ConditionBuilder {
      * @param refs
      * @return
      */
-	public String createExistsQuantifiedCondition(Instance agent, ConditionDef cond, Object2VariableBindingTable refs) {
+    public String createExistsQuantifiedCondition(Instance agent, ConditionDef cond, Object2VariableBindingTable refs) {
 
         String objectPath = resolveObjectClass(cond.getParameterName());
         String attPath = null;
-		if (ParsingUtils.referencesChildInstance(agent, cond.getParameterName())) {
-			// if (cond.getParameterName().contains("::")) {
+        if (ParsingUtils.referencesChildFrame(agent.getDefinition(), cond.getParameterName())) {
             attPath = resolveAttribute(cond.getParameterName());
         }
 
@@ -242,57 +234,50 @@ public class ConditionBuilder {
 
         String value = cond.getParameterValue();
 
-        // int idx = refs.get(objectPath);
         String binding = refs.getBinding(objectPath);
-        if (!isConstant(value) && negated) {
 
-            if (refs.getBinding(resolveObjectClass(value)) != null) {
-                binding = refs.getBinding(resolveObjectClass(value));
+        if (!isConstant(value)) {
+            String objPath = ParsingUtils.resolveChildFrameWithList(agent.getDefinition(), value);
+            String list = objPath.split("/")[0].trim();
+            String remainingPath = value.substring(objPath.length(), value.length());
+
+            if (negated) {
+
+                if (refs.getBinding(resolveObjectClass(value)) != null) {
+                    binding = refs.getBinding(resolveObjectClass(value));
+                }
+
+                s += " (or (not (exists (object-parameter (object-class ?pName" + k + "&:(eq pName" + k + " \"" + objPath + "\")) (instance-name "
+                        + binding + ") )))\n";
+                s += "  (and (object-parameter (object-class \"" + objPath + "\") (instance-name " + binding + "))\n";
+                s += "  (parameter (name ?n&:(eq ?n (str-cat \"" + list + "/\"" + " " + binding + " " + " \"/" + remainingPath + "\"))) "
+                        + " (value ?exparam" + (k + 1) + "))\n";
+                value = "?exparam" + (k + 1);
+            } else if (!isConstant(value) && !negated) {
+
+                if (refs.getBinding(resolveObjectClass(cond.getParameterName())) != null) {
+                    binding = refs.getBinding(resolveObjectClass(cond.getParameterName()));
+                }
+
+                s += "  (object-parameter (object-class ?pName" + k + "&:(eq pName" + k + " \"" + objPath + "\")) (instance-name " + binding + "))\n";
+                s += "  (parameter (name ?n&:(eq ?n (str-cat \"" + list + "/\"" + " " + binding + " " + " \"/" + remainingPath + "\"))) "
+                        + " (value ?exparam" + (k + 1) + "))\n";
+
+                value = "?exparam" + (k + 1);
             }
-
-            String[] a = value.split("::");
-            String remainingPath = a[1];
-            String objPath = a[0].trim().replace("$", "");
-            String list = a[0].split("/")[0].trim().replace("$", "");
-            s += " (or (not (exists (object-parameter (object-class ?pName" + k + "&:(eq pName" + k + " \"" + objPath + "\")) (instance-name "
-                    + binding + ") )))\n";
-            s += "  (and (object-parameter (object-class \"" + objPath + "\") (instance-name " + binding + "))\n";
-            s += "  (parameter (name ?n&:(eq ?n (str-cat \"" + list + "/\"" + " " + binding + " " + " \"/" + remainingPath + "\"))) "
-                    + " (value ?exparam" + (k + 1) + "))\n"; // two
-            value = "?exparam" + (k + 1);
-        } else if (!isConstant(value) && !negated) {
-
-            if (refs.getBinding(resolveObjectClass(cond.getParameterName())) != null) {
-                binding = refs.getBinding(resolveObjectClass(cond.getParameterName()));
-            }
-
-            String[] a = value.split("::");
-            String remainingPath = resolveAttribute(a[1]);
-            String objPath = resolveObjectClass(a[0].trim());
-            String list = resolveList(a[0].split("/")[0].trim());
-            s += "  (object-parameter (object-class ?pName" + k + "&:(eq pName" + k + " \"" + objPath + "\")) (instance-name " + binding + "))\n";
-            s += "  (parameter (name ?n&:(eq ?n (str-cat \"" + list + "/\"" + " " + binding + " " + " \"/" + remainingPath + "\"))) "
-                    + " (value ?exparam" + (k + 1) + "))\n";
-
-            value = "?exparam" + (k + 1);
-        } else if (value.contains("$")) {
-            if (refs.getBinding(resolveObjectClass(cond.getParameterName())) != null) {
-                binding = refs.getBinding(resolveObjectClass(cond.getParameterName()));
-            }
-
-            String[] a = value.split("::");
-            String remainingPath = a[1];
-            String list = a[0].split("/")[0].trim().replace("$", "");
-            s += " (parameter (name ?n&:(eq ?n (str-cat \"" + list + "/\"" + " " + binding + " " + " \"/" + remainingPath + "\"))) "
-                    + " (value ?exparam" + (k + 7012) + "))\n";
-
-            value = "?exparam" + (k + 7012);
         }
 
-		// is part above unnecessary?
+        String listLHS = resolveList(cond.getParameterName().split("/")[0].trim());
 
-        String list = resolveList(cond.getParameterName().split("/")[0].trim());
+        String s2 = buildExistsQuantifiedConstantExpression(cond, objectPath, attPath, k, negated, value, binding, listLHS);
 
+        return s+"\n"+s2;
+
+    }
+
+    private String buildExistsQuantifiedConstantExpression(ConditionDef cond, String objectPath, String attPath, int k, boolean negated, String value,
+            String binding, String list) {
+        String s;
         if (!negated) {
             if (attPath == null) {
                 s = " (exists (object-parameter (object-class \"" + objectPath + "\")))\n";
@@ -316,8 +301,8 @@ public class ConditionBuilder {
             if (attPath == null) {
                 s = " (not (exists (object-parameter (object-class \"" + objectPath + "\"))))\n";
             } else {
-				// was s += ...
-				s = "  (not (parameter (name ?m&:(and (call (new java.lang.String ?m) contains  \"" + list + "\") "
+                // was s += ...
+                s = "  (not (parameter (name ?m&:(and (call (new java.lang.String ?m) contains  \"" + list + "\") "
                         + " (call (new java.lang.String ?m) contains  \"" + attPath + "\"))) ";
 
                 if (cond.getParameterValue().length() > 0) {
@@ -340,10 +325,7 @@ public class ConditionBuilder {
             }
 
         }
-
-        // logger.debug(s);
         return s;
-
     }
 
     /**
@@ -555,10 +537,7 @@ public class ConditionBuilder {
     }
 
     private boolean isConstant(String s) {
-        if (s.contains("::")) {
-            return false;
-        }
-        return true;
+        return !s.contains("/");
     }
 
     private boolean isExistQuantified(ConditionDef c) {
@@ -572,7 +551,7 @@ public class ConditionBuilder {
 
     private boolean isNumericalAttribute(Instance obj, String pathToAtt) {
         //Attribute a = (Attribute) obj.resolveName(pathToAtt.split("/"));
-    	Path<Attribute> p = Path.attributePath(pathToAtt.split("/"));
+        Path<Attribute> p = Path.attributePath(pathToAtt.split("/"));
         Attribute a = (Attribute) obj.resolvePath(p);
         return (a instanceof NumericalAttribute);
     }

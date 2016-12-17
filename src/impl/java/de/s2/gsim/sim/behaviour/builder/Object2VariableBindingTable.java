@@ -78,11 +78,9 @@ public class Object2VariableBindingTable {
     private void addConditionsRefs(ConditionDef[] conditions) {
         for (ConditionDef c : conditions) {
 			if (ParsingUtils.referencesChildFrame(agent.getDefinition(), c.getParameterName())) {
-				// if (c.getParameterName().contains("::")) {
                 String object = resolveObjectClassWithList(c.getParameterName());
                 addObjectClass(object);
 			} else if (ParsingUtils.referencesChildFrame(agent.getDefinition(), c.getParameterValue())) {
-				// } else if (c.getParameterValue().contains("::")) {
                 String object = resolveObjectClassWithList(c.getParameterValue());
                 addObjectClass(object);
             } else {

@@ -473,7 +473,6 @@ public class SimTest {
 	}
 	public double runRLsimulation(AgentInstance testAgent, double alpha, int steps) throws Exception {
 
-
 		SimulationController m = core.createScenarioManager(env, new HashMap<String, Object>(), steps, 1);
 		SimulationId id = m.getSimulationInstances()[0];
 		Simulation sim = m.getModelState(id);

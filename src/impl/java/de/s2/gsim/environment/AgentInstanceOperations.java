@@ -70,7 +70,7 @@ public class AgentInstanceOperations {
     public GenericAgent instanciateAgentWithNormalDistributedAttributes(GenericAgentClass cls, String name, double svar) {
         GenericAgent a = new GenericAgent(name, cls);
         a = Generator.randomiseNormalDistributedAttributeValues(a, svar);
-        container.getAgents().add(a);
+        container.addAgent(a);
         return (GenericAgent) a.clone();
     }
 
