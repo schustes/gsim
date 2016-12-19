@@ -25,6 +25,10 @@ public class Path<T> {
 		this.type = type;
 	}
 
+	public static Path<?> copy(Path<?> p) {
+		return new Path<Object>(p.getName(), p.getType());
+	}
+
 	public Path(String name, Path<T> next, Type type) {
 		this.name = name;
 		this.next = next;
@@ -41,6 +45,11 @@ public class Path<T> {
 
 	public Type getType() {
 		return type;
+	}
+
+	public <X> Path<X> add(Path<X> p) {
+		p.append(this);
+		return p;
 	}
 
 	@SuppressWarnings("unchecked")

@@ -1,5 +1,9 @@
 package de.s2.gsim.sim.behaviour.builder;
 
+import static de.s2.gsim.sim.behaviour.builder.ParsingUtils.extractChildAttributePathWithoutParent;
+import static de.s2.gsim.sim.behaviour.builder.ParsingUtils.resolveChildFrameWithList;
+import static de.s2.gsim.sim.behaviour.builder.ParsingUtils.resolveList;
+
 import java.util.List;
 
 import cern.jet.random.Uniform;
@@ -30,7 +34,8 @@ public class ConditionBuilder {
      * @return
      * @throws GSimEngineException
      */
-    public String createAttributeCondition(ConditionDef cond, Object2VariableBindingTable objRefs, String nRule_1) throws GSimEngineException {
+	public String createAttributeCondition(Instance owner, ConditionDef cond, Object2VariableBindingTable objRefs, String nRule_1)
+	        throws GSimEngineException {
 
         String nRule = "";
 
@@ -58,7 +63,7 @@ public class ConditionBuilder {
             }
         }
 
-        nRule += createLHS(cond.getParameterName(), objRefs, k, nRule_1);
+		nRule += createLHS(owner, cond.getParameterName(), objRefs, k, nRule_1);
 
         if (cond.getOperator().equals("=")) {
             nRule += "(value ?value" + (k) + "&:(eq*" + " ?value" + (k) + " " + replace + " " + ")))\n";
@@ -73,7 +78,8 @@ public class ConditionBuilder {
 
     }
 
-    public String createCategoricalAtomCondition(String attName, String selectedFiller, Object2VariableBindingTable objRefs, String nRule_1)
+	public String createCategoricalAtomCondition(Instance owner, String attName, String selectedFiller, Object2VariableBindingTable objRefs,
+	        String nRule_1)
             throws GSimEngineException {
 
         String nRule = "";
@@ -82,7 +88,7 @@ public class ConditionBuilder {
 
         ConditionDef c0 = new ConditionDef(attName, "=", selectedFiller);
 
-        nRule = createLHS(c0.getParameterName(), objRefs, k, nRule_1);
+		nRule = createLHS(owner, c0.getParameterName(), objRefs, k, nRule_1);
 
         if (!de.s2.gsim.util.Utils.isNumerical(selectedFiller)) {
             nRule += "(value ?value" + k + 1251 + "&:(eq ?value" + k + 1251 + " \"" + selectedFiller + "\"  )))\n";
@@ -93,11 +99,12 @@ public class ConditionBuilder {
 
     }
 
-    public String createCategoricalAtomCondition(String attName, List<String> selectedFillers, Object2VariableBindingTable objRefs, String nRule_1)
+	public String createCategoricalAtomCondition(Instance owner, String attName, List<String> selectedFillers,
+	        Object2VariableBindingTable objRefs, String nRule_1)
             throws GSimEngineException {
 
         if (selectedFillers.size() == 1) {
-            return this.createCategoricalAtomCondition(attName, selectedFillers.get(0), objRefs, nRule_1);
+			return this.createCategoricalAtomCondition(owner, attName, selectedFillers.get(0), objRefs, nRule_1);
         }
 
         String nRule = "";
@@ -113,7 +120,7 @@ public class ConditionBuilder {
         }
 
         ConditionDef c0 = new ConditionDef(attName, "=", name.toString());
-        nRule = createLHS(c0.getParameterName(), objRefs, k, nRule_1);
+		nRule = createLHS(owner, c0.getParameterName(), objRefs, k, nRule_1);
 
         nRule += " (value ?value" + k + 1251 + "&:(or ";
 
@@ -138,11 +145,11 @@ public class ConditionBuilder {
         String n = "";
 
         if (isConstant(cond.getParameterValue()) && !isExistQuantified(cond) && cond.getParameterValue().indexOf("{") < 0) {
-            n = "" + createFixedAtomCondition(cond, objRefs, n);
+			n = "" + createFixedAtomCondition(agent, cond, objRefs, n);
         } else if (isExistQuantified(cond)) {
             n = createExistsQuantifiedCondition(agent, cond, objRefs);
         } else if (isConstant(cond.getParameterValue()) && !isExistQuantified(cond)) {
-            n = createAttributeCondition(cond, objRefs, n);
+			n = createAttributeCondition(agent, cond, objRefs, n);
         } else if (!isConstant(cond.getParameterValue()) && !isExistQuantified(cond)) {
             n = createVariableCondition(agent, cond, objRefs, n);
         }
@@ -159,7 +166,8 @@ public class ConditionBuilder {
      * @return
      * @throws GSimEngineException
      */
-    public String createDefaultAtomCondition(ExpansionDef cond, Object2VariableBindingTable objRefs, String nRule_1) throws GSimEngineException {
+	public String createDefaultAtomCondition(Instance owner, ExpansionDef cond, Object2VariableBindingTable objRefs, String nRule_1)
+	        throws GSimEngineException {
 
         String nRule = "";
 
@@ -171,17 +179,17 @@ public class ConditionBuilder {
         if (cond.isNumerical()) {
             c0 = new ConditionDef(cond.getParameterName(), ">=", String.valueOf(cond.getMin()));
             c1 = new ConditionDef(cond.getParameterName(), "<", String.valueOf(cond.getMax()));
-            nRule = createLHS(c0.getParameterName(), objRefs, k + 9001, nRule_1);
+			nRule = createLHS(owner, c0.getParameterName(), objRefs, k + 9001, nRule_1);
             nRule += "(value ?value" + k + "&:(and (numberp ?value" + k + ") (>= ?value" + k + " " + String.valueOf(cond.getMin()) + " ))))\n";
 
-            nRule += createLHS(c1.getParameterName(), objRefs, k + 9002, nRule + nRule_1);
+			nRule += createLHS(owner, c1.getParameterName(), objRefs, k + 9002, nRule + nRule_1);
             nRule += "(value ?value" + k + 891 + "&:(and (numberp ?value" + k + 891 + ") (< ?value" + k + 891 + " " + String.valueOf(cond.getMax())
                     + " ))))\n";
 
         } else {
             List<String> cat = cond.getFillers();
             c0 = new ConditionDef(cond.getParameterName(), "=", cat.get(0));
-            nRule = createLHS(c0.getParameterName(), objRefs, k + 12001, nRule_1);
+			nRule = createLHS(owner, c0.getParameterName(), objRefs, k + 12001, nRule_1);
             if (!de.s2.gsim.util.Utils.isNumerical(cat.get(0))) {
                 nRule += "(value ?value" + k + 1251 + "&:(or (eq ?value" + k + 1251 + " \"" + cat.get(0) + "\" ) ";
             } else {
@@ -220,10 +228,10 @@ public class ConditionBuilder {
      */
     public String createExistsQuantifiedCondition(Instance agent, ConditionDef cond, Object2VariableBindingTable refs) {
 
-        String objectPath = resolveObjectClass(cond.getParameterName());
+		String objectPath = ParsingUtils.resolveChildFrameWithList(agent.getDefinition(), cond.getParameterName());
         String attPath = null;
         if (ParsingUtils.referencesChildFrame(agent.getDefinition(), cond.getParameterName())) {
-            attPath = resolveAttribute(cond.getParameterName());
+			attPath = extractChildAttributePathWithoutParent(agent.getDefinition(), cond.getParameterName());
         }
 
         String s = "";
@@ -237,14 +245,15 @@ public class ConditionBuilder {
         String binding = refs.getBinding(objectPath);
 
         if (!isConstant(value)) {
-            String objPath = ParsingUtils.resolveChildFrameWithList(agent.getDefinition(), value);
-            String list = objPath.split("/")[0].trim();
-            String remainingPath = value.substring(objPath.length(), value.length());
+			String objPath = ParsingUtils.resolveChildFrameWithoutList(agent.getDefinition(), value);
+			String objPathFull = ParsingUtils.resolveChildFrameWithList(agent.getDefinition(), value);
+			String list = objPathFull.split("/")[0].trim();
+			String remainingPath = value.substring(objPathFull.length() + 1, value.length());
 
             if (negated) {
 
-                if (refs.getBinding(resolveObjectClass(value)) != null) {
-                    binding = refs.getBinding(resolveObjectClass(value));
+				if (refs.getBinding(resolveChildFrameWithList(agent.getDefinition(), value)) != null) {
+					binding = refs.getBinding(resolveChildFrameWithList(agent.getDefinition(), value));
                 }
 
                 s += " (or (not (exists (object-parameter (object-class ?pName" + k + "&:(eq pName" + k + " \"" + objPath + "\")) (instance-name "
@@ -255,12 +264,13 @@ public class ConditionBuilder {
                 value = "?exparam" + (k + 1);
             } else if (!isConstant(value) && !negated) {
 
-                if (refs.getBinding(resolveObjectClass(cond.getParameterName())) != null) {
-                    binding = refs.getBinding(resolveObjectClass(cond.getParameterName()));
+				if (refs.getBinding(resolveChildFrameWithList(agent.getDefinition(), cond.getParameterName())) != null) {
+					binding = refs.getBinding(resolveChildFrameWithList(agent.getDefinition(), cond.getParameterName()));
                 }
 
-                s += "  (object-parameter (object-class ?pName" + k + "&:(eq pName" + k + " \"" + objPath + "\")) (instance-name " + binding + "))\n";
-                s += "  (parameter (name ?n&:(eq ?n (str-cat \"" + list + "/\"" + " " + binding + " " + " \"/" + remainingPath + "\"))) "
+				s += " (object-parameter (object-class ?pName" + k + "&:(eq pName" + k + " \"" + objPath + "\")) (instance-name " + binding
+				        + "))\n";
+				s += " (parameter (name ?n&:(eq ?n (str-cat \"" + list + "/\"" + " " + binding + " " + " \"/" + remainingPath + "\"))) "
                         + " (value ?exparam" + (k + 1) + "))\n";
 
                 value = "?exparam" + (k + 1);
@@ -269,13 +279,13 @@ public class ConditionBuilder {
 
         String listLHS = resolveList(cond.getParameterName().split("/")[0].trim());
 
-        String s2 = buildExistsQuantifiedConstantExpression(cond, objectPath, attPath, k, negated, value, binding, listLHS);
+        String s2 = buildExistsQuantifiedRHSExpression(cond, objectPath, attPath, k, negated, value, binding, listLHS);
 
-        return s+"\n"+s2;
+		return s + s2;
 
     }
 
-    private String buildExistsQuantifiedConstantExpression(ConditionDef cond, String objectPath, String attPath, int k, boolean negated, String value,
+    private String buildExistsQuantifiedRHSExpression(ConditionDef cond, String objectPath, String attPath, int k, boolean negated, String value,
             String binding, String list) {
         String s;
         if (!negated) {
@@ -283,7 +293,7 @@ public class ConditionBuilder {
                 s = " (exists (object-parameter (object-class \"" + objectPath + "\")))\n";
             } else {
                 s = " (object-parameter (object-class \"" + objectPath + "\") (instance-name " + binding + "))\n";
-                s += " (exists (parameter (name ?m&:(eq ?m (str-cat \"" + list + "/\"" + " " + binding + " " + " \"/" + attPath + "\")))";
+				s += " (exists (parameter (name ?m&:(eq ?m (str-cat \"" + list + "/\"" + " " + binding + " " + " \"" + attPath + "\")))";
                 if (cond.getParameterValue().length() > 0) {
 
                     if (Utils.isNumerical(value)) {
@@ -301,27 +311,20 @@ public class ConditionBuilder {
             if (attPath == null) {
                 s = " (not (exists (object-parameter (object-class \"" + objectPath + "\"))))\n";
             } else {
-                // was s += ...
                 s = "  (not (parameter (name ?m&:(and (call (new java.lang.String ?m) contains  \"" + list + "\") "
-                        + " (call (new java.lang.String ?m) contains  \"" + attPath + "\"))) ";
+				        + " (call (new java.lang.String ?m) contains \"" + attPath + "\"))) ";
 
                 if (cond.getParameterValue().length() > 0) {
-                    // last two brackets close first part within the OR
                     if (Utils.isNumerical(value)) {
-                        s += " (value ?v" + k + "&:(eq* ?v" + k + " " + value
-                        // + ")))) )) \n";
-                                + ")) )) \n";
+						s += " (value ?v" + k + "&:(eq* ?v" + k + " " + value + ")) )) \n";
                     } else if (!value.contains("?")) {
                         s += " (value ?v" + k + "&:(eq ?v" + k + " \"" + value + "\")))) )) \n";
                     } else {
                         s += " (value ?v" + k + "&:(eq ?v" + k + " " + value + ")))) )) \n";
-                        // s += " (value ?v" + k + "&:(eq ?v" + k + " " + value + ")) ))
-                        // \n";
                     }
                 } else {
                     s += "))\n";
                 }
-
             }
 
         }
@@ -337,13 +340,14 @@ public class ConditionBuilder {
      * @return
      * @throws GSimEngineException
      */
-    public String createFixedAtomCondition(ConditionDef cond, Object2VariableBindingTable objRefs, String nRule_1) throws GSimEngineException {
+	public String createFixedAtomCondition(Instance owner, ConditionDef cond, Object2VariableBindingTable objRefs, String nRule_1)
+	        throws GSimEngineException {
 
         String nRule = "";
 
         int k = Uniform.staticNextIntFromTo(0, 1000);
 
-        nRule = createLHS(cond.getParameterName(), objRefs, k, nRule_1);
+		nRule = createLHS(owner, cond.getParameterName(), objRefs, k, nRule_1);
 
         if (!Utils.isNumerical(cond.getParameterValue()) && !isJessFunc(cond.getParameterValue()) && !cond.getOperator().equals("<>")) {
             nRule += "(value ?value" + k + "&:(eq*" + " ?value" + k + " \"" + cond.getParameterValue() + "\" )))\n";
@@ -364,7 +368,8 @@ public class ConditionBuilder {
 
     }
 
-    public String createNumericalAtomCondition(String attributeName, double min, double max, Object2VariableBindingTable objRefs, String nRule_1)
+	public String createNumericalAtomCondition(Instance owner, String attributeName, double min, double max,
+	        Object2VariableBindingTable objRefs, String nRule_1)
             throws GSimEngineException {
 
         String nRule = "";
@@ -374,11 +379,11 @@ public class ConditionBuilder {
         ConditionDef c0 = new ConditionDef(attributeName, ">=", String.valueOf(min));
         ConditionDef c1 = new ConditionDef(attributeName, "<", String.valueOf(max));
 
-        nRule = createLHS(c0.getParameterName(), objRefs, k + 12001, nRule_1);
+		nRule = createLHS(owner, c0.getParameterName(), objRefs, k + 12001, nRule_1);
 
         nRule += "(value ?value" + k + 1251 + "&:(and (numberp ?value" + k + 1251 + ") (>= ?value" + k + 1251 + " " + String.valueOf(min) + " ))))\n";
 
-        nRule += createLHS(c1.getParameterName(), objRefs, k + 12002, nRule + nRule_1);
+		nRule += createLHS(owner, c1.getParameterName(), objRefs, k + 12002, nRule + nRule_1);
         nRule += "(value ?value" + k + 1291 + "&:(and (numberp ?value" + k + 1291 + ") (< ?value" + k + 1291 + " " + String.valueOf(max) + " ))))\n";
 
         return nRule;
@@ -407,11 +412,10 @@ public class ConditionBuilder {
         int k = Uniform.staticNextIntFromTo(0, 1000);
 
         String list0 = resolveList(cond.getParameterValue());
-        String object0 = resolveObjectClass(cond.getParameterValue());
-        String att0 = resolveAttribute(cond.getParameterValue());
+		String object0 = resolveChildFrameWithList(owner.getDefinition(), cond.getParameterValue());
+		String att0 = extractChildAttributePathWithoutParent(owner.getDefinition(), cond.getParameterValue());
 
         String nRule = "";
-        // int idx = objRefs.get(object0);
         String binding = objRefs.getBinding(object0);
 
         if (binding == null) {
@@ -424,10 +428,10 @@ public class ConditionBuilder {
         }
         nRule += " (parameter (name ?x" + (k + 300) + "&:(eq ?x" + (k + 300) + " (str-cat \"" + list0 + "/\" " + binding + " \"/" + att0 + "\")))";
         nRule += " (value ?value" + k + "))\n";
-        String s = createLHS(cond.getParameterName(), objRefs, k, nRule + nRule_1);
+		String s = createLHS(owner, cond.getParameterName(), objRefs, k, nRule + nRule_1);
         nRule += s;
 
-        String att = resolveAttribute(cond.getParameterName());
+		String att = extractChildAttributePathWithoutParent(owner.getDefinition(), cond.getParameterName());
 
         if (!isNumericalAttribute(owner, att) && !cond.getOperator().equals("<>") || cond.getOperator().equals("=")) {
             nRule += "(value ?valueV" + (k) + "&:(eq*" + " ?valueV" + (k) + " ?value" + k + " " + ")))\n";
@@ -444,76 +448,26 @@ public class ConditionBuilder {
 
     }
 
-    public String resolveAttribute(String s) {
-        if (s.contains("::")) {
-            s = s.split("::")[1];
-        }
-
-        String[] a = s.split("/");
-
-        // if (a.length==2 && !b) return null;
-
-        String ret = "";
-        int y = 0;
-        // if (!b) y=2;
-        for (int i = y; i < a.length; i++) {
-            if (ret.length() > 0) {
-                ret += "/";
-            }
-            ret += a[i];
-        }
-
-        return ret;
+	/**
+	 * Extract only that part in the child instance (without path to the instance in the owning agent).
+	 * 
+	 * @param s
+	 * @return
+	 */
+	public String resolveAttribute1(Instance agent, String s) {
+		return extractChildAttributePathWithoutParent(agent.getDefinition(), s);
     }
 
-    public String resolveList(String s) {
-        String[] a = s.split("/");
 
-        String list = a[0];
-
-        if (list.contains("$")) {
-            if (list.lastIndexOf("$") != list.indexOf("$")) {
-                list = list.substring(list.lastIndexOf("$"));
-                list = list.replace("$", "");
-            } else {
-                list = list.replace("$", "");
-            }
-        }
-        return list;
-
-    }
-
-    public String resolveObjectClass(String s) {
-        String[] a = s.split("/");
-
-        String list = a[0];
-        String object = a[1];
-
-        if (object.contains("::")) {
-            object = object.substring(0, object.indexOf("::"));
-        }
-
-        if (list.contains("$")) {
-            if (list.lastIndexOf("$") != list.indexOf("$")) {
-                list = list.substring(list.lastIndexOf("$"));
-                list = list.replace("$", "");
-            } else {
-                list = list.replace("$", "");
-            }
-        }
-        return list + "/" + object;
-
-    }
-
-    private String createLHS(String leftVariableName, Object2VariableBindingTable objRefs, int variableIdx, String nRule_1)
+	private String createLHS(Instance owner, String leftVariableName, Object2VariableBindingTable objRefs, int variableIdx, String nRule_1)
             throws GSimEngineException {
 
         String nRule = "";
 
         if (!isConstant(leftVariableName)) {
             String list = resolveList(leftVariableName);
-            String object = resolveObjectClass(leftVariableName);
-            String att = resolveAttribute(leftVariableName);
+			String object = resolveChildFrameWithList(owner.getDefinition(), leftVariableName);
+			String att = extractChildAttributePathWithoutParent(owner.getDefinition(), leftVariableName);
 
             // int idx = objRefs.get(object);
             String binding = objRefs.getBinding(object);

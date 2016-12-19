@@ -126,6 +126,10 @@ public class Object2VariableBindingTable {
 		return ParsingUtils.resolveChildFrameWithList(agent.getDefinition(), s);
 	}
 
+	private String resolveObjectClassWithList1(String s) {
+		return ParsingUtils.resolveChildFrameWithList(agent.getDefinition(), s);
+	}
+
 	private String resolveObjectClassOld(String s) {
         String[] a = s.split("/");
 

@@ -55,13 +55,13 @@ public class TreeExpansionBuilder {
         n = createConditions(rule, objRefs, n);
 
         for (String att : expansionAttValuePairs.getSetAttributes()) {
-            n += conditionBuilder.createCategoricalAtomCondition(att, expansionAttValuePairs.getFillers(att), objRefs, n);
+			n += conditionBuilder.createCategoricalAtomCondition(this.agent, att, expansionAttValuePairs.getFillers(att), objRefs, n);
 
         }
         for (String att : expansionAttValuePairs.getIntervalAttributes()) {
             double[] interval = expansionAttValuePairs.getInterval(att);
 
-            n += conditionBuilder.createNumericalAtomCondition(att, interval[0], interval[1], objRefs, n);
+			n += conditionBuilder.createNumericalAtomCondition(this.agent, att, interval[0], interval[1], objRefs, n);
         }
 
         return n;

@@ -53,7 +53,7 @@ public class ConditionBuilderTest {
         agentClass = agentOperations.changeAgentClassBehaviour(agentClass, bf);
 
         env.getAgentInstanceOperations().instanciateAgentWithNormalDistributedAttributes(agentClass, "test-instance", 0);
-        core.createScenarioManager(w, new HashMap<>(), 10, 1).start();
+		runRLsimulation(10);
 
     }
 
