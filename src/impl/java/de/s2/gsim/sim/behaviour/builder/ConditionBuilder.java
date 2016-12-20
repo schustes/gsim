@@ -293,7 +293,7 @@ public class ConditionBuilder {
                 s = " (exists (object-parameter (object-class \"" + objectPath + "\")))\n";
             } else {
                 s = " (object-parameter (object-class \"" + objectPath + "\") (instance-name " + binding + "))\n";
-				s += " (exists (parameter (name ?m&:(eq ?m (str-cat \"" + list + "/\"" + " " + binding + " " + " \"" + attPath + "\")))";
+				s += " (exists (parameter (name ?m&:(eq ?m (str-cat \"" + list + "/\"" + " " + binding + " " + "\"/" + attPath + "\")))";
                 if (cond.getParameterValue().length() > 0) {
 
                     if (Utils.isNumerical(value)) {
@@ -311,7 +311,7 @@ public class ConditionBuilder {
             if (attPath == null) {
                 s = " (not (exists (object-parameter (object-class \"" + objectPath + "\"))))\n";
             } else {
-                s = "  (not (parameter (name ?m&:(and (call (new java.lang.String ?m) contains  \"" + list + "\") "
+				s = " (not (parameter (name ?m&:(and (call (new java.lang.String ?m) contains  \"" + list + "\") "
 				        + " (call (new java.lang.String ?m) contains \"" + attPath + "\"))) ";
 
                 if (cond.getParameterValue().length() > 0) {

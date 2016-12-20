@@ -14,12 +14,13 @@ public class TreeExpansionBuilder {
 
     private GeneralRLBuilder general;
 
-	private Object2VariableBindingTable refTable = new Object2VariableBindingTable(agent);
+	private Object2VariableBindingTable refTable;
 
     public TreeExpansionBuilder(RuntimeAgent a) {
         agent = a;
         conditionBuilder = new ConditionBuilder();
         general = new GeneralRLBuilder(a, conditionBuilder);
+		refTable = new Object2VariableBindingTable(agent);
     }
 
     public String buildExperimentationRule(RLRule rootRule, String stateName, Attribute2ValuesMap exp) throws GSimEngineException {

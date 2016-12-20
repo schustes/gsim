@@ -71,6 +71,9 @@ public class Path<T> {
 	public String toString() {
 		StringBuilder b = new StringBuilder();
 		rek(this, b);
+		if (b.charAt(0) == '/') {
+			b.deleteCharAt(0);
+		}
 		return b.toString();
 	}
 

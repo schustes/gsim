@@ -1,11 +1,10 @@
 package de.s2.gsim.sim.behaviour.builder;
 
 import java.util.ArrayDeque;
-import java.util.ArrayList;
 import java.util.Deque;
-import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 import de.s2.gsim.api.sim.agent.impl.RuntimeAgent;
 import de.s2.gsim.environment.Frame;
@@ -173,7 +172,7 @@ public class ParsingUtils {
 		Path<?> p = path;
 
 		Deque<Path<?>> stack = new ArrayDeque<>();
-		while (!isChildFrame(owningAgent, p)) {
+		while (p != null && !isChildFrame(owningAgent, p)) {
 			stack.push(p.last());
 			p = Path.withoutLast(p);
 		}
@@ -216,9 +215,12 @@ public class ParsingUtils {
 	}
 
 	public static boolean referencesChildFrame(Frame owningAgent, String pathString) {
-		return resolveChildFrameAndDo(owningAgent, pathString, (Object resolved) -> {
+		if (!pathString.contains("/")) {
+			return false;
+		}
+		return resolveChildFrameAndDoOrElse(owningAgent, pathString, (Object resolved) -> {
 			return (resolved instanceof TypedList);
-		});
+		}, () -> false);
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
@@ -227,27 +229,25 @@ public class ParsingUtils {
 		Path<?> p = path;
 		Path<?> pn = new Path(p.getName(), p.getType());
 
-		return resolveChildFrameAndDo(owningAgent, pathString, (Object resolved) -> {
+		return resolveChildFrameAndDoOrElse(owningAgent, pathString, (Object resolved) -> {
 			if ((resolved instanceof TypedList)) {
 				TypedList<Frame> list = (TypedList<Frame>) resolved;
 				return pn.getName() + "/" + list.getType().getName();
 			}
 			return null;
-		});
+		}, () -> null);
 	}
 
-	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@SuppressWarnings({ "unchecked" })
 	public static String resolveChildFrameWithoutList(Frame owningAgent, String pathString) {
-		Path<Attribute> path = Path.attributePath(pathString.split("/"));
-		Path<?> p = path;
 
-		return resolveChildFrameAndDo(owningAgent, pathString, (Object resolved) -> {
+		return resolveChildFrameAndDoOrElse(owningAgent, pathString, (Object resolved) -> {
 			if ((resolved instanceof TypedList)) {
 				TypedList<Frame> list = (TypedList<Frame>) resolved;
 				return list.getType().getName();
 			}
 			return null;
-		});
+		}, () -> null);
 	}
 
 	// TODO fix with/without list, and need to differentiate between instance and frame names during runtime
@@ -273,7 +273,8 @@ public class ParsingUtils {
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	private static <R> R resolveChildFrameAndDo(Frame owningAgent, String pathString, Function<Object, R> supplier) {
+	private static <R> R resolveChildFrameAndDoOrElse(Frame owningAgent, String pathString, Function<Object, R> supplier,
+	        Supplier<R> otherwise) {
 		Path<Attribute> path = Path.attributePath(pathString.split("/"));
 		Path<?> p = path;
 		Path<?> pn = new Path(p.getName(), p.getType());
@@ -287,9 +288,11 @@ public class ParsingUtils {
 				return null;
 			}
 			p = p.next();
-			pn.append(new Path(p.getName(), p.getType()));
+			if (p != null) {
+				pn.append(new Path(p.getName(), p.getType()));
+			}
 		}
-		return null;
+		return otherwise.get();
 	}
 
 

@@ -844,6 +844,9 @@ public class Frame extends Unit<Frame , DomainAttribute> {
 
 		// step into object lists to find object
 		if (getObjectLists().containsKey(path.getName()) && !path.isTerminal()) {
+			if (this.getChildFrame(path.getName(), path.next().getName()) == null) {
+				throw new GSimDefException(String.format("Object %s not found in list %s: ", path.getName(), path.lastAsString()));
+			}
 			return (T) this.getChildFrame(path.getName(), path.next().getName()).resolvePath(path.next());
 		}
 

@@ -163,14 +163,6 @@ public class RLParser {
             s += erb.createStateDescriptionQueries();
             s += erb.createRetractFollowRules();
 
-            // if (hasExpansion) {
-            // int expandInterval = this.agent.getBehaviour().getStateUpdateInterval();
-            // double revisitCostFraction = this.agent.getBehaviour().getRevisitCost();
-            // double revaluationProbability = this.agent.getBehaviour().getRevalProb();
-            // String roleName = agent.getDefinition().getTypeName();
-            // s += new ExpansionRulesBuilder().build(expandInterval,revisitCostFraction, revaluationProbability, roleName);
-            // }
-
             res += s;
 
             res += "\n";
@@ -193,20 +185,7 @@ public class RLParser {
     private void extractConditionRefs(RLRule r, Attribute2ValuesMap exp) {
         for (ExpansionDef e : r.getExpansions()) {
             String path = e.getParameterName();
-            DomainAttribute a = null;
-            if (path.contains("::")) {
-                ConditionBuilder cb = new ConditionBuilder();
-                String obj = cb.resolveObjectClass(path);
-                Frame f = (Frame) agent.getDefinition().resolvePath(Path.attributePath(obj.split("/")));
-                if (f == null) {
-                    String list = cb.resolveList(path);
-                    f = agent.getDefinition().getListType(list);
-                }
-                String att = cb.resolveAttribute(path);
-                a = f.resolvePath(Path.attributePath(att.split("/")));
-            } else {
-                a = agent.getDefinition().resolvePath(Path.attributePath(path.split("/")));
-            }
+			DomainAttribute a = this.agent.getDefinition().resolvePath(Path.attributePath(path.split("/")));
             if (a.getType() == AttributeType.INTERVAL) {
                 exp.setIntervalAttributes(path, Double.parseDouble(e.getFillers().get(0)), Double.parseDouble(e.getFillers().get(1)));
             } else if (a.getType() == AttributeType.SET) {

@@ -365,9 +365,9 @@ public class RLRulesBuilder {
 
         int variableIdx = Uniform.staticNextIntFromTo(0, 1000);
 
-        String list = conditionBuilder.resolveList(paramName);
-        String object = conditionBuilder.resolveObjectClass(paramName);
-        String att = conditionBuilder.resolveAttribute(paramName);
+		String list = ParsingUtils.resolveList(paramName);// conditionBuilder.resolveList(paramName);
+		String object = ParsingUtils.resolveChildFrameWithList(this.agent.getDefinition(), paramName);// conditionBuilder.resolveObjectClass(paramName);
+		String att = ParsingUtils.extractChildAttributePathWithoutParent(agent.getDefinition(), paramName);// conditionBuilder.resolveAttribute(paramName);
 
         String binding = objRefs.getBinding(object);
         if (binding == null) {

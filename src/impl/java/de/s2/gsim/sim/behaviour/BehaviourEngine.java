@@ -190,8 +190,8 @@ public class BehaviourEngine implements java.io.Serializable {
                 currentConditionSet = JessHandlerUtils.buildCurrentState(rete, owner);
                 if (objectParams.isEmpty()) {
                     for (String s : currentConditionSet) {
-                        if (s.contains("::")) {
-                            objectParams.add(ParsingUtils.resolveObjectClass(s));
+						if (ParsingUtils.referencesChildFrame(owner.getDefinition(), s)) {
+							objectParams.add(ParsingUtils.resolveChildFrameWithList(this.owner.getDefinition(), s));
                         }
                     }
                 }
@@ -570,16 +570,18 @@ public class BehaviourEngine implements java.io.Serializable {
 
     private DomainAttribute extractAtt(String path) {
         DomainAttribute a = null;
-        if (path.contains("::")) {
-            ConditionBuilder cb = new ConditionBuilder();
-            String obj = cb.resolveObjectClass(path);
+		if (ParsingUtils.referencesChildFrame(owner.getDefinition(), path)) {
+			// ConditionBuilder cb = new ConditionBuilder();
+			String obj = ParsingUtils.resolveChildFrameWithList(this.owner.getDefinition(), path);
+			// String obj = cb.resolveObjectClass(path);
             Frame f = (Frame) owner.getDefinition().resolvePath(Path.objectPath(obj.split("/")));
             if (f == null) {
-                String list = cb.resolveList(path);
+				String list = ParsingUtils.resolveList(path);
                 f = owner.getDefinition().getListType(list);
 
             }
-            String att = cb.resolveAttribute(path);
+			String att = ParsingUtils.extractChildAttributePathWithoutParent(owner.getDefinition(), path);
+			// String att = cb.resolveAttribute(path);
             a = f.resolvePath(Path.attributePath(att.split("/")));
         } else {
             a = owner.getDefinition().resolvePath(Path.attributePath(path.split("/")));
