@@ -13,10 +13,11 @@ import de.s2.gsim.environment.RLRule;
 import de.s2.gsim.environment.UserRule;
 
 /**
- * Contains a map with the objects referenced by the conditions (and possibly consequents) of a rule/RLrule. In a rule, multiple references to object
- * specs in a condition set are bound to the same object instances. These bindings are typically stored in this map, containing unique indices for
- * each object class. These indices are then appended to the variable place holders in the jess-expression.
- *
+ * Maintains a map from agent objects to variable names in the rule program. This is necessary if the same agent objects have to be referenced in
+ * different lines of the rule program to match the proper facts in the rule base. Therefore it is important that the semantically same attributes and
+ * objects are bound to the same variables during runtime; neither must the semantically identical objects be bound to different variable names nor
+ * different a objects to the same variable name.
+ * 
  */
 public class Object2VariableBindingTable {
 

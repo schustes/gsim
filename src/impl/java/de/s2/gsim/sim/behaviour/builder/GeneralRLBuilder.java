@@ -1,15 +1,11 @@
 package de.s2.gsim.sim.behaviour.builder;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import de.s2.gsim.api.sim.agent.impl.RuntimeAgent;
-import de.s2.gsim.environment.ActionDef;
-import de.s2.gsim.environment.ConditionDef;
 import de.s2.gsim.environment.ExpansionDef;
 import de.s2.gsim.environment.Instance;
 import de.s2.gsim.environment.RLRule;
-import de.s2.gsim.environment.UserRule;
 import de.s2.gsim.environment.UserRuleFrame;
 import de.s2.gsim.objects.attribute.StringAttribute;
 import de.s2.gsim.sim.GSimEngineException;
@@ -18,10 +14,7 @@ public class GeneralRLBuilder {
 
 	private RuntimeAgent agent = null;
 
-	private ConditionBuilder conditionBuilder = null;
-
-	public GeneralRLBuilder(RuntimeAgent agent, ConditionBuilder conditionBuilder) {
-		this.conditionBuilder = conditionBuilder;
+    public GeneralRLBuilder(RuntimeAgent agent) {
 		this.agent = agent;
 	}
 

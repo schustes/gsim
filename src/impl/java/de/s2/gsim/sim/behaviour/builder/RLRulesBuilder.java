@@ -10,15 +10,12 @@ import de.s2.gsim.environment.ActionDef;
 import de.s2.gsim.environment.ConditionDef;
 import de.s2.gsim.environment.Instance;
 import de.s2.gsim.environment.RLRule;
-import de.s2.gsim.environment.UserRule;
 import de.s2.gsim.sim.GSimEngineException;
 import de.s2.gsim.sim.behaviour.Context;
 import de.s2.gsim.sim.behaviour.SimAction;
 import de.s2.gsim.util.Utils;
 
 public class RLRulesBuilder {
-
-    private static int someCounter = 0;
 
     private RuntimeAgent agent;
 
@@ -28,8 +25,7 @@ public class RLRulesBuilder {
 
     public RLRulesBuilder(RuntimeAgent a) {
         agent = a;
-        conditionBuilder = new ConditionBuilder();
-        general = new GeneralRLBuilder(a, conditionBuilder);
+        general = new GeneralRLBuilder(a);
     }
 
     String buildAvgRule(RLRule rule, ConditionDef evaluationFunction) {
@@ -188,8 +184,6 @@ public class RLRulesBuilder {
     }
 
     private String[] buildExperimentationTerminalRules(RLRule rule, boolean helpersOnly) throws GSimEngineException {
-
-        someCounter++;
 
         Set<String> singleRules = new HashSet<String>();
 

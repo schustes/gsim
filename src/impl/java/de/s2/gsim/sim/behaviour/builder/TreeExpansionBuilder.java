@@ -1,5 +1,9 @@
 package de.s2.gsim.sim.behaviour.builder;
 
+import static de.s2.gsim.sim.behaviour.builder.ConditionBuilder.createCategoricalAtomCondition;
+import static de.s2.gsim.sim.behaviour.builder.ConditionBuilder.createCondition;
+import static de.s2.gsim.sim.behaviour.builder.ConditionBuilder.createNumericalAtomCondition;
+
 import de.s2.gsim.api.sim.agent.impl.RuntimeAgent;
 import de.s2.gsim.environment.ConditionDef;
 import de.s2.gsim.environment.RLRule;
@@ -10,16 +14,13 @@ public class TreeExpansionBuilder {
 
     private RuntimeAgent agent;
 
-    private ConditionBuilder conditionBuilder;
-
     private GeneralRLBuilder general;
 
 	private Object2VariableBindingTable refTable;
 
     public TreeExpansionBuilder(RuntimeAgent a) {
         agent = a;
-        conditionBuilder = new ConditionBuilder();
-        general = new GeneralRLBuilder(a, conditionBuilder);
+        general = new GeneralRLBuilder(a);
 		refTable = new Object2VariableBindingTable(agent);
     }
 
@@ -42,7 +43,7 @@ public class TreeExpansionBuilder {
         String n = "";
 
         for (ConditionDef condition : rule.getConditions()) {
-            n += conditionBuilder.createCondition(agent, condition, objRefs, ruleSoFar);
+            n += createCondition(agent, condition, objRefs, ruleSoFar);
         }
         return n;
     }
@@ -56,13 +57,13 @@ public class TreeExpansionBuilder {
         n = createConditions(rule, objRefs, n);
 
         for (String att : expansionAttValuePairs.getSetAttributes()) {
-			n += conditionBuilder.createCategoricalAtomCondition(this.agent, att, expansionAttValuePairs.getFillers(att), objRefs, n);
+            n += createCategoricalAtomCondition(this.agent, att, expansionAttValuePairs.getFillers(att), objRefs, n);
 
         }
         for (String att : expansionAttValuePairs.getIntervalAttributes()) {
             double[] interval = expansionAttValuePairs.getInterval(att);
 
-			n += conditionBuilder.createNumericalAtomCondition(this.agent, att, interval[0], interval[1], objRefs, n);
+            n += createNumericalAtomCondition(this.agent, att, interval[0], interval[1], objRefs, n);
         }
 
         return n;

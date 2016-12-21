@@ -1,8 +1,13 @@
 package de.s2.gsim.sim.behaviour.builder;
 
-import static de.s2.gsim.sim.behaviour.builder.ParsingUtils.*;
-import cern.jet.random.Uniform;
+import static de.s2.gsim.sim.behaviour.builder.ConditionBuilder.createAttributeCondition;
+import static de.s2.gsim.sim.behaviour.builder.ConditionBuilder.createExistsQuantifiedCondition;
+import static de.s2.gsim.sim.behaviour.builder.ConditionBuilder.createFixedAtomCondition;
+import static de.s2.gsim.sim.behaviour.builder.ConditionBuilder.createVariableCondition;
+import static de.s2.gsim.sim.behaviour.builder.ParsingUtils.getDefiningRoleForRule;
+import static de.s2.gsim.sim.behaviour.builder.ParsingUtils.referencesChildFrame;
 
+import cern.jet.random.Uniform;
 import de.s2.gsim.api.sim.agent.impl.RuntimeAgent;
 import de.s2.gsim.environment.ActionDef;
 import de.s2.gsim.environment.ConditionDef;
@@ -17,8 +22,6 @@ import jess.Rete;
 public class ReactiveRuleBuilder {
 
     private RuntimeAgent agent = null;
-
-    private ConditionBuilder utils = new ConditionBuilder();
 
     public ReactiveRuleBuilder(RuntimeAgent agent) {
         this.agent = agent;
@@ -56,7 +59,7 @@ public class ReactiveRuleBuilder {
     private String buildUserRules_PerActionName(UserRule rule) throws GSimEngineException {
 
         ActionDef[] consequences = rule.getConsequents();
-        String role = ParsingUtils.getDefiningRoleForRule(agent, rule.getName());
+        String role = getDefiningRoleForRule(agent, rule.getName());
 
         String res = "";
 
@@ -101,7 +104,7 @@ public class ReactiveRuleBuilder {
                         nRule += " (parameter (name \"executing-role\") (value " + "\"" + role + "\"))\n";
 
                         // HashMap<String, Integer> p =
-                        // utils.buildObjectRefTable(conditions);
+                        // buildObjectRefTable(conditions);
 
 						Object2VariableBindingTable p = new Object2VariableBindingTable(agent);
                         p.build(rule);
@@ -110,13 +113,13 @@ public class ReactiveRuleBuilder {
                             ConditionDef cond = conditions[k];
 							if (!referencesChildFrame(agent.getDefinition(), cond.getParameterValue()) && !isExistQuantified(cond)
 							        && cond.getParameterValue().indexOf("{") < 0) {
-								nRule += " " + utils.createFixedAtomCondition(this.agent, cond, p, nRule);
+                                nRule += " " + createFixedAtomCondition(this.agent, cond, p, nRule);
 							} else if (!referencesChildFrame(agent.getDefinition(), cond.getParameterValue()) && isExistQuantified(cond)) {
-								nRule += "" + utils.createExistsQuantifiedCondition(agent, cond, p);
+                                nRule += "" + createExistsQuantifiedCondition(agent, cond, p);
 							} else if (!referencesChildFrame(agent.getDefinition(), cond.getParameterValue())) {
-								nRule += " " + utils.createAttributeCondition(this.agent, cond, p, nRule);
+                                nRule += " " + createAttributeCondition(this.agent, cond, p, nRule);
 							} else if (referencesChildFrame(agent.getDefinition(), cond.getParameterValue())) {
-                                nRule += "" + utils.createVariableCondition(agent, cond, p, nRule);
+                                nRule += "" + createVariableCondition(agent, cond, p, nRule);
                             }
 
                         }
@@ -152,7 +155,7 @@ public class ReactiveRuleBuilder {
 			Object2VariableBindingTable params = new Object2VariableBindingTable(agent);
             params.build(rule);
             // HashMap<String, Integer> params =
-            // utils.buildObjectRefTable(conditions);
+            // buildObjectRefTable(conditions);
 
             nRule += " (parameter (name \"exec-r\"))\n";
             // nRule += " (parameter (name \"exec-interval\") (value ?exc&:(= 0 (mod ?*current-time* ?exc))))\n";
@@ -176,15 +179,15 @@ public class ReactiveRuleBuilder {
                 ConditionDef cond = conditions[k];
                 if (!referencesChildFrame(agent.getDefinition(), cond.getParameterValue()) && 
                 		!isExistQuantified(cond) && cond.getParameterValue().indexOf("{") < 0) {
-					nRule += "" + utils.createFixedAtomCondition(this.agent, cond, params, nRule);
+                    nRule += "" + createFixedAtomCondition(this.agent, cond, params, nRule);
                 } else if (isExistQuantified(cond)) {
-					nRule += "" + utils.createExistsQuantifiedCondition(agent, cond, params);
+                    nRule += "" + createExistsQuantifiedCondition(agent, cond, params);
                 } else if (!referencesChildFrame(agent.getDefinition(), cond.getParameterValue()) && 
                 		!isExistQuantified(cond)) {
-					nRule += "" + utils.createAttributeCondition(this.agent, cond, params, nRule);
+                    nRule += "" + createAttributeCondition(this.agent, cond, params, nRule);
 				} else if (referencesChildFrame(agent.getDefinition(), cond.getParameterValue()) && 
                 		!isExistQuantified(cond)) {
-                    nRule += "" + utils.createVariableCondition(agent, cond, params, nRule);
+                    nRule += "" + createVariableCondition(agent, cond, params, nRule);
                 }
             }
 

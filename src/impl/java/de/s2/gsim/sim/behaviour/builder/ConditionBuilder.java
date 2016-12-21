@@ -24,7 +24,11 @@ import de.s2.gsim.util.Utils;
  * objects in one of the agent's object lists.
  *
  */
-public class ConditionBuilder {
+public abstract class ConditionBuilder {
+
+    private ConditionBuilder() {
+        // empty on purpose
+    }
 
     /**
      * Call this method if the attribute spec contains a reference to another attribute
@@ -35,7 +39,7 @@ public class ConditionBuilder {
      * @return
      * @throws GSimEngineException
      */
-	public String createAttributeCondition(Instance owner, ConditionDef cond, Object2VariableBindingTable objRefs, String nRule_1)
+    public static String createAttributeCondition(Instance owner, ConditionDef cond, Object2VariableBindingTable objRefs, String nRule_1)
 	        throws GSimEngineException {
 
         String nRule = "";
@@ -79,7 +83,7 @@ public class ConditionBuilder {
 
     }
 
-	public String createCategoricalAtomCondition(Instance owner, String attName, String selectedFiller, Object2VariableBindingTable objRefs,
+    public static String createCategoricalAtomCondition(Instance owner, String attName, String selectedFiller, Object2VariableBindingTable objRefs,
 	        String nRule_1)
             throws GSimEngineException {
 
@@ -100,12 +104,12 @@ public class ConditionBuilder {
 
     }
 
-	public String createCategoricalAtomCondition(Instance owner, String attName, List<String> selectedFillers,
+    public static String createCategoricalAtomCondition(Instance owner, String attName, List<String> selectedFillers,
 	        Object2VariableBindingTable objRefs, String nRule_1)
             throws GSimEngineException {
 
         if (selectedFillers.size() == 1) {
-			return this.createCategoricalAtomCondition(owner, attName, selectedFillers.get(0), objRefs, nRule_1);
+            return createCategoricalAtomCondition(owner, attName, selectedFillers.get(0), objRefs, nRule_1);
         }
 
         String nRule = "";
@@ -140,7 +144,7 @@ public class ConditionBuilder {
 
     }
 
-    public String createCondition(Instance agent, ConditionDef cond, Object2VariableBindingTable objRefs, String ruleSoFar)
+    public static String createCondition(Instance agent, ConditionDef cond, Object2VariableBindingTable objRefs, String ruleSoFar)
             throws GSimEngineException {
 
         String n = "";
@@ -168,7 +172,7 @@ public class ConditionBuilder {
      * @return
      * @throws GSimEngineException
      */
-	public String createDefaultAtomCondition(Instance owner, ExpansionDef cond, Object2VariableBindingTable objRefs, String nRule_1)
+    public static String createDefaultAtomCondition(Instance owner, ExpansionDef cond, Object2VariableBindingTable objRefs, String nRule_1)
 	        throws GSimEngineException {
 
         String nRule = "";
@@ -228,7 +232,7 @@ public class ConditionBuilder {
      * @param refs
      * @return
      */
-    public String createExistsQuantifiedCondition(Instance agent, ConditionDef cond, Object2VariableBindingTable refs) {
+    public static String createExistsQuantifiedCondition(Instance agent, ConditionDef cond, Object2VariableBindingTable refs) {
 
 
         String s = "";
@@ -291,7 +295,8 @@ public class ConditionBuilder {
 
     }
 
-    private String buildExistsQuantifiedRHSExpression(ConditionDef cond, String objectPath, String attPath, int k, boolean negated, String value,
+    private static String buildExistsQuantifiedRHSExpression(ConditionDef cond, String objectPath, String attPath, int k, boolean negated,
+            String value,
             String binding, String list) {
         String s;
         if (!negated) {
@@ -346,7 +351,7 @@ public class ConditionBuilder {
      * @return
      * @throws GSimEngineException
      */
-	public String createFixedAtomCondition(Instance owner, ConditionDef cond, Object2VariableBindingTable objRefs, String nRule_1)
+    public static String createFixedAtomCondition(Instance owner, ConditionDef cond, Object2VariableBindingTable objRefs, String nRule_1)
 	        throws GSimEngineException {
 
         String nRule = "";
@@ -374,7 +379,7 @@ public class ConditionBuilder {
 
     }
 
-	public String createNumericalAtomCondition(Instance owner, String attributeName, double min, double max,
+    public static String createNumericalAtomCondition(Instance owner, String attributeName, double min, double max,
 	        Object2VariableBindingTable objRefs, String nRule_1)
             throws GSimEngineException {
 
@@ -412,7 +417,7 @@ public class ConditionBuilder {
      * @return the string with the jess expression for that condition
      * @throws GSimEngineException
      */
-    public String createVariableCondition(Instance owner, ConditionDef cond, Object2VariableBindingTable objRefs, String nRule_1)
+    public static String createVariableCondition(Instance owner, ConditionDef cond, Object2VariableBindingTable objRefs, String nRule_1)
             throws GSimEngineException {
 
         int k = Uniform.staticNextIntFromTo(0, 1000);
@@ -460,12 +465,12 @@ public class ConditionBuilder {
 	 * @param s
 	 * @return
 	 */
-	public String resolveAttribute1(Instance agent, String s) {
+    public static String resolveAttribute1(Instance agent, String s) {
 		return extractChildAttributePathWithoutParent(agent.getDefinition(), s);
     }
 
 
-	private String createLHS(Instance owner, String leftVariableName, Object2VariableBindingTable objRefs, int variableIdx, String nRule_1)
+    private static String createLHS(Instance owner, String leftVariableName, Object2VariableBindingTable objRefs, int variableIdx, String nRule_1)
             throws GSimEngineException {
 
         String nRule = "";
@@ -497,16 +502,16 @@ public class ConditionBuilder {
         return nRule;
     }
 
-    private boolean isExistQuantified(ConditionDef c) {
+    private static boolean isExistQuantified(ConditionDef c) {
         return c.getOperator().trim().equalsIgnoreCase("EXISTS") || c.getOperator().trim().equalsIgnoreCase("~EXISTS")
                 || c.getOperator().trim().equalsIgnoreCase("NOT EXISTS");
     }
 
-    private boolean isJessFunc(String s) {
+    private static boolean isJessFunc(String s) {
         return s.trim().startsWith("(");
     }
 
-    private boolean isNumericalAttribute(Instance obj, String pathToAtt) {
+    private static boolean isNumericalAttribute(Instance obj, String pathToAtt) {
         //Attribute a = (Attribute) obj.resolveName(pathToAtt.split("/"));
         Path<Attribute> p = Path.attributePath(pathToAtt.split("/"));
         Attribute a = (Attribute) obj.resolvePath(p);
