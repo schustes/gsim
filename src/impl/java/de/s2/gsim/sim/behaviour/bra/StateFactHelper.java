@@ -1,4 +1,4 @@
-package de.s2.gsim.sim.behaviour.rangeupdate;
+package de.s2.gsim.sim.behaviour.bra;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -16,9 +16,9 @@ import jess.Rete;
 import jess.Value;
 import jess.ValueVector;
 
-public abstract class DynamicValueRangeExtensionFactHelper {
+public abstract class StateFactHelper {
 
-    private DynamicValueRangeExtensionFactHelper() {
+    private StateFactHelper() {
         // static class only
     }
 
@@ -120,9 +120,9 @@ public abstract class DynamicValueRangeExtensionFactHelper {
     }
 
     public static void appendRemainingStateFactElems(List<Fact> remaining, String stateFactName, Context context) {
-        applyIfConditionMatches(remaining, DynamicValueRangeExtensionFactHelper::isNumericalStateFactElem,
+        applyIfConditionMatches(remaining, StateFactHelper::isNumericalStateFactElem,
                 (Fact f) -> appendRemainingStateFactElemsInterval(f, stateFactName, context));
-        applyIfConditionMatches(remaining, DynamicValueRangeExtensionFactHelper::isCategoricalStateFactElem,
+        applyIfConditionMatches(remaining, StateFactHelper::isCategoricalStateFactElem,
                 (Fact f) -> appendRemainingStateFactElemsCat(f, stateFactName, context));
     }
 

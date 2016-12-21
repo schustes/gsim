@@ -1,6 +1,6 @@
 package de.s2.gsim.sim.behaviour.rangeupdate;
 
-import static de.s2.gsim.sim.behaviour.rangeupdate.DynamicValueRangeExtensionFactHelper.addStateFactIntervalElemFromStatefact;
+import static de.s2.gsim.sim.behaviour.bra.StateFactHelper.addStateFactIntervalElemFromStatefact;
 import static de.s2.gsim.sim.behaviour.rangeupdate.DynamicValueRangeExtensionRuleBuilder.increaseIntervalRangeInExperimentalRule;
 import static de.s2.gsim.sim.behaviour.util.FactHelper.getFloatSlotValue;
 import static de.s2.gsim.sim.behaviour.util.FactHelper.getStringSlotValue;

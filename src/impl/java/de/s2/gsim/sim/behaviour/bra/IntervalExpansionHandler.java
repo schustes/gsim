@@ -1,10 +1,10 @@
 package de.s2.gsim.sim.behaviour.bra;
 
-import static de.s2.gsim.sim.behaviour.rangeupdate.DynamicValueRangeExtensionFactHelper.addStateFactIntervalElemFromParentElem;
-import static de.s2.gsim.sim.behaviour.rangeupdate.DynamicValueRangeExtensionFactHelper.appendRemainingStateFactElems;
-import static de.s2.gsim.sim.behaviour.rangeupdate.DynamicValueRangeExtensionFactHelper.existsEquivalent;
-import static de.s2.gsim.sim.behaviour.rangeupdate.DynamicValueRangeExtensionFactHelper.expandStateDescription;
-import static de.s2.gsim.sim.behaviour.rangeupdate.DynamicValueRangeExtensionFactHelper.insertNewActionNodes;
+import static de.s2.gsim.sim.behaviour.bra.StateFactHelper.addStateFactIntervalElemFromParentElem;
+import static de.s2.gsim.sim.behaviour.bra.StateFactHelper.appendRemainingStateFactElems;
+import static de.s2.gsim.sim.behaviour.bra.StateFactHelper.existsEquivalent;
+import static de.s2.gsim.sim.behaviour.bra.StateFactHelper.expandStateDescription;
+import static de.s2.gsim.sim.behaviour.bra.StateFactHelper.insertNewActionNodes;
 import static de.s2.gsim.sim.behaviour.rangeupdate.DynamicValueRangeExtensionRuleBuilder.createNewExperimentalRule;
 
 import java.util.List;

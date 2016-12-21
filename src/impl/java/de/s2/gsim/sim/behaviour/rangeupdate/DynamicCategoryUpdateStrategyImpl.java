@@ -1,7 +1,7 @@
 package de.s2.gsim.sim.behaviour.rangeupdate;
 
 import static cern.jet.random.Uniform.staticNextIntFromTo;
-import static de.s2.gsim.sim.behaviour.rangeupdate.DynamicValueRangeExtensionFactHelper.addStateFactCategoryElemFromStatefact;
+import static de.s2.gsim.sim.behaviour.bra.StateFactHelper.addStateFactCategoryElemFromStatefact;
 import static de.s2.gsim.sim.behaviour.rangeupdate.DynamicValueRangeExtensionRuleBuilder.addCategoryToExperimentalRule;
 import static de.s2.gsim.sim.behaviour.util.FactHelper.getFloatSlotValue;
 import static de.s2.gsim.sim.behaviour.util.ReteHelper.deleteRule;
