@@ -175,7 +175,7 @@ public class EnvironmentTest {
 
 		}
 
-		double minimumExpectedCorrectSamples = ((double) samples) * 0.99;
+        double minimumExpectedCorrectSamples = ((double) samples) * 0.95;
 		assertThat("Distribution in expected confidence interval ", (double) countExpected,
 				greaterThanOrEqualTo(minimumExpectedCorrectSamples));
 
