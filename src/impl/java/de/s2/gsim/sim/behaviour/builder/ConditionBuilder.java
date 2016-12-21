@@ -272,6 +272,8 @@ public class ConditionBuilder {
 
                 value = "?exparam" + (k + 1);
             }
+        } else {
+            value = cond.getParameterValue();
         }
 
         String listLHS = resolveList(cond.getParameterName().split("/")[0].trim());
