@@ -80,10 +80,13 @@ public class Object2VariableBindingTable {
 			if (ParsingUtils.referencesChildFrame(agent.getDefinition(), c.getParameterName())) {
                 String object = resolveObjectClassWithList(c.getParameterName());
                 addObjectClass(object);
-			} else if (ParsingUtils.referencesChildFrame(agent.getDefinition(), c.getParameterValue())) {
+            }
+            if (ParsingUtils.referencesChildFrame(agent.getDefinition(), c.getParameterValue())) {
                 String object = resolveObjectClassWithList(c.getParameterValue());
                 addObjectClass(object);
-            } else {
+            }
+            if (!ParsingUtils.referencesChildFrame(agent.getDefinition(), c.getParameterValue())
+                    && !ParsingUtils.referencesChildFrame(agent.getDefinition(), c.getParameterName())) {
                 String object = c.getParameterName();
                 addObjectClass(object);
             }

@@ -3,7 +3,6 @@ package de.s2.gsim.sim.behaviour.builder;
 import static de.s2.gsim.sim.behaviour.builder.ParsingUtils.extractChildAttributePathWithoutParent;
 import static de.s2.gsim.sim.behaviour.builder.ParsingUtils.referencesChildFrame;
 import static de.s2.gsim.sim.behaviour.builder.ParsingUtils.resolveChildFrameWithList;
-import static de.s2.gsim.sim.behaviour.builder.ParsingUtils.resolveChildFrameWithoutList;
 import static de.s2.gsim.sim.behaviour.builder.ParsingUtils.resolveList;
 
 import java.util.List;
@@ -231,11 +230,6 @@ public class ConditionBuilder {
      */
     public String createExistsQuantifiedCondition(Instance agent, ConditionDef cond, Object2VariableBindingTable refs) {
 
-		String objectPath = resolveChildFrameWithList(agent.getDefinition(), cond.getParameterName());
-        String attPath = null;
-        if (referencesChildFrame(agent.getDefinition(), cond.getParameterName())) {
-			attPath = extractChildAttributePathWithoutParent(agent.getDefinition(), cond.getParameterName());
-        }
 
         String s = "";
 
@@ -243,37 +237,37 @@ public class ConditionBuilder {
 
         boolean negated = cond.getOperator().contains("~") || cond.getOperator().contains("NOT");
 
-        String value = cond.getParameterValue();
+        String value = "???";
 
-        String binding = refs.getBinding(objectPath);
+        String binding = "???";
 
-		if (referencesChildFrame(agent.getDefinition(), value)) {
-			String objPath = resolveChildFrameWithoutList(agent.getDefinition(), value);
-			String objPathFull = resolveChildFrameWithList(agent.getDefinition(), value);
-			String list = objPathFull.split("/")[0].trim();
-			String remainingPath = value.substring(objPathFull.length() + 1, value.length());
+        if (referencesChildFrame(agent.getDefinition(), cond.getParameterValue())) {
+            // String objPathNoList = resolveChildFrameWithoutList(agent.getDefinition(), value);
+            String objPath = resolveChildFrameWithList(agent.getDefinition(), cond.getParameterValue());
+            String list = objPath.split("/")[0].trim();
+            String remainingPath = cond.getParameterValue().substring(objPath.length() + 1, cond.getParameterValue().length());
 
             if (negated) {
 
-				if (refs.getBinding(resolveChildFrameWithList(agent.getDefinition(), value)) != null) {
-					binding = refs.getBinding(resolveChildFrameWithList(agent.getDefinition(), value));
+                if (refs.getBinding(resolveChildFrameWithList(agent.getDefinition(), cond.getParameterValue())) != null) {
+                    binding = refs.getBinding(resolveChildFrameWithList(agent.getDefinition(), cond.getParameterValue()));
                 }
 
                 s += " (or (not (exists (object-parameter (object-class ?pName" + k + "&:(eq pName" + k + " \"" + objPath + "\")) (instance-name "
                         + binding + ") )))\n";
                 s += "  (and (object-parameter (object-class \"" + objPath + "\") (instance-name " + binding + "))\n";
-                s += "  (parameter (name ?n&:(eq ?n (str-cat \"" + list + "/\"" + " " + binding + " " + " \"/" + remainingPath + "\"))) "
+                s += "  (parameter (name ?n0&:(eq ?n0 (str-cat \"" + list + "/\"" + " " + binding + " " + " \"/" + remainingPath + "\"))) "
                         + " (value ?exparam" + (k + 1) + "))\n";
                 value = "?exparam" + (k + 1);
-			} else if (referencesChildFrame(agent.getDefinition(), value) && !negated) {
+            } else if (referencesChildFrame(agent.getDefinition(), cond.getParameterValue())) {
 
-				if (refs.getBinding(resolveChildFrameWithList(agent.getDefinition(), cond.getParameterName())) != null) {
-					binding = refs.getBinding(resolveChildFrameWithList(agent.getDefinition(), cond.getParameterName()));
+                if (refs.getBinding(resolveChildFrameWithList(agent.getDefinition(), cond.getParameterValue())) != null) {
+                    binding = refs.getBinding(resolveChildFrameWithList(agent.getDefinition(), cond.getParameterValue()));
                 }
 
-				s += " (object-parameter (object-class ?pName" + k + "&:(eq pName" + k + " \"" + objPath + "\")) (instance-name " + binding
-				        + "))\n";
-				s += " (parameter (name ?n&:(eq ?n (str-cat \"" + list + "/\"" + " " + binding + " " + " \"/" + remainingPath + "\"))) "
+                s += " (object-parameter (object-class \"" + objPath + "\") (instance-name " + binding + "))\n";
+
+                s += " (parameter (name ?n1&:(eq ?n1 (str-cat \"" + list + "/\"" + " " + binding + " " + " \"/" + remainingPath + "\"))) "
                         + " (value ?exparam" + (k + 1) + "))\n";
 
                 value = "?exparam" + (k + 1);
@@ -282,6 +276,13 @@ public class ConditionBuilder {
 
         String listLHS = resolveList(cond.getParameterName().split("/")[0].trim());
 
+        String objectPath = resolveChildFrameWithList(agent.getDefinition(), cond.getParameterName());
+        String attPath = null;
+        if (referencesChildFrame(agent.getDefinition(), cond.getParameterName())) {
+            attPath = extractChildAttributePathWithoutParent(agent.getDefinition(), cond.getParameterName());
+        }
+
+        binding = refs.getBinding(resolveChildFrameWithList(agent.getDefinition(), objectPath));
         String s2 = buildExistsQuantifiedRHSExpression(cond, objectPath, attPath, k, negated, value, binding, listLHS);
 
 		return s + s2;
@@ -296,7 +297,7 @@ public class ConditionBuilder {
                 s = " (exists (object-parameter (object-class \"" + objectPath + "\")))\n";
             } else {
                 s = " (object-parameter (object-class \"" + objectPath + "\") (instance-name " + binding + "))\n";
-				s += " (exists (parameter (name ?m&:(eq ?m (str-cat \"" + list + "/\"" + " " + binding + " " + "\"/" + attPath + "\")))";
+                s += " (exists (parameter (name ?m&:(eq ?m (str-cat \"" + list + "/\"" + " " + binding + " " + "\"/" + attPath + "\")))";
                 if (cond.getParameterValue().length() > 0) {
 
                     if (Utils.isNumerical(value)) {
