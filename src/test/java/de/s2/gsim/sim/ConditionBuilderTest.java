@@ -61,7 +61,6 @@ public class ConditionBuilderTest {
 
 		env.getAgentInstanceOperations().instanciateAgentWithNormalDistributedAttributes(agentClass, "test-instance", 0);
 		runRLsimulation(10);
-		System.out.println(counter);
 		MatcherAssert.assertThat("Action must have been executed", counter, Matchers.greaterThan(0));
 
 	}
@@ -84,7 +83,6 @@ public class ConditionBuilderTest {
 
         env.getAgentInstanceOperations().instanciateAgentWithNormalDistributedAttributes(agentClass, "test-instance", 0);
 		runRLsimulation(10);
-		System.out.println(counter);
 		MatcherAssert.assertThat("Action must not have been executed", counter, Matchers.equalTo(0));
 
     }
@@ -103,7 +101,6 @@ public class ConditionBuilderTest {
 
         env.getAgentInstanceOperations().instanciateAgentWithNormalDistributedAttributes(agentClass, "test-instance", 0);
         runRLsimulation(10);
-		System.out.println(counter);
 		MatcherAssert.assertThat("Action must have been executed", counter, Matchers.greaterThan(0));
 
     }
@@ -120,7 +117,6 @@ public class ConditionBuilderTest {
 
 		env.getAgentInstanceOperations().instanciateAgentWithNormalDistributedAttributes(agentClass, "test-instance", 0);
 		runRLsimulation(10);
-		System.out.println(counter);
 		MatcherAssert.assertThat("Action must have been executed", counter, Matchers.greaterThan(0));
 
 	}
@@ -140,7 +136,6 @@ public class ConditionBuilderTest {
 
 		env.getAgentInstanceOperations().instanciateAgentWithNormalDistributedAttributes(agentClass, "test-instance", 0);
 		runRLsimulation(10);
-		System.out.println(counter);
 		MatcherAssert.assertThat("Action must have been executed", counter, Matchers.greaterThan(0));
 
 	}
