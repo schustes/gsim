@@ -43,13 +43,6 @@ public class RLActionNodeClass extends RuleClass implements RLActionNode, UnitWr
     }
 
     @Override
-    public void addOrSetSelectionNode(SelectionNode sc) throws GSimException {
-        ((RLRuleFrame) getReal()).removeSelectionRule(((UserRuleFrame) ((UnitWrapper) sc).toUnit()));
-        ((RLRuleFrame) getReal()).addSelectionRule((UserRuleFrame) ((UnitWrapper) sc).toUnit());
-        owner.addOrSetRLActionNode(this);
-    }
-
-    @Override
 	public Evaluator createEvaluator(String paramName, double val) throws GSimException {
 		ConditionFrame c = getReal().createCondition(paramName, "", String.valueOf(val));
         ((RLRuleFrame) getReal()).setEvaluationFunction(c);
@@ -150,12 +143,6 @@ public class RLActionNodeClass extends RuleClass implements RLActionNode, UnitWr
         Frame inst = (Frame) ((UnitWrapper) cond).toUnit();
         getReal().removeChildFrame(RLRuleFrame.INST_LIST_EXP, inst.getName());
         owner.addOrSetRule(this);
-    }
-
-    @Override
-    public void removeSelectionNode(SelectionNode sc) throws GSimException {
-        ((RLRuleFrame) getReal()).removeSelectionRule(((UserRuleFrame) ((UnitWrapper) sc).toUnit()));
-        owner.addOrSetRLActionNode(this);
     }
 
     public void setComparisonDiscount(double d) throws GSimException {

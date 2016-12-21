@@ -24,7 +24,7 @@ public class PathTest {
 
         String pathString = path.toString();
         assertThat("Path string is returned", pathString, notNullValue());
-        assertThat("Path string matches expected value", pathString, equalTo("/list-1/C1/list-2/C2/attr-list/attr"));
+		assertThat("Path string matches expected value", pathString, equalTo("list-1/C1/list-2/C2/attr-list/attr"));
 
     }
 

@@ -98,7 +98,6 @@ public class Object2VariableBindingTable {
 	private void addExpansionRefs(List<ExpansionDef> expansions) {
         for (ExpansionDef c : expansions) {
 			if (ParsingUtils.referencesChildFrame(agent.getDefinition(), c.getParameterName())) {
-				// if (c.getParameterName().contains("::")) {
                 String pn = c.getParameterName();
                 String object = resolveObjectClassWithList(pn);
                 addObjectClass(object);
@@ -125,31 +124,5 @@ public class Object2VariableBindingTable {
     private String resolveObjectClassWithList(String s) {
 		return ParsingUtils.resolveChildFrameWithList(agent.getDefinition(), s);
 	}
-
-	private String resolveObjectClassWithList1(String s) {
-		return ParsingUtils.resolveChildFrameWithList(agent.getDefinition(), s);
-	}
-
-	private String resolveObjectClassOld(String s) {
-        String[] a = s.split("/");
-
-        String list = a[0];
-        String object = a[1];
-
-        if (object.contains("::")) {
-            object = object.substring(0, object.indexOf("::"));
-        }
-
-        if (list.contains("$")) {
-            if (list.lastIndexOf("$") != list.indexOf("$")) {
-                list = list.substring(list.lastIndexOf("$"));
-                list = list.replace("$", "");
-            } else {
-                list = list.replace("$", "");
-            }
-        }
-        return list + "/" + object;
-
-    }
 
 }

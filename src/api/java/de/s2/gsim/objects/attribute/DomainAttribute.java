@@ -181,7 +181,7 @@ public class DomainAttribute {
     @Override
     public String toString() {
         String s = "";
-        s = getName() + " (" + defaultValue + ")";
+		s = getName() + " (default-value=" + defaultValue + ")";
         return s;
     }
 

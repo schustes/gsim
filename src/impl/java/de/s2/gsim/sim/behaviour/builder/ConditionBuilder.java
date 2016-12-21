@@ -1,7 +1,9 @@
 package de.s2.gsim.sim.behaviour.builder;
 
 import static de.s2.gsim.sim.behaviour.builder.ParsingUtils.extractChildAttributePathWithoutParent;
+import static de.s2.gsim.sim.behaviour.builder.ParsingUtils.referencesChildFrame;
 import static de.s2.gsim.sim.behaviour.builder.ParsingUtils.resolveChildFrameWithList;
+import static de.s2.gsim.sim.behaviour.builder.ParsingUtils.resolveChildFrameWithoutList;
 import static de.s2.gsim.sim.behaviour.builder.ParsingUtils.resolveList;
 
 import java.util.List;
@@ -144,13 +146,14 @@ public class ConditionBuilder {
 
         String n = "";
 
-        if (isConstant(cond.getParameterValue()) && !isExistQuantified(cond) && cond.getParameterValue().indexOf("{") < 0) {
+		if (!referencesChildFrame(agent.getDefinition(), cond.getParameterValue()) && !isExistQuantified(cond)
+		        && cond.getParameterValue().indexOf("{") < 0) {
 			n = "" + createFixedAtomCondition(agent, cond, objRefs, n);
         } else if (isExistQuantified(cond)) {
             n = createExistsQuantifiedCondition(agent, cond, objRefs);
-        } else if (isConstant(cond.getParameterValue()) && !isExistQuantified(cond)) {
+		} else if (!referencesChildFrame(agent.getDefinition(), cond.getParameterValue()) && !isExistQuantified(cond)) {
 			n = createAttributeCondition(agent, cond, objRefs, n);
-        } else if (!isConstant(cond.getParameterValue()) && !isExistQuantified(cond)) {
+		} else if (!referencesChildFrame(agent.getDefinition(), cond.getParameterValue()) && !isExistQuantified(cond)) {
             n = createVariableCondition(agent, cond, objRefs, n);
         }
 
@@ -228,9 +231,9 @@ public class ConditionBuilder {
      */
     public String createExistsQuantifiedCondition(Instance agent, ConditionDef cond, Object2VariableBindingTable refs) {
 
-		String objectPath = ParsingUtils.resolveChildFrameWithList(agent.getDefinition(), cond.getParameterName());
+		String objectPath = resolveChildFrameWithList(agent.getDefinition(), cond.getParameterName());
         String attPath = null;
-        if (ParsingUtils.referencesChildFrame(agent.getDefinition(), cond.getParameterName())) {
+        if (referencesChildFrame(agent.getDefinition(), cond.getParameterName())) {
 			attPath = extractChildAttributePathWithoutParent(agent.getDefinition(), cond.getParameterName());
         }
 
@@ -244,9 +247,9 @@ public class ConditionBuilder {
 
         String binding = refs.getBinding(objectPath);
 
-        if (!isConstant(value)) {
-			String objPath = ParsingUtils.resolveChildFrameWithoutList(agent.getDefinition(), value);
-			String objPathFull = ParsingUtils.resolveChildFrameWithList(agent.getDefinition(), value);
+		if (referencesChildFrame(agent.getDefinition(), value)) {
+			String objPath = resolveChildFrameWithoutList(agent.getDefinition(), value);
+			String objPathFull = resolveChildFrameWithList(agent.getDefinition(), value);
 			String list = objPathFull.split("/")[0].trim();
 			String remainingPath = value.substring(objPathFull.length() + 1, value.length());
 
@@ -262,7 +265,7 @@ public class ConditionBuilder {
                 s += "  (parameter (name ?n&:(eq ?n (str-cat \"" + list + "/\"" + " " + binding + " " + " \"/" + remainingPath + "\"))) "
                         + " (value ?exparam" + (k + 1) + "))\n";
                 value = "?exparam" + (k + 1);
-            } else if (!isConstant(value) && !negated) {
+			} else if (referencesChildFrame(agent.getDefinition(), value) && !negated) {
 
 				if (refs.getBinding(resolveChildFrameWithList(agent.getDefinition(), cond.getParameterName())) != null) {
 					binding = refs.getBinding(resolveChildFrameWithList(agent.getDefinition(), cond.getParameterName()));
@@ -464,7 +467,8 @@ public class ConditionBuilder {
 
         String nRule = "";
 
-        if (!isConstant(leftVariableName)) {
+		if (referencesChildFrame(owner.getDefinition(), leftVariableName)) {
+			// if (!referenceChildObject(leftVariableName)) {
             String list = resolveList(leftVariableName);
 			String object = resolveChildFrameWithList(owner.getDefinition(), leftVariableName);
 			String att = extractChildAttributePathWithoutParent(owner.getDefinition(), leftVariableName);
@@ -488,10 +492,6 @@ public class ConditionBuilder {
             nRule += "(parameter (name \"" + leftVariableName + "\") ";
         }
         return nRule;
-    }
-
-    private boolean isConstant(String s) {
-        return !s.contains("/");
     }
 
     private boolean isExistQuantified(ConditionDef c) {

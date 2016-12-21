@@ -49,13 +49,6 @@ public interface RLActionNode {
     void addOrSetExpansion(Expansion expansion);
 
     /**
-     * Adds or sets a {@link SelectionNode} to the learning node. A SelectionNode is a rule for generating the BRA expansions.
-     * 
-     * @param selectionNode the selection node
-     */
-    void addOrSetSelectionNode(SelectionNode selectionNode);
-
-    /**
 	 * Creates a {@link Evaluator}. An evaluator is basically a container for holding a path to an attribute used as reward for the RL
 	 * algorithm and the learning rate alpha to be applied to this node.
 	 * 
@@ -140,13 +133,6 @@ public interface RLActionNode {
      * @param expansion the expansion
      */
     void removeExpansion(Expansion expansion);
-
-    /**
-     * Removes a selection node.
-     * 
-     * @param selectionNode the node to remove
-     */
-    void removeSelectionNode(SelectionNode selectionNode);
 
     /**
      * Sets the learning discount factor.

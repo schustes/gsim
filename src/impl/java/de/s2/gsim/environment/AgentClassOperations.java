@@ -12,7 +12,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import android.annotation.Nullable;
-import de.s2.gsim.objects.ObjectClass;
 import de.s2.gsim.objects.Path;
 import de.s2.gsim.objects.attribute.Attribute;
 import de.s2.gsim.objects.attribute.AttributeFactory;
@@ -180,7 +179,6 @@ public class AgentClassOperations {
 
 	public GenericAgentClass addAgentClassAttribute(GenericAgentClass cls, Path<List<DomainAttribute>> path,
 			DomainAttribute a) {
-
 		GenericAgentClass oldOne = this.findGenericAgentClass(cls);
 		final GenericAgentClass newLocalRef = container.replaceAgentSubClass(oldOne, cls);
 
@@ -192,7 +190,10 @@ public class AgentClassOperations {
 			// "Path " + path + " does not exist and is not terminal, so no list can be created!");
 		}
 
-		newLocalRef.addChildAttribute(path, a);
+		if (!newLocalRef.addChildAttribute(path, a)) {
+			throw new GSimDefException(String.format(
+			        "The attribute %s could not be added. Probably the path %s specifies an non-existing object.", a.toString(), path));
+		}
 
 		Set<GenericAgentClass> agentSubClasses = container.getAgentSubClasses();
 		for (GenericAgentClass subClass : agentSubClasses) {
@@ -221,16 +222,19 @@ public class AgentClassOperations {
 	// TODO this might be not enough, if the hierarchy is deeper
 	private void createNecessaryLists(GenericAgentClass newLocalRef, Path<List<DomainAttribute>> path) {
 
-		Path<Frame> p = Path.withoutLast(path);
+		Path<?> p = path;// Path.withoutLast(path);
 		String listname = path.lastAsString();
 		while (!p.isTerminal()) {
+			p = Path.withoutLast(p);
 			if (existsPath(newLocalRef, p)) {
 				Object o = newLocalRef.resolvePath(p);
 				if (o instanceof Frame) {
 					((Frame) o).defineAttributeList(listname);
 				}
+			} else {
+				newLocalRef.defineAttributeList(listname);
 			}
-			p = Path.withoutLast(p);
+			// p = Path.withoutLast(p);
 			listname = p.lastAsString();
 		}
 

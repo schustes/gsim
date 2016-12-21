@@ -247,7 +247,7 @@ public class RLRulesBuilder {
 
         n += " (not (modified ?n ?param ?sfn))\n";
 
-        if (evaluationFunction.getParameterName().contains("::")) {
+		if (ParsingUtils.referencesChildFrame(this.agent.getDefinition(), evaluationFunction.getParameterName())) {
             String fnc = createLHS(rule, evaluationFunction.getParameterName());
             n += fnc + "\n";
         } else {

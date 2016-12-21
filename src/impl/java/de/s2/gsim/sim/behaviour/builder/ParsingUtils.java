@@ -56,53 +56,30 @@ public class ParsingUtils {
 	}
 
 	public static boolean isNumericalAttributeSpec(Instance agent, String attRef) throws GSimEngineException {
-		Attribute att = null;
-		if (!attRef.contains("::")) {
-			att = agent.resolvePath(Path.attributePath(attRef.split("/")));
+
+		Path<Attribute> attrPath = Path.attributePath(attRef.split("/"));
+		try {
+			Attribute att = agent.resolvePath(attrPath);
 			if (att instanceof NumericalAttribute || att instanceof IntervalAttribute) {
 				return true;
-			} 
+			}
 			return false;
-		} else {
-			String[] ref0 = attRef.split("::")[0].split("/");
-			String[] ref1 = attRef.split("::")[1].split("/");
-			String listName = ref0[0];
-			Frame object = agent.getDefinition().getListType(listName);
-			if (object != null) {
-				DomainAttribute datt = (DomainAttribute) object.resolvePath(Path.attributePath(ref1));
-				if (datt.getType() == AttributeType.NUMERICAL || datt.getType() == AttributeType.INTERVAL) {
-					return true;
-				} 
-				return false;
-			}
+		} catch (GSimDefException e) {
+			e.printStackTrace();
 		}
+
+		String listName = resolveList(attRef);
+		String ref1 = extractChildAttributePathWithoutParent(agent.getDefinition(), attRef);
+		Frame object = agent.getDefinition().getListType(listName);
+		if (object != null) {
+			DomainAttribute datt = (DomainAttribute) object.resolvePath(Path.attributePath(ref1));
+			if (datt.getType() == AttributeType.NUMERICAL || datt.getType() == AttributeType.INTERVAL) {
+				return true;
+			}
+			return false;
+		}
+
 		throw new GSimEngineException("Attribute reference " + attRef + " resolved to null!");
-	}
-
-	// TODO needs correct resolution process analogous to resolveObjectClass, otherwise parameters of referred objects are not inserted as
-	// facts
-	public static String resolveAttribute_DELETE(String s) {
-		// boolean b = false;
-		if (s.contains("::")) {
-			s = s.split("::")[1];
-			// b = true;
-		}
-
-		String[] a = s.split("/");
-
-		// if (a.length==2 && !b) return null;
-
-		String ret = "";
-		int y = 0;
-		// if (!b) y=2;
-		for (int i = y; i < a.length; i++) {
-			if (ret.length() > 0) {
-				ret += "/";
-			}
-			ret += a[i];
-		}
-
-		return ret;
 	}
 
 	public static String resolveList(String s) {
@@ -119,51 +96,6 @@ public class ParsingUtils {
 			}
 		}
 		return list;
-
-	}
-
-	@Deprecated
-	public static String resolveObjectClass_DELETE(String s) {
-		String[] a = s.split("/");
-
-		String list = a[0];
-		String object = a[1];
-
-		if (object.contains("::")) {
-			object = object.substring(0, object.indexOf("::"));
-		}
-
-		if (list.contains("$")) {
-			if (list.lastIndexOf("$") != list.indexOf("$")) {
-				list = list.substring(list.lastIndexOf("$"));
-				list = list.replace("$", "");
-			} else {
-				list = list.replace("$", "");
-			}
-		}
-		return list + "/" + object;
-
-	}
-
-	public static String resolveObjectClassNoList_DELETE(String s) {
-		String[] a = s.split("/");
-
-		String list = a[0];
-		String object = a[1];
-
-		if (object.contains("::")) {
-			object = object.substring(0, object.indexOf("::"));
-		}
-
-		if (list.contains("$")) {
-			if (list.lastIndexOf("$") != list.indexOf("$")) {
-				list = list.substring(list.lastIndexOf("$"));
-				list = list.replace("$", "");
-			} else {
-				list = list.replace("$", "");
-			}
-		}
-		return object;
 
 	}
 
@@ -185,7 +117,7 @@ public class ParsingUtils {
 				n.append(stack.pop());
 			}
 		}
-		
+
 		return n.toString();
 	}
 
@@ -225,6 +157,7 @@ public class ParsingUtils {
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public static String resolveChildFrameWithList(Frame owningAgent, String pathString) {
+
 		Path<Attribute> path = Path.attributePath(pathString.split("/"));
 		Path<?> p = path;
 		Path<?> pn = new Path(p.getName(), p.getType());
@@ -248,28 +181,6 @@ public class ParsingUtils {
 			}
 			return null;
 		}, () -> null);
-	}
-
-	// TODO fix with/without list, and need to differentiate between instance and frame names during runtime
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public static String resolveChildFrameWithList_DELETE(Frame owningAgent, String pathString) {
-		Path<Attribute> path = Path.attributePath(pathString.split("/"));
-		Path<?> p = path;
-		Path<?> pn = new Path(p.getName(), p.getType());
-		while (p != null) {
-			try {
-				Object o = owningAgent.resolvePath(pn);
-				if ((o instanceof TypedList)) {
-					TypedList<Frame> list = (TypedList<Frame>) o;
-					return pn.getName() + "/" + list.getType().getName();
-				}
-			} catch (GSimDefException e) {
-				return null;
-			}
-			p = p.next();
-			pn.append(new Path(p.getName(), p.getType()));
-		}
-		return null;
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })

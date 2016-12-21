@@ -222,28 +222,6 @@ public class ConditionBuilderTest {
 		}
 	}
 
-	private GenericAgentClass createTestAgent() {
-		AgentClassOperations agentOperations = env.getAgentClassOperations();
-		ObjectClassOperations objectClassOperations = env.getObjectClassOperations();
-        GenericAgentClass agentClass = agentOperations.createAgentSubclass("p0", agentOperations.getGenericAgentClass());
-        Frame obj1 = objectClassOperations.createObjectSubClass("obj1", objectClassOperations.getObjectClass());
-        Frame obj2 = objectClassOperations.createObjectSubClass("obj2", objectClassOperations.getObjectClass());
-
-        agentClass = agentOperations.addObjectList(agentClass, "list1", obj1);
-        agentClass = agentOperations.addObjectList(agentClass, "list2", obj2);
-
-        DomainAttribute a1 = new DomainAttribute("agentAttribute", AttributeType.NUMERICAL);
-        agentClass = agentOperations.addAgentClassAttribute(agentClass, Path.attributeListPath("agentAttrList"), a1);
-        DomainAttribute a2 = new DomainAttribute("obj1Attribute", AttributeType.NUMERICAL);
-        DomainAttribute a3 = new DomainAttribute("obj2Attribute", AttributeType.NUMERICAL);
-        obj1 = objectClassOperations.addAttribute(obj1, Path.attributeListPath("obj1AttrList"), a2);
-        obj2 = objectClassOperations.addAttribute(obj2, Path.attributeListPath("obj2AttrList"), a3);
-
-        agentClass = agentOperations.addChildObject(agentClass, Path.objectListPath("list1"), obj1);
-        agentClass = agentOperations.addChildObject(agentClass, Path.objectListPath("list2"), obj2);
-        return agentClass;
-    }
-
     public void runRLsimulation(int steps) throws Exception {
 
         SimulationController m = core.createScenarioManager(w, new HashMap<String, Object>(), steps, 1);

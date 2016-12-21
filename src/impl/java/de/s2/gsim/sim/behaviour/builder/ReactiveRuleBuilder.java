@@ -1,6 +1,8 @@
 package de.s2.gsim.sim.behaviour.builder;
 
+import static de.s2.gsim.sim.behaviour.builder.ParsingUtils.*;
 import cern.jet.random.Uniform;
+
 import de.s2.gsim.api.sim.agent.impl.RuntimeAgent;
 import de.s2.gsim.environment.ActionDef;
 import de.s2.gsim.environment.ConditionDef;
@@ -106,13 +108,14 @@ public class ReactiveRuleBuilder {
 
                         for (int k = 0; k < conditions.length; k++) {
                             ConditionDef cond = conditions[k];
-                            if (isConstant(cond.getParameterValue()) && !isExistQuantified(cond) && cond.getParameterValue().indexOf("{") < 0) {
+							if (!referencesChildFrame(agent.getDefinition(), cond.getParameterValue()) && !isExistQuantified(cond)
+							        && cond.getParameterValue().indexOf("{") < 0) {
 								nRule += " " + utils.createFixedAtomCondition(this.agent, cond, p, nRule);
-                            } else if (isConstant(cond.getParameterValue()) && isExistQuantified(cond)) {
+							} else if (!referencesChildFrame(agent.getDefinition(), cond.getParameterValue()) && isExistQuantified(cond)) {
 								nRule += "" + utils.createExistsQuantifiedCondition(agent, cond, p);
-                            } else if (isConstant(cond.getParameterValue())) {
+							} else if (!referencesChildFrame(agent.getDefinition(), cond.getParameterValue())) {
 								nRule += " " + utils.createAttributeCondition(this.agent, cond, p, nRule);
-                            } else if (!isConstant(cond.getParameterValue())) {
+							} else if (referencesChildFrame(agent.getDefinition(), cond.getParameterValue())) {
                                 nRule += "" + utils.createVariableCondition(agent, cond, p, nRule);
                             }
 
@@ -171,13 +174,16 @@ public class ReactiveRuleBuilder {
 
             for (int k = 0; k < conditions.length; k++) {
                 ConditionDef cond = conditions[k];
-                if (isConstant(cond.getParameterValue()) && !isExistQuantified(cond) && cond.getParameterValue().indexOf("{") < 0) {
+                if (!referencesChildFrame(agent.getDefinition(), cond.getParameterValue()) && 
+                		!isExistQuantified(cond) && cond.getParameterValue().indexOf("{") < 0) {
 					nRule += "" + utils.createFixedAtomCondition(this.agent, cond, params, nRule);
                 } else if (isExistQuantified(cond)) {
 					nRule += "" + utils.createExistsQuantifiedCondition(agent, cond, params);
-                } else if (isConstant(cond.getParameterValue()) && !isExistQuantified(cond)) {
+                } else if (!referencesChildFrame(agent.getDefinition(), cond.getParameterValue()) && 
+                		!isExistQuantified(cond)) {
 					nRule += "" + utils.createAttributeCondition(this.agent, cond, params, nRule);
-                } else if (!isConstant(cond.getParameterValue()) && !isExistQuantified(cond)) {
+				} else if (referencesChildFrame(agent.getDefinition(), cond.getParameterValue()) && 
+                		!isExistQuantified(cond)) {
                     nRule += "" + utils.createVariableCondition(agent, cond, params, nRule);
                 }
             }
@@ -199,13 +205,6 @@ public class ReactiveRuleBuilder {
             e.printStackTrace();
         }
         return null;
-    }
-
-    private boolean isConstant(String s) {
-        if (s.contains("::")) {
-            return false;
-        }
-        return true;
     }
 
     private boolean isExistQuantified(ConditionDef c) {

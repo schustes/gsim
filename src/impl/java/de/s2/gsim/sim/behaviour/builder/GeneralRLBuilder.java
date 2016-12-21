@@ -129,18 +129,6 @@ public class GeneralRLBuilder {
 		return false;
 	}
 
-	private boolean isConstant(String s) {
-		if (s.contains("::")) {
-			return false;
-		}
-		return true;
-	}
-
-	private boolean isExistQuantified(ConditionDef c) {
-		return c.getOperator().trim().equalsIgnoreCase("EXISTS") || c.getOperator().trim().equalsIgnoreCase("~EXISTS")
-				|| c.getOperator().trim().equalsIgnoreCase("NOT EXISTS");
-	}
-
 	private RLRule resolveEquivalentCondition(RLRule c) {
 		if (c.containsAttribute(UserRuleFrame.ATTR_LIST_ATTRS, "equivalent-state")) {
 			StringAttribute s = (StringAttribute) c.getAttribute(UserRuleFrame.ATTR_LIST_ATTRS, "equivalent-state");

@@ -47,14 +47,14 @@ public class DynamicCategoryUpdateStrategyImpl implements DynamicValueRangeUpdat
 
         List<Fact> stateFacts = getStateFactsForRootRule(baseRuleName, context);
         for (String newFiller : modifiedSet) {
-            update(agent, baseRuleName, domainAttribute.getName(), newFiller, stateFacts, context);
+			update(agent, baseRuleName, exp.getParameterName(), newFiller, stateFacts, context);
         }
 
     }
 
     private static void update(RuntimeAgent agent
             , String baseRuleName
-            , String simpleAttributeName
+	        , String attPath
             , String newFiller
             , List<Fact> stateFacts
             , Context context) {
@@ -73,10 +73,10 @@ public class DynamicCategoryUpdateStrategyImpl implements DynamicValueRangeUpdat
 
                 Fact[] elems = getStateElems(stateName, context);
 
-                String newRule = addCategoryToExperimentalRule(treeBuilder, agent, baseRule, stateName, elems, simpleAttributeName, newFiller,
+				String newRule = addCategoryToExperimentalRule(treeBuilder, agent, baseRule, stateName, elems, attPath, newFiller,
                         context);
 
-                addStateFactCategoryElemFromStatefact(state, simpleAttributeName, newFiller, context);
+				addStateFactCategoryElemFromStatefact(state, attPath, newFiller, context);
 
                 Rete rete = context.getEngine();
 
@@ -106,11 +106,13 @@ public class DynamicCategoryUpdateStrategyImpl implements DynamicValueRangeUpdat
 
         List<Fact> set = new ArrayList<Fact>();
 
-        List<Fact> map = new ArrayList<Fact>();
+        List<Fact> list = new ArrayList<Fact>();
 
-        set.stream().filter(state -> getFloatSlotValue(state, "active", context) > 0).forEach(map::add);
+		states.stream().filter(state -> getFloatSlotValue(state, "active", context) > 0).forEach(list::add);
 
-        Fact selectedFact = map.get(staticNextIntFromTo(0, map.size() - 1));
+		int pos = staticNextIntFromTo(0, list.size() - 1);
+		Fact selectedFact = list.get(pos);
+		set.add(selectedFact);
         addAllStateAncestors(set, context, selectedFact, states);
 
         return set;

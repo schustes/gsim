@@ -1,5 +1,7 @@
 package de.s2.gsim.sim.behaviour;
 
+import static de.s2.gsim.sim.behaviour.builder.ParsingUtils.*;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -150,7 +152,7 @@ public class JessHandlerUtils {
 		}
 
 		for (String s : uniqueConditions) {
-			if (s.contains("::")) {
+			if (referencesChildFrame(owner.getDefinition(), s)) {
 				res.addAll(JessHandlerUtils.buildReplaceVariablesSC(rete, owner, s));
 			}
 			Set<String> l = JessHandlerUtils.buildReplaceConstants(rete, owner, s);
@@ -164,7 +166,8 @@ public class JessHandlerUtils {
 	public static HashSet<String> buildCurrentState(Rete rete, RuntimeAgent owner, HashSet<String> uniqueConditions) throws JessException {
 		for (String s : uniqueConditions) {
 			// TODO this check has to be replaced
-			if (s.contains("::")) {
+
+			if (referencesChildFrame(owner.getDefinition(), s)) {
 				JessHandlerUtils.buildReplaceVariablesSC(rete, owner, s);
 			}
 			JessHandlerUtils.buildReplaceConstants(rete, owner, s);
@@ -188,10 +191,6 @@ public class JessHandlerUtils {
 	}
 
 	private static Set<String> buildReplaceConstants(Rete rete, Instance owner, String n) {
-
-		if (n.contains("::")) {
-			return new HashSet<String>();
-		}
 
 		if (!n.contains("/")) {
 			// This is what I call an 'Atom' (it is a numerical constant value)
