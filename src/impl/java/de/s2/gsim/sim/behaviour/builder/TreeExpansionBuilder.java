@@ -2,7 +2,7 @@ package de.s2.gsim.sim.behaviour.builder;
 
 import static de.s2.gsim.sim.behaviour.builder.ConditionBuilder.createCategoricalAtomCondition;
 import static de.s2.gsim.sim.behaviour.builder.ConditionBuilder.createCondition;
-import static de.s2.gsim.sim.behaviour.builder.ConditionBuilder.createNumericalAtomCondition;
+import static de.s2.gsim.sim.behaviour.builder.ConditionBuilder.createIntervalAtomCondition;
 
 import de.s2.gsim.api.sim.agent.impl.RuntimeAgent;
 import de.s2.gsim.environment.ConditionDef;
@@ -63,7 +63,7 @@ public class TreeExpansionBuilder {
         for (String att : expansionAttValuePairs.getIntervalAttributes()) {
             double[] interval = expansionAttValuePairs.getInterval(att);
 
-            n += createNumericalAtomCondition(this.agent, att, interval[0], interval[1], objRefs, n);
+            n += createIntervalAtomCondition(this.agent, att, interval[0], interval[1], objRefs, n);
         }
 
         return n;

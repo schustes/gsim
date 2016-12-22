@@ -2,7 +2,7 @@ package de.s2.gsim.sim.behaviour.builder;
 
 import static de.s2.gsim.sim.behaviour.builder.ConditionBuilder.createAttributeCondition;
 import static de.s2.gsim.sim.behaviour.builder.ConditionBuilder.createExistsQuantifiedCondition;
-import static de.s2.gsim.sim.behaviour.builder.ConditionBuilder.createFixedAtomCondition;
+import static de.s2.gsim.sim.behaviour.builder.ConditionBuilder.createAtomCondition;
 import static de.s2.gsim.sim.behaviour.builder.ConditionBuilder.createVariableCondition;
 import static de.s2.gsim.sim.behaviour.builder.ParsingUtils.getDefiningRoleForRule;
 import static de.s2.gsim.sim.behaviour.builder.ParsingUtils.referencesChildFrame;
@@ -113,7 +113,7 @@ public class ReactiveRuleBuilder {
                             ConditionDef cond = conditions[k];
 							if (!referencesChildFrame(agent.getDefinition(), cond.getParameterValue()) && !isExistQuantified(cond)
 							        && cond.getParameterValue().indexOf("{") < 0) {
-                                nRule += " " + createFixedAtomCondition(this.agent, cond, p, nRule);
+                                nRule += " " + createAtomCondition(this.agent, cond, p, nRule);
 							} else if (!referencesChildFrame(agent.getDefinition(), cond.getParameterValue()) && isExistQuantified(cond)) {
                                 nRule += "" + createExistsQuantifiedCondition(agent, cond, p);
 							} else if (!referencesChildFrame(agent.getDefinition(), cond.getParameterValue())) {
@@ -179,7 +179,7 @@ public class ReactiveRuleBuilder {
                 ConditionDef cond = conditions[k];
                 if (!referencesChildFrame(agent.getDefinition(), cond.getParameterValue()) && 
                 		!isExistQuantified(cond) && cond.getParameterValue().indexOf("{") < 0) {
-                    nRule += "" + createFixedAtomCondition(this.agent, cond, params, nRule);
+                    nRule += "" + createAtomCondition(this.agent, cond, params, nRule);
                 } else if (isExistQuantified(cond)) {
                     nRule += "" + createExistsQuantifiedCondition(agent, cond, params);
                 } else if (!referencesChildFrame(agent.getDefinition(), cond.getParameterValue()) && 
