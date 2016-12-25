@@ -4,31 +4,28 @@ import de.s2.gsim.sim.GSimEngineException;
 
 public class ExpansionRulesBuilder {
 
-    private String role = "";
-    private String rtContext;
+	// private String role = "";
+	// private String rtContext;
 
-    public String build(int expandInterval, double revisitCostFraction, double revaluationProbability, String role) throws GSimEngineException {
+	public static String build(int expandInterval, double revisitCostFraction, double revaluationProbability, String role)
+	        throws GSimEngineException {
 
-        this.role = role;
-        rtContext = "(parameter (name \"executing-role\") (value " + "\"" + role + "\"))\n";
+		// this.role = role;
+		String rtContext = "(parameter (name \"executing-role\") (value " + "\"" + role + "\"))\n";
 
-        String s = createStateContractionRule(expandInterval) + "\n";
-        s += createStateExpansionRuleFirstBest(expandInterval, revisitCostFraction) + "\n";
-        s += createStateBacktrackUpdateRule() + "\n";
-        s += createTreeUpdateBackwardChain() + "\n";
-        s += createStateHelpFunctions() + "\n";
-        s += createBranchSelectionRules(revaluationProbability) + "\n";
+		String s = createStateContractionRule(expandInterval, rtContext, role) + "\n";
+		s += createStateExpansionRuleFirstBest(expandInterval, revisitCostFraction, rtContext, role) + "\n";
+		s += createStateBacktrackUpdateRule(rtContext, role) + "\n";
+		s += createTreeUpdateBackwardChain(rtContext, role) + "\n";
+		s += createStateHelpFunctions(role) + "\n";
+		s += createBranchSelectionRules(revaluationProbability, role) + "\n";
 
         return s;
     }
 
-    public String createStateContractionRule(int expandInterval) throws GSimEngineException {
+	private static String createStateContractionRule(int expandInterval, String rtContext, String role) throws GSimEngineException {
 
         String n = "";
-        // if the parent-state value >= either children values (from previous
-        // experience), delete children and
-        // mark the parent node as expanded-finished.
-
         n += "\n(defrule contract_rule-1-" + role + "\n";
         n += " (declare (salience 100))\n";
         n += " (parameter (name \"exec-sc\"))\n";
@@ -51,7 +48,7 @@ public class ExpansionRulesBuilder {
 
     }
 
-    String createRetractFollowRules() {
+	public static String createRetractFollowRules() {
         // retract connected state-elems. you have to retract actions separately
         // because there are ususally more actoins than state-elems
 
@@ -83,7 +80,7 @@ public class ExpansionRulesBuilder {
 
     }
 
-    String createStateDescriptionQueries() {
+	public static String createStateDescriptionQueries() {
         String query1 = "(defquery list-states\n";
         query1 += " (declare (variables ?ctx))\n";
         query1 += " (state-fact (context ?ctx)) ) \n";
@@ -104,7 +101,7 @@ public class ExpansionRulesBuilder {
 
     }
 
-    private String createBranchSelectionRules(double probability) throws GSimEngineException {
+	private static String createBranchSelectionRules(double probability, String role) throws GSimEngineException {
 
         String n1 = "(defrule select-new-expansion-root-" + role + "\n";
         n1 += " (declare (salience 101))\n";
@@ -116,8 +113,6 @@ public class ExpansionRulesBuilder {
                 + " ?sfn) ?lf))  )\n";
         n1 += " (test (< (call cern.jet.random.Uniform staticNextDoubleFromTo 0.0 1.0 )" + probability + "))\n";
         n1 += " =>\n";
-        // n1+=" (printout t ----------- (call cern.jet.random.Uniform staticNextDoubleFromTo 0.0 1.0 ) --createBranchSelectionRules salience 101 must
-        // be last -------)";
         n1 += " (modify ?fact (active 1.0))\n";
         n1 += " (assert (new-root)) \n";
         n1 += " (assert (selected ?sfn))) \n";
@@ -145,7 +140,7 @@ public class ExpansionRulesBuilder {
         return n1;
     }
 
-    private String createStateBacktrackUpdateRule() {
+	private static String createStateBacktrackUpdateRule(String rtContext, String role) {
 
         String n = "";
 
@@ -169,7 +164,8 @@ public class ExpansionRulesBuilder {
 
     }
 
-    private String createStateExpansionRuleFirstBest(int interval, double costfraction) throws GSimEngineException {
+	private static String createStateExpansionRuleFirstBest(int interval, double costfraction, String rtContext, String role)
+	        throws GSimEngineException {
         String n1 = "";
 
         n1 += "(defrule expand_FIRST_BEST-" + role + "\n";
@@ -214,7 +210,7 @@ public class ExpansionRulesBuilder {
         return n1;
     }
 
-    private String createStateHelpFunctions() {
+	private static String createStateHelpFunctions(String role) {
 
         String f0 = "\n(deffunction count-all-elems-" + role + " (?sfn) \n";
         f0 += " (return (+ (count-query-results list-state-categories ?sfn) (count-query-results list-state-elems ?sfn))))\n";
@@ -241,7 +237,6 @@ public class ExpansionRulesBuilder {
         f4 += "  (bind ?act (fact-slot-value ?state count))\n";
         f4 += "  (bind ?lf (fact-slot-value ?state leaf))\n";
         f4 += "  (bind ?v (* ?c (/ ?act ?t))) \n";
-//        f4 += " (printout t => (count-all-elems-" + role + " ?sfn)   )";
         f4 += "  (if (and (>= (count-all-elems-" + role + " ?sfn)  1) (> ?v ?n)) then (bind ?n ?v)) )\n";
         f4 += " (return ?n)) \n";
         
@@ -270,22 +265,11 @@ public class ExpansionRulesBuilder {
         f5 += "  (if (eq ?parent ?sfn) then (bind ?n (+ ?n 1)) ) )\n";
         f5 += " (return ?n)) \n";
 
-        // String f6 = "(deffunction is-minimal (?sf) \n";
-        // f6 += " (bind ?it (run-query list-states \""+this.role+"\"))\n";
-        // f6 += " (while (?it hasNext) \n";
-        // f6 += " (bind ?token (call ?it next))\n";
-        // f6 += " (bind ?state (call ?token fact 1))\n";
-        // f6 += " (bind ?sfn (fact-slot-value ?state name))\n";
-        // f6 += " (bind ?x (count-query-results list-state-categories ?sf))";
-        // f6 += " (if (and (neq ?sfn ?sf) (< (count-query-results list-state-elems ?sfn) ?x) ) then (return false)) )\n";
-        // f6 += " (return true))\n";
-
-        // return query1 + "\n" + query2 + "\n" + query3 + "\n" + query4 + "\n" + query5 + "\n" + f1 + "\n" + f4 + "\n" + f5 + "\n" + f6 + "\n";
         return f0 + "\n" + f1 + "\n" + f4 + "\n" + f5 + "\n";
 
     }
 
-    private String createTreeUpdateBackwardChain() throws GSimEngineException {
+	private static String createTreeUpdateBackwardChain(String rtContext, String role) throws GSimEngineException {
 
         // if one element gets contracted (rule 1), the respective state-fact
         // and the sibling (complement) of this state has to be retracted.

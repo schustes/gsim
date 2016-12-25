@@ -106,7 +106,7 @@ public class ReactiveRuleBuilder {
                         // HashMap<String, Integer> p =
                         // buildObjectRefTable(conditions);
 
-						Object2VariableBindingTable p = new Object2VariableBindingTable(agent);
+						Object2JessVariableBindingTable p = new Object2JessVariableBindingTable(agent);
                         p.build(rule);
 
                         for (int k = 0; k < conditions.length; k++) {
@@ -152,7 +152,7 @@ public class ReactiveRuleBuilder {
         try {
             String ctxString = "";
 
-			Object2VariableBindingTable params = new Object2VariableBindingTable(agent);
+			Object2JessVariableBindingTable params = new Object2JessVariableBindingTable(agent);
             params.build(rule);
             // HashMap<String, Integer> params =
             // buildObjectRefTable(conditions);

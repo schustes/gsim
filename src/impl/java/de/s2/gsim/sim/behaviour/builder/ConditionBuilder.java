@@ -38,7 +38,7 @@ public abstract class ConditionBuilder {
      * @return
      * @throws GSimEngineException
      */
-    public static String createAttributeCondition(Instance owner, ConditionDef cond, Object2VariableBindingTable objRefs, String nRule_1)
+    public static String createAttributeCondition(Instance owner, ConditionDef cond, Object2JessVariableBindingTable objRefs, String nRule_1)
             throws GSimEngineException {
 
         String nRule = "";
@@ -82,7 +82,7 @@ public abstract class ConditionBuilder {
 
     }
 
-    public static String createCategoricalAtomCondition(Instance owner, String attName, String selectedFiller, Object2VariableBindingTable objRefs,
+    public static String createCategoricalAtomCondition(Instance owner, String attName, String selectedFiller, Object2JessVariableBindingTable objRefs,
             String nRule_1)
                     throws GSimEngineException {
 
@@ -104,7 +104,7 @@ public abstract class ConditionBuilder {
     }
 
     public static String createCategoricalAtomCondition(Instance owner, String attName, List<String> selectedFillers,
-            Object2VariableBindingTable objRefs, String nRule_1)
+            Object2JessVariableBindingTable objRefs, String nRule_1)
                     throws GSimEngineException {
 
         if (selectedFillers.size() == 1) {
@@ -143,7 +143,7 @@ public abstract class ConditionBuilder {
 
     }
 
-    public static String createCondition(Instance agent, ConditionDef cond, Object2VariableBindingTable objRefs, String ruleSoFar)
+    public static String createCondition(Instance agent, ConditionDef cond, Object2JessVariableBindingTable objRefs, String ruleSoFar)
             throws GSimEngineException {
 
         String n = "";
@@ -172,7 +172,7 @@ public abstract class ConditionBuilder {
      * @param refs
      * @return
      */
-    public static String createExistsQuantifiedCondition(Instance agent, ConditionDef cond, Object2VariableBindingTable refs) {
+    public static String createExistsQuantifiedCondition(Instance agent, ConditionDef cond, Object2JessVariableBindingTable refs) {
 
 
         int variableIndex = Uniform.staticNextIntFromTo(0, 1000);
@@ -200,7 +200,7 @@ public abstract class ConditionBuilder {
 
     }
 
-    private static String buildVariableExistQuantifiedConditionPart(Instance agent, ConditionDef cond, Object2VariableBindingTable refs,
+    private static String buildVariableExistQuantifiedConditionPart(Instance agent, ConditionDef cond, Object2JessVariableBindingTable refs,
             int variableIndex) {
 
         boolean negated = cond.getOperator().contains("~") || cond.getOperator().contains("NOT");
@@ -260,7 +260,7 @@ public abstract class ConditionBuilder {
         return s.toString();
     }
 
-    private static String buildConstantExistsQuantifiedConditionPart(Instance agent, ConditionDef cond, Object2VariableBindingTable refs,
+    private static String buildConstantExistsQuantifiedConditionPart(Instance agent, ConditionDef cond, Object2JessVariableBindingTable refs,
             String objectPath, String attPath, int variableIndex,
             String valueVariableBinding) {
 
@@ -321,7 +321,7 @@ public abstract class ConditionBuilder {
      * @return
      * @throws GSimEngineException
      */
-    public static String createAtomCondition(Instance owner, ConditionDef cond, Object2VariableBindingTable objRefs, String nRule_1)
+    public static String createAtomCondition(Instance owner, ConditionDef cond, Object2JessVariableBindingTable objRefs, String nRule_1)
             throws GSimEngineException {
 
         String nRule = "";
@@ -362,7 +362,7 @@ public abstract class ConditionBuilder {
      * @throws GSimEngineException
      */
     public static String createIntervalAtomCondition(Instance owner, String attributeName, double min, double max,
-            Object2VariableBindingTable objRefs, String nRule_1)
+            Object2JessVariableBindingTable objRefs, String nRule_1)
                     throws GSimEngineException {
 
         String nRule = "";
@@ -399,7 +399,7 @@ public abstract class ConditionBuilder {
      * @return the string with the jess expression for that condition
      * @throws GSimEngineException
      */
-    public static String createVariableCondition(Instance owner, ConditionDef cond, Object2VariableBindingTable objRefs, String nRule_1)
+    public static String createVariableCondition(Instance owner, ConditionDef cond, Object2JessVariableBindingTable objRefs, String nRule_1)
             throws GSimEngineException {
 
         int k = Uniform.staticNextIntFromTo(0, 1000);
@@ -441,7 +441,7 @@ public abstract class ConditionBuilder {
 
     }
 
-    private static String createLHS(Instance owner, String leftVariableName, Object2VariableBindingTable objRefs, int variableIdx, String nRule_1)
+    private static String createLHS(Instance owner, String leftVariableName, Object2JessVariableBindingTable objRefs, int variableIdx, String nRule_1)
             throws GSimEngineException {
 
         String nRule = "";

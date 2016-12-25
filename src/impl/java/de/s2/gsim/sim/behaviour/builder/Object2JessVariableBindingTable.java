@@ -19,7 +19,7 @@ import de.s2.gsim.environment.UserRule;
  * different a objects to the same variable name.
  * 
  */
-public class Object2VariableBindingTable {
+public class Object2JessVariableBindingTable {
 
 	private Instance agent;
 
@@ -27,7 +27,7 @@ public class Object2VariableBindingTable {
 
     private int runningIdx = 0;
 
-	public Object2VariableBindingTable(Instance agent) {
+	public Object2JessVariableBindingTable(Instance agent) {
 		this.agent = agent;
 	}
 
@@ -67,7 +67,7 @@ public class Object2VariableBindingTable {
         return map.keySet().iterator();
     }
 
-    public void merge(Object2VariableBindingTable another) {
+    public void merge(Object2JessVariableBindingTable another) {
         map.putAll(another.map);
     }
 

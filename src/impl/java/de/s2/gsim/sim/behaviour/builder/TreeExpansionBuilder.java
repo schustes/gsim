@@ -16,15 +16,15 @@ public class TreeExpansionBuilder {
 
     private GeneralRLBuilder general;
 
-	private Object2VariableBindingTable refTable;
+	private Object2JessVariableBindingTable refTable;
 
     public TreeExpansionBuilder(RuntimeAgent a) {
         agent = a;
         general = new GeneralRLBuilder(a);
-		refTable = new Object2VariableBindingTable(agent);
+		refTable = new Object2JessVariableBindingTable(agent);
     }
 
-    public String buildExperimentationRule(RLRule rootRule, String stateName, Attribute2ValuesMap exp) throws GSimEngineException {
+    public String buildExperimentationRule(RLRule rootRule, String stateName, ExpansionParameterReferences exp) throws GSimEngineException {
 
         refTable.build(rootRule);
 
@@ -34,11 +34,11 @@ public class TreeExpansionBuilder {
 
     }
 
-    public String buildInitialRule(RLRule rootRule, String stateName, Attribute2ValuesMap exp) throws GSimEngineException {
+    public String buildInitialRule(RLRule rootRule, String stateName, ExpansionParameterReferences exp) throws GSimEngineException {
         return buildExperimentationRule(rootRule, stateName, exp);
     }
 
-    private String createConditions(UserRule rule, Object2VariableBindingTable objRefs, String ruleSoFar) throws GSimEngineException {
+    private String createConditions(UserRule rule, Object2JessVariableBindingTable objRefs, String ruleSoFar) throws GSimEngineException {
 
         String n = "";
 
@@ -48,7 +48,7 @@ public class TreeExpansionBuilder {
         return n;
     }
 
-    private String createConditionString(RLRule rule, Object2VariableBindingTable objRefs, Attribute2ValuesMap expansionAttValuePairs)
+    private String createConditionString(RLRule rule, Object2JessVariableBindingTable objRefs, ExpansionParameterReferences expansionAttValuePairs)
 
             throws GSimEngineException {
 

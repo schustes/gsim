@@ -9,7 +9,7 @@ import de.s2.gsim.api.sim.agent.impl.RuntimeAgent;
 import de.s2.gsim.environment.RLRule;
 import de.s2.gsim.objects.Path;
 import de.s2.gsim.objects.attribute.DomainAttribute;
-import de.s2.gsim.sim.behaviour.builder.Attribute2ValuesMap;
+import de.s2.gsim.sim.behaviour.builder.ExpansionParameterReferences;
 import de.s2.gsim.sim.behaviour.builder.TreeExpansionBuilder;
 import jess.Context;
 import jess.Fact;
@@ -33,7 +33,7 @@ public abstract class DynamicValueRangeExtensionRuleBuilder {
             , double max
             , Context context) throws JessException {
 
-        Attribute2ValuesMap consts = new Attribute2ValuesMap();
+        ExpansionParameterReferences consts = new ExpansionParameterReferences();
 
         String s = statefactelem.getDeftemplate().getBaseName();
         String pm = statefactelem.getSlotValue("param-name").stringValue(context);
@@ -73,7 +73,7 @@ public abstract class DynamicValueRangeExtensionRuleBuilder {
     public static String addCategoryToExperimentalRule(TreeExpansionBuilder b, RuntimeAgent a, RLRule r, String stateName, Fact[] statefactelems,
             String domainAttr, String newFiller, Context context) throws JessException {
 
-        Attribute2ValuesMap consts = new Attribute2ValuesMap();
+        ExpansionParameterReferences consts = new ExpansionParameterReferences();
 
         for (int i = 0; i < statefactelems.length; i++) {
             String s = statefactelems[i].getDeftemplate().getBaseName();
@@ -117,7 +117,7 @@ public abstract class DynamicValueRangeExtensionRuleBuilder {
     public static String createNewExperimentalRule(TreeExpansionBuilder b, RLRule r, RuntimeAgent a, String stateName, Fact[] remainingStatefactelems,
             Context context, String param, double from, double to) throws JessException {
 
-        Attribute2ValuesMap consts = new Attribute2ValuesMap();
+        ExpansionParameterReferences consts = new ExpansionParameterReferences();
         consts.setIntervalAttributes(param, from, to);
 
         for (int i = 0; i < remainingStatefactelems.length; i++) {
@@ -153,7 +153,7 @@ public abstract class DynamicValueRangeExtensionRuleBuilder {
     public static String createNewExperimentalRuleCat(TreeExpansionBuilder b, RLRule r, String stateName, String paramToExpand,
             List<String> fillersOfExpand, Fact[] constants, Context context) throws JessException {
 
-        Attribute2ValuesMap consts = new Attribute2ValuesMap();
+        ExpansionParameterReferences consts = new ExpansionParameterReferences();
 
         consts.setSetAttributes(paramToExpand, fillersOfExpand);
 
@@ -193,7 +193,7 @@ public abstract class DynamicValueRangeExtensionRuleBuilder {
 
         String n = "";
 
-        Attribute2ValuesMap consts = new Attribute2ValuesMap();
+        ExpansionParameterReferences consts = new ExpansionParameterReferences();
 
         for (int i = 0; i < constants.length; i++) {
             String s = constants[i].getDeftemplate().getBaseName();
@@ -220,7 +220,7 @@ public abstract class DynamicValueRangeExtensionRuleBuilder {
 
         String n = "";
 
-        Attribute2ValuesMap consts = new Attribute2ValuesMap();
+        ExpansionParameterReferences consts = new ExpansionParameterReferences();
 
         for (int i = 0; i < constants.length; i++) {
             String s = constants[i].getDeftemplate().getBaseName();

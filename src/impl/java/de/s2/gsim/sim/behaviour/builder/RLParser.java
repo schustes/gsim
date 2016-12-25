@@ -75,7 +75,7 @@ public class RLParser {
         return count;
     }
 
-    private String doBuild() throws GSimEngineException {
+	private String doBuild() throws GSimEngineException {
 
         try {
             String res = "";
@@ -100,7 +100,7 @@ public class RLParser {
                         res += expRuleFinal + "\n";
 					} else if (r.get(i).hasExpansions()) {
 						String initialStateName = r.get(i).getName() + "_0" + "0";
-                        Attribute2ValuesMap exp = new Attribute2ValuesMap();
+                        ExpansionParameterReferences exp = new ExpansionParameterReferences();
 
 						extractConditionRefs(r.get(i), exp);
 
@@ -182,7 +182,7 @@ public class RLParser {
         }
     }
 
-    private void extractConditionRefs(RLRule r, Attribute2ValuesMap exp) {
+    private void extractConditionRefs(RLRule r, ExpansionParameterReferences exp) {
         for (ExpansionDef e : r.getExpansions()) {
             String path = e.getParameterName();
 			DomainAttribute a = this.agent.getDefinition().resolvePath(Path.attributePath(path.split("/")));

@@ -9,7 +9,7 @@ import java.util.List;
  * @author sschuster
  *
  */
-public class Attribute2ValuesMap {
+public class ExpansionParameterReferences {
 
     private HashMap<String, double[]> intervalAttributes = new HashMap<String, double[]>();
 

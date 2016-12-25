@@ -103,7 +103,7 @@ public class RLRulesBuilder {
             // removed
             // nRule += " (not (experimented-" + ownerRule + "))\n";
 
-			Object2VariableBindingTable map = new Object2VariableBindingTable(agent);
+			Object2JessVariableBindingTable map = new Object2JessVariableBindingTable(agent);
             map.build(rule);
 
             nRule += createConditions(rule, map);
@@ -165,7 +165,7 @@ public class RLRulesBuilder {
         // the
         // original rule]
 
-		Object2VariableBindingTable objRefs = new Object2VariableBindingTable(agent);
+		Object2JessVariableBindingTable objRefs = new Object2JessVariableBindingTable(agent);
         objRefs.build(c);
 
         String condStr = createConditions(c, objRefs);
@@ -188,7 +188,7 @@ public class RLRulesBuilder {
         Set<String> singleRules = new HashSet<String>();
 
         String expRule = "";
-		Object2VariableBindingTable objRefs = new Object2VariableBindingTable(agent);
+		Object2JessVariableBindingTable objRefs = new Object2JessVariableBindingTable(agent);
         objRefs.build(rule);
 
         String initialStateName = rule.getName() + "_0" + "0";
@@ -342,7 +342,7 @@ public class RLRulesBuilder {
 
     }
 
-    private String createConditions(RLRule rule, Object2VariableBindingTable objRefs) throws GSimEngineException {
+    private String createConditions(RLRule rule, Object2JessVariableBindingTable objRefs) throws GSimEngineException {
         StringBuffer result = new StringBuffer();
         for (ConditionDef condition : rule.getConditions()) {
             String sofar = result.toString();
@@ -354,7 +354,7 @@ public class RLRulesBuilder {
 
     private String createLHS(RLRule rule, String paramName) throws GSimEngineException {
 
-		Object2VariableBindingTable objRefs = new Object2VariableBindingTable(agent);
+		Object2JessVariableBindingTable objRefs = new Object2JessVariableBindingTable(agent);
         objRefs.build(rule);
 
         int variableIdx = Uniform.staticNextIntFromTo(0, 1000);
