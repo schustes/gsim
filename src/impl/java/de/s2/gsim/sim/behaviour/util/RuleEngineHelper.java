@@ -507,6 +507,10 @@ public abstract class RuleEngineHelper {
 
 	public static void insertNonExistentExecutedFinalFacts(Rete rete, RuntimeAgent agent, RLRule r, String sfn) throws JessException {
 
+		String evaluationAttributeName = r.getEvaluationFunction().getParameterName();
+		String s = r.getEvaluationFunction().getParameterValue();
+		double alpha = Double.parseDouble(s);
+
 		for (ActionDef action : r.getConsequents()) {
 
 			String[] params = action.getObjectClassParams();
@@ -567,8 +571,7 @@ public abstract class RuleEngineHelper {
 								}
 							}
 
-							Fact f = createActionNode(rete, sfn, signature, r.getEvaluationFunction().getParameterName(),
-							        Double.parseDouble(r.getEvaluationFunction().getParameterValue()), action);
+							Fact f = createActionNode(rete, sfn, signature, evaluationAttributeName, alpha, action);
 							if (!ruleBaseContainsExecutedFact(rete, f)) {
 								rete.assertFact(f);
 							}
@@ -578,8 +581,7 @@ public abstract class RuleEngineHelper {
 
 				}
 			} else {
-				Fact f = createActionNode(rete, sfn, new String[0], r.getEvaluationFunction().getParameterName(),
-				        Double.parseDouble(r.getEvaluationFunction().getParameterValue()), action);
+				Fact f = createActionNode(rete, sfn, new String[0], evaluationAttributeName, alpha, action);
 				if (!ruleBaseContainsExecutedFact(rete, f)) {
 					rete.assertFact(f);
 				}

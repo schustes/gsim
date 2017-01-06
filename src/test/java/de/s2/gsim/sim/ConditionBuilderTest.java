@@ -146,7 +146,8 @@ public class ConditionBuilderTest {
 		rf.addCondition(cf);
 		rf.addConsequence(ActionFrame.newActionFrame("action", TestAction.class.getName()));
 		rf.addCondition(cf);
-		rf.setEvaluationFunction(cf);
+		ConditionFrame eval = ConditionFrame.newConditionFrame("list1/obj1/obj1AttrList/obj1Attribute", op, "0.1");
+		rf.setEvaluationFunction(eval);
 		return rf;
 	}
 
