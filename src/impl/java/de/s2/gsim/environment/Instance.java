@@ -203,7 +203,7 @@ public class Instance extends Unit<Instance, Attribute> {
 				.filter(attr -> attr.getName().equals(attrName))
 				.findFirst().get();
 	}
-	
+
 	public boolean containsAttribute(@NotNull String listname, @NotNull String attrName) {
 		try {
 			return getAttribute(listname, attrName) != null;
@@ -211,7 +211,7 @@ public class Instance extends Unit<Instance, Attribute> {
 			return false;
 		}
 	}
-	
+
 	public boolean containsAttribute(@NotNull String attrName) {
 		try {
 			return getAttribute(attrName) != null;
@@ -429,34 +429,39 @@ public class Instance extends Unit<Instance, Attribute> {
 	@SuppressWarnings("unchecked")
 	public <T> T resolvePath(Path<T> path) {
 
-		// Terminal instance
-		if (this.getName().equals(path.getName()) && path.isTerminal()) {
-			return (T) this;
-		}
+		try {
 
-		// Instance is in path but has successors - step into child object
-		if (this.getName().equals(path.getName())) {
-			return (T) resolvePath(path.next());
-		}
+			// Terminal instance
+			if (this.getName().equals(path.getName()) && path.isTerminal()) {
+				return (T) this;
+			}
 
-		// Step into attribute lists to find attribute
-		if (getAttributeLists().containsKey(path.getName()) && !path.isTerminal()) {
-			return (T) this.getAttribute(path.getName(), path.next().getName());
-		}
+			// Instance is in path but has successors - step into child object
+			if (this.getName().equals(path.getName())) {
+				return (T) resolvePath(path.next());
+			}
 
-		// found attribute
-		if (getAttributeLists().containsKey(path.getName())) {
-			return (T) this.getAttributeLists().get(path.getName());
-		}
+			// Step into attribute lists to find attribute
+			if (getAttributeLists().containsKey(path.getName()) && !path.isTerminal()) {
+				return (T) this.getAttribute(path.getName(), path.next().getName());
+			}
 
-		// step into object lists to find object
-		if (getObjectLists().containsKey(path.getName()) && !path.isTerminal()) {
-			return (T) this.getChildInstance(path.getName(), path.next().getName()).resolvePath(path.next());
-		}
+			// found attribute
+			if (getAttributeLists().containsKey(path.getName())) {
+				return (T) this.getAttributeLists().get(path.getName());
+			}
 
-		// found object
-		if (getObjectLists().containsKey(path.getName())) {
-			return (T) this.getObjectLists().get(path.getName());
+			// step into object lists to find object
+			if (getObjectLists().containsKey(path.getName()) && !path.isTerminal()) {
+				return (T) this.getChildInstance(path.getName(), path.next().getName()).resolvePath(path.next());
+			}
+
+			// found object
+			if (getObjectLists().containsKey(path.getName())) {
+				return (T) this.getObjectLists().get(path.getName());
+			}
+		} catch (NoSuchElementException e) {
+			throw new GSimDefException(String.format("The path %s could not be resolved", path));
 		}
 
 		throw new GSimDefException(String.format("The path %s could not be resolved", path));

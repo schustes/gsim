@@ -4,6 +4,7 @@ import java.util.Set;
 
 import de.s2.gsim.api.sim.agent.impl.RuntimeAgent;
 import de.s2.gsim.environment.ActionDef;
+import de.s2.gsim.environment.GSimDefException;
 import de.s2.gsim.environment.Instance;
 import de.s2.gsim.objects.Path;
 import de.s2.gsim.objects.attribute.Attribute;
@@ -105,9 +106,11 @@ public class JessHandlerUtils {
 
 		String att = BuildingUtils.extractChildAttributePathWithoutParent(owner.getDefinition(), n);// ParsingUtils.resolveAttribute(n);
 
+		Path<Attribute> path = Path.attributePath(n.split("/"));
+
 		if (n.contains("{")) {
 			String attRef = n.substring(n.indexOf("{") + 1, n.lastIndexOf("}"));
-			Attribute ref = (Attribute) owner.resolvePath(Path.attributePath(attRef.split("/")));
+			Attribute ref = (Attribute) owner.resolvePath(path);
 			if (ref instanceof IntervalAttribute) {
 				double val = ((IntervalAttribute) ref).getValue();
 				assertParameter(rete, attRef, String.valueOf(val));
@@ -115,15 +118,16 @@ public class JessHandlerUtils {
 				assertParameter(rete, attRef, ref.toValueString());
 			}
 		} else {
-			Attribute ref = (Attribute) owner.resolvePath(Path.attributePath(n.split("/")));
-			if (ref instanceof IntervalAttribute) {
-				double val = ((IntervalAttribute) ref).getValue();
-				assertParameter(rete, att, String.valueOf(val));
-			} else {
-				if (ref == null) {
-					System.out.println("not resolved:" + att);
+			try {
+				Attribute ref = (Attribute) owner.resolvePath(path);
+				if (ref instanceof IntervalAttribute) {
+					double val = ((IntervalAttribute) ref).getValue();
+					assertParameter(rete, att, String.valueOf(val));
+				} else {
+					assertParameter(rete, att, ref.toValueString());
 				}
-				assertParameter(rete, att, ref.toValueString());
+			} catch (GSimDefException notExisiting) {
+				System.out.println("No object exists for given path " + path.toString());
 			}
 		}
 
