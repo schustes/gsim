@@ -48,8 +48,8 @@ public class SimTest {
 	static final String AGENT_NAME = "test";
 	static final String AGENT_CLASS_NAME = "test-class";
 
-	static double rewardAction0 = 100;
-	static double rewardAction1 = 20;
+	static double rewardAction0 = 0.9;
+	static double rewardAction1 = 0.001;
 	static String action0Name = "Test-Action0";
 	static String action1Name = "Test-Action1";
 

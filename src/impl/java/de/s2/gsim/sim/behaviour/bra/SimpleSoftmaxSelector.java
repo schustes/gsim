@@ -114,11 +114,11 @@ public class SimpleSoftmaxSelector implements Userfunction, java.io.Serializable
         // Utils.shuffle(evaluations); //for same prob. of events with same p
 
 		List<Interval> intervals = new ArrayList<>();
-		Iterator<Evaluation> iter = evaluations.iterator();
+		Iterator<Evaluation> evalIter = evaluations.iterator();
         double sum = 0;// adds up to 1 in the end
 
-        while (iter.hasNext()) {
-			Evaluation v = iter.next();
+        while (evalIter.hasNext()) {
+			Evaluation v = evalIter.next();
             double p = v.pref / sumOfPreferences;
             String stats = v.actionName + "," + v.reward + "," + v.pref + "," + p;
 
@@ -149,9 +149,9 @@ public class SimpleSoftmaxSelector implements Userfunction, java.io.Serializable
         }
 
         double z = cern.jet.random.Uniform.staticNextDoubleFromTo(0, 1);
-		Iterator<Interval> iiter = intervals.iterator();
-		while (iiter.hasNext()) {
-			Interval in = iiter.next();
+		Iterator<Interval> intervalIter = intervals.iterator();
+		while (intervalIter.hasNext()) {
+			Interval in = intervalIter.next();
             if (in.from <= z && in.to >= z) {
                 double p = in.e.pref / sumOfPreferences;
                 logger.debug("p: " + p + ", v.pref:" + in.e.pref + ", sumOfPreferences: " + sumOfPreferences + ", name:" + in.e.actionName);
@@ -160,9 +160,9 @@ public class SimpleSoftmaxSelector implements Userfunction, java.io.Serializable
         }
 
         StringBuffer b = new StringBuffer();
-		iiter = intervals.iterator();
-		while (iiter.hasNext()) {
-			Interval in = iiter.next();
+		intervalIter = intervals.iterator();
+		while (intervalIter.hasNext()) {
+			Interval in = intervalIter.next();
             b.append(in.from);
             b.append("-");
             b.append(in.to);

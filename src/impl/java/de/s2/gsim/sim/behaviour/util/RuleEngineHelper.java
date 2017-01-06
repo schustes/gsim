@@ -567,7 +567,8 @@ public abstract class RuleEngineHelper {
 								}
 							}
 
-							Fact f = createActionNode(rete, sfn, signature, r.getEvaluationFunction().getParameterName(), action);
+							Fact f = createActionNode(rete, sfn, signature, r.getEvaluationFunction().getParameterName(),
+							        Double.parseDouble(r.getEvaluationFunction().getParameterValue()), action);
 							if (!ruleBaseContainsExecutedFact(rete, f)) {
 								rete.assertFact(f);
 							}
@@ -577,7 +578,8 @@ public abstract class RuleEngineHelper {
 
 				}
 			} else {
-				Fact f = createActionNode(rete, sfn, new String[0], r.getEvaluationFunction().getParameterName(), action);
+				Fact f = createActionNode(rete, sfn, new String[0], r.getEvaluationFunction().getParameterName(),
+				        Double.parseDouble(r.getEvaluationFunction().getParameterValue()), action);
 				if (!ruleBaseContainsExecutedFact(rete, f)) {
 					rete.assertFact(f);
 				}
@@ -698,7 +700,8 @@ public abstract class RuleEngineHelper {
 		return false;
 	}
 
-	private static Fact createActionNode(Rete rete, String sfn, String[] args, String evaluator, ActionDef action) throws JessException {
+	private static Fact createActionNode(Rete rete, String sfn, String[] args, String evaluator, double alpha, ActionDef action)
+	        throws JessException {
 
 		Deftemplate p = rete.findDeftemplate("rl-action-node");
 
@@ -710,7 +713,7 @@ public abstract class RuleEngineHelper {
 
 		f.setSlotValue("value", new Value(0.0, RU.FLOAT));
 
-		f.setSlotValue("alpha", new Value(1.0, RU.FLOAT));
+		f.setSlotValue("alpha", new Value(alpha, RU.FLOAT));
 		f.setSlotValue("updateCount", new Value(0.0, RU.FLOAT));
 		f.setSlotValue("count", new Value(0.0, RU.FLOAT));
 		f.setSlotValue("time", new Value(-1.0, RU.FLOAT));
