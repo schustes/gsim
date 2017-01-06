@@ -259,4 +259,15 @@ public class BehaviourClass implements Behaviour, UnitWrapper {
         return real;
     }
 
+	@Override
+	public int getContractInterval() throws GSimException {
+		return real.getStateContractInterval();
+	}
+
+	@Override
+	public void setContractInterval(int n) throws GSimException {
+		this.real.setStateContractInterval(n);
+		owner.setBehaviour(this);
+	}
+
 }

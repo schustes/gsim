@@ -5,7 +5,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.util.ArrayList;
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -34,7 +34,7 @@ public class StateActionTree extends JFrame {
 
     private String agentName = "";
 
-    private Map attributes = new Hashtable();
+	private Map<Object, Object> attributes = new HashMap<>();
 
     private int cellH = 30;
 
@@ -100,14 +100,13 @@ public class StateActionTree extends JFrame {
         }
     }
 
-    @SuppressWarnings("unchecked")
     private void addLink(DefaultGraphCell self, DefaultGraphCell child) {
         try {
 
             DefaultEdge edge = new DefaultEdge();
 
             // TODO this will probably not work
-            Map edgeAttrib = GraphConstants.createAttributes(edge, "key2", "value");
+			Map<?, ?> edgeAttrib = GraphConstants.createAttributes(edge, "key2", "value");
             attributes.put(edge, edgeAttrib);
 
             int arrow = GraphConstants.ARROW_CLASSIC;
@@ -132,7 +131,7 @@ public class StateActionTree extends JFrame {
         }
     }
 
-    @SuppressWarnings({ "unchecked", "rawtypes" })
+	@SuppressWarnings({ "rawtypes" })
     private void addLinks(Fact g) {
         try {
 
@@ -193,7 +192,7 @@ public class StateActionTree extends JFrame {
         }
     }
 
-    @SuppressWarnings({ "unchecked", "rawtypes" })
+	@SuppressWarnings({ "rawtypes" })
     private void buildGraphRek(Fact fact, GraphModel model, int offsetTop, Offset offsetLeft) {
 
         try {
@@ -343,7 +342,7 @@ public class StateActionTree extends JFrame {
         ArrayList<Fact> list = new java.util.ArrayList<Fact>();
 
         try {
-            Iterator iter = rete.listFacts();
+			Iterator<?> iter = rete.listFacts();
             while (iter.hasNext()) {
                 Fact f = (Fact) iter.next();
                 if (f.getDeftemplate().getBaseName().equals("rl-action-node")) {
@@ -368,7 +367,7 @@ public class StateActionTree extends JFrame {
         try {
             if (parent != null) {
                 String n = parent.getSlotValue("name").stringValue(rete.getGlobalContext());
-                Iterator iter = rete.listFacts();
+				Iterator<?> iter = rete.listFacts();
                 while (iter.hasNext()) {
                     Fact f = (Fact) iter.next();
                     if (f.getDeftemplate().getBaseName().equals("state-fact")) {
@@ -379,7 +378,7 @@ public class StateActionTree extends JFrame {
                     }
                 }
             } else {
-                Iterator iter = rete.listFacts();
+				Iterator<?> iter = rete.listFacts();
                 while (iter.hasNext()) {
                     Fact f = (Fact) iter.next();
                     if (f.getDeftemplate().getBaseName().equals("state-fact")) {

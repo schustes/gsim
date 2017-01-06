@@ -3,10 +3,10 @@ package de.s2.gsim.sim.behaviour.rangeupdate;
 import static cern.jet.random.Uniform.staticNextIntFromTo;
 import static de.s2.gsim.sim.behaviour.bra.StateFactHelper.addStateFactCategoryElemFromStatefact;
 import static de.s2.gsim.sim.behaviour.rangeupdate.DynamicValueRangeExtensionRuleBuilder.addCategoryToExperimentalRule;
-import static de.s2.gsim.sim.behaviour.util.FactHelper.getFloatSlotValue;
-import static de.s2.gsim.sim.behaviour.util.ReteHelper.deleteRule;
-import static de.s2.gsim.sim.behaviour.util.ReteHelper.getStateElems;
-import static de.s2.gsim.sim.behaviour.util.ReteHelper.getStateFactsForRootRule;
+import static de.s2.gsim.sim.behaviour.util.FactUtils.getFloatSlotValue;
+import static de.s2.gsim.sim.behaviour.util.RuleEngineHelper.deleteRule;
+import static de.s2.gsim.sim.behaviour.util.RuleEngineHelper.getStateFactsCategories;
+import static de.s2.gsim.sim.behaviour.util.RuleEngineHelper.getStateFactsForRootRule;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,11 +16,9 @@ import de.s2.gsim.environment.ExpansionDef;
 import de.s2.gsim.environment.RLRule;
 import de.s2.gsim.objects.Path;
 import de.s2.gsim.objects.attribute.Attribute;
-import de.s2.gsim.objects.attribute.DomainAttribute;
 import de.s2.gsim.objects.attribute.SetAttribute;
-import de.s2.gsim.sim.behaviour.BehaviourEngine.RLParameterRanges;
-import de.s2.gsim.sim.behaviour.builder.TreeExpansionBuilder;
-import de.s2.gsim.sim.behaviour.util.CollectiveTreeDBWriter;
+import de.s2.gsim.sim.behaviour.engine.BehaviourEngine.RLParameterRanges;
+import de.s2.gsim.sim.behaviour.util.TreeWriter;
 import jess.Context;
 import jess.Fact;
 import jess.JessException;
@@ -39,7 +37,6 @@ public class DynamicCategoryUpdateStrategyImpl implements DynamicValueRangeUpdat
     @Override
     public void apply(RuntimeAgent agent, String baseRuleName, ExpansionDef exp, RLParameterRanges rlRanges, Context context) {
 
-        DomainAttribute domainAttribute = agent.getDefinition().resolvePath(Path.attributePath(exp.getParameterName().split("/")));
         Attribute attribute = agent.resolvePath(Path.attributePath(exp.getParameterName().split("/")));
 
         SetAttribute current = (SetAttribute) attribute;
@@ -59,8 +56,6 @@ public class DynamicCategoryUpdateStrategyImpl implements DynamicValueRangeUpdat
             , List<Fact> stateFacts
             , Context context) {
 
-        TreeExpansionBuilder treeBuilder = new TreeExpansionBuilder(agent);
-
         try {
 
             List<Fact> selectedStates = chooseStates(stateFacts, context);
@@ -71,22 +66,22 @@ public class DynamicCategoryUpdateStrategyImpl implements DynamicValueRangeUpdat
                 String expansionRuleName = "experimental_rule_" + baseRuleName + "@" + stateName + "@";
                 RLRule baseRule = agent.getBehaviour().getRLRule(baseRuleName);
 
-                Fact[] elems = getStateElems(stateName, context);
+                Fact[] elems = getStateFactsCategories(stateName, context);
 
-				String newRule = addCategoryToExperimentalRule(treeBuilder, agent, baseRule, stateName, elems, attPath, newFiller,
+				String newRule = addCategoryToExperimentalRule(agent, baseRule, stateName, elems, attPath, newFiller,
                         context);
 
 				addStateFactCategoryElemFromStatefact(state, attPath, newFiller, context);
 
                 Rete rete = context.getEngine();
 
-                CollectiveTreeDBWriter f = new CollectiveTreeDBWriter();
+                TreeWriter f = new TreeWriter();
                 f.output("before_deepening", rete, debugDir);
 
                 deleteRule(expansionRuleName, context);
                 context.getEngine().executeCommand(newRule);
 
-                f = new CollectiveTreeDBWriter();
+                f = new TreeWriter();
                 f.output("after_deepening", rete, debugDir);
             }
 

@@ -19,9 +19,6 @@ import de.s2.gsim.objects.Rule;
 
 public class BehaviourInstance implements Behaviour, UnitWrapper {
 
-    /**
-     *
-     */
     private static final long serialVersionUID = 1L;
 
     private AgentInstance owner;
@@ -202,8 +199,19 @@ public class BehaviourInstance implements Behaviour, UnitWrapper {
     }
 
     @Override
-    public Unit toUnit() {
+	public Unit<?, ?> toUnit() {
         return real;
     }
+
+	@Override
+	public int getContractInterval() throws GSimException {
+		return real.getStateContractInterval();
+	}
+
+	@Override
+	public void setContractInterval(int n) throws GSimException {
+		real.setStateContractInterval(n);
+		owner.setBehaviour(this);
+	}
 
 }

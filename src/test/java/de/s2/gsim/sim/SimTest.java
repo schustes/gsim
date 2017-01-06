@@ -48,8 +48,8 @@ public class SimTest {
 	static final String AGENT_NAME = "test";
 	static final String AGENT_CLASS_NAME = "test-class";
 
-	static double rewardAction0 = 1;
-	static double rewardAction1 = 0.1;
+	static double rewardAction0 = 100;
+	static double rewardAction1 = 20;
 	static String action0Name = "Test-Action0";
 	static String action1Name = "Test-Action1";
 
@@ -339,11 +339,18 @@ public class SimTest {
 		}
 	}
 
+	/**
+	 * Tests enlarges the attribute used for state description in the first steps from 1 to 10. As a result, the bra tree should expand the
+	 * lower half of the state up to some time around 10, after that consquently switch to the tree for the upper bound, deleting the
+	 * original subtree of the first steps.
+	 * 
+	 * @throws Exception
+	 */
 	@Test
 	public void bra_expansion_should_extend_interval() throws Exception {
 
 		int samples = 1;
-		int steps = 20;
+		int steps = 200;
 		int expandInterval = 2;
 		double alpha = 0.1;
 
@@ -374,17 +381,17 @@ public class SimTest {
 
 		DomainAttribute interval1 = new DomainAttribute("wealth", AttributeType.INTERVAL);
 		interval1.addFiller("0");
-		interval1.addFiller("10");
-		interval1.setDefault("4");
+		interval1.addFiller("1");
+		interval1.setDefault("0.5");
         objectClass.addAttribute(ATTR_LIST, interval1);
         // agentClass.addAttribute(ATTR_LIST, interval1);
 
 		// Expansion expansion = rule.createExpansion("object-list/test::" + ATTR_LIST + "/wealth", "0", "10");
-		Expansion expansion = rule.createExpansion("object-list/test/" + ATTR_LIST + "/wealth", "0", "10");
-		expansion.setMin("0");
-		expansion.setMax("10");
-		expansion.addFiller("0");
-		expansion.addFiller("10");
+		Expansion expansion = rule.createExpansion("object-list/test/" + ATTR_LIST + "/wealth", "0", "1");
+		// expansion.setMin("0");
+		// expansion.setMax("1");
+		// expansion.addFiller("0");
+		// expansion.addFiller("10");
 		rule.addOrSetExpansion(expansion);
 
 		Action action = behaviour.createAction("Test-Action", AddNewNumberAction.class.getName());
@@ -392,9 +399,10 @@ public class SimTest {
 		rrule.addOrSetConsequent(action);
 		// rrule.createCondition(ATTR_LIST + "/" + COUNTER0, ">", "4");
 
-		behaviour.setMaxNodes(10);
-		behaviour.setRevaluationProb(0.3);
+		behaviour.setMaxNodes(20);
+		behaviour.setRevaluationProb(0.25);
 		behaviour.setUpdateInterval(expandInterval);
+		behaviour.setContractInterval(expandInterval * 5);
 		behaviour.setRevisitCostFraction(0.5);
 		agentClass.setBehaviour(behaviour);
 
@@ -408,6 +416,7 @@ public class SimTest {
 			// lessThanOrEqualTo(counterAction));
 		}
 	}
+
 
 	@SuppressWarnings("unused")
 	private void scientific_rl_rule_test() throws Exception {
@@ -543,7 +552,10 @@ public class SimTest {
 			throws InterruptedException {
 		Semaphore sema = new Semaphore(1);
 		sema.acquire();
+
 		m.registerSimulationListener(new SimulationListener() {
+
+			double started;
 
 			@Override
 			public void simulationRestarted(String ns) {
@@ -560,6 +572,12 @@ public class SimTest {
 
 			@Override
 			public void instanceStep(String uid, int step) {
+				if (step == 1) {
+					started = System.currentTimeMillis();
+				}
+				double stepDuration = (System.currentTimeMillis() - started) / 1000d;
+				started = System.currentTimeMillis();
+				System.out.println(uid + " -- Duration (" + step + "): " + stepDuration);
 			}
 
 			@Override
@@ -657,20 +675,40 @@ public class SimTest {
 
 	}
 
+	static int av = 0;
 	public static class AddNewNumberAction extends SimAction {
 		private static final long serialVersionUID = 1L;
 
 		public Object execute() {
+
 			RuntimeAgent agent = super.getContext().getAgent();
-			// NumericalAttribute att = (NumericalAttribute) agent.getAttribute("wealth");
 
 			Path<Attribute> p = Path.attributePath("object-list", "test", ATTR_LIST, "wealth");
 			NumericalAttribute a = (NumericalAttribute) agent.resolvePath(p);
-			a.setValue(new Random().doubles(1, 20, 30).reduce(0, (x, y) -> y));
+			double current = a.getValue();
 
-			// att.setValue(new Random().nextInt(100));
-			// agent.addOrSetAttribute(ATTR_LIST, a);
+			if (av == 2) {
+				current = -2;
+			}
+
+			if (av == 3) {
+				current = 0;
+			}
+
+			if (av % 3 == 0 && av < 15) {
+				current += 2;
+			}
+
+			if (av == 15) {
+				current = current - 0.001;
+			}
+
+			a.setValue(current);
+			// a.setValue(new Random().doubles(1, 20, 30).reduce(0, (x, y) -> y));
 			agent.replaceChildAttribute(p, a);
+
+			av++;
+
 			return null;
 		}
 

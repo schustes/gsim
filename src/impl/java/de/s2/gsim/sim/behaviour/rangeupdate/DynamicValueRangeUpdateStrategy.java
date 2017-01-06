@@ -3,8 +3,7 @@ package de.s2.gsim.sim.behaviour.rangeupdate;
 import de.s2.gsim.api.sim.agent.impl.RuntimeAgent;
 import de.s2.gsim.environment.ExpansionDef;
 import de.s2.gsim.objects.attribute.AttributeType;
-import de.s2.gsim.sim.behaviour.BehaviourEngine;
-import de.s2.gsim.sim.behaviour.BehaviourEngine.RLParameterRanges;
+import de.s2.gsim.sim.behaviour.engine.BehaviourEngine.RLParameterRanges;
 import jess.Context;
 
 public interface DynamicValueRangeUpdateStrategy {

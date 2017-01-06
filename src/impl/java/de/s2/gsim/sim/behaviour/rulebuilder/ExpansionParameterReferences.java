@@ -1,4 +1,4 @@
-package de.s2.gsim.sim.behaviour.builder;
+package de.s2.gsim.sim.behaviour.rulebuilder;
 
 import java.util.Collection;
 import java.util.HashMap;

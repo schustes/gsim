@@ -128,7 +128,7 @@ public class GenericAgentClass extends Frame {
 
         cls.behaviour = (BehaviourFrame) BehaviourFrame.inherit(behaviourName, allParents.toArray(new BehaviourFrame[allParents.size()])).clone();
 
-        cls.behaviour.setDeleteUnusedAfter(old.getDeleteUnusedAfter());
+		cls.behaviour.setStateContractInterval(old.getStateContractInterval());
         cls.behaviour.setMaxDepth(old.getMaxDepth());
         cls.behaviour.setMaxNodes(old.getMaxNodes());
         cls.behaviour.setStateUpdateInterval(old.getStateUpdateInterval());

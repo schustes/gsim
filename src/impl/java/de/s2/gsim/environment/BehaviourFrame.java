@@ -257,10 +257,6 @@ public class BehaviourFrame extends Frame {
         return uf;
     }
 
-    public int getDeleteUnusedAfter() {
-        return Integer.parseInt(this.getAttribute("delete-unused-after").getDefaultValue());
-    }
-
     public int getMaxDepth() {
         return Integer.parseInt(this.getAttribute("max-depth").getDefaultValue());
     }
@@ -330,6 +326,10 @@ public class BehaviourFrame extends Frame {
         return Integer.parseInt(this.getAttribute("update-interval").getDefaultValue());
     }
 
+	public int getStateContractInterval() {
+		return Integer.parseInt(this.getAttribute("contract-interval").getDefaultValue());
+	}
+
     public String getTraversalMode() {
         DomainAttribute a = this.getAttribute("depth-first");
         if (a.getDefaultValue().equals("1")) {
@@ -375,12 +375,6 @@ public class BehaviourFrame extends Frame {
         super.removeChildFrame(RULE_LIST, name);
     }
 
-    public void setDeleteUnusedAfter(int n) {
-        DomainAttribute a = this.getAttribute("delete-unused-after");
-        a.setDefault(String.valueOf(n));
-        addOrSetAttribute(ATTR_LIST, a);
-    }
-
     public void setMaxDepth(int d) {
         DomainAttribute a = this.getAttribute("max-depth");
         a.setDefault(String.valueOf(d));
@@ -411,6 +405,11 @@ public class BehaviourFrame extends Frame {
         addOrSetAttribute(ATTR_LIST, a);
     }
 
+	public void setStateContractInterval(int d) {
+		DomainAttribute a = this.getAttribute("contract-interval");
+		a.setDefault(String.valueOf(d));
+		addOrSetAttribute(ATTR_LIST, a);
+	}
     public void setTraversalMode(String mode) {
         DomainAttribute a = this.getAttribute("depth-first");
         if (mode.equals(DEPTH_FIRST)) {
@@ -438,9 +437,10 @@ public class BehaviourFrame extends Frame {
         nattr.setDefault("100");
         super.addOrSetAttribute(ATTR_LIST, dattr);
         super.addOrSetAttribute(ATTR_LIST, nattr);
+
         DomainAttribute uattr = new DomainAttribute("update-interval", AttributeType.NUMERICAL);
         uattr.setDefault("10");
-        DomainAttribute delattr = new DomainAttribute("delete-unused-after", AttributeType.NUMERICAL);
+		DomainAttribute delattr = new DomainAttribute("contract-interval", AttributeType.NUMERICAL);
         delattr.setDefault("100");
         super.addOrSetAttribute(ATTR_LIST, uattr);
         super.addOrSetAttribute(ATTR_LIST, delattr);

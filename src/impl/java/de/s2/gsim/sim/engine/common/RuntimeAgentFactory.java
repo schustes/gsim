@@ -17,7 +17,7 @@ import de.s2.gsim.environment.GSimDefException;
 import de.s2.gsim.environment.GenericAgent;
 import de.s2.gsim.sim.DataHandler;
 import de.s2.gsim.sim.GSimEngineException;
-import de.s2.gsim.sim.behaviour.BehaviourEngine;
+import de.s2.gsim.sim.behaviour.engine.BehaviourEngine;
 
 public class RuntimeAgentFactory {
 

@@ -1,11 +1,11 @@
-package de.s2.gsim.sim.behaviour.builder;
+package de.s2.gsim.sim.behaviour.rulebuilder;
 
-import static de.s2.gsim.sim.behaviour.builder.ConditionBuilder.createAttributeCondition;
-import static de.s2.gsim.sim.behaviour.builder.ConditionBuilder.createExistsQuantifiedCondition;
-import static de.s2.gsim.sim.behaviour.builder.ConditionBuilder.createAtomCondition;
-import static de.s2.gsim.sim.behaviour.builder.ConditionBuilder.createVariableCondition;
-import static de.s2.gsim.sim.behaviour.builder.ParsingUtils.getDefiningRoleForRule;
-import static de.s2.gsim.sim.behaviour.builder.ParsingUtils.referencesChildFrame;
+import static de.s2.gsim.sim.behaviour.rulebuilder.BuildingUtils.getDefiningRoleForRule;
+import static de.s2.gsim.sim.behaviour.rulebuilder.BuildingUtils.referencesChildFrame;
+import static de.s2.gsim.sim.behaviour.rulebuilder.ConditionBuilder.createAtomCondition;
+import static de.s2.gsim.sim.behaviour.rulebuilder.ConditionBuilder.createAttributeCondition;
+import static de.s2.gsim.sim.behaviour.rulebuilder.ConditionBuilder.createExistsQuantifiedCondition;
+import static de.s2.gsim.sim.behaviour.rulebuilder.ConditionBuilder.createVariableCondition;
 
 import cern.jet.random.Uniform;
 import de.s2.gsim.api.sim.agent.impl.RuntimeAgent;

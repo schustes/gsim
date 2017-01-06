@@ -1,4 +1,4 @@
-package de.s2.gsim.sim.behaviour.builder;
+package de.s2.gsim.sim.behaviour.rulebuilder;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -15,28 +15,21 @@ import de.s2.gsim.sim.behaviour.Context;
 import de.s2.gsim.sim.behaviour.SimAction;
 import de.s2.gsim.util.Utils;
 
-public class RLRulesBuilder {
+public abstract class RLRulesBuilder {
 
-    private RuntimeAgent agent;
+	private RLRulesBuilder() {
+		// static class
+	}
 
-    private ConditionBuilder conditionBuilder = null;
 
-    private GeneralRLBuilder general = null;
-
-    public RLRulesBuilder(RuntimeAgent a) {
-        agent = a;
-        general = new GeneralRLBuilder(a);
-    }
-
-    String buildAvgRule(RLRule rule, ConditionDef evaluationFunction) {
+	public static String buildAvgRule(RuntimeAgent agent, RLRule rule, ConditionDef evaluationFunction) {
 
         String ownerRule = createRuleIdentifier(evaluationFunction);
 
-        String role = ParsingUtils.getDefiningRoleForRLRule(agent, createRuleIdentifier(rule));
+        String role = BuildingUtils.getDefiningRoleForRLRule(agent, createRuleIdentifier(rule));
 
         String n = "(defrule update-global-average-rule_" + ownerRule + "\n" + " (declare (salience +222199))\n"
                 + " (parameter (name \"executing-role\") (value " + "\"" + role + "\"))\n"
-                // + " (parameter (name \"exec-update-rewards\"))\n"
                 + " (timer (time ?currentTime))\n";
 
         String factString = " ?fact <- (rl-action-node (action-name ?n) (state-fact-name ?sfn) (arg $?param) (value ?old) (count ?times) "
@@ -57,7 +50,7 @@ public class RLRulesBuilder {
 
     }
 
-    String buildExecutionFunction(String ns) {
+	public static String buildExecutionFunction(String ns) {
 
         String nRule = "(deffunction execute(?action ?ctxName) \n";
         nRule += "  (bind $?param (fact-slot-value ?action arg))\n";
@@ -71,20 +64,21 @@ public class RLRulesBuilder {
         return nRule;
     }
 
-    String buildExperimentationUpdateRule(RLRule rule, ConditionDef evaluationFunction) throws GSimEngineException {
+	public static String buildExperimentationUpdateRule(RuntimeAgent agent, RLRule rule, ConditionDef evaluationFunction)
+	        throws GSimEngineException {
         String span = rule.getUpdateSpan();
         if (span != null) {
-            return buildExperimentationUpdateRule1(rule, evaluationFunction, span);
+			return buildExperimentationUpdateRule1(agent, rule, evaluationFunction, span);
         } else {
             String lag = rule.getUpdateLag();
             if (lag == null) {
                 lag = "1";
             }
-            return buildExperimentationUpdateRule0(rule, evaluationFunction, lag);
+			return buildExperimentationUpdateRule0(agent, rule, evaluationFunction, lag);
         }
     }
 
-    String buildIntermediateRule(RLRule rule) {
+	public static String buildIntermediateRule(RuntimeAgent agent, RLRule rule) {
 
         String nRule = "";
 
@@ -95,7 +89,7 @@ public class RLRulesBuilder {
             nRule = "(defrule " + ruleName + "\n";
             nRule += " (declare (salience +4999))\n";
             nRule += " (parameter (name \"exec-RLRule\"))\n";
-            nRule += " (parameter (name \"executing-role\") (value " + "\"" + ParsingUtils.getDefiningRoleForRLRule(agent, ownerRule) + "\"))\n";
+            nRule += " (parameter (name \"executing-role\") (value " + "\"" + BuildingUtils.getDefiningRoleForRLRule(agent, ownerRule) + "\"))\n";
             // nRule += " (parameter (name \"exec-interval\") (value ?exc&:(= 0 (mod
             // ?*current-time* ?exc))))\n";
 
@@ -106,11 +100,11 @@ public class RLRulesBuilder {
 			Object2JessVariableBindingTable map = new Object2JessVariableBindingTable(agent);
             map.build(rule);
 
-            nRule += createConditions(rule, map);
+			nRule += createConditions(agent, rule, map);
 
             nRule += " ?time <-(timer (time ?n))\n";
 
-            String[] pointers = getPointingNodes(rule);
+			String[] pointers = getPointingNodes(agent, rule);
             if (pointers.length > 0) {
                 nRule += " (" + rule.getName() + ")\n";
             }
@@ -124,28 +118,26 @@ public class RLRulesBuilder {
         return nRule;
     }
 
-    String createRLHelpRuleSetOnly(RLRule rule) throws GSimEngineException {
-        String[] rules = buildExperimentationTerminalRules(rule, true);
+	public static String createRLHelpRuleSetOnly(RuntimeAgent agent, RLRule rule) throws GSimEngineException {
+		String[] rules = buildExperimentationTerminalRules(agent, rule, true);
 
         String res = "";
         for (int i = 0; i < rules.length; i++) {
             res += rules[i];
         }
 
-        res += addShortCuts(rule, res) + "\n";
-
         return res;
     }
 
-    String createRLRuleSet(RLRule rule) throws GSimEngineException {
+	public static String createRLRuleSet(RuntimeAgent agent, RLRule rule) throws GSimEngineException {
 
-        String res = addShortCuts(rule, "");
+		String res = "";
         String[] rules = new String[0];
         if (res.length() > 0) {
-            rules = buildExperimentationTerminalRules(rule, true);
+			rules = buildExperimentationTerminalRules(agent, rule, true);
             res += "\n";
         } else {
-           rules = buildExperimentationTerminalRules(rule, false);
+			rules = buildExperimentationTerminalRules(agent, rule, false);
         }
 
         // String res = "";
@@ -158,22 +150,7 @@ public class RLRulesBuilder {
         return res;
     }
 
-    private String addShortCuts(RLRule c, String nRule_1) throws GSimEngineException {
-
-        String res = "";
-        String stateName = c.getName() + "_00";// initial state-name=rule-name [of
-        // the
-        // original rule]
-
-		Object2JessVariableBindingTable objRefs = new Object2JessVariableBindingTable(agent);
-        objRefs.build(c);
-
-        String condStr = createConditions(c, objRefs);
-
-        return res;
-    }
-
-    private String buildExperimentationFunctions(String ruleIdentifier, ActionDef[] a, FUNCTION f, ConditionDef funct) {
+	private static String buildExperimentationFunctions(String ruleIdentifier, ActionDef[] a, FUNCTION f, ConditionDef funct) {
 
         String s1 = createListActionQuery(ruleIdentifier, a, funct);
 
@@ -183,7 +160,8 @@ public class RLRulesBuilder {
 
     }
 
-    private String[] buildExperimentationTerminalRules(RLRule rule, boolean helpersOnly) throws GSimEngineException {
+	private static String[] buildExperimentationTerminalRules(RuntimeAgent agent, RLRule rule, boolean helpersOnly)
+	        throws GSimEngineException {
 
         Set<String> singleRules = new HashSet<String>();
 
@@ -194,8 +172,8 @@ public class RLRulesBuilder {
         String initialStateName = rule.getName() + "_0" + "0";
 
         if (!helpersOnly) {
-            String condStr = createConditions(rule, objRefs);
-            expRule += general.buildExperimentationRule(rule, initialStateName, condStr) + "\n";
+			String condStr = createConditions(agent, rule, objRefs);
+			expRule += ExperimentationRuleBuilder.buildExperimentationRule(agent, rule, initialStateName, condStr) + "\n";
         }
 
         singleRules.add(expRule);
@@ -222,11 +200,12 @@ public class RLRulesBuilder {
         return ss;
     }
 
-    private String buildExperimentationUpdateRule0(RLRule rule, ConditionDef evaluationFunction, String lag) throws GSimEngineException {
+	private static String buildExperimentationUpdateRule0(RuntimeAgent agent, RLRule rule, ConditionDef evaluationFunction, String lag)
+	        throws GSimEngineException {
 
         String ownerRule = createRuleIdentifier(evaluationFunction);
 
-        String role = ParsingUtils.getDefiningRoleForRLRule(agent, createRuleIdentifier(rule));
+        String role = BuildingUtils.getDefiningRoleForRLRule(agent, createRuleIdentifier(rule));
 
         String n = "(defrule update-rule_" + ownerRule + "\n" + " (declare (salience +22199))\n" + " (parameter (name \"executing-role\") (value "
                 + "\"" + role + "\"))\n" + " (timer (time ?t))\n"
@@ -241,8 +220,8 @@ public class RLRulesBuilder {
 
         n += " (not (modified ?n ?param ?sfn))\n";
 
-		if (ParsingUtils.referencesChildFrame(this.agent.getDefinition(), evaluationFunction.getParameterName())) {
-            String fnc = createLHS(rule, evaluationFunction.getParameterName());
+		if (BuildingUtils.referencesChildFrame(agent.getDefinition(), evaluationFunction.getParameterName())) {
+			String fnc = createLHS(agent, rule, evaluationFunction.getParameterName());
             n += fnc + "\n";
         } else {
             n += " (parameter (name \"" + evaluationFunction.getParameterName() + "\") (value ?currentReward))\n";
@@ -288,11 +267,11 @@ public class RLRulesBuilder {
 
     }
 
-    private String buildExperimentationUpdateRule1(RLRule rule, ConditionDef evaluationFunction, String span) {
+	private static String buildExperimentationUpdateRule1(RuntimeAgent agent, RLRule rule, ConditionDef evaluationFunction, String span) {
 
         String ownerRule = createRuleIdentifier(evaluationFunction);
 
-        String role = ParsingUtils.getDefiningRoleForRLRule(agent, createRuleIdentifier(rule));
+        String role = BuildingUtils.getDefiningRoleForRLRule(agent, createRuleIdentifier(rule));
 
         String n = "(defrule update-rule_" + ownerRule + "\n" + " (declare (salience +22199))\n" + " (parameter (name \"executing-role\") (value "
                 + "\"" + role + "\"))\n" + " (timer (time ?currentTime))\n"
@@ -342,26 +321,27 @@ public class RLRulesBuilder {
 
     }
 
-    private String createConditions(RLRule rule, Object2JessVariableBindingTable objRefs) throws GSimEngineException {
+	private static String createConditions(RuntimeAgent agent, RLRule rule, Object2JessVariableBindingTable objRefs)
+	        throws GSimEngineException {
         StringBuffer result = new StringBuffer();
         for (ConditionDef condition : rule.getConditions()) {
             String sofar = result.toString();
-            result.append(conditionBuilder.createCondition(agent, condition, objRefs, sofar));
+			result.append(ConditionBuilder.createCondition(agent, condition, objRefs, sofar));
         }
 
         return result.toString();
     }
 
-    private String createLHS(RLRule rule, String paramName) throws GSimEngineException {
+	private static String createLHS(RuntimeAgent agent, RLRule rule, String paramName) throws GSimEngineException {
 
 		Object2JessVariableBindingTable objRefs = new Object2JessVariableBindingTable(agent);
         objRefs.build(rule);
 
         int variableIdx = Uniform.staticNextIntFromTo(0, 1000);
 
-		String list = ParsingUtils.resolveList(paramName);// conditionBuilder.resolveList(paramName);
-		String object = ParsingUtils.resolveChildFrameWithList(this.agent.getDefinition(), paramName);// conditionBuilder.resolveObjectClass(paramName);
-		String att = ParsingUtils.extractChildAttributePathWithoutParent(agent.getDefinition(), paramName);// conditionBuilder.resolveAttribute(paramName);
+		String list = BuildingUtils.resolveList(paramName);// conditionBuilder.resolveList(paramName);
+		String object = BuildingUtils.resolveChildFrameWithList(agent.getDefinition(), paramName);// conditionBuilder.resolveObjectClass(paramName);
+		String att = BuildingUtils.extractChildAttributePathWithoutParent(agent.getDefinition(), paramName);// conditionBuilder.resolveAttribute(paramName);
 
         String binding = objRefs.getBinding(object);
         if (binding == null) {
@@ -377,7 +357,7 @@ public class RLRulesBuilder {
         return s0 + s1;
     }
 
-    private String createListActionQuery(String ruleIdentifier, ActionDef[] a, ConditionDef funct) {
+	private static String createListActionQuery(String ruleIdentifier, ActionDef[] a, ConditionDef funct) {
         String query1 = "(defquery list-actions_" + ruleIdentifier + "\n";
         query1 += " (declare (variables ?ev))\n";
         String ss2 = "	";
@@ -401,7 +381,7 @@ public class RLRulesBuilder {
         return query1;
     }
 
-    private String createRuleIdentifier(Instance inst) {
+	private static String createRuleIdentifier(Instance inst) {
         String x = inst.getName();
         x = x.replace(':', '_');
         x = x.replace(' ', '_');
@@ -412,7 +392,7 @@ public class RLRulesBuilder {
         return x;
     }
 
-    private String createSelectBestActionFunction(String ruleIdentifier, FUNCTION f) {
+	private static String createSelectBestActionFunction(String ruleIdentifier, FUNCTION f) {
         String func3 = "(deffunction selectBestAction_" + ruleIdentifier + " (?ev)\n";
         func3 += " (bind ?it (run-query list-actions_" + ruleIdentifier + " ?ev))\n";
         func3 += " (bind ?action (simplesoftmax-action-selector ?it))\n";
@@ -421,34 +401,7 @@ public class RLRulesBuilder {
         return func3;
     }
 
-    private String createShortcutSelectionRule(RLRule r) throws GSimEngineException {
-        String ident = createRuleIdentifier(r);
-        String role = ParsingUtils.getDefiningRoleForRLRule(agent, r.getName());
-
-        String s = "(defrule " + ident + "_sc_select\n";
-        s += " (declare (salience 199999999))\n";
-        s += " (parameter (name \"exec-RLRule\"))\n";
-        s += " (parameter (name \"executing-role\") (value " + "\"" + role + "\"))\n";
-        // s += " (parameter (name \"exec-interval\") (value ?exc&:(= 0 (mod
-        // ?*current-time* ?exc))))\n";
-        s += " (timer (time ?t))\n";
-        s += " (list (name \"" + ident + "\") (obj ?list))\n";
-        s += " =>\n";
-        // s+= "(printout t ======================(call ?list size) crlf)\n";
-        s += " (bind ?it (call ?list iterator))\n";
-        s += " (bind ?chosen (simplesoftmax-action-selector ?it))\n";
-        s += " (call ?list clear)\n";
-        s += " (if (neq ?chosen NIL) then\n";
-        s += " (execute ?chosen \"" + role + "\")\n";
-        s += "  (bind ?c (fact-slot-value ?chosen count))\n";
-        s += "  (modify (call ?chosen getFactId) (count (+ ?c 1)) (time ?t))\n";
-        s += "  (assert (experimented-" + ident + "))))\n";
-
-        return s;
-
-    }
-
-    private String[] getPointingNodes(RLRule to) {
+	private static String[] getPointingNodes(RuntimeAgent agent, RLRule to) {
         ArrayList<String> list = new ArrayList<String>();
         for (RLRule r : agent.getBehaviour().getRLRules()) {
             if (r.getAttribute("equivalent-actionset") != null) {

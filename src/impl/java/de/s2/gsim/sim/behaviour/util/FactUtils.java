@@ -9,10 +9,10 @@ import jess.Context;
 import jess.Fact;
 import jess.JessException;
 
-public class FactHelper {
+public class FactUtils {
     public static double getFloatSlotValue(Fact f, String slotName, Context context) {
         try {
-            return f.getSlotValue("active").floatValue(context);
+			return f.getSlotValue(slotName).floatValue(context);
         } catch (JessException e) {
             throw new GSimBehaviourException("Jess exception", e);
         }
@@ -21,7 +21,7 @@ public class FactHelper {
 
     public static String getStringSlotValue(Fact f, String slotName, Context context) {
         try {
-            return f.getSlotValue("active").stringValue(context);
+			return f.getSlotValue(slotName).stringValue(context);
         } catch (JessException e) {
             throw new GSimBehaviourException("Jess exception", e);
         }

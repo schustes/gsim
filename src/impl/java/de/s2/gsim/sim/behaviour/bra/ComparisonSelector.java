@@ -7,9 +7,6 @@ import jess.ValueVector;
 
 public class ComparisonSelector extends SimpleSoftmaxSelector implements Userfunction, java.io.Serializable {
 
-    /**
-     * 
-     */
     private static final long serialVersionUID = 1L;
 
     public ComparisonSelector() {

@@ -1,4 +1,4 @@
-package de.s2.gsim.sim.behaviour.builder;
+package de.s2.gsim.sim.behaviour.rulebuilder;
 
 import java.util.Map;
 
@@ -25,7 +25,7 @@ public class GlobalsBuilder {
         super();
     }
 
-    public String build(Rete rete, Map props) {
+	public String build(Rete rete, Map<?, ?> props) {
 
         String s = begin + "\n" + createRules() + "\n" + functions + "\n" + createGlobalVariables(props) + "\n" + endPart;
         try {
@@ -36,7 +36,7 @@ public class GlobalsBuilder {
         return s;
     }
 
-    private String createGlobalVariables(Map props) {
+	private String createGlobalVariables(Map<?, ?> props) {
         String s = "";
         if (props.containsKey("AGENT_COUNT")) {
             s += "(defglobal ?*agent-count* = " + (String) props.get("AGENT_COUNT") + ")\n";

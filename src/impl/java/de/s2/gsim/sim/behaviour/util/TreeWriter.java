@@ -2,23 +2,18 @@ package de.s2.gsim.sim.behaviour.util;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 
 import org.jdom.Element;
 import org.jdom.output.XMLOutputter;
 
-import de.s2.gsim.sim.engine.common.DatabaseManagerPostgres;
 import jess.Fact;
 import jess.Rete;
 import jess.Value;
 import jess.ValueVector;
 
-public class CollectiveTreeDBWriter {
+public class TreeWriter {
 
     // private String debugDir="/home/gsim/tmp";
     public void output(String agent, Rete rete, String debugDir) {
@@ -46,47 +41,8 @@ public class CollectiveTreeDBWriter {
         }
     }
 
-    public void writeToDB(String id, int time, Rete rete, String role) {
-
-        Element root = new Element("root");
-
-        // if (!role.equals("Learner")) return;
-
-        // System.out.println("====="+role);
-
-        ArrayList<Fact> level_1 = getChildren(rete, null);
-
-        for (Fact f : level_1) {
-            outputRek(rete, f, root);
-        }
-
-        writeRek(id, time, root);
-    }
-
-    private boolean existsEntry(Connection con, String id, int time, String description, String action) {
-
-        int count = 0;
-        try {
-
-            String sql = "SELECT COUNT(*) FROM TREE WHERE id='" + id + "' and description='" + description + "' AND action='" + action + "' and time="
-                    + time;
-            // System.out.println(sql);
-            Statement stmt = con.createStatement();
-            ResultSet res = stmt.executeQuery(sql);
-            res.next();
-            count = res.getInt(1);
-            res.close();
-            stmt.close();
-
-        } catch (Exception e) {
-            System.out.println("---->NEW");
-            e.printStackTrace();
-        }
-
-        return count > 0;
-    }
-
-    private ArrayList<Fact> getActions(Rete rete, String sfn) {
+	@SuppressWarnings("rawtypes")
+	private ArrayList<Fact> getActions(Rete rete, String sfn) {
 
         ArrayList<Fact> list = new java.util.ArrayList<Fact>();
 
@@ -109,7 +65,8 @@ public class CollectiveTreeDBWriter {
         return list;
     }
 
-    private ArrayList<Fact> getChildren(Rete rete, Fact parent) {
+	@SuppressWarnings("rawtypes")
+	private ArrayList<Fact> getChildren(Rete rete, Fact parent) {
 
         ArrayList<Fact> list = new java.util.ArrayList<Fact>();
 
@@ -150,7 +107,8 @@ public class CollectiveTreeDBWriter {
         return list;
     }
 
-    private ArrayList<Fact> getStateElems(Rete rete, String sfn, String paramName) {
+	@SuppressWarnings("rawtypes")
+	private ArrayList<Fact> getStateElems(Rete rete, String sfn, String paramName) {
 
         ArrayList<Fact> list = new java.util.ArrayList<Fact>();
 
@@ -172,21 +130,6 @@ public class CollectiveTreeDBWriter {
         }
 
         return list;
-    }
-
-    private void insert(Connection con, String id, int time, String description, String action, double actionValue, int activationCount,
-            int actionFre) {
-        try {
-            String sql = "INSERT INTO TREE VALUES ('" + id + "'," + time + ", '" + description + "', '" + action + "', " + actionValue + "," + "1, "
-                    + activationCount + ", " + actionFre + ")";
-            // System.out.println(sql);
-            Statement stmt = con.createStatement();
-            stmt.executeUpdate(sql);
-            stmt.close();
-        } catch (Exception e) {
-            System.out.println("---->NEW");
-            e.printStackTrace();
-        }
     }
 
     private void outputRek(Rete rete, Fact parent, Element elem) {
@@ -277,55 +220,6 @@ public class CollectiveTreeDBWriter {
             }
 
         } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void update(Connection con, String id, int time, String description, String action, double actionValue, int activationCount,
-            int actionFre) {
-        try {
-            String sql = "UPDATE TREE SET COUNT=COUNT + 1, ACTION_VALUE=ACTION_VALUE+" + actionValue + ", ACTIVATION_COUNT = ACTIVATION_COUNT + "
-                    + activationCount + ", action_fre=action_fre+" + actionFre + " WHERE id='" + id + "' and description = '" + description
-                    + "' and action='" + action + "' and time=" + time;
-            Statement stmt = con.createStatement();
-            // System.out.println(sql);
-            stmt.executeUpdate(sql);
-            stmt.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void writeRek(String id, int time, Element root) {
-        try {
-            Connection con = DatabaseManagerPostgres.getInstance().getConnection("socnt07", "gsim", "gsim", "gsim1");
-
-            List nextLevel = root.getChildren("state");
-            Iterator iter = nextLevel.iterator();
-            while (iter.hasNext()) {
-                Element stateElem = (Element) iter.next();
-                String description = stateElem.getText();
-                description = description.replaceAll("Description: ", "");
-                String state_name = id + "_" + stateElem.getAttributeValue("name");
-                int activationCount = stateElem.getAttribute("activation-count").getIntValue();
-                List actions = stateElem.getChild("actions").getChildren();
-                Iterator iter2 = actions.iterator();
-                while (iter2.hasNext()) {
-                    Element actionElement = (Element) iter2.next();
-                    String action = actionElement.getAttributeValue("name");
-                    double actionValue = actionElement.getAttribute("value").getDoubleValue();
-                    int fre = (int) actionElement.getAttribute("frequency").getDoubleValue();
-                    if (!existsEntry(con, "id", time, description, action)) {
-                        insert(con, state_name, time, description, action, actionValue, activationCount, fre);
-                    } else {
-                        update(con, state_name, time, description, action, actionValue, activationCount, fre);
-                    }
-                }
-                writeRek(id, time, stateElem);
-            }
-            con.close();
-        } catch (Exception e) {
-            System.out.println("---->NEW");
             e.printStackTrace();
         }
     }

@@ -219,6 +219,10 @@ public class BehaviourDef extends Instance {
         return (int) ((NumericalAttribute) this.getAttribute("update-interval")).getValue();
     }
 
+	public int getStateContractInterval() {
+		return (int) ((NumericalAttribute) this.getAttribute("contract-interval")).getValue();
+	}
+
     public boolean isBreadthFirst() {
         NumericalAttribute a = (NumericalAttribute) this.getAttribute("depth-first");
         return a.getValue() == 0;
@@ -279,6 +283,12 @@ public class BehaviourDef extends Instance {
         a.setValue(d);
         this.setAttribute(a);
     }
+
+	public void setStateContractInterval(int d) {
+		NumericalAttribute a = (NumericalAttribute) this.getAttribute("contract-interval");
+		a.setValue(d);
+		this.setAttribute(a);
+	}
 
     public void setTraversalMode(String mode) {
         NumericalAttribute a = (NumericalAttribute) this.getAttribute("depth-first");

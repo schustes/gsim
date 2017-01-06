@@ -1,43 +1,30 @@
-package de.s2.gsim.sim.behaviour.builder;
-
-import java.util.ArrayList;
+package de.s2.gsim.sim.behaviour.rulebuilder;
 
 import de.s2.gsim.api.sim.agent.impl.RuntimeAgent;
 import de.s2.gsim.environment.ExpansionDef;
 import de.s2.gsim.environment.Instance;
 import de.s2.gsim.environment.RLRule;
-import de.s2.gsim.environment.UserRuleFrame;
-import de.s2.gsim.objects.attribute.StringAttribute;
 import de.s2.gsim.sim.GSimEngineException;
 
-public class GeneralRLBuilder {
+public abstract class ExperimentationRuleBuilder {
 
-	private RuntimeAgent agent = null;
-
-    public GeneralRLBuilder(RuntimeAgent agent) {
-		this.agent = agent;
+	private ExperimentationRuleBuilder() {
+		// static class
 	}
 
-	public String buildExperimentationRule(RLRule rule, String stateName, String condStr) throws GSimEngineException {
+	public static String buildExperimentationRule(RuntimeAgent agent, RLRule rule, String stateName, String condStr) throws GSimEngineException {
 
 		String ownerRule = createRuleIdentifier(rule);
 		String ruleName = "experimental_rule_" + ownerRule + "@" + stateName + "@";// +
-		// createId();
 		String defaultIdentifier = ownerRule;
 
-		String role = ParsingUtils.getDefiningRoleForRLRule(agent, ownerRule);
+		String role = BuildingUtils.getDefiningRoleForRLRule(agent, ownerRule);
 
 		try {
-
-			RLRule real = resolveEquivalentCondition(rule);
 
 			String nRule = "(defrule " + ruleName + "\n";
 			nRule += " (declare (salience +4999))\n";
 			nRule += " (parameter (name \"exec-RLRule\"))\n";
-
-			// >>>>>>>>>>>>>>>>>>BG>>>>>>>>>>>>>>>>>//
-			// removed
-			// nRule += " (not (experimented-" + defaultIdentifier + "))\n";
 
 			nRule += " (state-fact (name ?sfn&:(eq ?sfn \"" + stateName + "\")) (expansion $?exp))\n";
 
@@ -50,19 +37,11 @@ public class GeneralRLBuilder {
 			}
 
 			nRule += " (parameter (name \"executing-role\") (value " + "\"" + role + "\"))\n";
-			// nRule += " (parameter (name \"exec-interval\") (value ?exc&:(= 0 (mod ?*current-time* ?exc))))\n";
 			nRule += condStr;
 			nRule += " ?time <-(timer (time ?n))\n";
 
-			String[] pointers = getPointingNodes(rule);
-			if (pointers.length > 0) {
-				nRule += " (" + rule.getName() + ")\n";
-			}
-
 			nRule += "  =>\n";
-			String realOwnerName = createRuleIdentifier(real);
-			// nRule+="(printout
-			// ********************************EXECUTE**************************)";
+			String realOwnerName = createRuleIdentifier(rule);
 			nRule += " (bind ?action (selectBestAction_" + realOwnerName + " ?sfn))\n";
 			nRule += " (if (neq ?action NIL) then\n";
 			nRule += "  (bind ?c (fact-slot-value ?action count))\n";
@@ -79,7 +58,7 @@ public class GeneralRLBuilder {
 	}
 
 
-	private String createRuleIdentifier(Instance inst) {
+	private static String createRuleIdentifier(Instance inst) {
 		String x = inst.getName();
 		x = x.replace(' ', '_');
 		x = x.replace('/', '_');
@@ -89,22 +68,7 @@ public class GeneralRLBuilder {
 		return x;
 	}
 
-	private String[] getPointingNodes(RLRule to) {
-		ArrayList<String> list = new ArrayList<String>();
-		for (RLRule r : agent.getBehaviour().getRLRules()) {
-			if (r.containsAttribute("equivalent-actionset") ) {
-				String pointingTo = r.getAttribute("equivalent-actionset").toValueString();
-				if (pointingTo.equals(to.getName())) {
-					list.add(r.getName());
-				}
-			}
-		}
-		String[] res = new String[list.size()];
-		list.toArray(res);
-		return res;
-	}
-
-	private boolean hasCatExpansion(RLRule rule) {
+	private static boolean hasCatExpansion(RLRule rule) {
 		for (ExpansionDef e : rule.getExpansions()) {
 			if (Double.isNaN(e.getMin()) && Double.isNaN(e.getMax())) {
 				return true;
@@ -113,7 +77,7 @@ public class GeneralRLBuilder {
 		return false;
 	}
 
-	private boolean hasNumericalExpansion(RLRule rule) {
+	private static boolean hasNumericalExpansion(RLRule rule) {
 		for (ExpansionDef e : rule.getExpansions()) {
 			if (!Double.isNaN(e.getMin()) && !Double.isNaN(e.getMax())) {
 				return true;
@@ -122,15 +86,6 @@ public class GeneralRLBuilder {
 		return false;
 	}
 
-	private RLRule resolveEquivalentCondition(RLRule c) {
-		if (c.containsAttribute(UserRuleFrame.ATTR_LIST_ATTRS, "equivalent-state")) {
-			StringAttribute s = (StringAttribute) c.getAttribute(UserRuleFrame.ATTR_LIST_ATTRS, "equivalent-state");
-			RLRule next = agent.getBehaviour().getRLRule(s.getValue());
-			return resolveEquivalentCondition(next);
-		}
 
-		return c;
-
-	}
 
 }

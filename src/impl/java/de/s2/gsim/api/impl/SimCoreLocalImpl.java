@@ -13,8 +13,6 @@ import de.s2.gsim.GSimException;
 import de.s2.gsim.api.sim.impl.local.SimulationInstanceContainerLocal;
 import de.s2.gsim.def.ModelDefinitionEnvironment;
 import de.s2.gsim.environment.Environment;
-import de.s2.gsim.environment.EnvironmentSetup;
-import de.s2.gsim.sim.BatchManager;
 import de.s2.gsim.sim.SimulationController;
 
 public class SimCoreLocalImpl implements GSimCore {
@@ -59,9 +57,9 @@ public class SimCoreLocalImpl implements GSimCore {
         try {
 
             Environment env = new Environment(ns);
-            EnvironmentSetup setup = new EnvironmentSetup(env);
-            setup.setInputStream(setupFile);
-            setup.runSetup();
+			// EnvironmentSetup setup = new EnvironmentSetup(env);
+			// setup.setInputStream(setupFile);
+			// setup.runSetup();
             EnvironmentWrapper impl = new EnvironmentWrapper(env);
             return impl;
         } catch (Exception e) {

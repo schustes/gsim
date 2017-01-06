@@ -37,7 +37,9 @@ public class ExpansionFrame extends Frame {
 
     public ExpansionFrame(String var, String min, String max) {
         this(var);
-        setDefaults(var, min, max, "");
+		this.setMin(min);
+		this.setMax(max);
+		// setDefaults(var, min, max, "");
     }
 
     public void addFiller(String s) {

@@ -1,4 +1,4 @@
-package de.s2.gsim.sim.behaviour.builder;
+package de.s2.gsim.sim.behaviour.engine;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -18,23 +18,22 @@ import de.s2.gsim.objects.Path;
 import de.s2.gsim.objects.attribute.AttributeType;
 import de.s2.gsim.objects.attribute.DomainAttribute;
 import de.s2.gsim.sim.GSimEngineException;
-import de.s2.gsim.sim.behaviour.util.ReteHelper;
+import de.s2.gsim.sim.behaviour.rulebuilder.BuildingUtils;
+import de.s2.gsim.sim.behaviour.rulebuilder.ExpansionParameterReferences;
+import de.s2.gsim.sim.behaviour.rulebuilder.ExpansionRulesBuilder;
+import de.s2.gsim.sim.behaviour.rulebuilder.RLRulesBuilder;
+import de.s2.gsim.sim.behaviour.rulebuilder.TreeExpansionBuilder;
+import de.s2.gsim.sim.behaviour.util.RuleEngineHelper;
 import jess.Fact;
 import jess.JessException;
 import jess.Rete;
 
-public class RLParser {
+public class RuleEngineFactory {
 
     private RuntimeAgent agent;
 
-    private RLRulesBuilder rlBuilder;
-
-    private TreeExpansionBuilder tBuilder;
-
-    public RLParser(RuntimeAgent agent) {
+    public RuleEngineFactory(RuntimeAgent agent) {
         this.agent = agent;
-        rlBuilder = new RLRulesBuilder(agent);
-        tBuilder = new TreeExpansionBuilder(agent);
     }
 
     public String build(Rete rete) throws GSimEngineException {
@@ -44,7 +43,7 @@ public class RLParser {
 
             rete.executeCommand(rules);
 
-            ReteHelper.parseAndInsertGlobalRLFacts(agent, rete);
+            RuleEngineHelper.parseAndInsertGlobalRLFacts(agent, rete);
 
             int n = countStateFactElems(rete);
             rete.executeCommand("(defglobal ?*state-elem-count* = " + n + ")");
@@ -62,7 +61,7 @@ public class RLParser {
         int count = 0;
 
         try {
-            Iterator iter = rete.listFacts();
+			Iterator<?> iter = rete.listFacts();
             while (iter.hasNext()) {
                 Fact f = (Fact) iter.next();
                 if (f.getDeftemplate().getBaseName().equals("state-fact-element") || f.getDeftemplate().getBaseName().equals("state-fact-category")) {
@@ -75,6 +74,7 @@ public class RLParser {
         return count;
     }
 
+	@SuppressWarnings("rawtypes")
 	private String doBuild() throws GSimEngineException {
 
         try {
@@ -91,12 +91,11 @@ public class RLParser {
 
             String s = "";
 
-            boolean hasExpansion = false;
 			for (int i = 0; i < r.size(); i++) {
 				if (r.get(i).isActivated() && !r.get(i).containsAttribute("equivalent-actionset")) {
 
 					if (!r.get(i).hasExpansions()) {
-						String expRuleFinal = rlBuilder.createRLRuleSet(r.get(i));
+						String expRuleFinal = RLRulesBuilder.createRLRuleSet(agent, r.get(i));
                         res += expRuleFinal + "\n";
 					} else if (r.get(i).hasExpansions()) {
 						String initialStateName = r.get(i).getName() + "_0" + "0";
@@ -104,15 +103,15 @@ public class RLParser {
 
 						extractConditionRefs(r.get(i), exp);
 
-						res += rlBuilder.createRLHelpRuleSetOnly(r.get(i));
-						res += tBuilder.buildInitialRule(r.get(i), initialStateName, exp);
+						res += RLRulesBuilder.createRLHelpRuleSetOnly(agent, r.get(i));
+						res += TreeExpansionBuilder.buildInitialRule(agent, r.get(i), initialStateName, exp);
 
                     }
 
 					updateRules.put(r.get(i).getEvaluationFunction().getParameterName(),
-					        rlBuilder.buildExperimentationUpdateRule(r.get(i), r.get(i).getEvaluationFunction()));
+					        RLRulesBuilder.buildExperimentationUpdateRule(agent, r.get(i), r.get(i).getEvaluationFunction()));
 					updateRules.put(r.get(i).getEvaluationFunction().getParameterName() + "avg",
-					        rlBuilder.buildAvgRule(r.get(i), r.get(i).getEvaluationFunction()));
+					        RLRulesBuilder.buildAvgRule(agent, r.get(i), r.get(i).getEvaluationFunction()));
                 }
 
             }
@@ -123,13 +122,13 @@ public class RLParser {
 
 				if (r.get(i).isActivated() && r.get(i).containsAttribute("equivalent-actionset")) {
 
-					String expRuleFinal = rlBuilder.buildIntermediateRule(r.get(i));
+					String expRuleFinal = RLRulesBuilder.buildIntermediateRule(agent, r.get(i));
                     res += expRuleFinal + "\n";
 
                 }
 
 				if (r.get(i).hasExpansions()) {
-					String roleName = ParsingUtils.getDefiningRoleForRLRule(agent, r.get(i).getName());
+					String roleName = BuildingUtils.getDefiningRoleForRLRule(agent, r.get(i).getName());
                     expansionMap.put(roleName, agent.getBehaviour());
 
                     Instance inst = agent;
@@ -143,25 +142,26 @@ public class RLParser {
 
             }
 
-            ExpansionRulesBuilder erb = new ExpansionRulesBuilder();
             for (String n : expansionMap.keySet()) {
                 Unit u = expansionMap.get(n);
                 if (u instanceof Instance) {
                     BehaviourDef beh = (BehaviourDef) u;
                     int expandInterval = beh.getStateUpdateInterval();
+					int contractInterval = beh.getStateContractInterval();
                     double revisitCostFraction = beh.getRevisitCost();
                     double revaluationProbability = beh.getRevalProb();
-                    s += erb.build(expandInterval, revisitCostFraction, revaluationProbability, n);
+					s += ExpansionRulesBuilder.build(expandInterval, contractInterval, revisitCostFraction, revaluationProbability, n);
                 } else {
                     BehaviourFrame beh = (BehaviourFrame) u;
                     int expandInterval = beh.getStateUpdateInterval();
+					int contractInterval = beh.getStateContractInterval();
                     double revisitCostFraction = beh.getRevisitCost();
                     double revaluationProbability = beh.getRevalProb();
-                    s += erb.build(expandInterval, revisitCostFraction, revaluationProbability, n);
+					s += ExpansionRulesBuilder.build(expandInterval, contractInterval, revisitCostFraction, revaluationProbability, n);
                 }
             }
-            s += erb.createStateDescriptionQueries();
-            s += erb.createRetractFollowRules();
+			s += ExpansionRulesBuilder.createStateDescriptionQueries();
+			s += ExpansionRulesBuilder.createRetractFollowRules();
 
             res += s;
 
@@ -174,7 +174,7 @@ public class RLParser {
             String ns = agent.getNameSpace();
             ns = ns.substring(0, ns.indexOf("/"));
 
-            res += rlBuilder.buildExecutionFunction(ns);
+			res += RLRulesBuilder.buildExecutionFunction(ns);
 
             return res;
         } catch (Exception e) {
@@ -187,7 +187,8 @@ public class RLParser {
             String path = e.getParameterName();
 			DomainAttribute a = this.agent.getDefinition().resolvePath(Path.attributePath(path.split("/")));
             if (a.getType() == AttributeType.INTERVAL) {
-                exp.setIntervalAttributes(path, Double.parseDouble(e.getFillers().get(0)), Double.parseDouble(e.getFillers().get(1)));
+				exp.setIntervalAttributes(path, e.getMin(), e.getMax());
+				// exp.setIntervalAttributes(path, Double.parseDouble(e.getFillers().get(0)), Double.parseDouble(e.getFillers().get(1)));
             } else if (a.getType() == AttributeType.SET) {
                 exp.setSetAttributes(path, e.getFillers());
             }

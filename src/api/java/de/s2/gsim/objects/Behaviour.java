@@ -144,20 +144,29 @@ public interface Behaviour extends Serializable {
     Rule[] getRules() throws GSimException;
 
     /**
-     * Gets the interval m with which nodes in the BRA process are updated. Note: The delete cycle is hardcoded at round(m - 1/4m).
-     * 
-     * @return the interval
-     * @throws GSimException
-     */
+	 * Gets the interval mu with which nodes in the BRA process are updated. Note: The delete cycle is hardcoded at round(m - 1/4m).
+	 * 
+	 * @return the interval
+	 * @throws GSimException
+	 */
     int getUpdateInterval() throws GSimException;
 
     /**
-     * Checks whether the {@link de.s2.gsim.objects.RLActionNode} with the specified name was declared in this level of the inheritance hierarchy.
-     * 
-     * @param nodeName the name of the node
-     * @return true if declared, false otherwise
-     * @throws GSimException
-     */
+	 * Gets the interval nu with which nodes in the BRA process are updated. Note: The delete cycle is hardcoded at round(m - 1/4m).
+	 * 
+	 * @return the interval
+	 * @throws GSimException
+	 */
+	int getContractInterval() throws GSimException;
+
+	/**
+	 * Checks whether the {@link de.s2.gsim.objects.RLActionNode} with the specified name was declared in this level of the inheritance
+	 * hierarchy.
+	 * 
+	 * @param nodeName the name of the node
+	 * @return true if declared, false otherwise
+	 * @throws GSimException
+	 */
     boolean isDeclaredRLNode(String nodeName) throws GSimException;
 
     /**
@@ -211,14 +220,21 @@ public interface Behaviour extends Serializable {
     void setRevisitCostFraction(double c) throws GSimException;
 
     /**
-     * Set the interval (timesteps) at which BRA evaluates new expansions (Note: Because of hardcoded delete cycle, this will also affect when nodes
-     * become deleted).
-     * 
-     * @param n the interval
-     * @throws GSimException
-     */
+	 * Set the interval mu (timesteps) at which BRA evaluates new expansions (Note: Because of hardcoded delete cycle, this will also affect
+	 * when nodes become deleted).
+	 * 
+	 * @param n the interval
+	 * @throws GSimException
+	 */
     void setUpdateInterval(int n) throws GSimException;
-    
+
+	/**
+	 * Set the interval nu (timesteps) at which BRA evaluates rule generalisations.
+	 * 
+	 * @param n the interval
+	 * @throws GSimException
+	 */
+	void setContractInterval(int n) throws GSimException;
    
 
 }

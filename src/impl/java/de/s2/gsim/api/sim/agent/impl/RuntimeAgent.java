@@ -15,7 +15,7 @@ import de.s2.gsim.environment.UserRule;
 import de.s2.gsim.objects.AgentInstance;
 import de.s2.gsim.sim.agent.ApplicationAgent;
 import de.s2.gsim.sim.agent.RtAgent;
-import de.s2.gsim.sim.behaviour.BehaviourEngine;
+import de.s2.gsim.sim.behaviour.engine.BehaviourEngine;
 import de.s2.gsim.sim.communication.AgentType;
 import de.s2.gsim.sim.communication.Communicator;
 
@@ -92,14 +92,6 @@ public class RuntimeAgent extends GenericAgent implements AgentType, RtAgent {
 		roles = null;
 		ruleBase = null;
 		currentStrategy = null;
-	}
-
-	public void endEpisode() {
-		try {
-			ruleBase.endEpisode();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
 	}
 
 	public void execute(HashMap<String, Object> globals, String roleName) {

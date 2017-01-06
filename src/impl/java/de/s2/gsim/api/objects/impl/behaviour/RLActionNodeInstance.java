@@ -10,12 +10,10 @@ import de.s2.gsim.environment.ExpansionDef;
 import de.s2.gsim.environment.Instance;
 import de.s2.gsim.environment.RLRule;
 import de.s2.gsim.environment.RLRuleFrame;
-import de.s2.gsim.environment.UserRule;
 import de.s2.gsim.objects.Condition;
 import de.s2.gsim.objects.Evaluator;
 import de.s2.gsim.objects.Expansion;
 import de.s2.gsim.objects.RLActionNode;
-import de.s2.gsim.objects.SelectionNode;
 
 public class RLActionNodeInstance extends RuleInstance implements RLActionNode, UnitWrapper {
 

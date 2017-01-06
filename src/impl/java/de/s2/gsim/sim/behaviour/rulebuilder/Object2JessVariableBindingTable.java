@@ -1,4 +1,4 @@
-package de.s2.gsim.sim.behaviour.builder;
+package de.s2.gsim.sim.behaviour.rulebuilder;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -78,16 +78,16 @@ public class Object2JessVariableBindingTable {
      */
     private void addConditionsRefs(ConditionDef[] conditions) {
         for (ConditionDef c : conditions) {
-			if (ParsingUtils.referencesChildFrame(agent.getDefinition(), c.getParameterName())) {
+			if (BuildingUtils.referencesChildFrame(agent.getDefinition(), c.getParameterName())) {
                 String object = resolveObjectClassWithList(c.getParameterName());
                 addObjectClass(object);
             }
-            if (ParsingUtils.referencesChildFrame(agent.getDefinition(), c.getParameterValue())) {
+            if (BuildingUtils.referencesChildFrame(agent.getDefinition(), c.getParameterValue())) {
                 String object = resolveObjectClassWithList(c.getParameterValue());
                 addObjectClass(object);
             }
-            if (!ParsingUtils.referencesChildFrame(agent.getDefinition(), c.getParameterValue())
-                    && !ParsingUtils.referencesChildFrame(agent.getDefinition(), c.getParameterName())) {
+            if (!BuildingUtils.referencesChildFrame(agent.getDefinition(), c.getParameterValue())
+                    && !BuildingUtils.referencesChildFrame(agent.getDefinition(), c.getParameterName())) {
                 String object = c.getParameterName();
                 addObjectClass(object);
             }
@@ -101,7 +101,7 @@ public class Object2JessVariableBindingTable {
      */
 	private void addExpansionRefs(List<ExpansionDef> expansions) {
         for (ExpansionDef c : expansions) {
-			if (ParsingUtils.referencesChildFrame(agent.getDefinition(), c.getParameterName())) {
+			if (BuildingUtils.referencesChildFrame(agent.getDefinition(), c.getParameterName())) {
                 String pn = c.getParameterName();
                 String object = resolveObjectClassWithList(pn);
                 addObjectClass(object);
@@ -126,7 +126,7 @@ public class Object2JessVariableBindingTable {
     }
 
     private String resolveObjectClassWithList(String s) {
-		return ParsingUtils.resolveChildFrameWithList(agent.getDefinition(), s);
+		return BuildingUtils.resolveChildFrameWithList(agent.getDefinition(), s);
 	}
 
 }

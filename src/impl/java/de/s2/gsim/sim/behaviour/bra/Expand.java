@@ -7,8 +7,8 @@ import static java.util.Collections.shuffle;
 import java.util.List;
 
 import de.s2.gsim.api.sim.agent.impl.RuntimeAgent;
-import de.s2.gsim.sim.behaviour.builder.ParsingUtils;
-import de.s2.gsim.sim.behaviour.util.ReteHelper;
+import de.s2.gsim.sim.behaviour.rulebuilder.BuildingUtils;
+import de.s2.gsim.sim.behaviour.util.RuleEngineHelper;
 import jess.Context;
 import jess.Fact;
 import jess.JessException;
@@ -37,7 +37,7 @@ public class Expand implements Userfunction, java.io.Serializable {
         Fact stateFact = val.factValue(context);
 
         String statefactName = stateFact.getSlotValue("name").stringValue(context);
-        List<Fact> unexpandedStateFactElems = ReteHelper.getStateFactElems(statefactName, context);
+        List<Fact> unexpandedStateFactElems = RuleEngineHelper.getStateFactElems(statefactName, context);
 
         if (unexpandedStateFactElems.size() == 0) {
             return null;
@@ -47,9 +47,8 @@ public class Expand implements Userfunction, java.io.Serializable {
         unexpandedStateFactElems.remove(elemToExpand);
 
         String attributeRef = elemToExpand.getSlotValue("param-name").stringValue(context);
-        CatgoryExpansionHandler impl = new CatgoryExpansionHandler();
         try {
-            if (ParsingUtils.isNumericalAttributeSpec(agent, attributeRef)) {
+            if (BuildingUtils.isNumericalAttributeSpec(agent, attributeRef)) {
                 createNextStatesNum(agent, stateFact, elemToExpand, unexpandedStateFactElems, context, false);
             } else {
                 createNextStatesCat(agent, stateFact, elemToExpand, unexpandedStateFactElems, context, false);

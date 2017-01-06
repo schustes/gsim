@@ -1,9 +1,9 @@
-package de.s2.gsim.sim.behaviour.builder;
+package de.s2.gsim.sim.behaviour.rulebuilder;
 
-import static de.s2.gsim.sim.behaviour.builder.ParsingUtils.extractChildAttributePathWithoutParent;
-import static de.s2.gsim.sim.behaviour.builder.ParsingUtils.referencesChildFrame;
-import static de.s2.gsim.sim.behaviour.builder.ParsingUtils.resolveChildFrameWithList;
-import static de.s2.gsim.sim.behaviour.builder.ParsingUtils.resolveList;
+import static de.s2.gsim.sim.behaviour.rulebuilder.BuildingUtils.extractChildAttributePathWithoutParent;
+import static de.s2.gsim.sim.behaviour.rulebuilder.BuildingUtils.referencesChildFrame;
+import static de.s2.gsim.sim.behaviour.rulebuilder.BuildingUtils.resolveChildFrameWithList;
+import static de.s2.gsim.sim.behaviour.rulebuilder.BuildingUtils.resolveList;
 
 import java.util.List;
 
@@ -74,7 +74,8 @@ public abstract class ConditionBuilder {
         } else if (cond.getOperator().equals("<>")) {
             nRule += "(value ?value" + (k) + "&:(neq" + " ?value" + (k) + " " + replace + " " + ")))\n";
         } else {
-            nRule += "(value ?value" + (k) + "&:(and (numberp ?value" + k + ") (" + cond.getOperator() + " ?value" + (k) + " " + replace + " "
+			nRule += "(value ?value" + (k) + "&:(and (numberp ?value" + k + ") (" + cond.getOperator() + " ?value" + (k) + " " + replace
+			        + cond.getParameterValue() + " "
                     + "))))\n";
         }
 
@@ -97,7 +98,8 @@ public abstract class ConditionBuilder {
         if (!de.s2.gsim.util.Utils.isNumerical(selectedFiller)) {
             nRule += "(value ?value" + k + 1251 + "&:(eq ?value" + k + 1251 + " \"" + selectedFiller + "\"  )))\n";
         } else {
-            nRule += "(value ?value" + k + 1251 + "&:(and (numberp ?value" + k + 1251 + ")  (= ?value" + k + 1251 + " " + selectedFiller + " ) )))";
+			nRule += "(value ?value" + k + 1251 + "&:(and (numberp ?value" + k + 1251 + ")  (= ?value" + k + 1251 + " " + selectedFiller
+			        + " ) )))";
         }
         return nRule;
 
@@ -133,7 +135,7 @@ public abstract class ConditionBuilder {
                 nRule += "(eq ?value" + k + 1251;
                 nRule += " \"" + selectedFillers.get(i) + "\"  )";
             } else {
-                nRule += " (and (numberp ?value" + k + 1251 + ")  (= ?value" + k + 1251 + " " + selectedFillers.get(i) + " ) )";
+				nRule += " (and (numberp ?value" + k + 1251 + ")  (= ?value" + k + 1251 + " " + selectedFillers.get(i) + " ) )";
             }
 
         }
@@ -333,10 +335,10 @@ public abstract class ConditionBuilder {
         if (!Utils.isNumerical(cond.getParameterValue()) && !isJessFunc(cond.getParameterValue()) && !cond.getOperator().equals("<>")) {
             nRule += "(value ?value" + k + "&:(eq*" + " ?value" + k + " \"" + cond.getParameterValue() + "\" )))\n";
         } else if (Utils.isNumerical(cond.getParameterValue()) && cond.getOperator().equals("=")) {
-            nRule += "(value ?value" + k + "&:(eq*" + " ?value" + k + " " + cond.getParameterValue() + " )))\n";
+			nRule += "(value ?value" + k + "&:(eq*" + " ?value" + k + " " + cond.getParameterValue() + cond.getParameterValue() + " )))\n";
         } else if (Utils.isNumerical(cond.getParameterValue())) {
-            nRule += "(value ?value" + k + "&:(and (numberp ?value" + k + ") (" + cond.getOperator() + " ?value" + k + " " + cond.getParameterValue()
-            + " ))))\n";
+			nRule += "(value ?value" + k + "&:(and (numberp ?value" + k + ") (" + cond.getOperator() + " ?value" + k + " "
+			        + cond.getParameterValue() + " ))))\n";
         } else if (!Utils.isNumerical(cond.getParameterValue()) && !isJessFunc(cond.getParameterValue()) && cond.getOperator().equals("<>")) {
             nRule += "(value ?value" + k + "&:(neq" + " ?value" + k + " \"" + cond.getParameterValue() + "\" )))\n";
         } else if (!Utils.isNumerical(cond.getParameterValue()) && isJessFunc(cond.getParameterValue()) && cond.getOperator().equals("<>")) {
@@ -374,10 +376,14 @@ public abstract class ConditionBuilder {
 
         nRule = createLHS(owner, c0.getParameterName(), objRefs, k + 12001, nRule_1);
 
-        nRule += "(value ?value" + k + 1251 + "&:(and (numberp ?value" + k + 1251 + ") (>= ?value" + k + 1251 + " " + String.valueOf(min) + " ))))\n";
+		nRule += "(value ?value" + k + 1251 + "&:(and (numberp ?value" + k + 1251 + ") (>= ?value" + k + 1251 + " " + String.valueOf(min)
+		        + " ))))\n";
 
         nRule += createLHS(owner, c1.getParameterName(), objRefs, k + 12002, nRule + nRule_1);
-        nRule += "(value ?value" + k + 1291 + "&:(and (numberp ?value" + k + 1291 + ") (< ?value" + k + 1291 + " " + String.valueOf(max) + " ))))\n";
+		nRule += "(value ?value" + k + 1291 + "&:(and (numberp ?value" + k + 1291 + ") (< ?value" + k + 1291 + " "
+		        + String.valueOf(max)
+		        //+ "(+ " + String.valueOf(max) + " 0.0000000000000000000000000000000000000000000000000000000000000000000000000001d)"
+		        + " ))))\n";
 
         return nRule;
 

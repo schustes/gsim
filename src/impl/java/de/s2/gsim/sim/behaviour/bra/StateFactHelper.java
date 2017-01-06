@@ -7,7 +7,7 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import de.s2.gsim.sim.behaviour.GSimBehaviourException;
-import de.s2.gsim.sim.behaviour.util.ReteHelper;
+import de.s2.gsim.sim.behaviour.util.RuleEngineHelper;
 import jess.Context;
 import jess.Fact;
 import jess.JessException;
@@ -24,7 +24,7 @@ public abstract class StateFactHelper {
 
     public static void insertNewActionNodes(Context context, String oldStatefactName, String newStatefactName) throws JessException {
 
-        ArrayList<Fact> connectedActionNodesAll = ReteHelper.getFacts("rl-action-node", oldStatefactName, context);
+        ArrayList<Fact> connectedActionNodesAll = RuleEngineHelper.getFacts("rl-action-node", oldStatefactName, context);
 
         for (Fact f : connectedActionNodesAll) {
             context.getEngine().retract(f);
@@ -53,7 +53,7 @@ public abstract class StateFactHelper {
             double alpha = o.getSlotValue("alpha").floatValue(context);
             ValueVector args = o.getSlotValue("arg").listValue(context);
 
-            Fact newAction = ReteHelper.createActionFact(context.getEngine(), name, evalFunc, alpha, args, stateFactName);
+            Fact newAction = RuleEngineHelper.createActionFact(context.getEngine(), name, evalFunc, alpha, args, stateFactName);
             newAction.setSlotValue("active", new Value(1.0, RU.FLOAT));
             ret[i] = newAction;
             i++;
@@ -80,36 +80,41 @@ public abstract class StateFactHelper {
             throws JessException {
 
         String stateName = state.getSlotValue("name").stringValue(context);
-        // String param = state.getSlotValue("expansion").stringValue(context);
+		// String param = state.getSlotValue("expansion").stringValue(context);
         String name = attributeName + "->" + String.valueOf(categoryValue);
 
-        return ReteHelper.addStateFactCat(context.getEngine(), state, stateName, name, attributeName, categoryValue);
+        return RuleEngineHelper.addStateFactCat(context.getEngine(), state, stateName, name, attributeName, categoryValue);
 
     }
 
-    public static Fact addStateFactIntervalElemFromParentElem(String stateName, Fact stateFactElem, double from, double to, Context context)
+    public static Fact addStateFactIntervalElemFromParentElem(String stateName, Fact parentStateFactElem, double from, double to, Context context)
             throws JessException {
 
         // String stateName = stateFactElem.getSlotValue("name").stringValue(context);
-        String param = stateFactElem.getSlotValue("param-name").stringValue(context);
+        String param = parentStateFactElem.getSlotValue("param-name").stringValue(context);
         String name = param + "->" + String.valueOf(from) + ":" + String.valueOf(to);
 
-        return ReteHelper.addStateFactElement(context.getEngine(), stateFactElem, stateName, name, param, from, to);
+		return RuleEngineHelper.addStateFactElement(context.getEngine(), parentStateFactElem.getSlotValue("name").stringValue(context),
+		        stateName, name,
+		        param, from, to);
 
     }
 
-    public static Fact addStateFactIntervalElemFromStatefact(String stateName, String paramName, Fact stateFactElem, double from, double to,
+	public static Fact addStateFactIntervalElemFromStatefact(String stateName, String paramName, Fact stateFactElem, double from, double to,
             Context context)
             throws JessException {
 
-        String name = paramName + "->" + String.valueOf(from) + ":" + String.valueOf(to);
+		String name = stateFactElem.getSlotValue("name").stringValue(context);// paramName + "->" + String.valueOf(from) + ":" +
+		                                                                      // String.valueOf(to);
 
-        return ReteHelper.addStateFactElement(context.getEngine(), stateFactElem, stateName, name, paramName, from, to);
+		return RuleEngineHelper.addStateFactElement(context.getEngine(), stateFactElem.getSlotValue("elem-parent").stringValue(context),
+		        stateName, name,
+		        paramName, from, to);
 
     }
 
     public static ArrayList<Fact> activateActionNodes(Context context, String stateFactName) throws JessException {
-        ArrayList<Fact> connectedActionNodes = ReteHelper.getFacts("rl-action-node", stateFactName, context);
+        ArrayList<Fact> connectedActionNodes = RuleEngineHelper.getFacts("rl-action-node", stateFactName, context);
         for (Fact f : connectedActionNodes) {
 
             context.getEngine().retract(f);
@@ -143,7 +148,7 @@ public abstract class StateFactHelper {
             String attributeName = f.getSlotValue("param-name").stringValue(context);
             String categoryValue = f.getSlotValue("category").stringValue(context);
             String name = attributeName + "->" + String.valueOf(categoryValue);
-            ReteHelper.addStateFactCat(context.getEngine(), stateFactName, name, attributeName, categoryValue);
+            RuleEngineHelper.addStateFactCat(context.getEngine(), stateFactName, name, attributeName, categoryValue);
         } catch (JessException e) {
             throw new GSimBehaviourException(e);
         }
@@ -156,7 +161,7 @@ public abstract class StateFactHelper {
             String from = f.getSlotValue("from").stringValue(context);
             String to = f.getSlotValue("to").stringValue(context);
             String name = attributeName + "->" + String.valueOf(from) + ":" + String.valueOf(to);
-            ReteHelper.addStateFactElement(context.getEngine(), stateFactName, name, attributeName, Double.parseDouble(from), Double.parseDouble(to));
+            RuleEngineHelper.addStateFactElement(context.getEngine(), stateFactName, name, attributeName, Double.parseDouble(from), Double.parseDouble(to));
         } catch (JessException e) {
             throw new GSimBehaviourException(e);
         }
@@ -189,17 +194,17 @@ public abstract class StateFactHelper {
         try {
             String parentSfn = parent.getSlotValue("name").stringValue(ctx);
             ValueVector v = parent.getSlotValue("expansion").listValue(ctx);
-            ArrayList<Fact> facts = ReteHelper.getStateFactElems(parentSfn, ctx);
+            ArrayList<Fact> facts = RuleEngineHelper.getStateFactElems(parentSfn, ctx);
             for (Fact f : sfes) {
                 facts.add(f);
             }
-            ArrayList<Fact> all = ReteHelper.getAllStateFacts(ctx);
+            ArrayList<Fact> all = RuleEngineHelper.getAllStateFacts(ctx);
 
             for (Fact sf : all) {
                 ValueVector v1 = sf.getSlotValue("expansion").listValue(ctx);
 
                 if (equals(v1, v)) {
-                    ArrayList<Fact> f0 = ReteHelper.getStateFactElems(sf.getSlotValue("name").stringValue(ctx), ctx);
+                    ArrayList<Fact> f0 = RuleEngineHelper.getStateFactElems(sf.getSlotValue("name").stringValue(ctx), ctx);
 
                     for (int i = 0; i < v1.size(); i++) {
 
@@ -275,9 +280,9 @@ public abstract class StateFactHelper {
         int t = getTime(context.getEngine());
         Fact f1 = null;
         if (!copy) {
-            f1 = ReteHelper.addStateFact(context.getEngine(), oldDesc, rootRuleName, paramName, depth, t);
+            f1 = RuleEngineHelper.addStateFact(context.getEngine(), oldDesc, rootRuleName, paramName, depth, t);
         } else {
-            f1 = ReteHelper.copyStateFact(context.getEngine(), oldDesc, paramName, depth, t);
+            f1 = RuleEngineHelper.copyStateFact(context.getEngine(), oldDesc, paramName, depth, t);
         }
         return f1;
 

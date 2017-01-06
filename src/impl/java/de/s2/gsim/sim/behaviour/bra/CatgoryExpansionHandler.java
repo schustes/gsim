@@ -6,7 +6,7 @@ import static de.s2.gsim.sim.behaviour.bra.StateFactHelper.existsEquivalent;
 import static de.s2.gsim.sim.behaviour.bra.StateFactHelper.expandStateDescription;
 import static de.s2.gsim.sim.behaviour.bra.StateFactHelper.insertNewActionNodes;
 import static de.s2.gsim.sim.behaviour.rangeupdate.DynamicValueRangeExtensionRuleBuilder.createNewExperimentalRuleCat;
-import static de.s2.gsim.sim.behaviour.util.FactHelper.extractCategoryElemSpec;
+import static de.s2.gsim.sim.behaviour.util.FactUtils.extractCategoryElemSpec;
 
 import java.util.Arrays;
 import java.util.Iterator;
@@ -17,8 +17,7 @@ import org.apache.log4j.Logger;
 import de.s2.gsim.api.sim.agent.impl.RuntimeAgent;
 import de.s2.gsim.environment.RLRule;
 import de.s2.gsim.sim.behaviour.GSimBehaviourException;
-import de.s2.gsim.sim.behaviour.builder.TreeExpansionBuilder;
-import de.s2.gsim.sim.behaviour.util.FactHelper.StateFactElemCategorySpec;
+import de.s2.gsim.sim.behaviour.util.FactUtils.StateFactElemCategorySpec;
 import jess.Context;
 import jess.Fact;
 import jess.JessException;
@@ -76,9 +75,7 @@ public class CatgoryExpansionHandler implements java.io.Serializable {
 
 			int oldDepth = (int) stateFact.getSlotValue("depth").floatValue(context);
 
-			TreeExpansionBuilder b = new TreeExpansionBuilder(agent);
-
-			// ceate and insert extracted new category (state fact, and elem-fact)
+			// create and insert extracted new category (state fact, and elem-fact)
 			List<String> fillersOfExpandAttribute = Arrays.asList(toExpandCategoryValue);
 			List<String> fillersOfSiblingAttributes = unexpandedElemsSpec.fillers;
 
@@ -128,10 +125,10 @@ public class CatgoryExpansionHandler implements java.io.Serializable {
 			appendRemainingStateFactElems(allElemsList, stateNameExpanded_New, context);
 			appendRemainingStateFactElems(allElemsList, stateNameExpanded_Siblings, context);
 
-			String newRule1 = createNewExperimentalRuleCat(b, r0, stateNameExpanded_New, unexpandedElemsSpec.attributeSpec,
+			String newRule1 = createNewExperimentalRuleCat(agent, r0, stateNameExpanded_New, unexpandedElemsSpec.attributeSpec,
 					fillersOfExpandAttribute, remaining, context);
 			context.getEngine().executeCommand(newRule1);
-			String newRule2 = createNewExperimentalRuleCat(b, r0, stateNameExpanded_Siblings, unexpandedElemsSpec.attributeSpec,
+			String newRule2 = createNewExperimentalRuleCat(agent, r0, stateNameExpanded_Siblings, unexpandedElemsSpec.attributeSpec,
 					fillersOfSiblingAttributes, remaining, context);
 			context.getEngine().executeCommand(newRule2);
 			//System.out.println("===============\n" + newRule1);

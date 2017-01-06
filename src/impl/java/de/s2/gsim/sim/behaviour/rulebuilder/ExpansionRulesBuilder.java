@@ -1,19 +1,20 @@
-package de.s2.gsim.sim.behaviour.builder;
+package de.s2.gsim.sim.behaviour.rulebuilder;
 
 import de.s2.gsim.sim.GSimEngineException;
 
-public class ExpansionRulesBuilder {
+public abstract class ExpansionRulesBuilder {
 
-	// private String role = "";
-	// private String rtContext;
+	private ExpansionRulesBuilder() {
+		// static class
+	}
 
-	public static String build(int expandInterval, double revisitCostFraction, double revaluationProbability, String role)
+	public static String build(int expandInterval, int contractInterval, double revisitCostFraction, double revaluationProbability,
+	        String role)
 	        throws GSimEngineException {
 
-		// this.role = role;
 		String rtContext = "(parameter (name \"executing-role\") (value " + "\"" + role + "\"))\n";
 
-		String s = createStateContractionRule(expandInterval, rtContext, role) + "\n";
+		String s = createStateContractionRule(contractInterval, rtContext, role) + "\n";
 		s += createStateExpansionRuleFirstBest(expandInterval, revisitCostFraction, rtContext, role) + "\n";
 		s += createStateBacktrackUpdateRule(rtContext, role) + "\n";
 		s += createTreeUpdateBackwardChain(rtContext, role) + "\n";
@@ -23,25 +24,46 @@ public class ExpansionRulesBuilder {
         return s;
     }
 
-	private static String createStateContractionRule(int expandInterval, String rtContext, String role) throws GSimEngineException {
+	/**
+	 * The fact 'contracting' ensures that only one leaf pair is deleted at a time. Although larger subtrees deletion seems plausible, it is
+	 * not done because the agent must have some cycles to dermine whether the generalised rule applies. So the deletion can be only one
+	 * state-pair by the next; otherwise too many descriptors may be deleted!
+	 * 
+	 * @param contractInterval
+	 * @param rtContext
+	 * @param role
+	 * @return
+	 * @throws GSimEngineException
+	 */
+	private static String createStateContractionRule(int contractInterval, String rtContext, String role) throws GSimEngineException {
 
         String n = "";
         n += "\n(defrule contract_rule-1-" + role + "\n";
         n += " (declare (salience 100))\n";
         n += " (parameter (name \"exec-sc\"))\n";
         n += " " + rtContext;
-        n += " (timer (time ?t&:(=(mod ?t " + expandInterval + ") " + (expandInterval - (int) ((expandInterval / 4d))) + ")))\n";
-        n += " (not (contracting ?))\n";
-        n += " ?fact <- (state-fact (name ?sfn) (context \"" + role
-                + "\")(value ?selectedStateValue)  (parent ?p&:(neq ?p nil)) (count ?selectedStateCount) (active ?a) )\n";
-        n += " (test (= 0 (child-count-" + role + " ?sfn)))\n";
+		n += " (not (contracting ?))\n";
+		n += " (timer (time ?t&:(=(mod ?t " + contractInterval + ") 0)))\n";
+
+		n += " ?fact <- (state-fact (name ?sfn) (context \"" + role
+		        + "\")(value ?selectedStateValue)  (last-activation ?la) (parent ?p&:(neq ?p nil)) (count ?selectedStateCount) (active ?a) )\n";
+		n += " (test (= 0 (child-count-" + role + " ?sfn)))\n";
         n += " ?parent <- (state-fact (name ?p) (value ?parentStateValue) )\n";
-        n += " ?sibling <- (state-fact (name ?sibling-name&:(neq ?sibling-name ?sfn)) (parent ?p) (value ?siblingStateValue) (count ?siblingStateCount) (active ?b) )\n";
-        n += " (test (= 0 (child-count-" + role + " ?sibling-name)))\n";
-        n += " (test (>= (+ ?parentStateValue (* ?parentStateValue 0.01)) "
-                + " (/ (+ (* ?siblingStateValue ?siblingStateCount) (* ?selectedStateValue ?selectedStateCount) ) ( + ?selectedStateCount ?siblingStateCount) ) )  )\n";
-        n += " =>\n";
-        n += " (if (or (= ?a 1.0) (= ?b 1.0)) then (modify ?parent (active 1.0)) ) \n";
+		n += " ?sibling <- (state-fact (name ?sibling-name&:(neq ?sibling-name ?sfn)) (parent ?p) (value ?siblingStateValue) (count ?siblingStateCount) (active ?b) )\n";
+		n += " (test (= 0 (child-count-" + role + " ?sibling-name)))\n";
+
+		// test: value of children, weighted by number of activations, is smaller than parent's value - but why this strange weighting - it
+		// cancels itself?
+		// n += " (test (or (>= (+ ?parentStateValue (* ?parentStateValue 0.01)) "
+		// + " (/ (+ (* ?siblingStateValue ?siblingStateCount) (* ?selectedStateValue ?selectedStateCount) ) ( + ?selectedStateCount
+		// ?siblingStateCount) ) ) (= ?la -1)) )\n";
+
+		n += " (test (>= ?parentStateValue (/ (+ ?siblingStateValue ?selectedStateValue ) 2) ) )\n";
+
+		n += " =>\n";
+		// n += "(printout t ----------------------------- CONTRACT -- ?sfn -- -----------------------)";
+		n += " (if (or (= ?a 1.0) (= ?b 1.0)) then (modify ?parent (active 1.0)) ) \n"; // set parent active only if the current level was
+		// actually active
         n += " (assert (contracting ?sfn)))\n";
 
         return n;
@@ -104,38 +126,74 @@ public class ExpansionRulesBuilder {
 	private static String createBranchSelectionRules(double probability, String role) throws GSimEngineException {
 
         String n1 = "(defrule select-new-expansion-root-" + role + "\n";
-        n1 += " (declare (salience 101))\n";
-        n1 += " (timer (time ?t))\n";
-        n1 += " (not (new-root))\n";
-        n1 += " (not (contracting ?))\n";
-        n1 += " ?fact <- (state-fact (name ?sfn) (value ?v&:(= ?v (max-value-overall-" + role + " ?t))) (leaf ?lf) ) (context \"" + role + "\")\n";
-        n1 += " (test (> (* (+ (count-query-results list-state-elems ?sfn) (count-query-results list-state-elems ?sfn))  2)  (+ (child-count-" + role
-                + " ?sfn) ?lf))  )\n";
-        n1 += " (test (< (call cern.jet.random.Uniform staticNextDoubleFromTo 0.0 1.0 )" + probability + "))\n";
+		n1 += " (declare (salience 101))\n";
+
+
+		n1 += " (timer (time ?t&:(> ?t 10.0 )  ))\n";
+
+		n1 += " (not (new-root))\n";
+		n1 += " (not (contracting ?))\n";
+
+		// n1 += " (test (> (numberp ?t) (numberp 10.0) )) \n";
+
+		//n1 += " ?fact <- (state-fact (name ?sfn) (value ?v) (leaf ?lf) (context \"" + role + "\"))\n";
+		n1 += " ?fact <- (state-fact (name ?sfn) (count ?count) (value ?v&:(>= ( / (* ?v ?count) ?t)  (max-value-overall-" + role
+		        + " ?t))) (leaf ?lf)  (context \"" + role + "\") )\n";
+		 
+		n1 += " (test (> (* (+ (count-query-results list-state-elems ?sfn) (count-query-results list-state-elems ?sfn)) 2) (+ (child-count-"+ role + " ?sfn) ?lf)) )\n";
+
+		n1 += " (test (< (call cern.jet.random.Uniform staticNextDoubleFromTo 0.0 1.0 )" + probability + "))\n";
+
+//        n1 += " (test (> (* (+ (count-query-results list-state-elems ?sfn) (count-query-results list-state-elems ?sfn)) 2) (+ (child-count-" + role + " ?sfn) ?lf)) )\n";
+//		n1 += " (test (< (call cern.jet.random.Uniform staticNextDoubleFromTo 0.0 1.0 )" + probability + "))\n";
+
         n1 += " =>\n";
-        n1 += " (modify ?fact (active 1.0))\n";
-        n1 += " (assert (new-root)) \n";
+		// n1 += " (printout t -------------SELECT : ?sfn ------)";
+		n1 += " (modify ?fact (active 1.0))\n";
+		n1 += " (assert (new-root)) \n";
         n1 += " (assert (selected ?sfn))) \n";
 
         n1 += "\n(defrule unselect-old-branch-" + role + "\n";
-        n1 += " (declare (salience 101))\n";
-        n1 += " (exists (selected ?)) \n";
-        n1 += " ?fact <- (state-fact (name ?sfn) (active 1.0) (context \"" + role + "\")) \n";
+		n1 += " (declare (salience 102))\n";
+		n1 += " (selected ?selectedFactName) \n"; // function exist at the beginning = no fire?
+		n1 += " (state-fact (name ?selectedFactName) (parent ?sp) ) \n";
+		n1 += " ?fact <- (state-fact (name ?sfn&:(neq ?sfn ?sp) ) (parent ?p&:(neq ?p nil)) (active 1.0) (context \"" + role + "\")) \n";
+		// n1 += " (not (state-fact (name ?selectedFactName) (parent ?pp&:(neq ?pp ?sfn)) (context \"" + role + "\") ) ) \n";
         n1 += " (not (selected ?sfn))\n";
         n1 += " (not (unselected ?sfn))\n";
+		n1 += " (not (selectedChild ?sp))\n";
         n1 += " =>\n";
+		// n1 += " (printout t -------------UNSELECT: ?sfn - [ ?selectedFactName ] - [ ?sp ] ------)";
         n1 += " (modify ?fact (active 0.0))\n";
         n1 += " (assert (unselected ?sfn))) \n";
 
         n1 += "\n(defrule forward-new-selection-" + role + " \n";
-        n1 += " (declare (salience 101))\n";
-        n1 += " (not (selected ?sfn))\n";
+		n1 += " (declare (salience 103))\n";
         n1 += " (selected ?p) \n";
-        n1 += " ?fact <- (state-fact (name ?sfn) (parent ?p) (active 0.0) (context \"" + role + "\")) \n";
-        n1 += " =>\n";
-        // n1+=" (printout t -------------createBranchSelectionRules_3 salience 101 must be last ------)";
-        n1 += " (modify ?fact (active 1.0))\n";
-        n1 += " (assert (selected ?sfn))) \n";
+		n1 += " ?fact <- (state-fact (name ?sfn&:(neq ?sfn ?p)) (parent ?p) (active 0.0) (context \"" + role + "\")) \n";
+		// both must be zero, otherwise I'm on the dead end
+		n1 += " ?sibling <- (state-fact (name ?sfn2&:(neq ?sfn2 ?sfn)) (parent ?p) (active 0.0) (context \"" + role + "\")) \n";
+		// n1 += " (not (unselected ?sfn)) \n";
+		n1 += " (not (selectedChild ?sfn))\n";
+		n1 += " =>\n";
+		// n1 += " (printout t ------------- forward: ?sfn ------)";
+		n1 += " (modify ?fact (active 1.0)) \n";
+		n1 += " (assert (selectedChild ?sfn)) \n";
+		n1 += " (assert (selected ?sfn))) \n";
+
+		n1 += "\n(defrule backward-new-selection-" + role + " \n";
+		n1 += " (declare (salience 104))\n";
+		n1 += " (selected ?sfn) \n";
+		n1 += " (not (unselected ?sfn))\n";
+		n1 += " (not (selectedChild ?sfn))\n";
+		n1 += " (not (selectedParent ?sfn))\n";
+		n1 += " (state-fact (name ?sfn) (parent ?parent)  (context \"" + role + "\")) \n";
+		n1 += " ?fact <- (state-fact (name ?parent)  (context \"" + role + "\")) \n";
+		n1 += " =>\n";
+		// n1 += " (printout t ------------- backward: ?sfn - ?parent ------)";
+		n1 += " (modify ?fact (active 1.0)) \n";
+		n1 += " (assert (selectedParent ?sfn)) \n";
+		n1 += " (assert (selected ?parent))) \n";
 
         return n1;
     }
@@ -146,18 +204,17 @@ public class ExpansionRulesBuilder {
 
         n = "(defrule state-update-rule-" + role + "\n";
         n += " (declare (salience 101))\n";
-        n += rtContext;
-        // n += " (parameter (name \"exec-update-rewards\"))\n";
-        n += " (timer (time ?t))\n";
+		n += " " + rtContext;
         n += " ?m <- (modified ?action ?param ?sfn) \n";
         n += " (state-fact (name ?sfn) (parent ?p) (context \"" + role + "\") )\n";
         n += " (not (modified ?n ?param ?p))\n";
         n += " ?state-description <- (state-fact (name ?p) (value ?old-value) (count ?state-count))\n";
-        n += " ?fact <- (rl-action-node (action-name ?an) (function ?func) (time ?t) (count ?c) (updateCount ?uc&:(= ?uc ?c)))\n ";
+		n += " ?fact <- (rl-action-node (action-name ?an) (function ?func) (time ?t) (count ?c) (updateCount ?uc&:(= ?uc ?c)))\n";
         n += " (parameter (name ?func) (value ?currentReward))\n";
+		n += " (timer (time ?t))\n";
         n += "  =>\n";
         n += " (modify ?state-description (count (+ ?state-count 1)) (last-activation ?t) )\n";
-        // n += " (printout t ----- createStateBacktrackUpdateRule salience 101 must be last--------)\n";
+		n += " (printout t ----- createStateBacktrackUpdateRule salience 101 must be last--------)\n";
         n += " (assert (modified ?an ?param ?p)))\n";
 
         return n;
@@ -168,13 +225,13 @@ public class ExpansionRulesBuilder {
 	        throws GSimEngineException {
         String n1 = "";
 
-        n1 += "(defrule expand_FIRST_BEST-" + role + "\n";
-        n1 += " (timer (time ?t&:(=(mod ?t " + interval + ") 0)))\n";
-        n1 += rtContext;
+		n1 += "(defrule expand_FIRST_BEST-" + role + "\n";
+		n1 += " " + rtContext;
         n1 += " (parameter (name \"exec-sc\"))\n";
         n1 += " (not (parameter (name \"exec-RLRule\")))\n";
         n1 += " (not (expanded)) \n";
         n1 += " (test (< (count-query-results list-states \"" + role + "\") (+ 0 ?*max-node-count*))) \n";
+		n1 += " (timer (time ?t&:(=(mod ?t " + interval + ") 0)))\n";
         n1 += " ?fact0 <- (state-fact (name ?sfn) (parent ?p) (depth ?h) (leaf ?lf) (value ?v)  (count ?act) (expansion-count ?epc) ) \n";
         n1 += " (test (= ?h (depth-" + role + ")) ) \n";
         n1 += " (exists (rl-action-node (state-fact-name ?sfn))) \n";
@@ -190,12 +247,12 @@ public class ExpansionRulesBuilder {
         n1 += "  (assert (expanded))  )\n";
         
         n1 += "\n(defrule expand_FIRST_BEST_ROOT-" + role + "\n";
-        n1 += " (timer (time ?t&:(=(mod ?t " + interval + ") 0)))\n";
-        n1 += rtContext;
+		n1 += " " + rtContext;
         n1 += " (parameter (name \"exec-sc\"))\n";
         n1 += " (not (parameter (name \"exec-RLRule\")))\n";
         n1 += " (not (expanded)) \n";
         n1 += " (test (< (count-query-results list-states " + role + ") (+ 0 ?*max-node-count*))) \n";
+		n1 += " (timer (time ?t&:(=(mod ?t " + interval + ") 0)))\n";
         n1 += " ?fact0 <- (state-fact (name ?sfn) (parent nil) (depth ?h) (leaf ?lf) (value ?v) (count ?act) (expansion-count ?epc)) \n";
         n1 += " (test (= ?h (depth-" + role + ")) ) \n";
         n1 += " (exists (rl-action-node (state-fact-name ?sfn))) \n";
@@ -251,8 +308,9 @@ public class ExpansionRulesBuilder {
         f4 += "  (bind ?act (fact-slot-value ?state count))\n";
         f4 += "  (bind ?lf0 (fact-slot-value ?state leaf))\n";
         f4 += "  (bind ?v (* ?c (/ ?act ?t))) \n";
-        f4 += "  (if (and (> (* (count-query-results list-state-elems ?sfn) 2)  (+ (child-count-" + role
-                + " ?sfn) ?lf0)) (> ?v ?n)) then (bind ?n ?v)) )\n";
+		f4 += "  (if (> ?v ?n) then (bind ?n ?v)) )\n";
+		// f4 += " (if (and (> (* (count-query-results list-state-elems ?sfn) 2) (+ (child-count-" + role + " ?sfn) ?lf0)) (> ?v ?n)) then
+		// (bind ?n ?v)) )\n";
         f4 += " (return ?n)) \n";
 
         String f5 = "(deffunction child-count-" + role + "(?sfn) \n";
@@ -276,7 +334,7 @@ public class ExpansionRulesBuilder {
         String n3 = "(defrule updateLeafInitial_NextState-retract_Current_state-" + role + " \n";
         n3 += " (declare (salience 100))\n";
         n3 += " (contracting ?sfn)\n";
-        n3 += rtContext;
+		n3 += " " + rtContext;
         n3 += " (parameter (name \"exec-sc\"))\n";
         n3 += " ?state <- (state-fact (name ?sfn) (context \"" + role + "\") (parent ?sn&:(neq ?sn nil)) (depth ?h) (rule ?ruleName1))\n";
         n3 += " ?sibling <- (state-fact (name ?sibling-name&:(neq ?sibling-name ?sfn)) (parent ?sn) (rule ?ruleName2))\n";
@@ -286,8 +344,9 @@ public class ExpansionRulesBuilder {
         n3 += " (retract ?sibling) \n";
         n3 += " (undefrule ?ruleName1) \n";
         n3 += " (undefrule ?ruleName2) \n";
-        n3 += " (printout t ---createTreeUpdateBackwardChain must be first ... salience=100--------- ?sfn ----childcount1= (child-count-" + role
-                + " ?sfn)--- sibling ?sibling-name --childcount2= (child-count-" + role + " ?sibling-name) -------- ?parent crlf)";
+		// n3 += " (printout t ---createTreeUpdateBackwardChain must be first ... salience=100--------- ?sfn ----childcount1= (child-count-"
+		// + role
+		// + " ?sfn)--- sibling ?sibling-name --childcount2= (child-count-" + role + " ?sibling-name) -------- ?parent crlf)";
         n3 += " (modify ?parent (leaf (+ ?pl 2.0))) \n";
         n3 += " (assert (state-retracted ?sfn))\n";
         n3 += " (assert (state-retracted ?sibling-name))\n";
@@ -295,7 +354,7 @@ public class ExpansionRulesBuilder {
 
         String n4 = "(defrule updateStateConnection_Elems_2 \n";
         n4 += " (state-retracted ?sn)\n";
-        n4 += rtContext;
+		n4 += " " + rtContext;
         n4 += " ?fact1 <- (state-fact-element (name ?n) (state-fact-name ?sn))\n";
         n4 += " =>\n";
         n4 += " (retract ?fact1)) \n";

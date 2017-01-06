@@ -15,10 +15,7 @@ import de.s2.gsim.objects.Rule;
 
 public class RuleInstance implements Rule, UnitWrapper {
 
-    /**
-     *
-     */
-    private static final long serialVersionUID = 1L;
+	static final long serialVersionUID = 1L;
 
     protected BehaviourInstance owner;
 
@@ -127,7 +124,7 @@ public class RuleInstance implements Rule, UnitWrapper {
     }
 
     @Override
-    public Unit toUnit() {
+	public Unit<?, ?> toUnit() {
         return real;
     }
 

@@ -7,12 +7,10 @@ import de.s2.gsim.environment.ConditionFrame;
 import de.s2.gsim.environment.ExpansionFrame;
 import de.s2.gsim.environment.Frame;
 import de.s2.gsim.environment.RLRuleFrame;
-import de.s2.gsim.environment.UserRuleFrame;
 import de.s2.gsim.objects.Condition;
 import de.s2.gsim.objects.Evaluator;
 import de.s2.gsim.objects.Expansion;
 import de.s2.gsim.objects.RLActionNode;
-import de.s2.gsim.objects.SelectionNode;
 //RLActionNode is WRONG
 public class RLActionNodeClass extends RuleClass implements RLActionNode, UnitWrapper {
 

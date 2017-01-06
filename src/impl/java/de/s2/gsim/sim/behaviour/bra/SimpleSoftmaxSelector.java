@@ -2,6 +2,7 @@ package de.s2.gsim.sim.behaviour.bra;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 
@@ -17,25 +18,21 @@ public class SimpleSoftmaxSelector implements Userfunction, java.io.Serializable
 
     private static Logger logger = Logger.getLogger(SimpleSoftmaxSelector.class);
 
-    /**
-     * 
-     */
     private static final long serialVersionUID = 1L;
 
     private double alpha = 1;
 
     private jess.Context ctx;
 
-    private ArrayList evaluations = new ArrayList();
+	private List<Evaluation> evaluations = new ArrayList<>();
 
     private double maxReward = 1;
 
     private double sumOfPreferences = 0;
 
-    private double sumReward = 0;
+	public SimpleSoftmaxSelector() {
 
-    public SimpleSoftmaxSelector() {
-    }
+	}
 
     public SimpleSoftmaxSelector(double maxReward) {
         this.maxReward = maxReward;
@@ -45,22 +42,16 @@ public class SimpleSoftmaxSelector implements Userfunction, java.io.Serializable
     public Value call(ValueVector vv, jess.Context context) throws JessException {
 
         sumOfPreferences = 0;
-        sumReward = 0;
         ctx = context;
-        // this.maxReward = -Double.MAX_VALUE;
         evaluations.clear();
 
         Value val = vv.get(1);
 
-        Iterator iter = (Iterator) val.externalAddressValue(context);
-
-        // Iterator iter =
-        // (Iterator)ctx.getEngine().fetch("query-result").externalAddressValue(ctx);
+		Iterator<?> iter = (Iterator<?>) val.externalAddressValue(context);
 
         if (!iter.hasNext()) {
             return new Value("NIL", RU.ATOM);
         }
-        ;// quick fix: shortcut-rule is always exccuted, even if no actions were selected. If this happens, the iter is empty.
 
         while (iter.hasNext()) {
             Object o = iter.next();
@@ -76,13 +67,9 @@ public class SimpleSoftmaxSelector implements Userfunction, java.io.Serializable
 
             double currentReward = f.getSlotValue("value").numericValue(ctx);
             alpha = f.getSlotValue("alpha").numericValue(ctx);
-            sumReward += Math.abs(currentReward);
 
             currentReward = currentReward / maxReward;
             evaluations.add(new Evaluation(actionName, currentReward, f));
-
-            // if (this.maxReward == 0) this.maxReward = 1;
-            // this.maxReward = 1;
 
         }
 
@@ -126,13 +113,12 @@ public class SimpleSoftmaxSelector implements Userfunction, java.io.Serializable
 
         // Utils.shuffle(evaluations); //for same prob. of events with same p
 
-        ArrayList intervals = new ArrayList();
-        Iterator iter = evaluations.iterator();
-
+		List<Interval> intervals = new ArrayList<>();
+		Iterator<Evaluation> iter = evaluations.iterator();
         double sum = 0;// adds up to 1 in the end
 
         while (iter.hasNext()) {
-            Evaluation v = (Evaluation) iter.next();
+			Evaluation v = iter.next();
             double p = v.pref / sumOfPreferences;
             String stats = v.actionName + "," + v.reward + "," + v.pref + "," + p;
 
@@ -148,7 +134,7 @@ public class SimpleSoftmaxSelector implements Userfunction, java.io.Serializable
             } catch (Exception e) {
                 // ignore
             }
-            // prefString+=v.actionName+":"+v.pref+"-->"+p+"\n";
+
             if (Double.isInfinite(p)) {
                 p = 1;
             } else if (Double.isNaN(p)) {
@@ -162,30 +148,21 @@ public class SimpleSoftmaxSelector implements Userfunction, java.io.Serializable
             intervals.add(in);
         }
 
-        // logger.debug("action-prefs:"+prefString);
-        // logger.debug("sum-pref:"+this.sumOfPreferences);
-        // logger.debug("max:"+maxReward);
-
-        // double z=new cern.jet.random.Uniform(new
-        // RandomJava()).nextDoubleFromTo(0,1);
         double z = cern.jet.random.Uniform.staticNextDoubleFromTo(0, 1);
-        iter = intervals.iterator();
-        while (iter.hasNext()) {
-            Interval in = (Interval) iter.next();
+		Iterator<Interval> iiter = intervals.iterator();
+		while (iiter.hasNext()) {
+			Interval in = iiter.next();
             if (in.from <= z && in.to >= z) {
                 double p = in.e.pref / sumOfPreferences;
-                // probString+=in.e.actionName+":"+p+"/";
-                // logger.debug(aName+":::"+"p: " + p+", v.pref:"+in.e.pref +",
-                // sumOfPreferences: " + sumOfPreferences+", name:" +in.e.actionName);
                 logger.debug("p: " + p + ", v.pref:" + in.e.pref + ", sumOfPreferences: " + sumOfPreferences + ", name:" + in.e.actionName);
                 return in.e.f;
             }
         }
 
         StringBuffer b = new StringBuffer();
-        iter = intervals.iterator();
-        while (iter.hasNext()) {
-            Interval in = (Interval) iter.next();
+		iiter = intervals.iterator();
+		while (iiter.hasNext()) {
+			Interval in = iiter.next();
             b.append(in.from);
             b.append("-");
             b.append(in.to);

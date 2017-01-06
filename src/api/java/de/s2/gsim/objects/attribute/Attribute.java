@@ -35,10 +35,10 @@ public abstract class Attribute implements Cloneable {
     public abstract boolean equalsValue(Attribute attribute);
 
     /**
-     * Creates a readable String representation of the attribute value.
-     * 
-     * @return the value string
-     */
+	 * Creates a readable String representation of the attribute.
+	 * 
+	 * @return the value string
+	 */
     public abstract String toValueString();
 
     /**

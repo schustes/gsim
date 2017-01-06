@@ -20,7 +20,7 @@ import de.s2.gsim.environment.ObjectClassOperations;
 import de.s2.gsim.objects.Path;
 import de.s2.gsim.objects.attribute.AttributeType;
 import de.s2.gsim.objects.attribute.DomainAttribute;
-import de.s2.gsim.sim.behaviour.builder.ParsingUtils;
+import de.s2.gsim.sim.behaviour.rulebuilder.BuildingUtils;
 
 public class ParsingUtilsTest {
 
@@ -53,7 +53,7 @@ public class ParsingUtilsTest {
         
         GenericAgent instance = env.getAgentInstanceOperations().instanciateAgentWithUniformDistributedAttributes(a, "my agent");
 		
-		String typeNameWithList = ParsingUtils.resolveChildFrameWithList(instance.getDefinition(), "objects/Object/test");
+		String typeNameWithList = BuildingUtils.resolveChildFrameWithList(instance.getDefinition(), "objects/Object/test");
 		System.out.println(typeNameWithList);
 		MatcherAssert.assertThat("Expected object", typeNameWithList, Matchers.equalTo("objects/Object"));
 

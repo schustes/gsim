@@ -1,8 +1,7 @@
-package de.s2.gsim.sim.behaviour.builder;
+package de.s2.gsim.sim.behaviour.rulebuilder;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
-import java.util.NoSuchElementException;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -20,7 +19,7 @@ import de.s2.gsim.objects.attribute.IntervalAttribute;
 import de.s2.gsim.objects.attribute.NumericalAttribute;
 import de.s2.gsim.sim.GSimEngineException;
 
-public class ParsingUtils {
+public class BuildingUtils {
 
 	public static String getDefiningRoleForRLRule(RuntimeAgent agent, String ruleName) {
 		GenericAgentClass def = (GenericAgentClass) agent.getDefinition();
@@ -128,22 +127,6 @@ public class ParsingUtils {
 		} catch (GSimDefException e) {
 			return false;
 		}
-	}
-
-	public static boolean referencesChildInstance(Instance owningAgent, String pathString) {
-		Path<Attribute> path = Path.attributePath(pathString.split("/"));
-		Path<?> p = path;
-		while (p != null) {
-			try {
-				if ((owningAgent.resolvePath(p) instanceof Instance)) {
-					return true;
-				}
-			} catch (NoSuchElementException e) {
-				return false;
-			}
-			p = p.next();
-		}
-		return false;
 	}
 
 	public static boolean referencesChildFrame(Frame owningAgent, String pathString) {

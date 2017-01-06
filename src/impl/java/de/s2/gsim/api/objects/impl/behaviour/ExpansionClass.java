@@ -67,7 +67,7 @@ public class ExpansionClass implements Expansion, UnitWrapper {
     }
 
     @Override
-    public Unit toUnit() {
+	public Unit<?, ?> toUnit() {
         return real;
     }
 

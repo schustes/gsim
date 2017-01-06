@@ -8,10 +8,7 @@ import de.s2.gsim.objects.Condition;
 
 public class ConditionInstance implements Condition, UnitWrapper {
 
-    /**
-     *
-     */
-    private static final long serialVersionUID = 1L;
+	static final long serialVersionUID = 1L;
 
     private RuleInstance owner;
 
@@ -56,7 +53,7 @@ public class ConditionInstance implements Condition, UnitWrapper {
     }
 
     @Override
-    public Unit toUnit() {
+	public Unit<?, ?> toUnit() {
         return real;
     }
 

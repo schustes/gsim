@@ -14,7 +14,6 @@ import org.apache.log4j.Logger;
 import de.s2.gsim.api.sim.agent.impl.RuntimeAgent;
 import de.s2.gsim.environment.RLRule;
 import de.s2.gsim.sim.behaviour.GSimBehaviourException;
-import de.s2.gsim.sim.behaviour.builder.TreeExpansionBuilder;
 import jess.Context;
 import jess.Fact;
 
@@ -68,14 +67,12 @@ public class IntervalExpansionHandler implements java.io.Serializable {
 			appendRemainingStateFactElems(allElems, newStateName1, context);
 			appendRemainingStateFactElems(allElems, newStateName2, context);
 
-			TreeExpansionBuilder b = new TreeExpansionBuilder(agent);
-
 			RLRule rootRule = agent.getBehaviour().getRLRule(newStateName1.split("_")[0]);
 
-			context.getEngine().executeCommand(createNewExperimentalRule(b, rootRule, agent, newStateName1, remaining, context,
+			context.getEngine().executeCommand(createNewExperimentalRule(rootRule, agent, newStateName1, remaining, context,
 					paramName, from, from + dist / 2d));
 			context.getEngine().executeCommand(
-					createNewExperimentalRule(b, rootRule, agent, newStateName2, remaining, context, paramName, from + dist / 2d, to));
+			        createNewExperimentalRule(rootRule, agent, newStateName2, remaining, context, paramName, from + dist / 2d, to));
 			context.getEngine().assertFact(stateFact_split1);
 			context.getEngine().assertFact(stateFact_split2);
 			System.out.println(stateFact_split1);
