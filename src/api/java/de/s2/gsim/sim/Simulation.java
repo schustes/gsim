@@ -3,7 +3,7 @@ package de.s2.gsim.sim;
 import java.util.List;
 
 import de.s2.gsim.def.ModelDefinitionEnvironment;
-import de.s2.gsim.objects.AppAgent;
+import de.s2.gsim.sim.agent.ApplicationAgent;
 import de.s2.gsim.sim.agent.RtAgent;
 
 /**
@@ -74,7 +74,7 @@ public interface Simulation {
      * 
      * @return the agents
      */
-    AppAgent[] getAppAgents();
+	List<ApplicationAgent> getAppAgents();
 
     /**
      * Retrieves a particular application agent.
@@ -82,29 +82,21 @@ public interface Simulation {
      * @param name the name of the agent
      * @return the application agent
      */
-    AppAgent getAppAgent(String name);
+	ApplicationAgent getAppAgent(String name);
+
+	/**
+	 * Adds an application agent.
+	 * 
+	 * @param agent the agent
+	 */
+	void addApplicationAgent(ApplicationAgent agent);
 
     /**
      * Gets the current time step the simulation is in.
      * 
      * @return the time step
      */
-    int getCurrentTimeStep();
-
-    /**
-     * Gets all DataHandlers registered with the simulation.
-     * 
-     * @return the data handlers
-     */
-    DataHandler[] getDataHandlers();
-
-    /**
-     * Retrieves a particular DataHandler from the simulation.
-     * 
-     * @param name name of the handler
-     * @return the handler
-     */
-    DataHandler getDataHandler(String name);
+	long getCurrentTimeStep();
 
     /**
      * Gets the {@link ModelDefinitionEnvironment} that is used to generate agents and objects of this simulation.

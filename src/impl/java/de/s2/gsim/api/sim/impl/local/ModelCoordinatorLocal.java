@@ -12,7 +12,6 @@ import java.util.Random;
 import org.apache.log4j.Logger;
 
 import de.s2.gsim.api.impl.EnvironmentWrapper;
-import de.s2.gsim.api.sim.agent.impl.ApplicationAgentImpl;
 import de.s2.gsim.api.sim.agent.impl.RuntimeAgent;
 import de.s2.gsim.def.ModelDefinitionEnvironment;
 import de.s2.gsim.environment.Environment;
@@ -20,7 +19,6 @@ import de.s2.gsim.environment.GSimDefException;
 import de.s2.gsim.environment.GenericAgent;
 import de.s2.gsim.environment.Instance;
 import de.s2.gsim.objects.AgentInstance;
-import de.s2.gsim.objects.AppAgent;
 import de.s2.gsim.objects.ObjectInstance;
 import de.s2.gsim.objects.attribute.Attribute;
 import de.s2.gsim.sim.DataHandler;
@@ -28,6 +26,7 @@ import de.s2.gsim.sim.GSimEngineException;
 import de.s2.gsim.sim.Simulation;
 import de.s2.gsim.sim.SimulationId;
 import de.s2.gsim.sim.Steppable;
+import de.s2.gsim.sim.agent.ApplicationAgent;
 import de.s2.gsim.sim.agent.RtAgent;
 import de.s2.gsim.sim.behaviour.SimAction;
 import de.s2.gsim.sim.communication.AgentType;
@@ -44,7 +43,7 @@ public class ModelCoordinatorLocal implements Simulation, Steppable {
 
 	private HashMap<String, RuntimeAgent> agents = new HashMap<String, RuntimeAgent>();
 
-	private HashMap<String, ApplicationAgentImpl> appAgents = new HashMap<String, ApplicationAgentImpl>();
+	private Map<String, ApplicationAgent> appAgents = new HashMap<String, ApplicationAgent>();
 
 	private HashMap<String, DataHandler> dataHandlers = new HashMap<String, DataHandler>();
 
@@ -102,14 +101,6 @@ public class ModelCoordinatorLocal implements Simulation, Steppable {
 
 			logger.debug("===== Free memory after agent-create: " + Runtime.getRuntime().freeMemory() / 1024d);
 
-			List<ApplicationAgentImpl> ap = factory.createAppAgents(env);
-
-			dataHandlers = (HashMap<String, DataHandler>) factory.createDataHandlers(env);
-
-			for (ApplicationAgentImpl app : ap) {
-				r.add(app);
-				appAgents.put(app.getName(), app);
-			}
 			messenger = new LocalMessenger(r);
         } catch (GSimDefException e) {
 			logger.error("Def-exception", e);
@@ -120,19 +111,7 @@ public class ModelCoordinatorLocal implements Simulation, Steppable {
 		for (RuntimeAgent mr : agents.values()) {
 			mr.setMessagingComponent(messenger);
 		}
-		for (ApplicationAgentImpl mr : appAgents.values()) {
-			mr.setMessengerRef(messenger);
-			mr.setCoordinatorRef(this);
-		}
 
-	}
-
-	// public void addAgent(RuntimeAgent agent) {
-	// agents.put(agent.getName(), agent);
-	// }
-
-	public void addAppAgent(ApplicationAgentImpl obj) {
-		appAgents.put(obj.getName(), obj);
 	}
 
 	@Override
@@ -214,39 +193,17 @@ public class ModelCoordinatorLocal implements Simulation, Steppable {
 	}
 
 	@Override
-	public AppAgent[] getAppAgents() {
-		Iterator iter = appAgents.values().iterator();
-		ArrayList<ApplicationAgentImpl> list = new ArrayList<ApplicationAgentImpl>();
-		while (iter.hasNext()) {
-			ApplicationAgentImpl a = (ApplicationAgentImpl) iter.next();
-			list.add(a);
-		}
-		ApplicationAgentImpl[] res = new ApplicationAgentImpl[list.size()];
-		list.toArray(res);
-		return res;
+	public List<ApplicationAgent> getAppAgents() {
+		return new ArrayList<>(this.appAgents.values());
 	}
 
 	@Override
-	public AppAgent getAppAgent(String name) {
-		AppAgent a = appAgents.get(name);
-		return a;
+	public ApplicationAgent getAppAgent(String name) {
+		return this.appAgents.get(name);
 	}
 
 	public double getAverageStepTime() {
 		return 0;
-	}
-
-	@Override
-	public DataHandler getDataHandler(String name) {
-		DataHandler a = dataHandlers.get(name);
-		return a;
-	}
-
-	@Override
-	public DataHandler[] getDataHandlers() {
-		DataHandler[] a = new DataHandler[dataHandlers.size()];
-		dataHandlers.values().toArray(a);
-		return a;
 	}
 
 	@Override
@@ -425,23 +382,10 @@ public class ModelCoordinatorLocal implements Simulation, Steppable {
 
 	private void postStepActivities() {
 		long l = System.currentTimeMillis();
-		Iterator iter = appAgents.values().iterator();
+		Iterator<ApplicationAgent> iter = appAgents.values().iterator();
 		while (iter.hasNext()) {
-			ApplicationAgentImpl e = (ApplicationAgentImpl) iter.next();
-			e.setCoordinatorRef(this);// !!!
-			e.setMessengerRef(messenger);
-			e.post();
-		}
-
-		iter = dataHandlers.values().iterator();
-		while (iter.hasNext()) {
-			DataHandler e = (DataHandler) iter.next();
-
-			try {
-				e.save(this);
-			} catch (Exception ex) {
-				logger.error("Error during getting database connection", ex);
-			}
+			ApplicationAgent e = iter.next();
+			e.post(this, messenger);
 		}
 
 		logger.debug("*********** POST: " + (System.currentTimeMillis() - l) / 1000d);
@@ -449,12 +393,10 @@ public class ModelCoordinatorLocal implements Simulation, Steppable {
 
 	private void preStepActivities() {
 		long l = System.currentTimeMillis();
-		Iterator iter = appAgents.values().iterator();
+		Iterator<ApplicationAgent> iter = appAgents.values().iterator();
 		while (iter.hasNext()) {
-			ApplicationAgentImpl e = (ApplicationAgentImpl) iter.next();
-			e.setCoordinatorRef(this);// !!!
-			e.setMessengerRef(messenger);
-			e.pre(props);
+			ApplicationAgent e = iter.next();
+			e.pre(this, messenger);
 		}
 		logger.debug("*********** PRE: " + (System.currentTimeMillis() - l) / 1000d);
 	}
@@ -516,9 +458,13 @@ public class ModelCoordinatorLocal implements Simulation, Steppable {
 	}
 
 	@Override
-	public int getCurrentTimeStep() {
-		// TODO Auto-generated method stub
-		return 0;
+	public long getCurrentTimeStep() {
+		return this.time;
+	}
+
+	@Override
+	public void addApplicationAgent(ApplicationAgent agent) {
+		this.appAgents.put(agent.getName(), agent);
 	}
 
 }

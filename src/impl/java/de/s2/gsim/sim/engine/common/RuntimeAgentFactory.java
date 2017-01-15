@@ -8,7 +8,6 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 
-import de.s2.gsim.api.sim.agent.impl.ApplicationAgentImpl;
 import de.s2.gsim.api.sim.agent.impl.RtExecutionContextImpl;
 import de.s2.gsim.api.sim.agent.impl.RuntimeAgent;
 import de.s2.gsim.environment.Environment;
@@ -204,40 +203,6 @@ public class RuntimeAgentFactory {
         }
     }
 
-    public List<ApplicationAgentImpl> createAppAgents(Environment env) throws GSimDefException {
-        try {
-            Map<String, String> m = env.getAgentRuntimeConfig().getSystemAgents();
-            Iterator iter = m.keySet().iterator();
-            ArrayList<ApplicationAgentImpl> agentList = new ArrayList<ApplicationAgentImpl>();
-            while (iter.hasNext()) {
-                String name = (String) iter.next();
-                String cls = m.get(name);
-                ApplicationAgentImpl a = null;
-                try {
-                    try {
-                        Object o = Class.forName(cls, false, cl).newInstance();
-                        if (o instanceof ApplicationAgentImpl) {
-                            a = (ApplicationAgentImpl) o;
-                        }
-                    } catch (ClassNotFoundException e) {
-                        Object o = Class.forName(cls).newInstance();
-                        if (o instanceof ApplicationAgentImpl) {
-                            a = (ApplicationAgentImpl) o;
-                        }
-                    }
-                    if (a != null) {
-                        a.setName(name);
-                        agentList.add(a);
-                    }
-                } catch (Exception e) {
-                    logger.error("Exception", e);
-                }
-            }
-            return agentList;
-        } catch (Exception e) {
-            throw new GSimDefException("Exception", e);
-        }
-    }
 
     public Map<String, DataHandler> createDataHandlers(Environment env) throws GSimDefException {
         try {
