@@ -29,9 +29,9 @@ sourceSets.all { set ->
         from set.output
     }
 
-    def sourcesJar =task("${set.name}Sources", type: Jar, dependsOn: classes) {
-      classifier = 'sources'
-      from set.output 
+    def sourcesJar =task("${set.name}Sources", type: Jar) {
+        classifier = 'sources'
+        from set.output 
     }
 
     artifacts {
