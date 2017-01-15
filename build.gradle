@@ -126,6 +126,7 @@ uploadArchives {
            	def priority = 0
 
             addFilter("main") { artifact, file -> artifact.name == project.name }
+            addFilter("sources") { artifact, file -> artifact.name.endsWith("-sources") }
             ["api", "impl"].each { type ->
                 addFilter(type) { artifact, file -> artifact.name.endsWith("-$type") }
                 
