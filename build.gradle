@@ -27,15 +27,19 @@ sourceSets.all { set ->
     def jarTask = task("${set.name}Jar", type: Jar) {
         baseName = baseName + "-$set.name"
         from set.output
-    }
+    } 
 
-    def sourcesJar =task("${set.name}Sources", type: Jar) {
+    def sourcesJar = task("${set.name}Sources",  type: Jar) {
         classifier = 'sources'
-        from set.output 
+        from "src/api/java"
+        from "src/impl/java"
+//        from sourceSets.api.output
+//        from sourceSets.impl.output
     }
 
     artifacts {
-        archives jarTask sourcesJar
+        archives jarTask 
+        archives sourcesJar
     }
 }
 
@@ -79,7 +83,6 @@ dependencies {
     runtime configurations.apiRuntime
     runtime configurations.implRuntime
 }    
-
 
 jar {
     from sourceSets.api.output
