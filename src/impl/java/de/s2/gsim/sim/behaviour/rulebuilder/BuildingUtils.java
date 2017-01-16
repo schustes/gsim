@@ -179,7 +179,7 @@ public class BuildingUtils {
 					return supplier.apply(o);
 				}
 			} catch (GSimDefException e) {
-				return null;
+				return otherwise.get();
 			}
 			p = p.next();
 			if (p != null) {
