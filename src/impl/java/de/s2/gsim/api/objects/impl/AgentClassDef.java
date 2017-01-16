@@ -56,6 +56,27 @@ public class AgentClassDef extends ObjectClassDef implements AgentClass, UnitWra
 	}
 
 	@Override
+	public void defineObjectList(String list, ObjectClass objectClass) throws GSimException {
+
+		if (destroyed) {
+			throw new GSimException("This object was removed from the runtime context.");
+		}
+
+		try {
+			Frame object = (Frame) ((UnitWrapper) objectClass).toUnit();
+			if (!getReal().getObjectLists().containsKey(list)) {
+				setReal(env.getAgentClassOperations().addObjectList((GenericAgentClass) getReal(), list, object));
+			}
+		} catch (Exception e) {
+			throw new GSimException(e);
+		}
+
+		observeDependentObject(objectClass, this);
+
+		onChange();
+	}
+
+	@Override
 	public void addOrSetObject(String list, ObjectClass objectClass) throws GSimException {
 
 		if (destroyed) {

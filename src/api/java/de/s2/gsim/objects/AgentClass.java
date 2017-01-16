@@ -10,6 +10,15 @@ import de.s2.gsim.GSimException;
  */
 public interface AgentClass extends ObjectClass {
 
+
+	/**
+	 * Defines object list.
+	 * 
+	 * @param listName the list name
+	 * @param type the object class defining the instances the list can hold.
+	 */
+	void defineObjectList(String listName, ObjectClass type);
+
     /**
      * Adds the object class if the object class is not yet defined, or updates it otherwise.
      * 
