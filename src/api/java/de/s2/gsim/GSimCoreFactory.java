@@ -185,7 +185,7 @@ public abstract class GSimCoreFactory {
                             LOG.debug(
                                     "Found appropriate resource with name [" + entryName + "]. Resource instance:" + classloader.getResource(entryName));
                         }
-                    } catch (Exception e) {
+					} catch (Throwable e) {
                         LOG.debug("Unable to load resource [" + entryName + "] form file [" + archive.getAbsolutePath() + "].", e);
                     }
                 }
@@ -230,7 +230,7 @@ public abstract class GSimCoreFactory {
                         } else {
                             list.add(classloader.getResource(name.replace('.', File.separatorChar) + fileName));
                         }
-                    } catch (ClassNotFoundException | NoClassDefFoundError e) {
+					} catch (Throwable e) {
                         LOG.trace("Class not found/defined , ignore", e);
                     }
                 }
