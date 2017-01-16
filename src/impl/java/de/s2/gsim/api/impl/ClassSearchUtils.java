@@ -118,7 +118,7 @@ public class ClassSearchUtils {
                         LOG.debug(
                                 "Found appropriate resource with name [" + entryName + "]. Resource instance:" + classloader.getResource(entryName));
                     }
-                } catch (Exception e) {
+				} catch (Throwable e) {
                     LOG.debug("Unable to load resource [" + entryName + "] form file [" + archive.getAbsolutePath() + "].", e);
                 }
             }
