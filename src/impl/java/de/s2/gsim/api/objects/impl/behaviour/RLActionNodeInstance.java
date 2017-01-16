@@ -10,10 +10,11 @@ import de.s2.gsim.environment.ExpansionDef;
 import de.s2.gsim.environment.Instance;
 import de.s2.gsim.environment.RLRule;
 import de.s2.gsim.environment.RLRuleFrame;
-import de.s2.gsim.objects.Condition;
 import de.s2.gsim.objects.Evaluator;
 import de.s2.gsim.objects.Expansion;
+import de.s2.gsim.objects.Path;
 import de.s2.gsim.objects.RLActionNode;
+import de.s2.gsim.objects.attribute.Attribute;
 
 public class RLActionNodeInstance extends RuleInstance implements RLActionNode, UnitWrapper {
 
@@ -22,9 +23,8 @@ public class RLActionNodeInstance extends RuleInstance implements RLActionNode, 
     }
 
     @Override
-    public void addOrSetCondition(Condition cond) throws GSimException {
-        Instance inst = (Instance) ((UnitWrapper) cond).toUnit();
-        ConditionDef c = new ConditionDef(inst);
+	public void addOrSetCondition(Path<Attribute> path, String op, String val) throws GSimException {
+		ConditionDef c = new ConditionDef(path.toString(), op, val);
         real.setCondition(c);
         owner.addOrSetRule(this);
     }

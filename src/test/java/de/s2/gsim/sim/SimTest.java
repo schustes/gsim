@@ -417,6 +417,58 @@ public class SimTest {
 		}
 	}
 
+	@Test
+	public void test_action_parameterisation() throws Exception {
+
+		int samples = 1;
+		int steps = 2;
+		double alpha = 0.1;
+
+		env.createAgentClass(AGENT_CLASS_NAME, null);
+
+		AgentClass agentClass = createBaseTestAgent();
+
+		Behaviour behaviour = agentClass.getBehaviour();
+		Action action1 = behaviour.createAction(action0Name, TestAction0.class.getName());
+		Action action2 = behaviour.createAction(action1Name, TestAction1.class.getName());
+
+		action1.addObjectClassParam("object-list/test");
+		action2.addObjectClassParam("object-list/test");
+
+		RLActionNode rule = behaviour.createRLActionNode("RL");
+
+		rule.addOrSetConsequent(action1);
+		rule.addOrSetConsequent(action2);
+
+		Rule rewardRule = behaviour.createRule("reward-rule");
+		Action rewardAction = behaviour.createAction("rewardAction", RewardComputation.class.getName());
+		rewardRule.addOrSetConsequent(rewardAction);
+
+		rule.createEvaluator(ATTR_LIST + "/" + EVAL_ATTR, alpha);
+		agentClass.setBehaviour(behaviour);
+
+		ObjectClass objectClass = env.createObjectClass("test", null);
+
+		agentClass.addOrSetObject("object-list", objectClass);
+
+		DomainAttribute interval1 = new DomainAttribute("wealth", AttributeType.INTERVAL);
+		interval1.addFiller("0");
+		interval1.addFiller("1");
+		interval1.setDefault("0.5");
+		objectClass.addAttribute(ATTR_LIST, interval1);
+
+		agentClass.setBehaviour(behaviour);
+
+		AgentInstance agent = env.instanciateAgent(agentClass, AGENT_NAME);
+
+		for (int i = 0; i < samples; i++) {
+			double counterAction = runRLsimulation(agent, alpha, steps);
+			// get handle of runtime agent, check fact base
+			// check: Action on for sf with sf-cat X is executed most of the time
+			// assertThat("Count of test action must be significantly over 2/3 of all actions or so", expectedIntuitive,
+			// lessThanOrEqualTo(counterAction));
+		}
+	}
 
 	@SuppressWarnings("unused")
 	private void scientific_rl_rule_test() throws Exception {

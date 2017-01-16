@@ -7,10 +7,11 @@ import de.s2.gsim.environment.ConditionFrame;
 import de.s2.gsim.environment.ExpansionFrame;
 import de.s2.gsim.environment.Frame;
 import de.s2.gsim.environment.RLRuleFrame;
-import de.s2.gsim.objects.Condition;
 import de.s2.gsim.objects.Evaluator;
 import de.s2.gsim.objects.Expansion;
+import de.s2.gsim.objects.Path;
 import de.s2.gsim.objects.RLActionNode;
+import de.s2.gsim.objects.attribute.Attribute;
 //RLActionNode is WRONG
 public class RLActionNodeClass extends RuleClass implements RLActionNode, UnitWrapper {
 
@@ -19,8 +20,8 @@ public class RLActionNodeClass extends RuleClass implements RLActionNode, UnitWr
     }
 
     @Override
-    public void addOrSetCondition(Condition cond) throws GSimException {
-        ConditionFrame f = (ConditionFrame) ((UnitWrapper) cond).toUnit();
+	public void addOrSetCondition(Path<Attribute> path, String op, String val) throws GSimException {
+		ConditionFrame f = ConditionFrame.newConditionFrame(path.toString(), op, val);
         getReal().removeCondition(f);
         getReal().addCondition(f);
         owner.addOrSetRLActionNode(this);

@@ -1,5 +1,7 @@
 package de.s2.gsim.objects;
 
+import de.s2.gsim.objects.attribute.Attribute;
+
 /**
  * An RLActionNode manages the reinforcement learning and state space partitioning part according to the BRA algorithm of the agent.
  * 
@@ -38,7 +40,7 @@ public interface RLActionNode {
         SOFTMAX
     }
 
-    void addOrSetCondition(Condition cond);
+	void addOrSetCondition(Path<Attribute> path, String op, String value);
 
     void addOrSetConsequent(de.s2.gsim.objects.Action cons);
     /**
