@@ -2,6 +2,7 @@ package de.s2.gsim.sim.behaviour.rulebuilder;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -68,9 +69,13 @@ public class BuildingUtils {
 		}
 
 		String listName = resolveList(attRef);
-		String ref1 = extractChildAttributePathWithoutParent(agent.getDefinition(), attRef);
+		Optional<Path<?>> rp = extractChildAttributePathWithoutParent(agent.getDefinition(), attRef);
+		String ref1 = null;
+		if (rp.isPresent()) {
+			ref1 = rp.get().toString();
+		}
 		Frame object = agent.getDefinition().getListType(listName);
-		if (object != null) {
+		if (object != null && ref1 != null) {
 			DomainAttribute datt = (DomainAttribute) object.resolvePath(Path.attributePath(ref1));
 			if (datt.getType() == AttributeType.NUMERICAL || datt.getType() == AttributeType.INTERVAL) {
 				return true;
@@ -98,7 +103,7 @@ public class BuildingUtils {
 
 	}
 
-	public static String extractChildAttributePathWithoutParent(Frame owningAgent, String pathString) {
+	public static Optional<Path<?>> extractChildAttributePathWithoutParent_OLD(Frame owningAgent, String pathString) {
 		Path<Attribute> path = Path.attributePath(pathString.split("/"));
 		Path<?> p = path;
 
@@ -117,7 +122,31 @@ public class BuildingUtils {
 			}
 		}
 
-		return n.toString();
+		return Optional.ofNullable(n);
+	}
+
+	public static Optional<Path<?>> extractChildAttributePathWithoutParent(Frame owningAgent, String pathString) {
+		Path<Attribute> path = Path.attributePath(pathString.split("/"));
+		Path<?> p = path;
+
+		String frameName = resolveChildFrameWithoutList(owningAgent, pathString);
+
+		Deque<Path<?>> stack = new ArrayDeque<>();
+		while (p != null && !p.last().getName().equals(frameName)) {
+			stack.push(p.last());
+			p = Path.withoutLast(p);
+		}
+
+		Path<?> n = null;
+		while (!stack.isEmpty()) {
+			if (n == null) {
+				n = Path.copy(stack.pop());
+			} else {
+				n.append(stack.pop());
+			}
+		}
+
+		return Optional.ofNullable(n);
 	}
 
 	private static boolean isChildFrame(Frame agent, Path<?> p) {

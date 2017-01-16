@@ -104,7 +104,7 @@ public class JessHandlerUtils {
 
 	private static void assertConstantsAttRef(Rete rete, Instance owner, String n) {
 
-		String att = BuildingUtils.extractChildAttributePathWithoutParent(owner.getDefinition(), n);// ParsingUtils.resolveAttribute(n);
+		String att = BuildingUtils.extractChildAttributePathWithoutParent(owner.getDefinition(), n).get().toString();
 
 		Path<Attribute> path = Path.attributePath(n.split("/"));
 

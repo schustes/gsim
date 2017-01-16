@@ -596,17 +596,14 @@ public class BehaviourEngine implements java.io.Serializable {
 	private DomainAttribute extractAtt(String path) {
 		DomainAttribute a = null;
 		if (BuildingUtils.referencesChildFrame(owner.getDefinition(), path)) {
-			// ConditionBuilder cb = new ConditionBuilder();
 			String obj = BuildingUtils.resolveChildFrameWithList(this.owner.getDefinition(), path);
-			// String obj = cb.resolveObjectClass(path);
 			Frame f = (Frame) owner.getDefinition().resolvePath(Path.objectPath(obj.split("/")));
 			if (f == null) {
 				String list = BuildingUtils.resolveList(path);
 				f = owner.getDefinition().getListType(list);
 
 			}
-			String att = BuildingUtils.extractChildAttributePathWithoutParent(owner.getDefinition(), path);
-			// String att = cb.resolveAttribute(path);
+			String att = BuildingUtils.extractChildAttributePathWithoutParent(owner.getDefinition(), path).get().toString();
 			a = f.resolvePath(Path.attributePath(att.split("/")));
 		} else {
 			a = owner.getDefinition().resolvePath(Path.attributePath(path.split("/")));

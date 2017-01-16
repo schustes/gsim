@@ -6,6 +6,7 @@ import static de.s2.gsim.sim.behaviour.rulebuilder.BuildingUtils.resolveChildFra
 import static de.s2.gsim.sim.behaviour.rulebuilder.BuildingUtils.resolveList;
 
 import java.util.List;
+import java.util.Optional;
 
 import cern.jet.random.Uniform;
 import de.s2.gsim.environment.ConditionDef;
@@ -191,10 +192,15 @@ public abstract class ConditionBuilder {
         }
 
         String objectPath = resolveChildFrameWithList(agent.getDefinition(), cond.getParameterName());
-        String attPath = null;
-        if (referencesChildFrame(agent.getDefinition(), cond.getParameterName())) {
-            attPath = extractChildAttributePathWithoutParent(agent.getDefinition(), cond.getParameterName());
-        }
+		Optional<Path<?>> p = extractChildAttributePathWithoutParent(agent.getDefinition(), cond.getParameterName());
+		String attPath = null;
+		if (p.isPresent()) {
+			attPath = p.get().toString();
+		}
+
+		// if (referencesChildFrame(agent.getDefinition(), cond.getParameterName())) {
+		// attPath = extractChildAttributePathWithoutParent(agent.getDefinition(), cond.getParameterName());
+		// }
 
         String s2 = buildConstantExistsQuantifiedConditionPart(agent, cond, refs, objectPath, attPath, variableIndex, conditionValueVar);
 
@@ -412,7 +418,12 @@ public abstract class ConditionBuilder {
 
         String list0 = resolveList(cond.getParameterValue());
         String object0 = resolveChildFrameWithList(owner.getDefinition(), cond.getParameterValue());
-        String att0 = extractChildAttributePathWithoutParent(owner.getDefinition(), cond.getParameterValue());
+
+		Path<?> p = extractChildAttributePathWithoutParent(owner.getDefinition(), cond.getParameterName())
+		        .orElseThrow(() -> new IllegalArgumentException("Referenced child attribute not present"));
+		String att0 = p.toString();
+
+		// extractChildAttributePathWithoutParent(owner.getDefinition(), cond.getParameterValue());
 
         String nRule = "";
         String binding = objRefs.getBinding(object0);
@@ -430,7 +441,11 @@ public abstract class ConditionBuilder {
         String s = createLHS(owner, cond.getParameterName(), objRefs, k, nRule + nRule_1);
         nRule += s;
 
-        String att = extractChildAttributePathWithoutParent(owner.getDefinition(), cond.getParameterName());
+		p = extractChildAttributePathWithoutParent(owner.getDefinition(), cond.getParameterName())
+		        .orElseThrow(() -> new IllegalArgumentException("Referenced child attribute not present"));
+		String att = p.toString();
+
+		// String att = extractChildAttributePathWithoutParent(owner.getDefinition(), cond.getParameterName());
 
         if (!isNumericalAttribute(owner, att) && !cond.getOperator().equals("<>") || cond.getOperator().equals("=")) {
             nRule += "(value ?valueV" + (k) + "&:(eq*" + " ?valueV" + (k) + " ?value" + k + " " + ")))\n";
@@ -456,7 +471,10 @@ public abstract class ConditionBuilder {
             // if (!referenceChildObject(leftVariableName)) {
             String list = resolveList(leftVariableName);
             String object = resolveChildFrameWithList(owner.getDefinition(), leftVariableName);
-            String att = extractChildAttributePathWithoutParent(owner.getDefinition(), leftVariableName);
+
+			Path<?> p = extractChildAttributePathWithoutParent(owner.getDefinition(), leftVariableName)
+			        .orElseThrow(() -> new IllegalArgumentException("Referenced child attribute not present"));
+			String att = p.toString();
 
             // int idx = objRefs.get(object);
             String binding = objRefs.getBinding(object);

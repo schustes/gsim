@@ -341,7 +341,7 @@ public abstract class RLRulesBuilder {
 
 		String list = BuildingUtils.resolveList(paramName);// conditionBuilder.resolveList(paramName);
 		String object = BuildingUtils.resolveChildFrameWithList(agent.getDefinition(), paramName);// conditionBuilder.resolveObjectClass(paramName);
-		String att = BuildingUtils.extractChildAttributePathWithoutParent(agent.getDefinition(), paramName);// conditionBuilder.resolveAttribute(paramName);
+		String att = BuildingUtils.extractChildAttributePathWithoutParent(agent.getDefinition(), paramName).get().toString();
 
         String binding = objRefs.getBinding(object);
         if (binding == null) {
