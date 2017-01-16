@@ -1,8 +1,9 @@
 package de.s2.gsim.sim;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.lessThanOrEqualTo;
+import static org.hamcrest.Matchers.*;
 import static org.hamcrest.Matchers.not;
 
 import java.util.HashMap;
@@ -99,7 +100,8 @@ public class SimTest {
 		
 		for (int i=0; i<samples; i++) {
 			double counterAction = runRLsimulation(agent, alpha, steps);
-			assertThat("Count of test action must be significantly over 2/3 of all actions or so", expectedIntuitive, lessThanOrEqualTo(counterAction));
+			assertThat("Count of test action must be significantly over 2/3 of all actions or so", counterAction,
+			        greaterThanOrEqualTo(expectedIntuitive));
 		}
 
 	}

@@ -35,7 +35,8 @@ public abstract class SimAction implements java.io.Serializable {
 
 	public final void doExecute() {
 		execute();
-		ctx.getAgent().setLastActionClassName(name);
+		ctx.getAgent().setLastActionClassName(this.getClass().getName());
+		// ctx.getAgent().setLastActionClassName(name);
 	}
 
 	public Context getContext() {
