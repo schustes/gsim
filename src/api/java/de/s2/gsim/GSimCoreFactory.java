@@ -85,20 +85,23 @@ public abstract class GSimCoreFactory {
 			String token;
 			File dir;
 			String name;
+
+			GSimCoreFactory foundFactory = null;
+
 			while (tokenizer.hasMoreTokens()) {
 				token = tokenizer.nextToken();
 				dir = new File(token);
 				if (dir.isDirectory()) {
-					return lookInDirectory(factoryName, "", dir, classloader);
+					foundFactory = lookInDirectory(factoryName, "", dir, classloader);
 				}
 				if (dir.isFile()) {
 					name = dir.getName().toLowerCase();
 					if (name.endsWith(".zip") || name.endsWith(".jar")) {
-						return lookInArchive(factoryName, dir, classloader);
+						foundFactory = lookInArchive(factoryName, dir, classloader);
 					}
 				}
 			}
-			return null;
+			return foundFactory;
 		}
 
 		/**
