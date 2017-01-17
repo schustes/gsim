@@ -143,7 +143,8 @@ public class Instance extends Unit<Instance, Attribute> {
 		// of this type.", this.getName(), instance.getDefinition().getName(), instance.getName()));
 		// }
 
-		if (!getObjectLists().containsKey(listname)) {
+		if (!getObjectLists().containsKey(listname)
+		        || ((TypedList<Instance>) getObjectLists().get(listname)).getType().isSuccessor(instance.getDefinition().getName())) {
 			throw new IllegalArgumentException(String.format("Listname %s is not defined for this type of instance", listname));
 		}
 
