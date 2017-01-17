@@ -57,7 +57,7 @@ public class AgentInstanceSim extends Observable implements AgentInstance, Objec
 
         try {
             GenericAgent a = real;
-			a.addChildInstance(list, (Instance) ((ObjectInstanceDef) object).toUnit());
+			a.addChildInstance(list, (Instance) ((UnitWrapper) object).toUnit());
             observeDependentObjectInstance(object, this);
         } catch (Exception e) {
             throw new GSimException(e);
