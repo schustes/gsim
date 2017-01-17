@@ -138,9 +138,10 @@ public class Instance extends Unit<Instance, Attribute> {
 	 */
 	public void addChildInstance(@NotNull String listname, @NotNull Instance instance) {
 
-		if (!frame.containsChildFrame(listname, instance.getDefinition())) {
-			throw new IllegalArgumentException(String.format("Instance %s cannot contain instance of type %s, but the instance to add %s is of this type.", this.getName(), instance.getDefinition().getName(), instance.getName()));
-		}
+		// if (!frame.containsChildFrame(listname, instance.getDefinition())) {
+		// throw new IllegalArgumentException(String.format("Instance %s cannot contain instance of type %s, but the instance to add %s is
+		// of this type.", this.getName(), instance.getDefinition().getName(), instance.getName()));
+		// }
 
 		if (!getObjectLists().containsKey(listname)) {
 			throw new IllegalArgumentException(String.format("Listname %s is not defined for this type of instance", listname));
