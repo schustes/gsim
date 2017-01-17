@@ -93,11 +93,17 @@ public abstract class GSimCoreFactory {
 				dir = new File(token);
 				if (dir.isDirectory()) {
 					foundFactory = lookInDirectory(factoryName, "", dir, classloader);
+					if (foundFactory != null) {
+						return foundFactory;
+					}
 				}
 				if (dir.isFile()) {
 					name = dir.getName().toLowerCase();
 					if (name.endsWith(".zip") || name.endsWith(".jar")) {
 						foundFactory = lookInArchive(factoryName, dir, classloader);
+						if (foundFactory != null) {
+							return foundFactory;
+						}
 					}
 				}
 			}
