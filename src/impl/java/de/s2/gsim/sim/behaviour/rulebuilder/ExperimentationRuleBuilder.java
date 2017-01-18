@@ -5,6 +5,7 @@ import de.s2.gsim.environment.ExpansionDef;
 import de.s2.gsim.environment.Instance;
 import de.s2.gsim.environment.RLRule;
 import de.s2.gsim.sim.GSimEngineException;
+import de.s2.gsim.sim.behaviour.util.BuildingUtils;
 
 public abstract class ExperimentationRuleBuilder {
 

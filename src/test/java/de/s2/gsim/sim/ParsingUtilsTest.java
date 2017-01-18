@@ -20,7 +20,7 @@ import de.s2.gsim.environment.ObjectClassOperations;
 import de.s2.gsim.objects.Path;
 import de.s2.gsim.objects.attribute.AttributeType;
 import de.s2.gsim.objects.attribute.DomainAttribute;
-import de.s2.gsim.sim.behaviour.rulebuilder.BuildingUtils;
+import de.s2.gsim.sim.behaviour.util.BuildingUtils;
 
 public class ParsingUtilsTest {
 

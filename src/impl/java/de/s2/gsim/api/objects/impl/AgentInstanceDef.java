@@ -1,9 +1,9 @@
 package de.s2.gsim.api.objects.impl;
 
-import static de.s2.gsim.api.objects.impl.ObserverUtils.*;
+import static de.s2.gsim.api.objects.impl.ObserverUtils.observeDependentObjectInstance;
+import static de.s2.gsim.api.objects.impl.ObserverUtils.stopObservingDependentObjectInstance;
 
 import java.util.ArrayList;
-
 import java.util.Iterator;
 import java.util.List;
 import java.util.Observable;
@@ -61,7 +61,8 @@ public class AgentInstanceDef extends ObjectInstanceDef implements AgentInstance
 
 		try {
 			GenericAgent a = (GenericAgent) real;
-			real = env.getAgentInstanceOperations().addChildInstance(a, Path.objectListPath(list), (Instance) object);
+			real = env.getAgentInstanceOperations().addChildInstance(a, Path.objectListPath(list),
+			        (Instance) ((UnitWrapper) object).toUnit());
 
 			observeDependentObjectInstance(object, this);
 

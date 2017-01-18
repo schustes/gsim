@@ -11,6 +11,7 @@ import de.s2.gsim.environment.ExpansionDef;
 import de.s2.gsim.environment.Instance;
 import de.s2.gsim.environment.RLRule;
 import de.s2.gsim.environment.UserRule;
+import de.s2.gsim.sim.behaviour.util.BuildingUtils;
 
 /**
  * Maintains a map from agent objects to variable names in the rule program. This is necessary if the same agent objects have to be referenced in

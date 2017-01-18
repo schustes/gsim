@@ -16,7 +16,6 @@ import de.s2.gsim.environment.RLRule;
 import de.s2.gsim.objects.attribute.AttributeType;
 import de.s2.gsim.objects.attribute.DomainAttribute;
 import de.s2.gsim.sim.GSimEngineException;
-import de.s2.gsim.sim.behaviour.rulebuilder.BuildingUtils;
 import de.s2.gsim.util.CombinationGenerator;
 import de.s2.gsim.util.Utils;
 import jess.Context;

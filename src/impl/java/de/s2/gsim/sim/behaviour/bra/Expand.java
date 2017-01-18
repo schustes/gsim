@@ -7,7 +7,11 @@ import static java.util.Collections.shuffle;
 import java.util.List;
 
 import de.s2.gsim.api.sim.agent.impl.RuntimeAgent;
-import de.s2.gsim.sim.behaviour.rulebuilder.BuildingUtils;
+import de.s2.gsim.environment.Instance;
+import de.s2.gsim.objects.attribute.AttributeType;
+import de.s2.gsim.objects.attribute.DomainAttribute;
+import de.s2.gsim.sim.GSimEngineException;
+import de.s2.gsim.sim.behaviour.util.PathDefinitionResolutionUtils;
 import de.s2.gsim.sim.behaviour.util.RuleEngineHelper;
 import jess.Context;
 import jess.Fact;
@@ -48,7 +52,7 @@ public class Expand implements Userfunction, java.io.Serializable {
 
         String attributeRef = elemToExpand.getSlotValue("param-name").stringValue(context);
         try {
-            if (BuildingUtils.isNumericalAttributeSpec(agent, attributeRef)) {
+			if (isNumericalAttributeSpec(agent, attributeRef)) {
                 createNextStatesNum(agent, stateFact, elemToExpand, unexpandedStateFactElems, context, false);
             } else {
                 createNextStatesCat(agent, stateFact, elemToExpand, unexpandedStateFactElems, context, false);
@@ -64,6 +68,18 @@ public class Expand implements Userfunction, java.io.Serializable {
   
         return null;
     }
+
+	private static boolean isNumericalAttributeSpec(Instance agent, String domainAttRef) throws GSimEngineException {
+
+		DomainAttribute da = PathDefinitionResolutionUtils.extractAttribute(agent.getDefinition(), domainAttRef).get();
+
+		if (da.getType() == AttributeType.NUMERICAL || da.getType() == AttributeType.INTERVAL) {
+			return true;
+		}
+
+		return false;
+
+	}
 
     // select a random element to expand
     private Fact selectRandomStatefact(List<Fact> allStateFactElems) {

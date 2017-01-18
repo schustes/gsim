@@ -36,9 +36,9 @@ import de.s2.gsim.sim.behaviour.GSimBehaviourException;
 import de.s2.gsim.sim.behaviour.bra.Expand;
 import de.s2.gsim.sim.behaviour.bra.SimpleSoftmaxSelector;
 import de.s2.gsim.sim.behaviour.rangeupdate.DynamicValueRangeUpdateStrategy;
-import de.s2.gsim.sim.behaviour.rulebuilder.BuildingUtils;
 import de.s2.gsim.sim.behaviour.rulebuilder.GlobalsBuilder;
 import de.s2.gsim.sim.behaviour.rulebuilder.ReactiveRuleBuilder;
+import de.s2.gsim.sim.behaviour.util.BuildingUtils;
 import de.s2.gsim.sim.behaviour.util.RuleEngineHelper;
 import de.s2.gsim.sim.behaviour.util.TreeWriter;
 import jess.Deftemplate;
@@ -118,7 +118,7 @@ public class BehaviourEngine implements java.io.Serializable {
 					DynamicValueRangeUpdateStrategy strategy = DynamicValueRangeUpdateStrategy
 					        .getStrategyForAttributeType(domainAttribute.get().getType());
 
-					// strategy.apply(owner, r.getName(), e, rlRanges, rete.getGlobalContext());
+					strategy.apply(owner, r.getName(), e, rlRanges, rete.getGlobalContext());
 
 				}
 			}

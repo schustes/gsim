@@ -1,4 +1,4 @@
-package de.s2.gsim.sim.behaviour.rulebuilder;
+package de.s2.gsim.sim.behaviour.util;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
@@ -10,15 +10,10 @@ import de.s2.gsim.api.sim.agent.impl.RuntimeAgent;
 import de.s2.gsim.environment.Frame;
 import de.s2.gsim.environment.GSimDefException;
 import de.s2.gsim.environment.GenericAgentClass;
-import de.s2.gsim.environment.Instance;
 import de.s2.gsim.environment.TypedList;
 import de.s2.gsim.objects.Path;
 import de.s2.gsim.objects.attribute.Attribute;
-import de.s2.gsim.objects.attribute.AttributeType;
 import de.s2.gsim.objects.attribute.DomainAttribute;
-import de.s2.gsim.objects.attribute.IntervalAttribute;
-import de.s2.gsim.objects.attribute.NumericalAttribute;
-import de.s2.gsim.sim.GSimEngineException;
 
 public class BuildingUtils {
 
@@ -55,36 +50,6 @@ public class BuildingUtils {
 		return "default";
 	}
 
-	public static boolean isNumericalAttributeSpec(Instance agent, String attRef) throws GSimEngineException {
-
-		Path<Attribute> attrPath = Path.attributePath(attRef.split("/"));
-		try {
-			Attribute att = agent.resolvePath(attrPath);
-			if (att instanceof NumericalAttribute || att instanceof IntervalAttribute) {
-				return true;
-			}
-			return false;
-		} catch (GSimDefException e) {
-			e.printStackTrace();
-		}
-
-		String listName = resolveList(attRef);
-		Optional<Path<?>> rp = extractChildAttributePathWithoutParent(agent.getDefinition(), attRef);
-		String ref1 = null;
-		if (rp.isPresent()) {
-			ref1 = rp.get().toString();
-		}
-		Frame object = agent.getDefinition().getListType(listName);
-		if (object != null && ref1 != null) {
-			DomainAttribute datt = (DomainAttribute) object.resolvePath(Path.attributePath(ref1));
-			if (datt.getType() == AttributeType.NUMERICAL || datt.getType() == AttributeType.INTERVAL) {
-				return true;
-			}
-			return false;
-		}
-
-		throw new GSimEngineException("Attribute reference " + attRef + " resolved to null!");
-	}
 
 	public static String resolveList(String s) {
 		String[] a = s.split("/");
@@ -101,28 +66,6 @@ public class BuildingUtils {
 		}
 		return list;
 
-	}
-
-	public static Optional<Path<?>> extractChildAttributePathWithoutParent_OLD(Frame owningAgent, String pathString) {
-		Path<Attribute> path = Path.attributePath(pathString.split("/"));
-		Path<?> p = path;
-
-		Deque<Path<?>> stack = new ArrayDeque<>();
-		while (p != null && !isChildFrame(owningAgent, p)) {
-			stack.push(p.last());
-			p = Path.withoutLast(p);
-		}
-
-		Path<?> n = null;
-		while (!stack.isEmpty()) {
-			if (n == null) {
-				n = Path.copy(stack.pop());
-			} else {
-				n.append(stack.pop());
-			}
-		}
-
-		return Optional.ofNullable(n);
 	}
 
 	public static Optional<Path<?>> extractChildAttributePathWithoutParent(Frame owningAgent, String pathString) {
@@ -159,15 +102,6 @@ public class BuildingUtils {
 			a = owner.resolvePath(Path.attributePath(path.split("/")));
 		}
 		return Optional.ofNullable(a);
-	}
-
-	private static boolean isChildFrame(Frame agent, Path<?> p) {
-		try {
-			Object obj = agent.resolvePath(p);
-			return obj != null && (obj instanceof Frame);
-		} catch (GSimDefException e) {
-			return false;
-		}
 	}
 
 	public static boolean referencesChildFrame(Frame owningAgent, String pathString) {

@@ -13,6 +13,7 @@ import de.s2.gsim.environment.RLRule;
 import de.s2.gsim.sim.GSimEngineException;
 import de.s2.gsim.sim.behaviour.Context;
 import de.s2.gsim.sim.behaviour.SimAction;
+import de.s2.gsim.sim.behaviour.util.BuildingUtils;
 import de.s2.gsim.util.Utils;
 
 public abstract class RLRulesBuilder {

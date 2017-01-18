@@ -1,9 +1,9 @@
 package de.s2.gsim.sim.behaviour.rulebuilder;
 
-import static de.s2.gsim.sim.behaviour.rulebuilder.BuildingUtils.extractChildAttributePathWithoutParent;
-import static de.s2.gsim.sim.behaviour.rulebuilder.BuildingUtils.referencesChildFrame;
-import static de.s2.gsim.sim.behaviour.rulebuilder.BuildingUtils.resolveChildFrameWithList;
-import static de.s2.gsim.sim.behaviour.rulebuilder.BuildingUtils.resolveList;
+import static de.s2.gsim.sim.behaviour.util.BuildingUtils.extractChildAttributePathWithoutParent;
+import static de.s2.gsim.sim.behaviour.util.BuildingUtils.referencesChildFrame;
+import static de.s2.gsim.sim.behaviour.util.BuildingUtils.resolveChildFrameWithList;
+import static de.s2.gsim.sim.behaviour.util.BuildingUtils.resolveList;
 
 import java.util.List;
 import java.util.Optional;

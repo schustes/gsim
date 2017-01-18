@@ -24,6 +24,7 @@ import de.s2.gsim.objects.AgentInstance;
 import de.s2.gsim.objects.Behaviour;
 import de.s2.gsim.objects.Expansion;
 import de.s2.gsim.objects.ObjectClass;
+import de.s2.gsim.objects.ObjectInstance;
 import de.s2.gsim.objects.Path;
 import de.s2.gsim.objects.RLActionNode;
 import de.s2.gsim.objects.Rule;
@@ -378,29 +379,22 @@ public class SimTest {
 		rule.createEvaluator(ATTR_LIST + "/" + EVAL_ATTR, alpha);
 		agentClass.setBehaviour(behaviour);
 
+		// careful the type must be fully defined before added or the list is defined
         ObjectClass objectClass = env.createObjectClass("test", null);
-
-        agentClass.addOrSetObject("object-list", objectClass);
 
 		DomainAttribute interval1 = new DomainAttribute("wealth", AttributeType.INTERVAL);
 		interval1.addFiller("0");
 		interval1.addFiller("1");
 		interval1.setDefault("0.5");
         objectClass.addAttribute(ATTR_LIST, interval1);
-        // agentClass.addAttribute(ATTR_LIST, interval1);
+		agentClass.defineObjectList("object-list", objectClass);
 
-		// Expansion expansion = rule.createExpansion("object-list/test::" + ATTR_LIST + "/wealth", "0", "10");
 		Expansion expansion = rule.createExpansion("object-list/test/" + ATTR_LIST + "/wealth", "0", "1");
-		// expansion.setMin("0");
-		// expansion.setMax("1");
-		// expansion.addFiller("0");
-		// expansion.addFiller("10");
 		rule.addOrSetExpansion(expansion);
 
 		Action action = behaviour.createAction("Test-Action", AddNewNumberAction.class.getName());
 		Rule rrule = behaviour.createRule("Test-Rule");
 		rrule.addOrSetConsequent(action);
-		// rrule.createCondition(ATTR_LIST + "/" + COUNTER0, ">", "4");
 
 		behaviour.setMaxNodes(20);
 		behaviour.setRevaluationProb(0.25);
@@ -410,6 +404,9 @@ public class SimTest {
 		agentClass.setBehaviour(behaviour);
 
 		AgentInstance agent = env.instanciateAgent(agentClass, AGENT_NAME);
+		ObjectInstance inst = env.createObjectInstance("something", objectClass);
+		agent.addOrSetObject("object-list", inst);
+		// add a fresh instance in object child list so that framename <> instancename
 
 		for (int i = 0; i < samples; i++) {
 			double counterAction = runRLsimulation(agent, alpha, steps);
@@ -738,7 +735,7 @@ public class SimTest {
 
 			RuntimeAgent agent = super.getContext().getAgent();
 
-			Path<Attribute> p = Path.attributePath("object-list", "test", ATTR_LIST, "wealth");
+			Path<Attribute> p = Path.attributePath("object-list", "something", ATTR_LIST, "wealth");
 			NumericalAttribute a = (NumericalAttribute) agent.resolvePath(p);
 			double current = a.getValue();
 

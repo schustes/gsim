@@ -10,7 +10,7 @@ import de.s2.gsim.environment.Instance;
 import de.s2.gsim.objects.Path;
 import de.s2.gsim.objects.attribute.Attribute;
 import de.s2.gsim.objects.attribute.IntervalAttribute;
-import de.s2.gsim.sim.behaviour.rulebuilder.BuildingUtils;
+import de.s2.gsim.sim.behaviour.util.BuildingUtils;
 import jess.Deftemplate;
 import jess.Fact;
 import jess.JessException;

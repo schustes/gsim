@@ -15,6 +15,8 @@ import java.util.stream.Collectors;
 
 import de.s2.gsim.api.sim.agent.impl.RuntimeAgent;
 import de.s2.gsim.environment.ExpansionDef;
+import de.s2.gsim.environment.Frame;
+import de.s2.gsim.environment.Instance;
 import de.s2.gsim.environment.RLRule;
 import de.s2.gsim.objects.Path;
 import de.s2.gsim.objects.attribute.Attribute;
@@ -22,6 +24,7 @@ import de.s2.gsim.objects.attribute.DomainAttribute;
 import de.s2.gsim.objects.attribute.NumericalAttribute;
 import de.s2.gsim.sim.behaviour.GSimBehaviourException;
 import de.s2.gsim.sim.behaviour.engine.BehaviourEngine.RLParameterRanges;
+import de.s2.gsim.sim.behaviour.util.PathDefinitionResolutionUtils;
 import de.s2.gsim.sim.behaviour.util.TreeWriter;
 import jess.Context;
 import jess.Fact;
@@ -41,8 +44,32 @@ public class DynamicIntervalUpdateStrategyImpl implements DynamicValueRangeUpdat
 	@Override
 	public void apply(RuntimeAgent agent, String baseRuleName, ExpansionDef expansion, RLParameterRanges rlRanges, Context context) {
 
+		String evalPath = expansion.getParameterName();
+		Path<Attribute> ePath = Path.attributePath(evalPath.split("/"));
 
-		double[] modifiedRange = determineInterval(agent, expansion, rlRanges);
+		if (PathDefinitionResolutionUtils.referencesChildFrame(agent.getDefinition(), evalPath)) {
+			Frame referencedObject = PathDefinitionResolutionUtils.extractChildType(agent.getDefinition(), evalPath);
+			String frameName = referencedObject.getName();
+			List<Instance> actualInstances = agent.getChildInstances(ePath.getName());
+			for (Instance child : actualInstances) {
+				String instancePath = evalPath.replaceFirst(frameName, child.getName());
+				Attribute attribute = agent.resolvePath(Path.attributePath(instancePath.split("/")));
+				DomainAttribute dattr = PathDefinitionResolutionUtils.extractAttribute(agent.getDefinition(), evalPath).get();
+				applyUpdates(agent, baseRuleName, expansion, ePath, dattr, attribute, rlRanges, context);
+			}
+
+		} else {
+			Attribute attribute = agent.resolvePath(ePath);
+			DomainAttribute dattr = agent.getDefinition().resolvePath(Path.attributePath(evalPath));
+			applyUpdates(agent, baseRuleName, expansion, ePath, dattr, attribute, rlRanges, context);
+		}
+
+	}
+
+	private void applyUpdates(RuntimeAgent agent, String baseRuleName, ExpansionDef expansion, Path<Attribute> instancePath,
+	        DomainAttribute def, Attribute a, RLParameterRanges rlRanges, Context context) {
+
+		double[] modifiedRange = determineInterval(agent, instancePath, expansion.getParameterName(), a, def, rlRanges);
 
 		if (modifiedRange == null) {
 			return;
@@ -116,16 +143,16 @@ public class DynamicIntervalUpdateStrategyImpl implements DynamicValueRangeUpdat
 	/**
 	 * Determines the interval to update the engine with.
 	 * 
-	 * @param agent the agent
-	 * @param expansion the expansion to check for required update
-	 * @param rlRanges the current range of parameters in the rule base.
-	 * @return the interval or null if it was not changed
+	 * @param agent
+	 * @param instancePath
+	 * @param evalPath
+	 * @param attr
+	 * @param domainAttribute
+	 * @param rlRanges
+	 * @return
 	 */
-	private double[] determineInterval(RuntimeAgent agent, ExpansionDef expansion, RLParameterRanges rlRanges) {
-		Path<Attribute> instancePath = Path.attributePath(expansion.getParameterName().split("/"));
-		Path<DomainAttribute> framePath = Path.attributePath(expansion.getParameterName().split("/"));
-		Attribute attr = agent.resolvePath(instancePath);
-		DomainAttribute domainAttribute = agent.getDefinition().resolvePath(framePath);
+	private double[] determineInterval(RuntimeAgent agent, Path<Attribute> instancePath, String evalPath, Attribute attr,
+	        DomainAttribute domainAttribute, RLParameterRanges rlRanges) {
 
 		if (!(attr instanceof NumericalAttribute)) {
 			throw new IllegalArgumentException("This strategy can only be applied to numerical attributes!");
@@ -136,11 +163,11 @@ public class DynamicIntervalUpdateStrategyImpl implements DynamicValueRangeUpdat
 		double currentVal = ((NumericalAttribute) attr).getValue();
 		double[] modifiedRange;
 		if (currentVal > currentMax) {
-			modifiedRange = rlRanges.getNewIntervalParameterRange(expansion.getParameterName(), new double[] { currentMin, currentVal });
+			modifiedRange = rlRanges.getNewIntervalParameterRange(evalPath, new double[] { currentMin, currentVal });
 		} else if (currentVal < currentMin) {
-			modifiedRange = rlRanges.getNewIntervalParameterRange(expansion.getParameterName(), new double[] { currentVal, currentMax });
+			modifiedRange = rlRanges.getNewIntervalParameterRange(evalPath, new double[] { currentVal, currentMax });
 		} else {
-			modifiedRange = rlRanges.getNewIntervalParameterRange(expansion.getParameterName(), new double[] { currentMin, currentMax });
+			modifiedRange = rlRanges.getNewIntervalParameterRange(evalPath, new double[] { currentMin, currentMax });
 		}
 		return modifiedRange;
 	}
