@@ -25,8 +25,8 @@ public class Path<T> {
 		this.type = type;
 	}
 
-	public static Path<?> copy(Path<?> p) {
-		return new Path<Object>(p.getName(), p.getType());
+	public static <U> Path<U> copy(Path<U> p) {
+		return new Path<U>(p.getName(), p.getType());
 	}
 
 	public Path(String name, Path<T> next, Type type) {

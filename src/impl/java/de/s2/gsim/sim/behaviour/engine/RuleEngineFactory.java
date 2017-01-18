@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import de.s2.gsim.api.sim.agent.impl.RuntimeAgent;
 import de.s2.gsim.environment.BehaviourDef;
@@ -14,7 +15,6 @@ import de.s2.gsim.environment.GenericAgentClass;
 import de.s2.gsim.environment.Instance;
 import de.s2.gsim.environment.RLRule;
 import de.s2.gsim.environment.Unit;
-import de.s2.gsim.objects.Path;
 import de.s2.gsim.objects.attribute.AttributeType;
 import de.s2.gsim.objects.attribute.DomainAttribute;
 import de.s2.gsim.sim.GSimEngineException;
@@ -185,11 +185,12 @@ public class RuleEngineFactory {
     private void extractConditionRefs(RLRule r, ExpansionParameterReferences exp) {
         for (ExpansionDef e : r.getExpansions()) {
             String path = e.getParameterName();
-			DomainAttribute a = this.agent.getDefinition().resolvePath(Path.attributePath(path.split("/")));
-            if (a.getType() == AttributeType.INTERVAL) {
+
+			Optional<DomainAttribute> a = BuildingUtils.extractAttribute(agent.getDefinition(), path);
+
+			if (a.isPresent() && a.get().getType() == AttributeType.INTERVAL) {
 				exp.setIntervalAttributes(path, e.getMin(), e.getMax());
-				// exp.setIntervalAttributes(path, Double.parseDouble(e.getFillers().get(0)), Double.parseDouble(e.getFillers().get(1)));
-            } else if (a.getType() == AttributeType.SET) {
+			} else if (a.isPresent() && a.get().getType() == AttributeType.SET) {
                 exp.setSetAttributes(path, e.getFillers());
             }
         }

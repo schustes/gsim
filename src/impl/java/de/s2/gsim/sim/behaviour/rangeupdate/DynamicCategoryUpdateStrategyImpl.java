@@ -37,6 +37,8 @@ public class DynamicCategoryUpdateStrategyImpl implements DynamicValueRangeUpdat
     @Override
     public void apply(RuntimeAgent agent, String baseRuleName, ExpansionDef exp, RLParameterRanges rlRanges, Context context) {
 
+		// Replace the class name in exp with the actual instance name
+
         Attribute attribute = agent.resolvePath(Path.attributePath(exp.getParameterName().split("/")));
 
         SetAttribute current = (SetAttribute) attribute;

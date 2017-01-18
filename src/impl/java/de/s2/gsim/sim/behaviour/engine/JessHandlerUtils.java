@@ -1,5 +1,6 @@
 package de.s2.gsim.sim.behaviour.engine;
 
+import java.util.Optional;
 import java.util.Set;
 
 import de.s2.gsim.api.sim.agent.impl.RuntimeAgent;
@@ -104,7 +105,13 @@ public class JessHandlerUtils {
 
 	private static void assertConstantsAttRef(Rete rete, Instance owner, String n) {
 
-		String att = BuildingUtils.extractChildAttributePathWithoutParent(owner.getDefinition(), n).get().toString();
+		Optional<Path<?>> childAttr = BuildingUtils.extractChildAttributePathWithoutParent(owner.getDefinition(), n);
+		if (!childAttr.isPresent()) {
+			// this is possible if n is not a path to an attribute, but only to an instance
+			return;
+		}
+
+		String att = childAttr.get().toString();
 
 		Path<Attribute> path = Path.attributePath(n.split("/"));
 
@@ -140,7 +147,13 @@ public class JessHandlerUtils {
 
 		for (Instance inst : owner.getChildInstances(listName)) {
 			assertObjectParam(rete, objectWithList, inst.getName());
+
+			if (n.length() <= objectWithList.length() + 1) {
+				// no attribute in path, so nothing more to insert
+				continue;
+			}
 			String attributePathInChild = n.substring(objectWithList.length() + 1);
+
 			Attribute ref = inst.resolvePath(Path.attributeListPath(attributePathInChild.split("/")));
 
 			String fullPath = listName + "/" + inst.getName() + "/" + attributePathInChild;

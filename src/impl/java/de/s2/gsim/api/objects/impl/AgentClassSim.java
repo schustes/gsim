@@ -47,6 +47,19 @@ public class AgentClassSim extends Observable implements AgentClass, ObjectClass
 	}
 
 	@Override
+	public void defineAttributeList(String list) throws GSimException {
+
+		try {
+			real.defineAttributeList(list);
+			onChange();
+		} catch (Exception e) {
+			throw new GSimException(e);
+		}
+
+		onChange();
+	}
+
+	@Override
 	public void defineObjectList(String list, ObjectClass object) throws GSimException {
 		try {
 			real.defineObjectList(list, (Frame) ((UnitWrapper) object).toUnit());

@@ -19,6 +19,15 @@ public interface AgentClass extends ObjectClass {
 	 */
 	void defineObjectList(String listName, ObjectClass type);
 
+	/**
+	 * Defines an attribute list. This is not strictly necessary if an attribute is put to the list - then the list is created on the fly.
+	 * However, this might, if not careful, to unexpected 'List name does not exist' exceptions if the list is tried to get, but does not
+	 * exist yet.
+	 * 
+	 * @param listName the list name
+	 */
+	void defineAttributeList(String listName);
+
     /**
      * Adds the object class if the object class is not yet defined, or updates it otherwise.
      * 

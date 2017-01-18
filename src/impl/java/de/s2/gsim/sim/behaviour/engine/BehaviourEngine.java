@@ -10,6 +10,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -19,6 +20,7 @@ import de.s2.gsim.environment.BehaviourFrame;
 import de.s2.gsim.environment.ConditionDef;
 import de.s2.gsim.environment.ExpansionDef;
 import de.s2.gsim.environment.Frame;
+import de.s2.gsim.environment.GSimDefException;
 import de.s2.gsim.environment.Instance;
 import de.s2.gsim.environment.RLRule;
 import de.s2.gsim.environment.RLRuleFrame;
@@ -110,11 +112,15 @@ public class BehaviourEngine implements java.io.Serializable {
 	public void checkRLParams() {
 		for (RLRule r : owner.getBehaviour().getRLRules()) {
 			for (ExpansionDef e : r.getExpansions()) {
-				Path<DomainAttribute> framePath = Path.attributePath(e.getParameterName().split("/"));
-				DomainAttribute domainAttribute = owner.getDefinition().resolvePath(framePath);
-				DynamicValueRangeUpdateStrategy strategy = DynamicValueRangeUpdateStrategy
-				        .getStrategyForAttributeType(domainAttribute.getType());
-				strategy.apply(owner, r.getName(), e, rlRanges, rete.getGlobalContext());
+				// Path<DomainAttribute> framePath = Path.attributePath(e.getParameterName().split("/"));
+				Optional<DomainAttribute> domainAttribute = BuildingUtils.extractAttribute(owner.getDefinition(), e.getParameterName());// owner.getDefinition().resolvePath(framePath);
+				if (domainAttribute.isPresent()) {
+					DynamicValueRangeUpdateStrategy strategy = DynamicValueRangeUpdateStrategy
+					        .getStrategyForAttributeType(domainAttribute.get().getType());
+
+					// strategy.apply(owner, r.getName(), e, rlRanges, rete.getGlobalContext());
+
+				}
 			}
 		}
 	}
@@ -594,21 +600,30 @@ public class BehaviourEngine implements java.io.Serializable {
 	}
 
 	private DomainAttribute extractAtt(String path) {
-		DomainAttribute a = null;
-		if (BuildingUtils.referencesChildFrame(owner.getDefinition(), path)) {
-			String obj = BuildingUtils.resolveChildFrameWithList(this.owner.getDefinition(), path);
-			Frame f = (Frame) owner.getDefinition().resolvePath(Path.objectPath(obj.split("/")));
-			if (f == null) {
-				String list = BuildingUtils.resolveList(path);
-				f = owner.getDefinition().getListType(list);
+		Optional<DomainAttribute> a = BuildingUtils.extractAttribute(owner.getDefinition(), path);
+		return a.orElse(null);
 
-			}
-			String att = BuildingUtils.extractChildAttributePathWithoutParent(owner.getDefinition(), path).get().toString();
-			a = f.resolvePath(Path.attributePath(att.split("/")));
-		} else {
-			a = owner.getDefinition().resolvePath(Path.attributePath(path.split("/")));
-		}
-		return a;
+		// DomainAttribute ret = null;
+		// if (BuildingUtils.referencesChildFrame(owner.getDefinition(), path)) {
+		// Optional<DomainAttribute> a = BuildingUtils.extractAttribute(agent.getDefinition(), path);
+		// return a.orElse(null);
+		// String obj = BuildingUtils.resolveChildFrameWithList(this.owner.getDefinition(), path);
+		// Frame f = null;
+		// try {
+		// f = (Frame) owner.getDefinition().resolvePath(Path.objectPath(obj.split("/")));
+		// } catch (GSimDefException e) {
+		// logger.debug("Object with path + " + obj + " doesn't seem to be present yet.");
+		// }
+		// if (f == null) {
+		// String list = BuildingUtils.resolveList(path);
+		// f = owner.getDefinition().getListType(list);
+		// }
+		// String att = BuildingUtils.extractChildAttributePathWithoutParent(owner.getDefinition(), path).get().toString();
+		// a = f.resolvePath(Path.attributePath(att.split("/")));
+		// } else {
+		// a = owner.getDefinition().resolvePath(Path.attributePath(path.split("/")));
+		// }
+		// return a;
 	}
 
 	private boolean hasReactiveRules(String role) {

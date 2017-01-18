@@ -149,6 +149,18 @@ public class BuildingUtils {
 		return Optional.ofNullable(n);
 	}
 
+	public static Optional<DomainAttribute> extractAttribute(Frame owner, String path) {
+		DomainAttribute a;
+		if (BuildingUtils.referencesChildFrame(owner, path.toString())) {
+			Frame child = BuildingUtils.extractChildType(owner, path.toString());
+			a = (DomainAttribute) child
+			        .resolvePath(BuildingUtils.extractChildAttributePathWithoutParent(owner, path.toString()).get());
+		} else {
+			a = owner.resolvePath(Path.attributePath(path.split("/")));
+		}
+		return Optional.ofNullable(a);
+	}
+
 	private static boolean isChildFrame(Frame agent, Path<?> p) {
 		try {
 			Object obj = agent.resolvePath(p);
@@ -190,6 +202,18 @@ public class BuildingUtils {
 			if ((resolved instanceof TypedList)) {
 				TypedList<Frame> list = (TypedList<Frame>) resolved;
 				return list.getType().getName();
+			}
+			return null;
+		}, () -> null);
+	}
+
+	@SuppressWarnings({ "unchecked" })
+	public static Frame extractChildType(Frame owningAgent, String pathString) {
+
+		return resolveChildFrameAndDoOrElse(owningAgent, pathString, (Object resolved) -> {
+			if ((resolved instanceof TypedList)) {
+				TypedList<Frame> list = (TypedList<Frame>) resolved;
+				return list.getType();
 			}
 			return null;
 		}, () -> null);

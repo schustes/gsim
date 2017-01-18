@@ -104,6 +104,9 @@ public class RuntimeAgent extends GenericAgent implements AgentType, RtAgent {
 				c = (GenericAgentClass) getDefinition().getAncestor(roleName);
 			} else if (this.getDefinition().getName().equals(roleName)) {
 				c = (GenericAgentClass) getDefinition();
+			} else {
+				// not my turn
+				return;
 			}
 
 			if (c.getBehaviour().getDeclaredRules().length > 0 || c.getBehaviour().getDeclaredRLRules().length > 0) {

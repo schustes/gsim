@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import de.s2.gsim.api.sim.agent.impl.RuntimeAgent;
@@ -12,6 +13,8 @@ import de.s2.gsim.environment.BehaviourDef;
 import de.s2.gsim.environment.ExpansionDef;
 import de.s2.gsim.environment.Instance;
 import de.s2.gsim.environment.RLRule;
+import de.s2.gsim.objects.attribute.AttributeType;
+import de.s2.gsim.objects.attribute.DomainAttribute;
 import de.s2.gsim.sim.GSimEngineException;
 import de.s2.gsim.sim.behaviour.rulebuilder.BuildingUtils;
 import de.s2.gsim.util.CombinationGenerator;
@@ -478,7 +481,9 @@ public abstract class RuleEngineHelper {
 			String to = String.valueOf(cond.getMax());
 			Fact sf = null;
 
-			if (Utils.isNumericalAttribute(owner, cond.getParameterName())) {
+
+			if (referencesNumericalAttribute(owner, cond.getParameterName())) {
+				// if (Utils.isNumericalAttribute(owner, cond.getParameterName())) {
 				sf = addStateFactElement(rete, stateName, cond.getParameterName() + "->" + from + ":" + to, cond.getParameterName(),
 				        cond.getMin(), cond.getMax());
 				rete.assertFact(sf);
@@ -493,6 +498,15 @@ public abstract class RuleEngineHelper {
 		f.setSlotValue("expansion", new Value(v1, RU.LIST));
 
 		rete.assertFact(f);
+
+	}
+	
+	private static boolean referencesNumericalAttribute(RuntimeAgent owner, String path) {
+		Optional<DomainAttribute> a = BuildingUtils.extractAttribute(owner.getDefinition(), path);
+		if (a.isPresent()) {
+			return a.get().getType().equals(AttributeType.INTERVAL) || a.get().getType().equals(AttributeType.NUMERICAL);
+		}
+		return false;
 
 	}
 

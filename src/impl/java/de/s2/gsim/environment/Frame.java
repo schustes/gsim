@@ -198,6 +198,7 @@ public class Frame extends Unit<Frame , DomainAttribute> {
 	protected static <F extends Frame> F copyInternal(@NotNull F from, @NotNull F to) {
 
 		from.getDeclaredAttributesListNames().stream().forEach(attList -> {
+			to.defineAttributeList(attList);
 			from.getDeclaredAttributes(attList).forEach(att -> to.addOrSetAttribute(attList, att));
 		});
 

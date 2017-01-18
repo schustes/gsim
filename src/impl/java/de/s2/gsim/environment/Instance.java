@@ -143,10 +143,19 @@ public class Instance extends Unit<Instance, Attribute> {
 		// of this type.", this.getName(), instance.getDefinition().getName(), instance.getName()));
 		// }
 
-		if (!getObjectLists().containsKey(listname)
-		        || ((TypedList<Instance>) getObjectLists().get(listname)).getType().isSuccessor(instance.getDefinition().getName())) {
-			throw new IllegalArgumentException(String.format("Listname %s is not defined for this type of instance", listname));
+		if (!getObjectLists().containsKey(listname)) {
+			throw new IllegalArgumentException(
+			        String.format("Tried to add an instance of type %s to a list %s, but this list is not defined.",
+			                instance.getDefinition().getName(), listname));
 		}
+
+		// Frame expectedType = ((TypedList<Instance>) getObjectLists().get(listname)).getType();
+		// if (!getObjectLists().containsKey(listname)
+		// && !instance.inheritsFrom(expectedType)) {
+		// throw new IllegalArgumentException(
+		// String.format("Expected list type %s for list %s, but tried to add an instance of type %s to a list %s",
+		// expectedType.getName(), listname, instance.getDefinition().getName(), listname));
+		// }
 
 		Instance in = instance.clone();
 		List<Instance> list = getObjectLists().get(listname); 
@@ -358,9 +367,7 @@ public class Instance extends Unit<Instance, Attribute> {
 	public boolean inheritsFrom(@NotNull String frameName) {
 
 		try {
-			Frame f = frame.getAncestor(frameName);
-			System.out.println(f);
-			return true;
+			return frame.getAncestor(frameName) != null;
 		} catch (NoSuchElementException e) {
 			return false;
 		}
@@ -405,11 +412,11 @@ public class Instance extends Unit<Instance, Attribute> {
 
 	public boolean removeChildInstance(@NotNull String listname, @NotNull String instanceName) {
 
-		Instance instance = this.getChildInstance(listname, instanceName);
-
-		if (!frame.containsChildFrame(listname, instance.getDefinition())) {
-			throw new IllegalArgumentException(String.format("Instance %s cannot contain instance of type %s, but the instance to add %s is of this type.", this.getName(), instance.getDefinition().getName(), instance.getName()));
-		}
+		// Instance instance = this.getChildInstance(listname, instanceName);
+		// if (!frame.containsChildFrame(listname, instance.getDefinition())) {
+		// throw new IllegalArgumentException(String.format("Instance %s cannot contain instance of type %s, but the instance to add %s is
+		// of this type.", this.getName(), instance.getDefinition().getName(), instance.getName()));
+		// }
 
 		if (!getObjectLists().containsKey(listname)) {
 			throw new IllegalArgumentException(String.format("Listname %s is not defined for this type of instance", listname));
