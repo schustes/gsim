@@ -1,6 +1,5 @@
 package de.s2.gsim.api.objects.impl;
 
-import static de.s2.gsim.api.objects.impl.Invariant.objectNotDestroyed;
 import static de.s2.gsim.api.objects.impl.Invariant.precondition;
 
 import java.util.Observable;

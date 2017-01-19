@@ -1,8 +1,9 @@
 package de.s2.gsim.api.objects.impl;
 
-import static de.s2.gsim.api.objects.impl.Invariant.*;
+import static de.s2.gsim.api.objects.impl.Invariant.intervalIntegrity;
+import static de.s2.gsim.api.objects.impl.Invariant.precondition;
+import static de.s2.gsim.api.objects.impl.Invariant.setIntegrity;
 import static de.s2.gsim.api.objects.impl.ObserverUtils.observeDependentObjectInstance;
-
 import static de.s2.gsim.api.objects.impl.ObserverUtils.stopObservingDependentObjectInstance;
 
 import java.util.ArrayList;

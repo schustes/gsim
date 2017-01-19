@@ -1,7 +1,6 @@
 package de.s2.gsim.api.objects.impl;
 
-import static de.s2.gsim.api.objects.impl.Invariant.*;
-
+import static de.s2.gsim.api.objects.impl.Invariant.precondition;
 import static de.s2.gsim.api.objects.impl.ObserverUtils.observeDependentObject;
 import static de.s2.gsim.api.objects.impl.ObserverUtils.stopObservingDependent;
 import static de.s2.gsim.api.objects.impl.ObserverUtils.stopObservingDependentObject;

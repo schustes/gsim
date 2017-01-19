@@ -1,7 +1,8 @@
 package de.s2.gsim.environment;
 
 
-import static de.s2.gsim.environment.CommonFunctions.*;
+import static de.s2.gsim.environment.CommonFunctions.existsPath;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;

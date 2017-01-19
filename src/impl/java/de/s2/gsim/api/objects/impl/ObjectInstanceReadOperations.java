@@ -5,7 +5,6 @@ import static de.s2.gsim.api.objects.impl.Invariant.precondition;
 import java.util.List;
 
 import de.s2.gsim.GSimException;
-import de.s2.gsim.environment.GenericAgent;
 import de.s2.gsim.environment.Instance;
 import de.s2.gsim.objects.Path;
 import de.s2.gsim.objects.attribute.Attribute;

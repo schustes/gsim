@@ -1,7 +1,5 @@
 package de.s2.gsim.environment;
 
-import de.s2.gsim.objects.attribute.AttributeType;
-import de.s2.gsim.objects.attribute.DomainAttribute;
 import de.s2.gsim.objects.attribute.StringAttribute;
 
 public class ConditionDef extends Instance {

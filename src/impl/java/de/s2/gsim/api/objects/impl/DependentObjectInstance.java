@@ -1,7 +1,7 @@
 package de.s2.gsim.api.objects.impl;
 
-import java.util.ArrayList;
-import static de.s2.gsim.api.objects.impl.Invariant.*;
+import static de.s2.gsim.api.objects.impl.Invariant.precondition;
+import static de.s2.gsim.api.objects.impl.Invariant.setIntegrity;
 
 import java.util.List;
 
