@@ -11,6 +11,7 @@ import de.s2.gsim.objects.Path;
 import de.s2.gsim.objects.attribute.DomainAttribute;
 import de.s2.gsim.sim.behaviour.rulebuilder.ExpansionParameterReferences;
 import de.s2.gsim.sim.behaviour.rulebuilder.TreeExpansionBuilder;
+import de.s2.gsim.sim.behaviour.util.PathDefinitionResolutionUtils;
 import jess.Context;
 import jess.Fact;
 import jess.JessException;
@@ -70,8 +71,9 @@ public abstract class DynamicValueRangeExtensionRuleBuilder {
 			String s = statefactelems[i].getDeftemplate().getBaseName();
 			String pm = statefactelems[i].getSlotValue("param-name").stringValue(context);
 
-			DomainAttribute attr = (DomainAttribute) a.getDefinition().resolvePath(Path.attributePath(pm.split("/")));
-			String simpleAttrName = attr.getName();
+			// DomainAttribute attr = (DomainAttribute) a.getDefinition().resolvePath(Path.attributePath(pm.split("/")));
+			DomainAttribute attr = PathDefinitionResolutionUtils.extractAttribute(a.getDefinition(), pm).get();
+			// String simpleAttrName = attr.getName();
 
 			if (s.equals("state-fact-element")) {
 				double m = statefactelems[i].getSlotValue("from").floatValue(context);
@@ -83,7 +85,7 @@ public abstract class DynamicValueRangeExtensionRuleBuilder {
 
 				List<String> f = consts.getFillers(pm);
 				f = maybeAddFiller(f, c);
-				if (simpleAttrName.equals(domainAttr)) {
+				if (pm.equals(domainAttr)) {
 					f = maybeAddFiller(f, newFiller);
 				}
 				consts.setSetAttributes(pm, f);

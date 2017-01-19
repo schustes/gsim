@@ -157,6 +157,8 @@ public class BehaviourEngine implements java.io.Serializable {
 
 			Constant roleParameter = new Constant("executing-role", role);
 
+			System.out.println("Running agent " + owner.getName());
+
 			reset();
 
 			checkRLParams();
@@ -222,8 +224,9 @@ public class BehaviourEngine implements java.io.Serializable {
 
 			printTree(role);
 
-			logger.debug("EXECUTE RULES FOR AGENT " + owner.getName() + ", role:" + role + ": "
+			System.out.println("EXECUTE RULES FOR AGENT " + owner.getName() + ", role:" + role + ": "
 			        + ((System.currentTimeMillis() - total) / 1000d));
+
 
 			dirty = true;
 

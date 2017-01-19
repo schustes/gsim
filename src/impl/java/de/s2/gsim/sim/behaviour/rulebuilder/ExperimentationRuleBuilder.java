@@ -43,6 +43,7 @@ public abstract class ExperimentationRuleBuilder {
 
 			nRule += "  =>\n";
 			String realOwnerName = createRuleIdentifier(rule);
+			// nRule += " (printout t >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>)\n";
 			nRule += " (bind ?action (selectBestAction_" + realOwnerName + " ?sfn))\n";
 			nRule += " (if (neq ?action NIL) then\n";
 			nRule += "  (bind ?c (fact-slot-value ?action count))\n";
