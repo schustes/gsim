@@ -36,6 +36,7 @@ public class DependentObjectInstance implements ObjectInstance, UnitWrapper {
     public DependentObjectInstance(AgentInstance env, String list, Instance real) {
         this.env = env;
         this.real = real;
+		this.list = list;
     }
 
     @Override
@@ -354,10 +355,12 @@ public class DependentObjectInstance implements ObjectInstance, UnitWrapper {
         }
 
         try {
-            StringAttribute a = (StringAttribute) real.getAttribute(list, attName);
-            if (a == null) {
-                a = new StringAttribute(attName, value);
-            }
+        	StringAttribute a;
+			if (!real.containsAttribute(list, attName)) {
+        		a = new StringAttribute(attName, value);
+        	} else {
+        		a = (StringAttribute) real.getAttribute(list, attName);
+        	}
 
             a.setValue(value);
             real.addOrSetAttribute(list, a);

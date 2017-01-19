@@ -32,6 +32,20 @@ public class DependentObjectClass implements ObjectClass, UnitWrapper {
     }
 
     @Override
+	public void defineAttributeList(String list) throws GSimException {
+		if (destroyed) {
+			throw new GSimException("This object was removed from the runtime context.");
+		}
+
+		try {
+			real.defineAttributeList(list);
+			env.addOrSetObject(this.list, this);
+		} catch (Exception e) {
+			throw new GSimException(e);
+		}
+	}
+
+	@Override
     public void addAttribute(String list, DomainAttribute a) throws GSimException {
         if (destroyed) {
             throw new GSimException("This object was removed from the runtime context.");

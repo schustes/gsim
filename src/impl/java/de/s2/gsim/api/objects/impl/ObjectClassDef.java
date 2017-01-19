@@ -53,7 +53,25 @@ public class ObjectClassDef extends Observable implements ObjectClass, UnitWrapp
     protected void setReal(Frame real) {
     	this.real = real;
     }
-	
+
+	@Override
+	public void defineAttributeList(String list) throws GSimException {
+		if (destroyed) {
+			throw new GSimException("This object was removed from the runtime context.");
+		}
+
+		try {
+			if (!getReal().getAttributeLists().containsKey(list)) {
+				env.getObjectClassOperations().addAttributeList(getReal(), list);
+			}
+		} catch (Exception e) {
+			throw new GSimException(e);
+		}
+
+		onChange();
+
+	}
+
     @Override
     public void addAttribute(String list, DomainAttribute a) throws GSimException {
         if (destroyed) {

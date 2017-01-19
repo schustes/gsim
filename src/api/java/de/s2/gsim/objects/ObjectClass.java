@@ -12,6 +12,13 @@ import de.s2.gsim.objects.attribute.DomainAttribute;
  */
 public interface ObjectClass extends Serializable {
 
+	/**
+	 * Defines an attribute list.
+	 * 
+	 * @param name name of the list
+	 */
+	void defineAttributeList(String name);
+
     /**
      * Add an attribute the object class.
      * 
