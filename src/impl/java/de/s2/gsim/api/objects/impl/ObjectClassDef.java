@@ -1,6 +1,8 @@
 package de.s2.gsim.api.objects.impl;
 
-import java.util.ArrayList;
+import static de.s2.gsim.api.objects.impl.Invariant.objectNotDestroyed;
+import static de.s2.gsim.api.objects.impl.Invariant.precondition;
+
 import java.util.Observable;
 
 import de.s2.gsim.GSimException;
@@ -9,7 +11,6 @@ import de.s2.gsim.environment.Frame;
 import de.s2.gsim.environment.Unit;
 import de.s2.gsim.objects.ObjectClass;
 import de.s2.gsim.objects.Path;
-import de.s2.gsim.objects.attribute.Attribute;
 import de.s2.gsim.objects.attribute.DomainAttribute;
 
 /**
@@ -20,45 +21,47 @@ import de.s2.gsim.objects.attribute.DomainAttribute;
  * @author sschuster
  *
  */
-public class ObjectClassDef extends Observable implements ObjectClass, UnitWrapper {
+public class ObjectClassDef extends Observable implements ObjectClass, UnitWrapper, ManagedObject {
 
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-    protected boolean destroyed = false;
+	protected boolean destroyed = false;
 
-    protected Environment env;
+	protected Environment env;
 
-    private Frame real;
-    
-    /**
-     * Constructor.
-     * 
-     * @param env environment instance
-     * @param getReal() the reference to the actual frame
-     */
-    public ObjectClassDef(Environment env, Frame real) {
-        this.env = env;
-        this.real = real;
-    }
-    
-    protected Frame getRealRef() {
-    	return this.real;
-    }
-    
-    protected Frame getReal() {
-    	this.real = env.getObjectClassOperations().getObjectSubClass(real.getName());
-    	return this.real;
-    }
-    
-    protected void setReal(Frame real) {
-    	this.real = real;
-    }
+	private Frame real;
+
+	private ObjectClassReadOperations readOperations;
+
+	/**
+	 * Constructor.
+	 * 
+	 * @param env environment instance
+	 * @param getReal() the reference to the actual frame
+	 */
+	public ObjectClassDef(Environment env, Frame real) {
+		this.env = env;
+		this.real = real;
+		readOperations = new ObjectClassReadOperations(this);
+	}
+
+	protected Frame getRealRef() {
+		return this.real;
+	}
+
+	protected Frame getReal() {
+		this.real = env.getObjectClassOperations().getObjectSubClass(real.getName());
+		return this.real;
+	}
+
+	protected void setReal(Frame real) {
+		this.real = real;
+	}
 
 	@Override
 	public void defineAttributeList(String list) throws GSimException {
-		if (destroyed) {
-			throw new GSimException("This object was removed from the runtime context.");
-		}
+
+		precondition(this, list);
 
 		try {
 			if (!getReal().getAttributeLists().containsKey(list)) {
@@ -72,188 +75,113 @@ public class ObjectClassDef extends Observable implements ObjectClass, UnitWrapp
 
 	}
 
-    @Override
-    public void addAttribute(String list, DomainAttribute a) throws GSimException {
-        if (destroyed) {
-            throw new GSimException("This object was removed from the runtime context.");
-        }
+	@Override
+	public void addAttribute(String list, DomainAttribute a) throws GSimException {
 
-        try {
-        	if (!getReal().getAttributeLists().containsKey(list)) {
+		precondition(this, list, a);
+
+		try {
+			if (!getReal().getAttributeLists().containsKey(list)) {
 				env.getObjectClassOperations().addAttributeList(getReal(), list);
-        	}
-        	this.real = env.getObjectClassOperations().addAttribute(getReal(), Path.attributeListPath(list), a);
-        } catch (Exception e) {
-            throw new GSimException(e);
-        }
+			}
+			this.real = env.getObjectClassOperations().addAttribute(getReal(), Path.attributeListPath(list), a);
+		} catch (Exception e) {
+			throw new GSimException(e);
+		}
 
-        onChange();
-        
-    }
+		onChange();
 
-    @Override
-    public void destroy() throws GSimException {
-        if (destroyed) {
-            throw new GSimException("This object was removed from the runtime context.");
-        }
+	}
 
-        try {
-            env.getObjectClassOperations().removeObjectClass(getReal());
-            this.real = null;
-        } catch (Exception e) {
-            throw new GSimException(e);
-        }
+	@Override
+	public void destroy() throws GSimException {
 
-        destroyed = true;
-        
-        onDestroy();
-    }
+		precondition(this);
 
-    @Override
-    public DomainAttribute getAttribute(String list, String attName) throws GSimException {
-        if (destroyed) {
-            throw new GSimException("This object was removed from the runtime context.");
-        }
+		try {
+			env.getObjectClassOperations().removeObjectClass(getReal());
+			this.real = null;
+		} catch (Exception e) {
+			throw new GSimException(e);
+		}
 
-        try {
-            return getReal().getAttribute(list, attName);
-        } catch (Exception e) {
-            throw new GSimException(e);
-        }
+		destroyed = true;
 
-    }
+		onDestroy();
+	}
 
-    @Override
-    public String[] getAttributeListNames() throws GSimException {
-        if (destroyed) {
-            throw new GSimException("This object was removed from the runtime context.");
-        }
+	@Override
+	public DomainAttribute getAttribute(String list, String attName) throws GSimException {
+		return readOperations.getAttribute(getReal(), list, attName);
 
-        try {
-            return getReal().getAttributesListNames().toArray(new String[0]);
-        } catch (Exception e) {
-            throw new GSimException(e);
-        }
-    }
+	}
 
-    @Override
-    public DomainAttribute[] getAttributes(String list) throws GSimException {
+	@Override
+	public String[] getAttributeListNames() throws GSimException {
+		return readOperations.getAttributeListNames(getReal());
+	}
 
-        if (destroyed) {
-            throw new GSimException("This object was removed from the runtime context.");
-        }
+	@Override
+	public DomainAttribute[] getAttributes(String list) throws GSimException {
+		return readOperations.getAttributes(getReal(), list);
+	}
 
-        try {
-            return getReal().getAttributes(list).toArray(new DomainAttribute[0]);
-        } catch (Exception e) {
-            throw new GSimException(e);
-        }
-    }
+	@Override
+	public String getDefaultValue(String list, String attName) throws GSimException {
+		return readOperations.getDefaultValue(getReal(), list, attName);
+	}
 
-    @Override
-    public String getDefaultValue(String list, String attName) throws GSimException {
+	@Override
+	public String getName() throws GSimException {
+		return readOperations.getName(getReal());
+	}
 
-        if (destroyed) {
-            throw new GSimException("This object was removed from the runtime context.");
-        }
+	@Override
+	public boolean isDeclaredAttribute(String list, String attName) throws GSimException {
+		return readOperations.isDeclaredAttribute(getReal(), list, attName);
+	}
 
-        try {
-            DomainAttribute a = getReal().getAttribute(list, attName);
-            return a.getDefaultValue();
-        } catch (Exception e) {
-            throw new GSimException(e);
-        }
-    }
+	@Override
+	public Object resolveName(String path) throws GSimException {
+		return readOperations.resolveName(getReal(), path);
+	}
 
-    @Override
-    public String getName() throws GSimException {
+	@Override
+	public void setAttribute(String list, DomainAttribute a) throws GSimException {
 
-        if (destroyed) {
-            throw new GSimException("This object was removed from the runtime context.");
-        }
+		precondition(this, list, a);
 
-        try {
-            return getReal().getName();
-        } catch (Exception e) {
-            throw new GSimException(e);
-        }
-    }
+		try {
+			real = env.getObjectClassOperations().modifyObjectClassAttribute(getReal(), Path.attributePath(list, a.getName()), a);
+		} catch (Exception e) {
+			throw new GSimException(e);
+		}
 
-    @Override
-    public boolean isDeclaredAttribute(String list, String attName) throws GSimException {
-        return getReal().isDeclaredAttribute(list, attName);
-    }
+		onChange();
+	}
 
-    @Override
-    public Object resolveName(String path) throws GSimException {
+	@Override
+	public void setDefaultAttributeValue(String list, String attName, String value) throws GSimException {
 
-        if (destroyed) {
-            throw new GSimException("This object was removed from the runtime context.");
-        }
+		precondition(this, list, attName, value);
 
-        try {
-        	Object o = getReal().resolvePath(Path.attributePath(path.split("/")));
+		try {
+			DomainAttribute a = getReal().getAttribute(list, attName);
+			a.setDefault(value);
+			real = env.getObjectClassOperations().modifyObjectClassAttribute(getReal(), Path.attributePath(list, a.getName()), a);
+		} catch (Exception e) {
+			throw new GSimException(e);
+		}
 
-			if (o == null) {
-				o = getReal().resolvePath(Path.attributeListPath(path.split("/")));
-			} 
+		onChange();
 
-			if (o == null) {
-                return null;
-            }
+	}
 
-            if (o instanceof Attribute || o instanceof ArrayList) {
-				return ((Attribute) o).clone();
-            } else {
-                throw new GSimException("Can't handle return value " + o);
-            }
+	@Override
+	public Unit<?, ?> toUnit() {
+		return real;
+	}
 
-        } catch (Exception e) {
-            throw new GSimException(e);
-        }
-
-    }
-
-    @Override
-    public void setAttribute(String list, DomainAttribute a) throws GSimException {
-
-        if (destroyed) {
-            throw new GSimException("This object was removed from the runtime context.");
-        }
-
-        try {
-        	real = env.getObjectClassOperations().modifyObjectClassAttribute(getReal(), Path.attributePath(list, a.getName()), a);
-        } catch (Exception e) {
-            throw new GSimException(e);
-        }
-        
-        onChange();
-    }
-
-    @Override
-    public void setDefaultAttributeValue(String list, String attName, String value) throws GSimException {
-
-        if (destroyed) {
-            throw new GSimException("This object was removed from the runtime context.");
-        }
-
-        try {
-            DomainAttribute a = getReal().getAttribute(list, attName);
-            a.setDefault(value);
-           real = env.getObjectClassOperations().modifyObjectClassAttribute(getReal(), Path.attributePath(list, a.getName()), a);
-        } catch (Exception e) {
-            throw new GSimException(e);
-        }
-        
-        onChange();
-
-    }
-
-    @Override
-    public Unit<?, ?> toUnit() {
-        return real;
-    }
-    
 	protected void onChange() {
 		setChanged();
 		notifyObservers();
@@ -262,6 +190,11 @@ public class ObjectClassDef extends Observable implements ObjectClass, UnitWrapp
 	protected void onDestroy() {
 		setChanged();
 		notifyObservers(false);
+	}
+
+	@Override
+	public boolean isDestroyed() {
+		return destroyed;
 	}
 
 }

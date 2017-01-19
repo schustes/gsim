@@ -1,6 +1,8 @@
 package de.s2.gsim.api.objects.impl;
 
 import java.util.ArrayList;
+import static de.s2.gsim.api.objects.impl.Invariant.*;
+
 import java.util.List;
 
 import de.s2.gsim.GSimException;
@@ -21,7 +23,7 @@ import de.s2.gsim.objects.attribute.StringAttribute;
  * A dependent object instance wraps a child instance of an owning agent. The dependent object instance updates only its parent, which then may trigger more
  * notifications and events.
  */
-public class DependentObjectInstance implements ObjectInstance, UnitWrapper {
+public class DependentObjectInstance implements ObjectInstance, UnitWrapper, ManagedObject {
 
     private static final long serialVersionUID = 1L;
 
@@ -49,9 +51,7 @@ public class DependentObjectInstance implements ObjectInstance, UnitWrapper {
     @Override
     public void destroy() throws GSimException {
 
-        if (destroyed) {
-            throw new GSimException("This object was removed from the runtime context.");
-        }
+		precondition(this);
 
         try {
             env.removeObject(list, this);
@@ -67,14 +67,10 @@ public class DependentObjectInstance implements ObjectInstance, UnitWrapper {
     @Override
     public Attribute getAttribute(String attName) throws GSimException {
 
-        if (destroyed) {
-            throw new GSimException("This object was removed from the runtime context.");
-        }
+		precondition(this, attName);
 
         try {
-
             return real.getAttribute(attName);
-
         } catch (Exception e) {
             throw new GSimException(e);
         }
@@ -84,9 +80,7 @@ public class DependentObjectInstance implements ObjectInstance, UnitWrapper {
     @Override
     public Attribute getAttribute(String list, String attName) throws GSimException {
 
-        if (destroyed) {
-            throw new GSimException("This object was removed from the runtime context.");
-        }
+		precondition(this, list, attName);
 
         try {
             return real.getAttribute(list, attName);
@@ -99,9 +93,7 @@ public class DependentObjectInstance implements ObjectInstance, UnitWrapper {
     @Override
     public String[] getAttributeListNames() throws GSimException {
 
-        if (destroyed) {
-            throw new GSimException("This object was removed from the runtime context.");
-        }
+		precondition(this);
 
         try {
             return real.getAttributesListNames().toArray(new String[0]);
@@ -114,9 +106,7 @@ public class DependentObjectInstance implements ObjectInstance, UnitWrapper {
     @Override
     public Attribute[] getAttributes(String list) throws GSimException {
 
-        if (destroyed) {
-            throw new GSimException("This object was removed from the runtime context.");
-        }
+		precondition(this, list);
 
         try {
             return real.getAttributes(list).toArray(new Attribute[0]);
@@ -129,9 +119,7 @@ public class DependentObjectInstance implements ObjectInstance, UnitWrapper {
     @Override
     public double getIntervalAttributeFrom(String list, String attName) throws GSimException {
 
-        if (destroyed) {
-            throw new GSimException("This object was removed from the runtime context.");
-        }
+		precondition(this, list, attName);
 
         try {
             IntervalAttribute a = (IntervalAttribute) real.getAttribute(list, attName);
@@ -145,9 +133,7 @@ public class DependentObjectInstance implements ObjectInstance, UnitWrapper {
     @Override
     public double getIntervalAttributeTo(String list, String attName) throws GSimException {
 
-        if (destroyed) {
-            throw new GSimException("This object was removed from the runtime context.");
-        }
+		precondition(this, list, attName);
 
         try {
             IntervalAttribute a = (IntervalAttribute) real.getAttribute(list, attName);
@@ -160,9 +146,7 @@ public class DependentObjectInstance implements ObjectInstance, UnitWrapper {
     @Override
     public String getName() throws GSimException {
 
-        if (destroyed) {
-            throw new GSimException("This object was removed from the runtime context.");
-        }
+		precondition(this);
 
         try {
             return real.getName();
@@ -174,9 +158,7 @@ public class DependentObjectInstance implements ObjectInstance, UnitWrapper {
     @Override
     public double getNumericalAttribute(String list, String attName) throws GSimException {
 
-        if (destroyed) {
-            throw new GSimException("This object was removed from the runtime context.");
-        }
+		precondition(this, list, attName);
 
         try {
             NumericalAttribute a = (NumericalAttribute) real.getAttribute(list, attName);
@@ -189,9 +171,7 @@ public class DependentObjectInstance implements ObjectInstance, UnitWrapper {
     @Override
     public String[] getSetAttributeValues(String list, String attName) throws GSimException {
 
-        if (destroyed) {
-            throw new GSimException("This object was removed from the runtime context.");
-        }
+		precondition(this, list, attName);
 
         try {
             SetAttribute set = (SetAttribute) real.getAttribute(list, attName);
@@ -208,9 +188,7 @@ public class DependentObjectInstance implements ObjectInstance, UnitWrapper {
     @Override
     public String getStringAttribute(String list, String attName) throws GSimException {
 
-        if (destroyed) {
-            throw new GSimException("This object was removed from the runtime context.");
-        }
+		precondition(this, list, attName);
 
         try {
             StringAttribute a = (StringAttribute) real.getAttribute(list, attName);
@@ -222,34 +200,19 @@ public class DependentObjectInstance implements ObjectInstance, UnitWrapper {
 
     @Override
     public boolean inheritsFrom(String agentclassName) {
+
+		precondition(this, agentclassName);
+
         return real.inheritsFromOrIsOfType(agentclassName);
     }
 
     @Override
     public Object resolveName(String path) throws GSimException {
 
-        if (destroyed) {
-            throw new GSimException("This object was removed from the runtime context.");
-        }
+		precondition(this, path);
 
         try {
-
-        	Object o = real.resolvePath(Path.attributePath(path.split("/")));
-
-			if (o == null) {
-				o = real.resolvePath(Path.attributeListPath(path.split("/")));
-			} 
-
-            if (o == null) {
-                return null;
-            }
-
-            if (o instanceof Attribute || o instanceof ArrayList) {
-                return o;
-            } else {
-                throw new GSimException("Can't handle return value " + o);
-            }
-
+			return real.resolvePath(Path.of(path.split("/")));
         } catch (Exception e) {
             throw new GSimException(e);
         }
@@ -258,9 +221,7 @@ public class DependentObjectInstance implements ObjectInstance, UnitWrapper {
     @Override
     public void setAttribute(String list, Attribute a) throws GSimException {
 
-        if (destroyed) {
-            throw new GSimException("This object was removed from the runtime context.");
-        }
+		precondition(this, a);
 
         try {
             real.addOrSetAttribute(list, a);
@@ -274,20 +235,22 @@ public class DependentObjectInstance implements ObjectInstance, UnitWrapper {
     @Override
     public void setIntervalAttributeValue(String list, String attName, double from, double to) throws GSimException {
 
-        if (destroyed) {
-            throw new GSimException("This object was removed from the runtime context.");
-        }
+		precondition(this, list, attName);
 
         try {
-            IntervalAttribute a = (IntervalAttribute) real.getAttribute(list, attName);
-            if (a == null) {
+			IntervalAttribute a;
+			if (!real.containsAttribute(list, attName)) {
                 a = new IntervalAttribute(attName, from, to);
+			} else {
+				a = (IntervalAttribute) real.getAttribute(list, attName);
             }
 
             a.setFrom(from);
             a.setTo(to);
+
             real.addOrSetAttribute(list, a);
             env.addOrSetObject(this.list, this);
+
         } catch (Exception e) {
             throw new GSimException(e);
         }
@@ -295,19 +258,21 @@ public class DependentObjectInstance implements ObjectInstance, UnitWrapper {
     }
 
     @Override
-    public synchronized void setNumericalAttributeValue(String list, String attName, double value) throws GSimException {
+	public void setNumericalAttributeValue(String list, String attName, double value) throws GSimException {
 
-        if (destroyed) {
-            throw new GSimException("This object was removed from the runtime context.");
-        }
+		precondition(this, list, attName);
 
         try {
-            NumericalAttribute a = (NumericalAttribute) real.getAttribute(list, attName);
-            if (a == null) {
+
+			NumericalAttribute a;
+			if (real.containsAttribute(list, attName)) {
                 a = new NumericalAttribute(attName, value);
+			} else {
+				a = (NumericalAttribute) real.getAttribute(list, attName);
             }
 
             a.setValue(value);
+
             real.addOrSetAttribute(list, a);
             env.addOrSetObject(this.list, this);
 
@@ -318,18 +283,19 @@ public class DependentObjectInstance implements ObjectInstance, UnitWrapper {
     }
 
     @Override
-    public synchronized void setSetAttributeValues(String list, String attName, String... values) throws GSimException {
+	public void setSetAttributeValues(String list, String attName, String... values) throws GSimException {
 
-        if (destroyed) {
-            throw new GSimException("This object was removed from the runtime context.");
-        }
+		precondition(this, list, attName);
+		setIntegrity(values);
 
         try {
-            SetAttribute a = (SetAttribute) real.getAttribute(list, attName);
-            if (a == null) {
+			SetAttribute a;
+			if (real.containsAttribute(list, attName)) {
                 Frame f = real.getDefinition();
                 DomainAttribute def = f.getAttribute(list, attName);
                 a = new SetAttribute(attName, def.getFillers());
+			} else {
+				a = (SetAttribute) real.getAttribute(list, attName);
             }
 
             a.removeAllEntries();
@@ -348,11 +314,9 @@ public class DependentObjectInstance implements ObjectInstance, UnitWrapper {
     }
 
     @Override
-    public synchronized void setStringAttributeValue(String list, String attName, String value) throws GSimException {
+	public void setStringAttributeValue(String list, String attName, String value) throws GSimException {
 
-        if (destroyed) {
-            throw new GSimException("This object was removed from the runtime context.");
-        }
+		precondition(this, list, attName, value);
 
         try {
         	StringAttribute a;
@@ -376,5 +340,10 @@ public class DependentObjectInstance implements ObjectInstance, UnitWrapper {
     public Unit<?,?> toUnit() {
         return real;
     }
+
+	@Override
+	public boolean isDestroyed() {
+		return destroyed;
+	}
 
 }

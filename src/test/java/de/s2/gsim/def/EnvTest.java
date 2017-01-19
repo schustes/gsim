@@ -17,6 +17,7 @@ import org.junit.rules.ExpectedException;
 
 import de.s2.gsim.GSimCore;
 import de.s2.gsim.GSimCoreFactory;
+import de.s2.gsim.GSimException;
 import de.s2.gsim.api.objects.impl.AgentClassSim;
 import de.s2.gsim.environment.Environment;
 import de.s2.gsim.environment.Frame;
@@ -150,7 +151,8 @@ public class EnvTest {
     @Test
     public void removal_of_children_is_propagated() {
 
-        expected.expect(NoSuchElementException.class);
+		expected.expect(GSimException.class);
+		expected.expectMessage("No value present");
 
         env.createAgentClass("Test", null);
         AgentClass agentClass = env.getAgentClass("Test");

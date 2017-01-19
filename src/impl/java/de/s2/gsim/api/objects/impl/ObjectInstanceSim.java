@@ -1,6 +1,9 @@
 package de.s2.gsim.api.objects.impl;
 
+import static de.s2.gsim.api.objects.impl.Invariant.*;
+
 import java.util.ArrayList;
+
 import java.util.List;
 import java.util.Observable;
 
@@ -20,7 +23,7 @@ import de.s2.gsim.objects.attribute.StringAttribute;
 /**
  * Wraps an object instance during simulation time. It can be observed, but does not listen itself for changes.
  */
-public class ObjectInstanceSim extends Observable implements ObjectInstance, UnitWrapper {
+public class ObjectInstanceSim extends Observable implements ObjectInstance, UnitWrapper, ManagedObject {
 
     private static final long serialVersionUID = 1L;
 
@@ -46,9 +49,7 @@ public class ObjectInstanceSim extends Observable implements ObjectInstance, Uni
     @Override
     public Attribute getAttribute(String attName) throws GSimException {
 
-        if (destroyed) {
-            throw new GSimException("This object was removed from the runtime context.");
-        }
+		precondition(this, attName);
 
         try {
             return real.getAttribute(attName);
@@ -61,9 +62,7 @@ public class ObjectInstanceSim extends Observable implements ObjectInstance, Uni
     @Override
     public Attribute getAttribute(String list, String attName) throws GSimException {
 
-        if (destroyed) {
-            throw new GSimException("This object was removed from the runtime context.");
-        }
+		precondition(this, list, attName);
 
         try {
 
@@ -78,9 +77,7 @@ public class ObjectInstanceSim extends Observable implements ObjectInstance, Uni
     @Override
     public String[] getAttributeListNames() throws GSimException {
 
-        if (destroyed) {
-            throw new GSimException("This object was removed from the runtime context.");
-        }
+		precondition(this);
 
         try {
             return real.getAttributesListNames().toArray(new String[0]);
@@ -93,9 +90,7 @@ public class ObjectInstanceSim extends Observable implements ObjectInstance, Uni
     @Override
     public Attribute[] getAttributes(String list) throws GSimException {
 
-        if (destroyed) {
-            throw new GSimException("This object was removed from the runtime context.");
-        }
+		precondition(this);
 
         try {
             return real.getAttributes(list).toArray(new Attribute[0]);
@@ -108,9 +103,7 @@ public class ObjectInstanceSim extends Observable implements ObjectInstance, Uni
     @Override
     public double getIntervalAttributeFrom(String list, String attName) throws GSimException {
 
-        if (destroyed) {
-            throw new GSimException("This object was removed from the runtime context.");
-        }
+		precondition(this, list, attName);
 
         try {
             IntervalAttribute a = (IntervalAttribute) real.getAttribute(list, attName);
@@ -124,9 +117,7 @@ public class ObjectInstanceSim extends Observable implements ObjectInstance, Uni
     @Override
     public double getIntervalAttributeTo(String list, String attName) throws GSimException {
 
-        if (destroyed) {
-            throw new GSimException("This object was removed from the runtime context.");
-        }
+		precondition(this, list, attName);
 
         try {
             IntervalAttribute a = (IntervalAttribute) real.getAttribute(list, attName);
@@ -139,9 +130,7 @@ public class ObjectInstanceSim extends Observable implements ObjectInstance, Uni
     @Override
     public String getName() throws GSimException {
 
-        if (destroyed) {
-            throw new GSimException("This object was removed from the runtime context.");
-        }
+		precondition(this);
 
         try {
             return real.getName();
@@ -153,9 +142,7 @@ public class ObjectInstanceSim extends Observable implements ObjectInstance, Uni
     @Override
     public double getNumericalAttribute(String list, String attName) throws GSimException {
 
-        if (destroyed) {
-            throw new GSimException("This object was removed from the runtime context.");
-        }
+		precondition(this, list, attName);
 
         try {
             NumericalAttribute a = (NumericalAttribute) real.getAttribute(list, attName);
@@ -168,9 +155,7 @@ public class ObjectInstanceSim extends Observable implements ObjectInstance, Uni
     @Override
     public String[] getSetAttributeValues(String list, String attName) throws GSimException {
 
-        if (destroyed) {
-            throw new GSimException("This object was removed from the runtime context.");
-        }
+		precondition(this, list, attName);
 
         try {
             SetAttribute set = (SetAttribute) real.getAttribute(list, attName);
@@ -187,9 +172,7 @@ public class ObjectInstanceSim extends Observable implements ObjectInstance, Uni
     @Override
     public String getStringAttribute(String list, String attName) throws GSimException {
 
-        if (destroyed) {
-            throw new GSimException("This object was removed from the runtime context.");
-        }
+		precondition(this, list, attName);
 
         try {
             StringAttribute a = (StringAttribute) real.getAttribute(list, attName);
@@ -201,33 +184,20 @@ public class ObjectInstanceSim extends Observable implements ObjectInstance, Uni
 
     @Override
     public boolean inheritsFrom(String agentclassName) {
+
+		precondition(this, agentclassName);
+
         return real.inheritsFromOrIsOfType(agentclassName);
     }
 
     @Override
     public Object resolveName(String path) throws GSimException {
 
-        if (destroyed) {
-            throw new GSimException("This object was removed from the runtime context.");
-        }
+		precondition(this, path);
 
         try {
 
-        	Object o = real.resolvePath(Path.attributePath(path.split("/")));
-
-			if (o == null) {
-				o = real.resolvePath(Path.attributeListPath(path.split("/")));
-			} 
-
-            if (o == null) {
-                return null;
-            }
-
-            if (o instanceof Attribute || o instanceof ArrayList) {
-                return o;
-            } else {
-                throw new GSimException("Can't handle return value " + o);
-            }
+			return real.resolvePath(Path.of(path.split("/")));
 
         } catch (Exception e) {
             throw new GSimException(e);
@@ -237,9 +207,7 @@ public class ObjectInstanceSim extends Observable implements ObjectInstance, Uni
     @Override
     public void setAttribute(String list, Attribute a) throws GSimException {
 
-        if (destroyed) {
-            throw new GSimException("This object was removed from the runtime context.");
-        }
+		precondition(this, a);
 
         try {
             real.addOrSetAttribute(list, a);
@@ -253,17 +221,18 @@ public class ObjectInstanceSim extends Observable implements ObjectInstance, Uni
     @Override
     public void setIntervalAttributeValue(String list, String attName, double from, double to) throws GSimException {
 
-        if (destroyed) {
-            throw new GSimException("This object was removed from the runtime context.");
-        }
+		precondition(this, list, attName);
+		intervalIntegrity(from, to);
 
         try {
-            IntervalAttribute a = (IntervalAttribute) real.getAttribute(list, attName);
-            if (a == null) {
+			IntervalAttribute a;
+			if (!real.containsAttribute(list, attName)) {
                 a = new IntervalAttribute(attName, from, to);
-            }
-            a.setFrom(from);
-            a.setTo(to);
+			} else {
+				a = (IntervalAttribute) real.getAttribute(list, attName);
+				a.setFrom(from);
+				a.setTo(to);
+			}
             real.addOrSetAttribute(list, a);
             onChange();
         } catch (Exception e) {
@@ -275,14 +244,14 @@ public class ObjectInstanceSim extends Observable implements ObjectInstance, Uni
     @Override
     public void setNumericalAttributeValue(String list, String attName, double value) throws GSimException {
 
-        if (destroyed) {
-            throw new GSimException("This object was removed from the runtime context.");
-        }
+		precondition(this, list, attName);
 
         try {
-            NumericalAttribute a = (NumericalAttribute) real.getAttribute(list, attName);
-            if (a == null) {
+			NumericalAttribute a;
+			if (!real.containsAttribute(list, attName)) {
                 a = new NumericalAttribute(attName, value);
+			} else {
+				a = (NumericalAttribute) real.getAttribute(list, attName);
             }
             a.setValue(value);
             real.addOrSetAttribute(list, a);
@@ -296,16 +265,17 @@ public class ObjectInstanceSim extends Observable implements ObjectInstance, Uni
     @Override
     public void setSetAttributeValues(String list, String attName, String... values) throws GSimException {
 
-        if (destroyed) {
-            throw new GSimException("This object was removed from the runtime context.");
-        }
+		precondition(this, list, attName);
+		setIntegrity(values);
 
         try {
-            SetAttribute a = (SetAttribute) real.getAttribute(list, attName);
-            if (a == null) {
+			SetAttribute a;
+			if (!real.containsAttribute(list, attName)) {
                 Frame f = real.getDefinition();
                 DomainAttribute def = f.getAttribute(list, attName);
                 a = new SetAttribute(attName, def.getFillers());
+			} else {
+				a = (SetAttribute) real.getAttribute(list, attName);
             }
 
             a.removeAllEntries();
@@ -324,14 +294,14 @@ public class ObjectInstanceSim extends Observable implements ObjectInstance, Uni
     @Override
     public void setStringAttributeValue(String list, String attName, String value) throws GSimException {
 
-        if (destroyed) {
-            throw new GSimException("This object was removed from the runtime context.");
-        }
+		precondition(this, list, attName, value);
 
         try {
-            StringAttribute a = (StringAttribute) real.getAttribute(list, attName);
-            if (a == null) {
+			StringAttribute a;
+			if (real.containsAttribute(list, attName)) {
                 a = new StringAttribute(attName, value);
+			} else {
+				a = (StringAttribute) real.getAttribute(list, attName);
             }
             a.setValue(value);
             real.addOrSetAttribute(list, a);
@@ -355,6 +325,11 @@ public class ObjectInstanceSim extends Observable implements ObjectInstance, Uni
 	protected void onDestroy() {
 		setChanged();
 		notifyObservers(false);
+	}
+
+	@Override
+	public boolean isDestroyed() {
+		return destroyed;
 	}
 
 }

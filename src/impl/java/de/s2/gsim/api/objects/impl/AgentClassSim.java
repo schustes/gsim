@@ -1,10 +1,13 @@
 package de.s2.gsim.api.objects.impl;
 
+import static de.s2.gsim.api.objects.impl.Invariant.precondition;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.Optional;
 
 import de.s2.gsim.GSimException;
 import de.s2.gsim.api.objects.impl.behaviour.BehaviourClass;
@@ -13,6 +16,7 @@ import de.s2.gsim.environment.Environment;
 import de.s2.gsim.environment.Frame;
 import de.s2.gsim.environment.GenericAgentClass;
 import de.s2.gsim.environment.TypedList;
+import de.s2.gsim.environment.TypedMap;
 import de.s2.gsim.objects.AgentClass;
 import de.s2.gsim.objects.Behaviour;
 import de.s2.gsim.objects.ObjectClass;
@@ -24,7 +28,7 @@ import de.s2.gsim.objects.attribute.DomainAttribute;
  * Implementation of AgentClass interface used during runtime of the simulation. Changes on dependent objects are observed and changes notified,
  * but no environment is called, i.e. no hierarchical changes of the definition environment can occur. Changes remain local to the runtime.
  */
-public class AgentClassSim extends Observable implements AgentClass, ObjectClass, Observer {
+public class AgentClassSim extends Observable implements AgentClass, ObjectClass, Observer, ManagedObject {
 
 	public static final long serialVersionUID = 1L;
 
@@ -32,12 +36,18 @@ public class AgentClassSim extends Observable implements AgentClass, ObjectClass
 
 	private static Environment dummyEnv = new Environment("");
 
+	private ObjectClassReadOperations readOperations;
+
 	public AgentClassSim(GenericAgentClass real) {
 		this.real = real;
+		this.readOperations = new ObjectClassReadOperations(this);
 	}
 
 	@Override
 	public void addAttribute(String list, DomainAttribute a) throws GSimException {
+
+		precondition(this, list, a);
+
 		try {
 			real.addOrSetAttribute(list, a);
 			onChange();
@@ -48,6 +58,8 @@ public class AgentClassSim extends Observable implements AgentClass, ObjectClass
 
 	@Override
 	public void defineAttributeList(String list) throws GSimException {
+
+		precondition(this, list);
 
 		try {
 			real.defineAttributeList(list);
@@ -61,6 +73,9 @@ public class AgentClassSim extends Observable implements AgentClass, ObjectClass
 
 	@Override
 	public void defineObjectList(String list, ObjectClass object) throws GSimException {
+
+		precondition(this, list, object);
+
 		try {
 			real.defineObjectList(list, (Frame) ((UnitWrapper) object).toUnit());
 		} catch (Exception e) {
@@ -70,6 +85,7 @@ public class AgentClassSim extends Observable implements AgentClass, ObjectClass
 
 	@Override
 	public void addOrSetObject(String list, ObjectClass object) throws GSimException {
+		precondition(this, list, object);
 		try {
 			real.addOrSetChildFrame(list, (Frame) ((UnitWrapper) object).toUnit());
 		} catch (Exception e) {
@@ -84,34 +100,22 @@ public class AgentClassSim extends Observable implements AgentClass, ObjectClass
 
 	@Override
 	public DomainAttribute getAttribute(String list, String attName) throws GSimException {
-		try {
-			return real.getAttribute(list, attName);
-		} catch (Exception e) {
-			throw new GSimException(e);
-		}
-
+		return readOperations.getAttribute(real, list, attName);
 	}
 
 	@Override
 	public String[] getAttributeListNames() throws GSimException {
-		try {
-			return real.getAttributesListNames().toArray(new String[0]);
-		} catch (Exception e) {
-			throw new GSimException(e);
-		}
+		return readOperations.getAttributeListNames(real);
 	}
 
 	@Override
 	public DomainAttribute[] getAttributes(String list) throws GSimException {
-		try {
-			return real.getAttributes(list).toArray(new DomainAttribute[0]);
-		} catch (Exception e) {
-			throw new GSimException(e);
-		}
+		return readOperations.getAttributes(real, list);
 	}
 
 	@Override
 	public Behaviour getBehaviour() throws GSimException {
+		precondition(this);
 		try {
 			return new BehaviourClass(this, real.getBehaviour());
 		} catch (Exception e) {
@@ -121,27 +125,18 @@ public class AgentClassSim extends Observable implements AgentClass, ObjectClass
 
 	@Override
 	public String getDefaultValue(String list, String attName) throws GSimException {
-
-		try {
-			DomainAttribute a = real.getAttribute(list, attName);
-			return a.getDefaultValue();
-		} catch (Exception e) {
-			throw new GSimException(e);
-		}
+		return readOperations.getDefaultValue(real, list, attName);
 	}
 
 	@Override
 	public String getName() throws GSimException {
-
-		try {
-			return real.getName();
-		} catch (Exception e) {
-			throw new GSimException(e);
-		}
+		return readOperations.getName(real);
 	}
 
 	@Override
 	public String[] getObjectListNames() throws GSimException {
+
+		precondition(this);
 
 		try {
 			return real.getChildFrameListNames().toArray(new String[0]);
@@ -153,6 +148,9 @@ public class AgentClassSim extends Observable implements AgentClass, ObjectClass
 
 	@Override
 	public ObjectClass getObjectListType(String listName) throws GSimException {
+
+		precondition(this, listName);
+
 		try {
 			ObjectClass c = new DependentObjectClass(this, listName, real.getListType(listName));
 			return c;
@@ -164,6 +162,8 @@ public class AgentClassSim extends Observable implements AgentClass, ObjectClass
 
 	@Override
 	public ObjectClass[] getObjects(String list) throws GSimException {
+
+		precondition(this, list);
 
 		try {
 			List<Frame> f = real.getChildFrames(list);
@@ -181,16 +181,29 @@ public class AgentClassSim extends Observable implements AgentClass, ObjectClass
 
 	@Override
 	public boolean isDeclaredAttribute(String list, String attName) throws GSimException {
-		return real.isDeclaredAttribute(list, attName);
+		return readOperations.isDeclaredAttribute(real, list, attName);
 	}
 
 	@Override
 	public boolean isDeclaredObject(String list, String objectName) throws GSimException {
-		return real.getDeclaredAttribute(list, objectName) == null;
+		
+		precondition(this, list, objectName);
+
+		Optional<TypedList<Frame>> map = real.getObjectLists().entrySet().stream().filter(e -> e.getKey().equals(list))
+		        .map(entry -> entry.getValue()).findAny();
+		
+		if (!map.isPresent()) {
+			return false;
+		}
+
+		return map.get().getType().getName().equals(objectName);
+
 	}
 
 	@Override
 	public void removeObject(String list, ObjectClass object) throws GSimException {
+
+		precondition(this, list, object);
 
 		try {
 			real.removeChildFrame(list, object.getName());
@@ -203,6 +216,8 @@ public class AgentClassSim extends Observable implements AgentClass, ObjectClass
 
 	@Override
 	public Object resolveName(String path) throws GSimException {
+
+		precondition(this, path);
 
 		try {
 
@@ -250,6 +265,8 @@ public class AgentClassSim extends Observable implements AgentClass, ObjectClass
 	@Override
 	public void setAttribute(String list, DomainAttribute a) throws GSimException {
 
+		precondition(this, list, a);
+
 		try {
 			real.addOrSetAttribute(list, a);
 			onChange();
@@ -261,6 +278,8 @@ public class AgentClassSim extends Observable implements AgentClass, ObjectClass
 
 	@Override
 	public void setBehaviour(Behaviour b) throws GSimException {
+
+		precondition(this, b);
 
 		try {
 			if (!(b instanceof BehaviourClass)) {
@@ -275,6 +294,9 @@ public class AgentClassSim extends Observable implements AgentClass, ObjectClass
 
 	@Override
 	public void setDefaultAttributeValue(String list, String attName, String value) throws GSimException {
+
+		precondition(this, list, attName, value);
+
 		try {
 			DomainAttribute a = real.getAttribute(list, attName);
 			a.setDefault(value);
@@ -296,6 +318,11 @@ public class AgentClassSim extends Observable implements AgentClass, ObjectClass
 	private void onChange() {
 		setChanged();
 		notifyObservers();
+	}
+
+	@Override
+	public boolean isDestroyed() {
+		return false;
 	}
 
 }

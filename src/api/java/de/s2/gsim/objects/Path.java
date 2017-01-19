@@ -10,7 +10,7 @@ import java.util.Objects;
 public class Path<T> {
 
 	public enum Type {
-		OBJECT, ATTRIBUTE, LIST, PATH
+		OBJECT, ATTRIBUTE, LIST, PATH, UNKNOWN
 	}
 
 	private final String name;
@@ -139,6 +139,12 @@ public class Path<T> {
 		}
 
 		return p1;
+
+	}
+
+	public static <T> Path<T> of(String... path) {
+
+		return build(Type.UNKNOWN, path);
 
 	}
 

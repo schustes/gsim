@@ -1,7 +1,8 @@
 package de.s2.gsim.api.objects.impl;
 
-import static de.s2.gsim.api.objects.impl.ObserverUtils.*;
-
+import static de.s2.gsim.api.objects.impl.Invariant.*;
+import static de.s2.gsim.api.objects.impl.ObserverUtils.observeDependentObjectInstance;
+import static de.s2.gsim.api.objects.impl.ObserverUtils.stopObservingDependentObjectInstance;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -33,268 +34,203 @@ import de.s2.gsim.objects.attribute.StringAttribute;
 /**
  * AgentInstance implementation used to wrap agents during simulation time.
  */
-public class AgentInstanceSim extends Observable implements AgentInstance, ObjectInstance, UnitWrapper, Serializable, Observer {
+public class AgentInstanceSim extends Observable
+        implements AgentInstance, ObjectInstance, UnitWrapper, Serializable, Observer, ManagedObject {
 
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-    private boolean destroyed = false;
+	private boolean destroyed = false;
 
-    private GenericAgent real;
+	private GenericAgent real;
 
-    public AgentInstanceSim() {
-    }
+	private ObjectInstanceReadOperations readOperations;
 
-    public AgentInstanceSim(GenericAgent real) {
-        this.real = real;
-    }
+	public AgentInstanceSim() {
+		this.readOperations = new ObjectInstanceReadOperations(this, real);
+	}
 
-    @Override
-    public void addOrSetObject(String list, ObjectInstance object) throws GSimException {
+	public AgentInstanceSim(GenericAgent real) {
+		this.real = real;
+		this.readOperations = new ObjectInstanceReadOperations(this, real);
+	}
 
-        if (destroyed) {
-            throw new GSimException("This object was removed from the runtime context.");
-        }
-
-        try {
-            GenericAgent a = real;
-			a.addChildInstance(list, (Instance) ((UnitWrapper) object).toUnit());
-            observeDependentObjectInstance(object, this);
-        } catch (Exception e) {
-            throw new GSimException(e);
-        }
-
-    }
-
-    @Override
-    public ObjectInstance copy() {
-        GenericAgent copyAgent = GenericAgent.from(real);
-        return new AgentInstanceSim(copyAgent);
-    }
-
-    @Override
-    public ObjectInstance createObjectFromListType(String objectName, String listName) {
-        Frame f = real.getDefinition().getListType(listName);
-        Instance instance = Instance.instanciate(objectName, f);
-        return new DependentObjectInstance(this, listName, instance);
-    }
-
-    @Override
-    public void destroy() throws GSimException {
-        throw new GSimException("You can't delete an agent from a running simulation with this mechanism");
-    }
-
-    @Override
-    public Attribute getAttribute(String attName) throws GSimException {
-
-        try {
-            return real.getAttribute(attName);
-        } catch (Exception e) {
-            throw new GSimException(e);
-        }
-
-    }
-
-    @Override
-    public Attribute getAttribute(String list, String attName) throws GSimException {
-
-        try {
-
-            return real.getAttribute(list, attName);
-
-        } catch (Exception e) {
-            throw new GSimException(e);
-        }
-
-    }
-
-    @Override
-    public String[] getAttributeListNames() throws GSimException {
-
-        try {
-            return real.getAttributesListNames().toArray(new String[0]);
-        } catch (Exception e) {
-            throw new GSimException(e);
-        }
-
-    }
-
-    @Override
-    public Attribute[] getAttributes(String list) throws GSimException {
-
-        try {
-            return real.getAttributes(list).toArray(new Attribute[0]);
-        } catch (Exception e) {
-            throw new GSimException(e);
-        }
-
-    }
-
-    @Override
-    public Behaviour getBehaviour() throws GSimException {
-
-        if (destroyed) {
-            throw new GSimException("This object was removed from the runtime context.");
-        }
-
-        try {
-            GenericAgent a = real;
-            return new BehaviourInstance(this, a.getBehaviour());
-        } catch (Exception e) {
-            throw new GSimException(e);
-        }
-
-    }
-
-    @Override
-    public double getIntervalAttributeFrom(String list, String attName) throws GSimException {
-
-        try {
-            IntervalAttribute a = (IntervalAttribute) real.getAttribute(list, attName);
-            return a.getFrom();
-        } catch (Exception e) {
-            throw new GSimException(e);
-        }
-
-    }
-
-    @Override
-    public double getIntervalAttributeTo(String list, String attName) throws GSimException {
-
-        try {
-            IntervalAttribute a = (IntervalAttribute) real.getAttribute(list, attName);
-            return a.getTo();
-        } catch (Exception e) {
-            throw new GSimException(e);
-        }
-    }
-
-    @Override
-    public String getName() throws GSimException {
-
-        try {
-            return real.getName();
-        } catch (Exception e) {
-            throw new GSimException(e);
-        }
-    }
-
-    @Override
-    public double getNumericalAttribute(String list, String attName) throws GSimException {
-
-        try {
-            NumericalAttribute a = (NumericalAttribute) real.getAttribute(list, attName);
-            return a.getValue();
-        } catch (Exception e) {
-            throw new GSimException(e);
-        }
-    }
-
-    @Override
-    public ObjectInstance getObject(String list, String objectName) throws GSimException {
-        Instance in = real.getChildInstance(list, objectName);
-        if (in != null) {
-            return new DependentObjectInstance(this, list, in);
-        } else {
-            return null;
-        }
-    }
-
-    @Override
-    public String[] getObjectListNames() throws GSimException {
-
-        if (destroyed) {
-            throw new GSimException("This object was removed from the runtime context.");
-        }
-
-        try {
-            GenericAgent a = real;
-            return a.getChildInstanceListNames().toArray(new String[0]);
-        } catch (Exception e) {
-            throw new GSimException(e);
-        }
-
-    }
-
-    @Override
-    public ObjectInstance[] getObjects(String list) throws GSimException {
-
-        if (destroyed) {
-            throw new GSimException("This object was removed from the runtime context.");
-        }
-
-        try {
-
-            List<Instance> f = real.getChildInstances(list);
-            ObjectInstance[] ret = new ObjectInstance[f.size()];
-            for (int i = 0; i < f.size(); i++) {
-                ret[i] = new DependentObjectInstance(this, list, f.get(i));
-            }
-            return ret;
-
-        } catch (Exception e) {
-            throw new GSimException(e);
-        }
-
-    }
-
-    @Override
-    public String[] getSetAttributeValues(String list, String attName) throws GSimException {
-
-        try {
-            SetAttribute set = (SetAttribute) real.getAttribute(list, attName);
-            List<String> l = set.getEntries();
-            String[] ret = new String[l.size()];
-            l.toArray(ret);
-            return ret;
-        } catch (Exception e) {
-            throw new GSimException(e);
-        }
-
-    }
-    
-    @Override
-    public String getStringAttribute(String list, String attName) throws GSimException {
-
-        try {
-            StringAttribute a = (StringAttribute) real.getAttribute(list, attName);
-            return a.getValue();
-        } catch (Exception e) {
-            throw new GSimException(e);
-        }
-    }
-
-    @Override
-    public boolean inheritsFrom(String agentclassName) {
-        return real.inheritsFromOrIsOfType(agentclassName);
-    }
-
-    @Override
-    public void removeObject(String list, ObjectInstance object) throws GSimException {
-
-        if (destroyed) {
-            throw new GSimException("This object was removed from the runtime context.");
-        }
-
-        try {
-            real.removeChildInstance(list, object.getName());
-            stopObservingDependentObjectInstance(object, this);
-        } catch (Exception e) {
-            throw new GSimException(e);
-        }
-
-    }
-
-    @SuppressWarnings("unchecked")
 	@Override
-    public Object resolveName(String path) throws GSimException {
+	public void addOrSetObject(String list, ObjectInstance object) throws GSimException {
 
-        if (destroyed) {
-            throw new GSimException("This object was removed from the runtime context.");
-        }
+		precondition(this, object);
 
-        try {
+		try {
+			GenericAgent a = real;
+			a.addChildInstance(list, (Instance) ((UnitWrapper) object).toUnit());
+			observeDependentObjectInstance(object, this);
+		} catch (Exception e) {
+			throw new GSimException(e);
+		}
 
-            String[] p = path.split("/");
+	}
+
+	@Override
+	public ObjectInstance copy() {
+		GenericAgent copyAgent = GenericAgent.from(real);
+		return new AgentInstanceSim(copyAgent);
+	}
+
+	@Override
+	public ObjectInstance createObjectFromListType(String objectName, String listName) {
+
+		precondition(this, objectName, listName);
+
+		Frame f = real.getDefinition().getListType(listName);
+		Instance instance = Instance.instanciate(objectName, f);
+		return new DependentObjectInstance(this, listName, instance);
+	}
+
+	@Override
+	public void destroy() throws GSimException {
+		throw new GSimException("You can't delete an agent from a running simulation with this mechanism");
+	}
+
+	@Override
+	public Attribute getAttribute(String attName) throws GSimException {
+		return readOperations.getAttribute(attName);
+	}
+
+	@Override
+	public Attribute getAttribute(String list, String attName) throws GSimException {
+		return readOperations.getAttribute(list, attName);
+	}
+
+	@Override
+	public String[] getAttributeListNames() throws GSimException {
+		return readOperations.getAttributeListNames();
+	}
+
+	@Override
+	public Attribute[] getAttributes(String list) throws GSimException {
+		return readOperations.getAttributes(list);
+	}
+
+	@Override
+	public Behaviour getBehaviour() throws GSimException {
+
+		precondition(this);
+
+		try {
+			GenericAgent a = real;
+			return new BehaviourInstance(this, a.getBehaviour());
+		} catch (Exception e) {
+			throw new GSimException(e);
+		}
+
+	}
+
+	@Override
+	public double getIntervalAttributeFrom(String list, String attName) throws GSimException {
+		return readOperations.getIntervalAttributeFrom(list, attName);
+	}
+
+	@Override
+	public double getIntervalAttributeTo(String list, String attName) throws GSimException {
+		return readOperations.getIntervalAttributeTo(list, attName);
+	}
+
+	@Override
+	public String getName() throws GSimException {
+		return readOperations.getName();
+	}
+
+	@Override
+	public double getNumericalAttribute(String list, String attName) throws GSimException {
+		return readOperations.getNumericalAttribute(list, attName);
+	}
+
+	@Override
+	public ObjectInstance getObject(String list, String objectName) throws GSimException {
+
+		precondition(this, list, objectName);
+
+		Instance in = real.getChildInstance(list, objectName);
+		if (in != null) {
+			return new DependentObjectInstance(this, list, in);
+		} else {
+			return null;
+		}
+	}
+
+	@Override
+	public String[] getObjectListNames() throws GSimException {
+
+		precondition(this);
+
+		try {
+			GenericAgent a = real;
+			return a.getChildInstanceListNames().toArray(new String[0]);
+		} catch (Exception e) {
+			throw new GSimException(e);
+		}
+
+	}
+
+	@Override
+	public ObjectInstance[] getObjects(String list) throws GSimException {
+
+		precondition(this, list);
+
+		try {
+
+			List<Instance> f = real.getChildInstances(list);
+			ObjectInstance[] ret = new ObjectInstance[f.size()];
+			for (int i = 0; i < f.size(); i++) {
+				ret[i] = new DependentObjectInstance(this, list, f.get(i));
+			}
+			return ret;
+
+		} catch (Exception e) {
+			throw new GSimException(e);
+		}
+
+	}
+
+	@Override
+	public String[] getSetAttributeValues(String list, String attName) throws GSimException {
+		return readOperations.getSetAttributeValues(list, attName);
+	}
+
+	@Override
+	public String getStringAttribute(String list, String attName) throws GSimException {
+		return readOperations.getStringAttribute(list, attName);
+	}
+
+	@Override
+	public boolean inheritsFrom(String agentclassName) {
+		return readOperations.inheritsFrom(agentclassName);
+	}
+
+	@Override
+	public void removeObject(String list, ObjectInstance object) throws GSimException {
+
+		precondition(this, list, object);
+
+		try {
+			real.removeChildInstance(list, object.getName());
+			stopObservingDependentObjectInstance(object, this);
+		} catch (Exception e) {
+			throw new GSimException(e);
+		}
+
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public Object resolveName(String path) throws GSimException {
+
+		if (destroyed) {
+			throw new GSimException("This object was removed from the runtime context.");
+		}
+
+		try {
+
+			String[] p = path.split("/");
 
 			Object o = real.resolvePath(Path.attributePath(path.split("/")));
 			if (o == null) {
@@ -311,171 +247,169 @@ public class AgentInstanceSim extends Observable implements AgentInstance, Objec
 				return null;
 			}
 
-            if (o instanceof Attribute) {
+			if (o instanceof Attribute) {
 				return ((Attribute) o).clone();
-            } else if (o instanceof Instance) {
-                return new DependentObjectInstance(this, p[0], (Instance) o);
-            } else if (o instanceof TypedList) {
+			} else if (o instanceof Instance) {
+				return new DependentObjectInstance(this, p[0], (Instance) o);
+			} else if (o instanceof TypedList) {
 				TypedList<Instance> list = (TypedList<Instance>) o;
-                List<DependentObjectInstance> ret = new ArrayList<DependentObjectInstance>();
-                Iterator<Instance> iter = list.iterator();
-                while (iter.hasNext()) {
-                    Instance f = iter.next();
-                    DependentObjectInstance c = new DependentObjectInstance(this, p[0], f);
-                    ret.add(c);
-                }
-                return ret;
+				List<DependentObjectInstance> ret = new ArrayList<DependentObjectInstance>();
+				Iterator<Instance> iter = list.iterator();
+				while (iter.hasNext()) {
+					Instance f = iter.next();
+					DependentObjectInstance c = new DependentObjectInstance(this, p[0], f);
+					ret.add(c);
+				}
+				return ret;
 
-            } else if (o instanceof ArrayList) {
+			} else if (o instanceof ArrayList) {
 				return ((ArrayList<?>) o).clone();
-            } else {
-                throw new GSimException("Can't handle return value " + o);
-            }
+			} else {
+				throw new GSimException("Can't handle return value " + o);
+			}
 
-        } catch (Exception e) {
-            throw new GSimException(e);
-        }
-    }
+		} catch (Exception e) {
+			throw new GSimException(e);
+		}
+	}
 
-    public void setAgentInstance(GenericAgent real) {
-        this.real = real;
-    }
+	public void setAgentInstance(GenericAgent real) {
+		this.real = real;
+	}
 
-    @Override
-    public void setAttribute(String list, Attribute a) throws GSimException {
+	@Override
+	public void setAttribute(String list, Attribute a) throws GSimException {
 
-        if (destroyed) {
-            throw new GSimException("This object was removed from the runtime context.");
-        }
+		precondition(this, list, a);
 
-        try {
-            real.addOrSetAttribute(list, a);
-            onChange();
-        } catch (Exception e) {
-            throw new GSimException(e);
-        }
+		try {
+			real.addOrSetAttribute(list, a);
+			onChange();
+		} catch (Exception e) {
+			throw new GSimException(e);
+		}
 
-    }
+	}
 
-    @Override
-    public void setBehaviour(Behaviour b) throws GSimException {
+	@Override
+	public void setBehaviour(Behaviour b) throws GSimException {
 
-        if (destroyed) {
-            throw new GSimException("This object was removed from the runtime context.");
-        }
+		precondition(this, b);
 
-        try {
+		try {
 
-            if (!(b instanceof BehaviourInstance && b instanceof BehaviourClass)) {
-                throw new GSimException("Passed Behaviour interface " + b + " is not a valid class for Frame-type objects!");
-            }
+			if (!(b instanceof BehaviourInstance && b instanceof BehaviourClass)) {
+				throw new GSimException("Passed Behaviour interface " + b + " is not a valid class for Frame-type objects!");
+			}
 
-            GenericAgent a = real;
-            a.setBehaviour((BehaviourDef) ((UnitWrapper) b).toUnit());
+			GenericAgent a = real;
+			a.setBehaviour((BehaviourDef) ((UnitWrapper) b).toUnit());
 
-            onChange();
-            
-        } catch (Exception e) {
-            throw new GSimException(e);
-        }
+			onChange();
 
-    }
+		} catch (Exception e) {
+			throw new GSimException(e);
+		}
 
-    @Override
-    public void setIntervalAttributeValue(String list, String attName, double from, double to) throws GSimException {
+	}
 
-        if (destroyed) {
-            throw new GSimException("This object was removed from the runtime context.");
-        }
+	@Override
+	public void setIntervalAttributeValue(String list, String attName, double from, double to) throws GSimException {
 
-        try {
-            IntervalAttribute a = (IntervalAttribute) real.getAttribute(list, attName);
-            if (a == null) {
-                a = new IntervalAttribute(attName, from, to);
-            }
-            a.setFrom(from);
-            a.setTo(to);
-            real.addOrSetAttribute(list, a);
-            onChange();
-        } catch (Exception e) {
-            throw new GSimException(e);
-        }
+		precondition(this, list, attName);
+		intervalIntegrity(from, to);
 
-    }
+		try {
+			IntervalAttribute a;
+			if (!real.containsAttribute(list, attName)) {
+				a = new IntervalAttribute(attName, from, to);
+			} else {
+				a = (IntervalAttribute) real.getAttribute(list, attName);
+			}
+			a.setFrom(from);
+			a.setTo(to);
+			real.addOrSetAttribute(list, a);
+			onChange();
+		} catch (Exception e) {
+			throw new GSimException(e);
+		}
 
-    @Override
-    public void setNumericalAttributeValue(String list, String attName, double value) throws GSimException {
+	}
 
-        if (destroyed) {
-            throw new GSimException("This object was removed from the runtime context.");
-        }
+	@Override
+	public void setNumericalAttributeValue(String list, String attName, double value) throws GSimException {
 
-        try {
-            NumericalAttribute a = (NumericalAttribute) real.getAttribute(list, attName);
-            if (a == null) {
-                a = new NumericalAttribute(attName, value);
-            }
-            a.setValue(value);
-            real.addOrSetAttribute(list, a);
-            onChange();
-        } catch (Exception e) {
-            throw new GSimException(e);
-        }
+		precondition(this, list, attName);
 
-    }
+		try {
+			NumericalAttribute a;
+			if (!real.containsAttribute(list, attName)) {
+				a = new NumericalAttribute(attName, value);
+			} else {
+				a = (NumericalAttribute) real.getAttribute(list, attName);
+			}
+			a.setValue(value);
+			real.addOrSetAttribute(list, a);
+			onChange();
+		} catch (Exception e) {
+			throw new GSimException(e);
+		}
 
-    @Override
-    public void setSetAttributeValues(String list, String attName, String... values) throws GSimException {
+	}
 
-        if (destroyed) {
-            throw new GSimException("This object was removed from the runtime context.");
-        }
+	@Override
+	public void setSetAttributeValues(String list, String attName, String... values) throws GSimException {
 
-        try {
-            SetAttribute a = (SetAttribute) real.getAttribute(list, attName);
-            if (a == null) {
-                Frame f = real.getDefinition();
-                DomainAttribute def = f.getAttribute(list, attName);
-                a = new SetAttribute(attName, def.getFillers());
-            }
-            a.removeAllEntries();
-            for (String v : values) {
-                a.addEntry(v);
-            }
-            real.addOrSetAttribute(list, a);
-            onChange();
-        } catch (Exception e) {
-            throw new GSimException(e);
-        }
+		precondition(this, list, attName);
+		setIntegrity(values);
 
-    }
+		try {
+			SetAttribute a;
+			if (!real.containsAttribute(list, attName)) {
+				Frame f = real.getDefinition();
+				DomainAttribute def = f.getAttribute(list, attName);
+				a = new SetAttribute(attName, def.getFillers());
+			} else {
+				a = (SetAttribute) real.getAttribute(list, attName);
+			}
+			a.removeAllEntries();
+			for (String v : values) {
+				a.addEntry(v);
+			}
+			real.addOrSetAttribute(list, a);
+			onChange();
+		} catch (Exception e) {
+			throw new GSimException(e);
+		}
 
-    @Override
-    public void setStringAttributeValue(String list, String attName, String value) throws GSimException {
+	}
 
-        if (destroyed) {
-            throw new GSimException("This object was removed from the runtime context.");
-        }
+	@Override
+	public void setStringAttributeValue(String list, String attName, String value) throws GSimException {
 
-        try {
-            StringAttribute a = (StringAttribute) real.getAttribute(list, attName);
-            if (a == null) {
-                a = new StringAttribute(attName, value);
-            }
-            a.setValue(value);
-            real.addOrSetAttribute(list, a);
-            onChange();
-        } catch (Exception e) {
-            throw new GSimException(e);
-        }
+		precondition(this, list, attName, value);
 
-    }
+		try {
+			StringAttribute a;
+			if (!real.containsAttribute(list, attName)) {
+				a = new StringAttribute(attName, value);
+			} else {
+				a = (StringAttribute) real.getAttribute(list, attName);
+			}
+			a.setValue(value);
+			real.addOrSetAttribute(list, a);
+			onChange();
+		} catch (Exception e) {
+			throw new GSimException(e);
+		}
 
-    @Override
-    public Unit<?,?> toUnit() {
-        return real;
-    }
-    
+	}
+
+	@Override
+	public Unit<?, ?> toUnit() {
+		return real;
+	}
+
 	protected void onChange() {
 		setChanged();
 		notifyObservers();
@@ -483,6 +417,11 @@ public class AgentInstanceSim extends Observable implements AgentInstance, Objec
 
 	@Override
 	public void update(Observable o, Object arg) {
+	}
+
+	@Override
+	public boolean isDestroyed() {
+		return destroyed;
 	}
 
 }

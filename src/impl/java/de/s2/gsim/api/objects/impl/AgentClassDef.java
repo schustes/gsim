@@ -1,5 +1,6 @@
 package de.s2.gsim.api.objects.impl;
 
+import static de.s2.gsim.api.objects.impl.Invariant.*;
 
 import static de.s2.gsim.api.objects.impl.ObserverUtils.observeDependentObject;
 import static de.s2.gsim.api.objects.impl.ObserverUtils.stopObservingDependent;
@@ -35,16 +36,15 @@ public class AgentClassDef extends ObjectClassDef implements AgentClass, UnitWra
 		super(env, real);
 	}
 
-    protected Frame getReal() {
-    	super.setReal(env.getAgentClassOperations().getAgentSubClass(super.getRealRef().getName()));
-    	return super.getRealRef();
-    }
+	protected Frame getReal() {
+		super.setReal(env.getAgentClassOperations().getAgentSubClass(super.getRealRef().getName()));
+		return super.getRealRef();
+	}
 
 	@Override
 	public void addAttribute(String list, DomainAttribute a) throws GSimException {
-		if (destroyed) {
-			throw new GSimException("This object was removed from the runtime context.");
-		}
+
+		precondition(this, a);
 
 		try {
 			setReal(env.getAgentClassOperations().addAgentClassAttribute((GenericAgentClass) getReal(), Path.attributeListPath(list), a));
@@ -58,9 +58,7 @@ public class AgentClassDef extends ObjectClassDef implements AgentClass, UnitWra
 	@Override
 	public void defineAttributeList(String list) throws GSimException {
 
-		if (destroyed) {
-			throw new GSimException("This object was removed from the runtime context.");
-		}
+		precondition(this, list);
 
 		try {
 			if (!getReal().getAttributeLists().containsKey(list)) {
@@ -76,9 +74,7 @@ public class AgentClassDef extends ObjectClassDef implements AgentClass, UnitWra
 	@Override
 	public void defineObjectList(String list, ObjectClass objectClass) throws GSimException {
 
-		if (destroyed) {
-			throw new GSimException("This object was removed from the runtime context.");
-		}
+		precondition(this, list, objectClass);
 
 		try {
 			Frame object = (Frame) ((UnitWrapper) objectClass).toUnit();
@@ -97,9 +93,7 @@ public class AgentClassDef extends ObjectClassDef implements AgentClass, UnitWra
 	@Override
 	public void addOrSetObject(String list, ObjectClass objectClass) throws GSimException {
 
-		if (destroyed) {
-			throw new GSimException("This object was removed from the runtime context.");
-		}
+		precondition(this, list, objectClass);
 
 		try {
 			Frame object = (Frame) ((UnitWrapper) objectClass).toUnit();
@@ -122,9 +116,8 @@ public class AgentClassDef extends ObjectClassDef implements AgentClass, UnitWra
 
 	@Override
 	public void destroy() throws GSimException {
-		if (destroyed) {
-			throw new GSimException("This object was removed from the runtime context.");
-		}
+
+		precondition(this);
 
 		try {
 			env.getAgentClassOperations().removeAgentClass((GenericAgentClass)  getReal());
@@ -140,9 +133,8 @@ public class AgentClassDef extends ObjectClassDef implements AgentClass, UnitWra
 
 	@Override
 	public Behaviour getBehaviour() throws GSimException {
-		if (destroyed) {
-			throw new GSimException("This object was removed from the runtime context.");
-		}
+
+		precondition(this);
 
 		try {
 			return new BehaviourClass(this, ((GenericAgentClass)  getReal()).getBehaviour());
@@ -154,9 +146,8 @@ public class AgentClassDef extends ObjectClassDef implements AgentClass, UnitWra
 
 	@Override
 	public String[] getObjectListNames() throws GSimException {
-		if (destroyed) {
-			throw new GSimException("This object was removed from the runtime context.");
-		}
+
+		precondition(this);
 
 		try {
 			return  getReal().getChildFrameListNames().toArray(new String[0]);
@@ -168,9 +159,8 @@ public class AgentClassDef extends ObjectClassDef implements AgentClass, UnitWra
 
 	@Override
 	public ObjectClass getObjectListType(String listName) throws GSimException {
-		if (destroyed) {
-			throw new GSimException("This object was removed from the runtime context.");
-		}
+
+		precondition(this, listName);
 
 		try {
 			ObjectClassDef obj = new ObjectClassDef(env, getReal().getListType(listName));
@@ -184,9 +174,8 @@ public class AgentClassDef extends ObjectClassDef implements AgentClass, UnitWra
 
 	@Override
 	public ObjectClass[] getObjects(String list) throws GSimException {
-		if (destroyed) {
-			throw new GSimException("This object was removed from the runtime context.");
-		}
+
+		precondition(this, list);
 
 		try {
 			List<Frame> f = getReal().getChildFrames(list);
@@ -204,20 +193,30 @@ public class AgentClassDef extends ObjectClassDef implements AgentClass, UnitWra
 
 	@Override
 	public boolean isDeclaredAttribute(String list, String attName) throws GSimException {
-		return getReal().isDeclaredAttribute(list, attName);
+		precondition(this, list, attName);
+		try {
+			return getReal().isDeclaredAttribute(list, attName);
+		} catch (Exception e) {
+			throw new GSimException(e);
+		}
+
 	}
 
 	@Override
 	public boolean isDeclaredObject(String list, String objectName) throws GSimException {
-		return getReal().getDeclaredAttribute(list, objectName) == null;
+		precondition(this, list, objectName);
+		try {
+			return getReal().getDeclaredAttribute(list, objectName) == null;
+		} catch (Exception e) {
+			throw new GSimException(e);
+		}
+
 	}
 
 	@Override
 	public void removeObject(String list, ObjectClass object) throws GSimException {
 
-		if (destroyed) {
-			throw new GSimException("This object was removed from the runtime context.");
-		}
+		precondition(this, list, object);
 
 		try {
 			setReal(env.getAgentClassOperations().removeChildFrame((GenericAgentClass) getReal(), Path.objectPath(list, object.getName())));
@@ -233,9 +232,7 @@ public class AgentClassDef extends ObjectClassDef implements AgentClass, UnitWra
 	@Override
 	public Object resolveName(String path) throws GSimException {
 
-		if (destroyed) {
-			throw new GSimException("This object was removed from the runtime context.");
-		}
+		precondition(this, path);
 
 		try {
 			Object o = getReal().resolvePath(Path.attributePath(path.split("/")));
@@ -281,9 +278,7 @@ public class AgentClassDef extends ObjectClassDef implements AgentClass, UnitWra
 	@Override
 	public void setAttribute(String list, DomainAttribute a) throws GSimException {
 
-		if (destroyed) {
-			throw new GSimException("This object was removed from the runtime context.");
-		}
+		precondition(this, list, a);
 
 		try {
 			setReal(env.getAgentClassOperations().modifyAgentClassAttribute((GenericAgentClass) getReal(), Path.attributePath(list, a.getName()), a));
@@ -297,9 +292,7 @@ public class AgentClassDef extends ObjectClassDef implements AgentClass, UnitWra
 	@Override
 	public void setBehaviour(Behaviour b) throws GSimException {
 
-		if (destroyed) {
-			throw new GSimException("This object was removed from the runtime context..");
-		}
+		precondition(this, b);
 
 		try {
 			if (!(b instanceof BehaviourClass)) {
@@ -316,9 +309,7 @@ public class AgentClassDef extends ObjectClassDef implements AgentClass, UnitWra
 	@Override
 	public void setDefaultAttributeValue(String list, String attName, String value) throws GSimException {
 
-		if (destroyed) {
-			throw new GSimException("This object was removed from the runtime context.");
-		}
+		precondition(this, list, attName, value);
 
 		try {
 			DomainAttribute a = getReal().getAttribute(list, attName);
@@ -331,11 +322,6 @@ public class AgentClassDef extends ObjectClassDef implements AgentClass, UnitWra
 		onChange();
 
 	}
-
-//	@Override
-//	public Unit<Frame, DomainAttribute> toUnit() {
-//		return real;
-//	}
 
 	@Override
 	public void update(Observable o, Object arg) {
