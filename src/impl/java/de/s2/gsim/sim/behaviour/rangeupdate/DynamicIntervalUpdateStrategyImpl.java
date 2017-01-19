@@ -60,7 +60,7 @@ public class DynamicIntervalUpdateStrategyImpl implements DynamicValueRangeUpdat
 
 		} else {
 			Attribute attribute = agent.resolvePath(ePath);
-			DomainAttribute dattr = agent.getDefinition().resolvePath(Path.attributePath(evalPath));
+			DomainAttribute dattr = agent.getDefinition().resolvePath(Path.attributePath(evalPath.split("/")));
 			applyUpdates(agent, baseRuleName, expansion, ePath, dattr, attribute, rlRanges, context);
 		}
 
