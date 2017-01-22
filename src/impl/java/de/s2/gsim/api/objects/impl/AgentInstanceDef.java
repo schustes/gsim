@@ -328,7 +328,7 @@ public class AgentInstanceDef extends ObjectInstanceDef implements AgentInstance
 			for (String v : values) {
 				a.addEntry(v);
 			}
-			real = env.getAgentInstanceOperations().modifyAgentAttribute((GenericAgent) real, Path.attributePath( list, a.getName()), a);
+			real = env.getAgentInstanceOperations().modifyAgentAttribute((GenericAgent) real, Path.attributeListPath(list), a);
 		} catch (Exception e) {
 			throw new GSimException(e);
 		}

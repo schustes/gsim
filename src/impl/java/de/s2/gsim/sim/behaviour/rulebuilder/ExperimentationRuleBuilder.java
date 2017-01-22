@@ -28,6 +28,7 @@ public abstract class ExperimentationRuleBuilder {
 			nRule += " (parameter (name \"exec-RLRule\"))\n";
 
 			nRule += " (state-fact (name ?sfn&:(eq ?sfn \"" + stateName + "\")) (expansion $?exp))\n";
+			nRule += " (not (experimented-" + defaultIdentifier + "))\n";
 
 			if (hasCatExpansion(rule)) {
 				nRule += " (not (exists (state-fact (active 1.0) (parent ?p&:(eq ?p ?sfn)) ) ))\n";

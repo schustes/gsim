@@ -39,10 +39,23 @@ public class DomainAttribute {
     }
 
     /**
-     * Adds a filler to the possible value range if the attribute is a categorical one.
-     * 
-     * @param fillerValue filler value
-     */
+	 * Constructor.
+	 * 
+	 * @param attrName the attribute name
+	 * @param attType the attribute type (one of {@link AttributeConstants}
+	 * @param defaultValue default value
+	 */
+	public DomainAttribute(String attrName, AttributeType attType, String defaultValue) {
+		name = attrName;
+		this.attType = attType;
+		this.defaultValue = defaultValue;
+	}
+
+	/**
+	 * Adds a filler to the possible value range if the attribute is a categorical one.
+	 * 
+	 * @param fillerValue filler value
+	 */
     public void addFiller(String fillerValue) {
         fillers.add(fillerValue);
     }

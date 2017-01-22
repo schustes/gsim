@@ -61,7 +61,7 @@ public abstract class ExpansionRulesBuilder {
 		n += " (test (>= ?parentStateValue (/ (+ ?siblingStateValue ?selectedStateValue ) 2) ) )\n";
 
 		n += " =>\n";
-		// n += "(printout t ----------------------------- CONTRACT -- ?sfn -- -----------------------)";
+		n += "(printout t ----------------------------- CONTRACT -- ?sfn -- ?parentStateValue -- ?siblingStateValue  ------ ?selectedStateValue  ----  (/ (+ ?siblingStateValue ?selectedStateValue ) 2) -----------)";
 		n += " (if (or (= ?a 1.0) (= ?b 1.0)) then (modify ?parent (active 1.0)) ) \n"; // set parent active only if the current level was
 		// actually active
         n += " (assert (contracting ?sfn)))\n";
