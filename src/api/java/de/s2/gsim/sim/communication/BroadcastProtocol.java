@@ -6,9 +6,6 @@ import org.apache.log4j.Logger;
 
 public abstract class BroadcastProtocol implements java.io.Serializable {
 
-    /**
-     *
-     */
     private static final long serialVersionUID = 1L;
 
     private static Logger logger = Logger.getLogger(BroadcastProtocol.class);

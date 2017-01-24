@@ -34,8 +34,8 @@ public abstract class ExperimentationRuleBuilder {
 				nRule += " (not (exists (state-fact (active 1.0) (parent ?p&:(eq ?p ?sfn)) ) ))\n";
 			} else if (hasNumericalExpansion(rule)) {
 				nRule += " (state-fact-element (name ?sfe) (state-fact-name ?sfn) (from ?lower) (to ?upper))\n";
-				nRule += " (not (exists (state-fact-element (elem-parent ?sfe) (param-name ?pn&:(member$ ?pn ?exp)) (from ?l2&:(= ?l2 ?lower)) (to ?u2&:(< ?u2 ?upper)) )))\n";
-				nRule += " (not (exists (state-fact-element (elem-parent ?sfe) (param-name ?pn&:(member$ ?pn ?exp)) (from ?l3&:(> ?l3 ?lower)) (to ?u3&:(= ?u3 ?upper)) )))\n";
+				nRule += " (not (exists (state-fact-element (elem-parent ?sfe) (param-name ?pn&:(member$ ?pn ?exp)) (from ?l2&:(= ?l2 ?lower)) (to ?u2&:(<= ?u2 ?upper)) )))\n";
+				nRule += " (not (exists (state-fact-element (elem-parent ?sfe) (param-name ?pn&:(member$ ?pn ?exp)) (from ?l3&:(>= ?l3 ?lower)) (to ?u3&:(= ?u3 ?upper)) )))\n";
 			}
 
 			nRule += " (parameter (name \"executing-role\") (value " + "\"" + role + "\"))\n";

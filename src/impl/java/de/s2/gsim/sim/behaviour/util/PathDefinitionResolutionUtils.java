@@ -98,7 +98,7 @@ public abstract class PathDefinitionResolutionUtils {
 
 		Path<Attribute> path = Path.attributePath(pathString.split("/"));
 		Path<?> p = path;
-		Path<?> pn = new Path(p.getName(), p.getType());
+		Path<?> pn = new Path<Object>(p.getName(), p.getType());
 
 		return resolveChildFrameAndDoOrElse(owningAgent, pathString, (TypedList<Frame> resolved) -> {
 			return pn.getName() + "/" + resolved.getType().getName();

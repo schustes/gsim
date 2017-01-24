@@ -1,6 +1,5 @@
 package de.s2.gsim.sim.behaviour.rulebuilder;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -18,10 +17,13 @@ import de.s2.gsim.util.Utils;
 
 public abstract class RLRulesBuilder {
 
+	private enum FUNCTION {
+		COMPARISON, SIMPLE_SOFTMAX
+	}
+
 	private RLRulesBuilder() {
 		// static class
 	}
-
 
 	public static String buildAvgRule(RuntimeAgent agent, RLRule rule, ConditionDef evaluationFunction) {
 
@@ -79,46 +81,6 @@ public abstract class RLRulesBuilder {
         }
     }
 
-	public static String buildIntermediateRule(RuntimeAgent agent, RLRule rule) {
-
-        String nRule = "";
-
-        try {
-            String ownerRule = createRuleIdentifier(rule);
-            String ruleName = "intermediate_rule_" + ownerRule;
-
-            nRule = "(defrule " + ruleName + "\n";
-            nRule += " (declare (salience +4999))\n";
-            nRule += " (parameter (name \"exec-RLRule\"))\n";
-            nRule += " (parameter (name \"executing-role\") (value " + "\"" + BuildingUtils.getDefiningRoleForRLRule(agent, ownerRule) + "\"))\n";
-            // nRule += " (parameter (name \"exec-interval\") (value ?exc&:(= 0 (mod
-            // ?*current-time* ?exc))))\n";
-
-            // >>>>>>>>>>>>>>>>>>BG>>>>>>>>>>>>>>>>>//
-            // removed
-            // nRule += " (not (experimented-" + ownerRule + "))\n";
-
-			Object2JessVariableBindingTable map = new Object2JessVariableBindingTable(agent);
-            map.build(rule);
-
-			nRule += createConditions(agent, rule, map);
-
-            nRule += " ?time <-(timer (time ?n))\n";
-
-			String[] pointers = getPointingNodes(agent, rule);
-            if (pointers.length > 0) {
-                nRule += " (" + rule.getName() + ")\n";
-            }
-
-            nRule += "  =>\n";
-            nRule += " (assert (" + rule.getAttribute("equivalent-actionset").toValueString() + ")))\n";
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return nRule;
-    }
-
 	public static String createRLHelpRuleSetOnly(RuntimeAgent agent, RLRule rule) throws GSimEngineException {
 		String[] rules = buildExperimentationTerminalRules(agent, rule, true);
 
@@ -141,12 +103,9 @@ public abstract class RLRulesBuilder {
 			rules = buildExperimentationTerminalRules(agent, rule, false);
         }
 
-        // String res = "";
         for (int i = 0; i < rules.length; i++) {
             res += rules[i];
         }
-
-        // res += this.addShortCuts(rule, res) + "\n";
 
         return res;
     }
@@ -402,23 +361,5 @@ public abstract class RLRulesBuilder {
         return func3;
     }
 
-	private static String[] getPointingNodes(RuntimeAgent agent, RLRule to) {
-        ArrayList<String> list = new ArrayList<String>();
-        for (RLRule r : agent.getBehaviour().getRLRules()) {
-            if (r.getAttribute("equivalent-actionset") != null) {
-                String pointingTo = r.getAttribute("equivalent-actionset").toValueString();
-                if (pointingTo.equals(to.getName())) {
-                    list.add(r.getName());
-                }
-            }
-        }
-        String[] res = new String[list.size()];
-        list.toArray(res);
-        return res;
-    }
-
-    private enum FUNCTION {
-        COMPARISON, SIMPLE_SOFTMAX
-    }
 
 }

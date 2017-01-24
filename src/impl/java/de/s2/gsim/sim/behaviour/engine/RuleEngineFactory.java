@@ -120,13 +120,6 @@ public class RuleEngineFactory {
 
 			for (int i = 0; i < r.size(); i++) {
 
-				if (r.get(i).isActivated() && r.get(i).containsAttribute("equivalent-actionset")) {
-
-					String expRuleFinal = RLRulesBuilder.buildIntermediateRule(agent, r.get(i));
-                    res += expRuleFinal + "\n";
-
-                }
-
 				if (r.get(i).hasExpansions()) {
 					String roleName = BuildingUtils.getDefiningRoleForRLRule(agent, r.get(i).getName());
                     expansionMap.put(roleName, agent.getBehaviour());

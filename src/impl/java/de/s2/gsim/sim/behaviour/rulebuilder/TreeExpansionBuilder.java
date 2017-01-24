@@ -16,14 +16,13 @@ public abstract class TreeExpansionBuilder {
 		// static class
 	}
 
-	public static String buildExperimentationRule(RuntimeAgent agent, RLRule rootRule, String stateName, ExpansionParameterReferences exp)
+	public static String buildExperimentationRule(RuntimeAgent agent, RLRule rootRule, String stateName, ExpansionParameterReferences exp,
+	        boolean isUpperBoundInclusive)
 	        throws GSimEngineException {
 
-		Object2JessVariableBindingTable refTable = new Object2JessVariableBindingTable(agent);
+		Object2JessVariableBindingTable refTable = buildRefTable(agent, rootRule);
 
-		refTable.build(rootRule);
-
-		String condStr = createConditionString(agent, rootRule, refTable, exp);
+		String condStr = createConditionString(agent, rootRule, refTable, exp, isUpperBoundInclusive);
 
 		return ExperimentationRuleBuilder.buildExperimentationRule(agent, rootRule, stateName, condStr);
 
@@ -31,8 +30,16 @@ public abstract class TreeExpansionBuilder {
 
 	public static String buildInitialRule(RuntimeAgent agent, RLRule rootRule, String stateName, ExpansionParameterReferences exp)
 	        throws GSimEngineException {
-		return buildExperimentationRule(agent, rootRule, stateName, exp);
+
+		return buildExperimentationRule(agent, rootRule, stateName, exp, true);
+
     }
+
+	private static Object2JessVariableBindingTable buildRefTable(RuntimeAgent agent, RLRule rootRule) {
+		Object2JessVariableBindingTable refTable = new Object2JessVariableBindingTable(agent);
+		refTable.build(rootRule);
+		return refTable;
+	}
 
 	private static String createConditions(RuntimeAgent agent, UserRule rule, Object2JessVariableBindingTable objRefs, String ruleSoFar)
 	        throws GSimEngineException {
@@ -46,7 +53,7 @@ public abstract class TreeExpansionBuilder {
     }
 
 	private static String createConditionString(RuntimeAgent agent, RLRule rule, Object2JessVariableBindingTable objRefs,
-	        ExpansionParameterReferences expansionAttValuePairs)
+	        ExpansionParameterReferences expansionAttValuePairs, boolean initial)
 
             throws GSimEngineException {
 
@@ -61,7 +68,7 @@ public abstract class TreeExpansionBuilder {
         for (String att : expansionAttValuePairs.getIntervalAttributes()) {
             double[] interval = expansionAttValuePairs.getInterval(att);
 
-			n += createIntervalAtomCondition(agent, att, interval[0], interval[1], objRefs, n);
+			n += createIntervalAtomCondition(agent, att, interval[0], interval[1], objRefs, n, initial);
         }
 
         return n;

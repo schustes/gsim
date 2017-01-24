@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -43,7 +44,7 @@ public class ModelCoordinatorLocal implements Simulation, Steppable {
 
 	private HashMap<String, RuntimeAgent> agents = new HashMap<String, RuntimeAgent>();
 
-	private Map<String, ApplicationAgent> appAgents = new HashMap<String, ApplicationAgent>();
+	private Map<String, ApplicationAgent> appAgents = new LinkedHashMap<String, ApplicationAgent>();
 
 	private HashMap<String, DataHandler> dataHandlers = new HashMap<String, DataHandler>();
 

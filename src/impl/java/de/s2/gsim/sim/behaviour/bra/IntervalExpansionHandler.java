@@ -70,13 +70,11 @@ public class IntervalExpansionHandler implements java.io.Serializable {
 			RLRule rootRule = agent.getBehaviour().getRLRule(newStateName1.split("_")[0]);
 
 			context.getEngine().executeCommand(createNewExperimentalRule(rootRule, agent, newStateName1, remaining, context,
-					paramName, from, from + dist / 2d));
+			        paramName, from, from + dist / 2d, false));
 			context.getEngine().executeCommand(
-			        createNewExperimentalRule(rootRule, agent, newStateName2, remaining, context, paramName, from + dist / 2d, to));
+			        createNewExperimentalRule(rootRule, agent, newStateName2, remaining, context, paramName, from + dist / 2d, to, true));
 			context.getEngine().assertFact(stateFact_split1);
 			context.getEngine().assertFact(stateFact_split2);
-			System.out.println(stateFact_split1);
-			System.out.println(stateFact_split2);
 
 			insertNewActionNodes(context, stateFactName, newStateName1);
 			insertNewActionNodes(context, stateFactName, newStateName2);

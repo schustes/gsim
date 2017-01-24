@@ -85,7 +85,8 @@ public class DynamicIntervalUpdateStrategyImpl implements DynamicValueRangeUpdat
 	private void update(RuntimeAgent agent, String baseRuleName, String attributeRef, double[] modifiedRange, Context context) throws JessException {
 
 		List<Fact> allStates = getStateFactsForRootRule(baseRuleName, context);
-		List<Fact> selectedStateFactElems = findAllAffectedStateFactElems(allStates, modifiedRange[0], modifiedRange[1], context);
+		List<Fact> selectedStateFactElems = findAllAffectedStateFactElems(allStates, attributeRef, modifiedRange[0], modifiedRange[1],
+		        context);
 
 		double min = findMinElemValue(selectedStateFactElems, context);
 		double max = findMaxElemValue(selectedStateFactElems, context);
@@ -108,14 +109,14 @@ public class DynamicIntervalUpdateStrategyImpl implements DynamicValueRangeUpdat
 
 				addStateFactIntervalElemFromStatefact(stateName, attributeRef, stateFactElem, modifiedRange[0], oldMaxOfFact, context);
 				newRule = increaseIntervalRangeInExperimentalRule(agent, baseRule, stateName, stateFactElem, modifiedRange[0],
-				        oldMaxOfFact, context);
+				        oldMaxOfFact, context, stateName.contains("00"));
 
 			} else if (oldMaxOfFact == max) {
 				deleteFactByName(context.getEngine(), stateFactElem);
 
 				addStateFactIntervalElemFromStatefact(stateName, attributeRef, stateFactElem, oldMinOfFact, modifiedRange[1], context);
 				newRule = increaseIntervalRangeInExperimentalRule(agent, baseRule, stateName, stateFactElem, oldMinOfFact,
-				        modifiedRange[1], context);
+				        modifiedRange[1], context, stateName.contains("00"));
 
 			}
 
@@ -173,22 +174,24 @@ public class DynamicIntervalUpdateStrategyImpl implements DynamicValueRangeUpdat
 	}
 
 	/**
-	 * Finds all states that have either an upper limit greater than the given max value or a lower limit less than the given min value.
+	 * Finds all statesfact elems that have either an upper limit greater than the given max value or a lower limit less than the given min
+	 * value.
 	 * 
 	 * @param states the states to look at
-	 * @param min the minimum
-	 * @param max the maximum
+	 * @param min the minimum of the elem
+	 * @param max the maximum of the elem
+	 * @param attrRef the attribute referenced by one of the statefact-elems (important if there is more than 1 with the same intervals)
 	 * @param context Rete context
 	 * @return a list of statefacts or empty list if not applicable
 	 */
-	private static List<Fact> findAllAffectedStateFactElems(List<Fact> states, double min, double max, Context context) {
+	private static List<Fact> findAllAffectedStateFactElems(List<Fact> states, String attrRef, double min, double max, Context context) {
 
 		return states.stream()
-		        // .filter(state -> getFloatSlotValue(state, "active", context) > 0)
 				.flatMap(state -> {
 					Fact[] elems = getStateFactElemsForState(context, state);
 					return Arrays.stream(elems);
 				})
+		        .filter(f -> getStringSlotValue(f, "param-name", context).equals(attrRef))
 		        .filter(f -> getFloatSlotValue(f, "from", context) > min || getFloatSlotValue(f, "to", context) < max)
 		        .collect(Collectors.toList());
 	}

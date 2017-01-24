@@ -7,11 +7,8 @@ import org.apache.log4j.Logger;
 
 import de.s2.gsim.api.sim.agent.impl.RuntimeAgent;
 import de.s2.gsim.environment.RLRule;
-import de.s2.gsim.objects.Path;
-import de.s2.gsim.objects.attribute.DomainAttribute;
 import de.s2.gsim.sim.behaviour.rulebuilder.ExpansionParameterReferences;
 import de.s2.gsim.sim.behaviour.rulebuilder.TreeExpansionBuilder;
-import de.s2.gsim.sim.behaviour.util.PathDefinitionResolutionUtils;
 import jess.Context;
 import jess.Fact;
 import jess.JessException;
@@ -26,7 +23,8 @@ public abstract class DynamicValueRangeExtensionRuleBuilder {
 	}
 
 	public static String increaseIntervalRangeInExperimentalRule(RuntimeAgent agent, RLRule braRule,
-	        String stateName, Fact statefactelem, double min, double max, Context context) throws JessException {
+	        String stateName, Fact statefactelem, double min, double max, Context context, boolean isUpperBoundInclusive)
+	        throws JessException {
 
 		ExpansionParameterReferences consts = new ExpansionParameterReferences();
 
@@ -52,7 +50,7 @@ public abstract class DynamicValueRangeExtensionRuleBuilder {
 
 		String n = "";
 		try {
-			n = TreeExpansionBuilder.buildExperimentationRule(agent, braRule, stateName, consts);
+			n = TreeExpansionBuilder.buildExperimentationRule(agent, braRule, stateName, consts, isUpperBoundInclusive);
 			Logger.getLogger(DynamicValueRangeExtensionRuleBuilder.class).debug("New rule after dynamic attribute add:\n" + n);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -70,10 +68,6 @@ public abstract class DynamicValueRangeExtensionRuleBuilder {
 		for (int i = 0; i < statefactelems.length; i++) {
 			String s = statefactelems[i].getDeftemplate().getBaseName();
 			String pm = statefactelems[i].getSlotValue("param-name").stringValue(context);
-
-			// DomainAttribute attr = (DomainAttribute) a.getDefinition().resolvePath(Path.attributePath(pm.split("/")));
-			DomainAttribute attr = PathDefinitionResolutionUtils.extractAttribute(a.getDefinition(), pm).get();
-			// String simpleAttrName = attr.getName();
 
 			if (s.equals("state-fact-element")) {
 				double m = statefactelems[i].getSlotValue("from").floatValue(context);
@@ -94,7 +88,7 @@ public abstract class DynamicValueRangeExtensionRuleBuilder {
 
 		String n = "";
 		try {
-			n = TreeExpansionBuilder.buildExperimentationRule(a, r, stateName, consts);
+			n = TreeExpansionBuilder.buildExperimentationRule(a, r, stateName, consts, false);
 			Logger.getLogger(DynamicValueRangeExtensionRuleBuilder.class).debug("New rule after dynamic attribute add:\n" + n);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -108,14 +102,14 @@ public abstract class DynamicValueRangeExtensionRuleBuilder {
 
 	// TODO condition fehlt!
 	public static String createNewExperimentalRule(RLRule r, RuntimeAgent a, String stateName,
-	        Fact[] remainingStatefactelems, Context context, String param, double from, double to) throws JessException {
+	        Fact[] remainingStatefactelems, Context context, String param, double from, double to, boolean isUpper) throws JessException {
 
 		ExpansionParameterReferences consts = new ExpansionParameterReferences();
 		consts.setIntervalAttributes(param, from, to);
 
 		for (int i = 0; i < remainingStatefactelems.length; i++) {
 			String s = remainingStatefactelems[i].getDeftemplate().getBaseName();
-			String pm = remainingStatefactelems[i].getSlotValue("name").stringValue(context);
+			String pm = remainingStatefactelems[i].getSlotValue("param-name").stringValue(context);
 			if (s.equals("state-fact-element")) {
 				double m = remainingStatefactelems[i].getSlotValue("from").floatValue(context);
 				double x = remainingStatefactelems[i].getSlotValue("to").floatValue(context);
@@ -133,7 +127,7 @@ public abstract class DynamicValueRangeExtensionRuleBuilder {
 
 		String n = "";
 		try {
-			n = TreeExpansionBuilder.buildExperimentationRule(a, r, stateName, consts);
+			n = TreeExpansionBuilder.buildExperimentationRule(a, r, stateName, consts, isUpper);
 			// System.out.println(">>>>>>>>>>>>>>>>>>>>>>" + n);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -169,7 +163,7 @@ public abstract class DynamicValueRangeExtensionRuleBuilder {
 
 		String n = "";
 		try {
-			n = TreeExpansionBuilder.buildExperimentationRule(a, r, stateName, consts);
+			n = TreeExpansionBuilder.buildExperimentationRule(a, r, stateName, consts, false);
 			// System.out.println(">>>>>>>>>>>>>>>>>>>>>>" + n);
 		} catch (Exception e) {
 			e.printStackTrace();
