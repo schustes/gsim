@@ -1,21 +1,18 @@
 package de.s2.gsim;
 
 import org.apache.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Method;
-import java.net.JarURLConnection;
-import java.net.URI;
-import java.net.URL;
+import java.net.*;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.StringTokenizer;
+import java.util.*;
 import java.util.jar.JarEntry;
 import java.util.jar.JarInputStream;
 import java.util.stream.Stream;
@@ -46,7 +43,12 @@ public abstract class GSimCoreFactory {
      */
     public static GSimCoreFactory defaultFactory() {
 
-        GSimCoreFactory factory = ClassSearchUtils.find(null, GSimCoreFactory.class.getClassLoader());
+        GSimCoreFactory factory = null;
+        try {
+            factory = ClassSearchUtils.find(null, GSimCoreFactory.class.getClassLoader());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         if (factory == null) {
             throw new GSimException(String.format("No default factory found in classpath!"));
@@ -63,7 +65,12 @@ public abstract class GSimCoreFactory {
      */
     public static GSimCoreFactory customFactory(String name) {
 
-        GSimCoreFactory factory = ClassSearchUtils.find(name, GSimCoreFactory.class.getClassLoader());
+        GSimCoreFactory factory = null;
+        try {
+            factory = ClassSearchUtils.find(name, GSimCoreFactory.class.getClassLoader());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         if (factory == null) {
             throw new GSimException(String.format("No factory %s found in classpath!", name));
@@ -74,15 +81,16 @@ public abstract class GSimCoreFactory {
 
     private static final Logger LOG = Logger.getLogger(ClassSearchUtils.class);
 
-    public static void main(String... args) {
-        ClassSearchUtils utils = new ClassSearchUtils();
-        System.setProperty("java.class.path", "/home/stephan/projects/discrimination/discrimination-scenario/build/libs/discrimination-scenario-1.0.jar");
-        utils.find(null, GSimCoreFactory.class.getClassLoader());
-    }
-
     private static class ClassSearchUtils {
 
-        private static GSimCoreFactory find(String factoryName, ClassLoader classloader) {
+        private static Map<String, GSimCoreFactory> factories = new HashMap<>();
+
+        private static GSimCoreFactory find(String factoryName, ClassLoader classloader) throws IOException, URISyntaxException {
+
+            if (factories.containsKey(factoryName)) {
+                return factories.get(factoryName);
+            }
+
             String classpath = System.getProperty("java.class.path");
 
             try {
@@ -110,52 +118,81 @@ public abstract class GSimCoreFactory {
                 if (dir.isDirectory()) {
                     foundFactory = lookInDirectory(factoryName, "", dir, classloader);
                     if (foundFactory != null) {
+                        factories.put(factoryName, foundFactory);
                         return foundFactory;
                     }
                 }
                 if (dir.isFile()) {
                     name = dir.getName().toLowerCase();
+
+                    URI uri = new URI("jar:file:" + dir.getAbsolutePath());
+                    FileSystem system = FileSystems.newFileSystem(uri, Collections.<String, Object>emptyMap());
                     if (name.endsWith(".zip") || name.endsWith(".jar")) {
-                        foundFactory = lookInArchiveRek(factoryName, dir, classloader);
+                        foundFactory = lookInArchiveRek(factoryName, uri, system, classloader);
                         if (foundFactory != null) {
+                            factories.put(factoryName, foundFactory);
                             return foundFactory;
                         }
-                    } 
+                    }
                 }
             }
+            factories.put(factoryName, foundFactory);
             return foundFactory;
         }
 
-        private static GSimCoreFactory lookInArchiveRek(String factoryName, File archive, ClassLoader classloader) {
+        public static void main(String... args) throws Exception {
+            //System.setProperty("java.class.path", "/home/stephan/projects/discrimination/discrimination-scenario/build/libs/discrimination-scenario-1.0.jar");
+            System.setProperty("java.class.path", "file:///home/stephan/projects/gsim/build/libs/gsim-2.0-SNAPSHOT.jar");
+            ClassLoader urlClassLoader = new URLClassLoader(new URL[]{new URL("file:///home/stephan/projects/gsim/build/libs/gsim-2.0-SNAPSHOT.jar")});
+            GSimCoreFactory f = find(null, urlClassLoader);
+            System.out.println(f);
+            Class<?> beanClass = urlClassLoader.loadClass("de.s2.gsim.api.impl.StandaloneFactory");
+            System.out.println(beanClass);
+        }
+
+        private static GSimCoreFactory lookInArchiveRek(String factoryName, URI uri, FileSystem fileSystem, ClassLoader classloader) {
 
             try {
-                URI uri = new URI("jar:file:" + archive.getAbsolutePath());
 
-                FileSystem fileSystem = FileSystems.newFileSystem(uri, Collections.<String, Object>emptyMap());
                 Path myPath = fileSystem.getRootDirectories().iterator().next();
                 Stream<Path> walk = Files.walk(myPath, 10);
 
                 for (Iterator<Path> it = walk.iterator(); it.hasNext();){
                     Path p = it.next();
-                    if (p.toString().endsWith(".jar")) {
+                    if (p.toString().endsWith(".jar") && !p.toString().contains("spring") && !p.toString().contains("apache") ) {
                         GSimCoreFactory f = lookInArchive0(factoryName, uri, p, classloader);
                         if (f != null) {
                             return f;
                         }
-                    } else if (p.toFile().isDirectory()) {//geht nicht so
-                        lookInArchiveRek(factoryName, archive, classloader);
                     } else if (p.toString().endsWith(".class")) {
-                        GSimCoreFactory factory =  loadClassIfFactoryAnnotationPresent(factoryName, classloader, p.toString().replace('/', '.'));
+                        String entry = pathToClassName(p.toString());
+                        GSimCoreFactory factory =  loadClassIfFactoryAnnotationPresent(factoryName, classloader, entry);
                         if (factory != null) {
                             return factory;
                         }
+                    } else if (!p.toString().contains(".") && !p.toString().contains("/")) {
+                        URI nextUri = new URI("jar:file:" + p.toString());
+                        System.out.println("-> NEXT -> " + nextUri);
+                        FileSystem nextSystem = FileSystems.newFileSystem(nextUri, Collections.<String, Object>emptyMap());
+                        lookInArchiveRek(factoryName, nextUri, nextSystem, classloader);
                     }
+
                 }
             } catch (Exception e) {
                 e.printStackTrace();
             }
 
             return null;
+        }
+
+        @NotNull
+        private static String pathToClassName(String entry) {
+            entry = entry.substring(0, entry.length() - 6);
+            if (entry.startsWith("/")) {
+                entry = entry.substring(1);
+            }
+            entry = entry.replace('/', '.');
+            return entry;
         }
 
         /**
@@ -178,8 +215,7 @@ public abstract class GSimCoreFactory {
 
                     if (entryName.toLowerCase().endsWith(".class")) {
                         try {
-                            entryName = entryName.substring(0, entryName.length() - 6);
-                            entryName = entryName.replace('/', '.');
+                            entryName = pathToClassName(entryName);
 
                             GSimCoreFactory clazz = loadClassIfFactoryAnnotationPresent(factoryName, classloader, entryName);
                             if (clazz != null) return clazz;
@@ -203,6 +239,9 @@ public abstract class GSimCoreFactory {
 
         @Nullable
         private static GSimCoreFactory loadClassIfFactoryAnnotationPresent(String factoryName, ClassLoader classloader, String entryName) throws ClassNotFoundException, InstantiationException, IllegalAccessException {
+            if (entryName.contains("StandaloneFactory")) {
+                System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>" + entryName + ">>>>>>>>>>>>>>>>>>>>>>>>>>>>><");
+            }
             try {
                 Class<?> clazz = classloader.loadClass(entryName);
                 if (clazz.isAnnotationPresent(CoreFactory.class)) {
@@ -212,8 +251,11 @@ public abstract class GSimCoreFactory {
                     }
                 }
 
-            } catch (NoClassDefFoundError e) {
-                LOG.debug("Ignore Error");
+            } catch (NoClassDefFoundError | Exception e) {
+                if (entryName.contains("StandaloneFactory")) {
+                    System.out.println(">>>PROBLEM>>>" + e.getMessage() + " [" + e.getClass().getSimpleName() + "]");
+                    LOG.debug("Ignore Error");
+                }
             }
             return null;
         }
