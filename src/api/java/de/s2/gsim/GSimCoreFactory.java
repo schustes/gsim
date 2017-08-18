@@ -125,7 +125,7 @@ public abstract class GSimCoreFactory {
                 if (dir.isFile()) {
                     name = dir.getName().toLowerCase();
 
-                    URI uri = new URI("jar:file:" + dir.getAbsolutePath());
+                    URI uri = new URI("jar:" + dir.toURI());
                     FileSystem system = FileSystems.newFileSystem(uri, Collections.<String, Object>emptyMap());
                     if (name.endsWith(".zip") || name.endsWith(".jar")) {
                         foundFactory = lookInArchiveRek(factoryName, uri, system, classloader);
