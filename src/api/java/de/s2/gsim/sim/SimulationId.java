@@ -68,19 +68,19 @@ public class SimulationId implements Serializable {
 
     @Override
     public String toString() {
-        return String.valueOf(ns + "/" + uid);
+        return String.valueOf(ns + "_" + uid);
     }
 
     /**
      * Parses the given string and tries to create a SimulationId from it.
      * 
-     * The excepted format is ns/uid, e.g. prisoners-dilemma/8883812312 Throws an exception if the format is not correct.
+     * The excepted format is ns_uid, e.g. prisoners-dilemma/8883812312 Throws an exception if the format is not correct.
      * 
      * @param idString
      * @return the SimulationId
      */
     public static SimulationId valueOf(String idString) {
-        String[] p = idString.split("/");
+        String[] p = idString.split("_");
         if (p.length == 2) {
             String ns = p[0];
             long id = Long.parseLong(p[1].trim());
