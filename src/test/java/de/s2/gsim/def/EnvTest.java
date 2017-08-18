@@ -1,20 +1,5 @@
 package de.s2.gsim.def;
 
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.startsWith;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.notNullValue;
-import static org.hamcrest.Matchers.nullValue;
-
-import java.util.HashMap;
-import java.util.NoSuchElementException;
-
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-
 import de.s2.gsim.GSimCore;
 import de.s2.gsim.GSimCoreFactory;
 import de.s2.gsim.GSimException;
@@ -22,14 +7,20 @@ import de.s2.gsim.api.objects.impl.AgentClassSim;
 import de.s2.gsim.environment.Environment;
 import de.s2.gsim.environment.Frame;
 import de.s2.gsim.environment.GenericAgentClass;
-import de.s2.gsim.objects.Action;
-import de.s2.gsim.objects.AgentClass;
-import de.s2.gsim.objects.AgentInstance;
-import de.s2.gsim.objects.Behaviour;
-import de.s2.gsim.objects.Condition;
-import de.s2.gsim.objects.ObjectClass;
+import de.s2.gsim.objects.*;
 import de.s2.gsim.objects.attribute.AttributeType;
 import de.s2.gsim.objects.attribute.DomainAttribute;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
+
+import java.util.HashMap;
+
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.startsWith;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
 
 public class EnvTest {
 
@@ -45,7 +36,35 @@ public class EnvTest {
        // core = GSimCoreFactory.customFactory("Standalone").createCore();
         env = core.create("test", new HashMap<>());
     }
-    
+
+    @Test
+    public void destroy_agent_removes_wrapper() throws Exception {
+        String agentName = "Test";
+        AgentClass a = env.createAgentClass(agentName, null);
+        assertThat("agent class exists", env.getAgentClass(a.getName()), notNullValue());
+        a.destroy();
+        assertThat("agent class deleted", env.getAgentClass(agentName), nullValue());
+    }
+
+    @Test
+    public void destroy_agent_from_env_removes_wrapper() throws Exception {
+        String agentName = "Test";
+        AgentClass a = env.createAgentClass(agentName, null);
+        assertThat("agent class exists", env.getAgentClass(agentName), notNullValue());
+        env.removeAgentClass(a);
+        assertThat("agent class deleted", env.getAgentClass(agentName), nullValue());
+    }
+
+    @Test
+    public void name_of_destroyed_agent_can_be_reused() throws Exception {
+        String agentName = "Test";
+        AgentClass a = env.createAgentClass(agentName, null);
+        a.destroy();
+        assertThat("agent class deleted", env.getAgentClass(agentName), nullValue());
+        AgentClass b = env.createAgentClass(agentName, null);
+        assertThat("agent class exists again", env.getAgentClass(agentName), notNullValue());
+    }
+
     @Test
     public void verify_behaviour_attributes_are_set() throws Exception {
     	AgentClass parent = env.createAgentClass("Test", null);

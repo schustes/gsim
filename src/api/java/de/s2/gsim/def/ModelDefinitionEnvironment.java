@@ -238,4 +238,15 @@ public interface ModelDefinitionEnvironment {
      * Clears the environment from agents.
      */
     public void removeAgentInstances();
+
+    /**
+     * Removes agent class, all of its subclasses and instance from the environment.
+     */
+    public void removeAgentClass(AgentClass cls);
+
+    /**
+     * Removes object class, all of its subclasses and instance from the environment.
+     */
+    public void removeObjectClass(ObjectClass cls);
+
 }

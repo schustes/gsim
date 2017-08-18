@@ -290,7 +290,10 @@ public abstract class GSimCoreFactory {
                     }
                 }
                 if (file.isDirectory()) {
-                    return lookInDirectory(factoryName, name + fileName + ".", file, classloader);
+                    GSimCoreFactory inDepth = lookInDirectory(factoryName, name + fileName + ".", file, classloader);
+                    if (inDepth != null) {
+                        return inDepth;
+                    }
                 }
             }
 

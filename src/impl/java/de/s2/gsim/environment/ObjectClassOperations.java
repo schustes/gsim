@@ -1,20 +1,15 @@
 package de.s2.gsim.environment;
 
 
-import static de.s2.gsim.environment.CommonFunctions.existsPath;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
-
 import de.s2.gsim.objects.Path;
 import de.s2.gsim.objects.attribute.Attribute;
 import de.s2.gsim.objects.attribute.AttributeFactory;
 import de.s2.gsim.objects.attribute.DomainAttribute;
+
+import java.util.*;
+import java.util.stream.Collectors;
+
+import static de.s2.gsim.environment.CommonFunctions.existsPath;
 
 public class ObjectClassOperations {
 
@@ -77,7 +72,7 @@ public class ObjectClassOperations {
 
 		return  here.clone();
 	}
-	
+
 	private void defineAttributeListInInstancesOfFrame(String listName, Frame here) {
 		for (Instance member : container.getInstancesOfClass(here, Instance.class)) {
 			member.setFrame(here);
@@ -87,7 +82,7 @@ public class ObjectClassOperations {
 
 	/**
 	 * The list must exist.
-	 * 
+	 *
 	 * @param cls
 	 * @param path
 	 * @param newValue
@@ -316,11 +311,17 @@ public class ObjectClassOperations {
 		container.getObjectSubClasses().parallelStream().forEach(object -> {
 			for (String listName : object.getDeclaredFrameListNames()) {
 				object.getChildFrames(listName).stream().filter(child -> child.isSuccessor(here.getName()) || child.getName().equals(here.getName()))
-				.forEach(child -> {
-					Path<TypedList<Frame>> p = Path.objectListPath(listName, child.getName()).append(path);
-					addChildFrame(object, p, addedObject);
-				});
+						.forEach(child -> {
+							Path<TypedList<Frame>> p = Path.objectListPath(listName, child.getName()).append(path);
+							addChildFrame(object, p, addedObject);
+						});
 			}
 		});
+	}
+
+	public boolean containsObjectSubClass(String name) {
+		return container.getObjectSubClasses()
+				.stream()
+				.anyMatch(sub -> sub.getName().equals(name));
 	}
 }

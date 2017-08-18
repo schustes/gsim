@@ -1,21 +1,16 @@
 package de.s2.gsim.environment;
 
 
-import static de.s2.gsim.environment.CommonFunctions.existsPath;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
-
 import android.annotation.Nullable;
 import de.s2.gsim.objects.Path;
 import de.s2.gsim.objects.attribute.Attribute;
 import de.s2.gsim.objects.attribute.AttributeFactory;
 import de.s2.gsim.objects.attribute.DomainAttribute;
+
+import java.util.*;
+import java.util.stream.Collectors;
+
+import static de.s2.gsim.environment.CommonFunctions.existsPath;
 
 /**
  * TODO all get methods must return a clone!
@@ -519,7 +514,13 @@ public class AgentClassOperations {
 	public GenericAgentClass getAgentSubClass(String className) {
 		return container.getAgentSubClasses()
 				.stream()
-				.filter(sub -> sub.getName().equals(className)).map(GenericAgentClass::clone).findAny().get();
+				.filter(sub -> sub.getName().equals(className)).map(GenericAgentClass::clone).findAny().orElse(null);
+	}
+
+	public boolean containsAgentSubClass(String className) {
+		return container.getAgentSubClasses()
+				.stream()
+				.anyMatch(sub -> sub.getName().equals(className));
 	}
 
 	public List<GenericAgentClass> getAgentSubClasses() {

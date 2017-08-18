@@ -36,7 +36,9 @@ public class AgentClassDef extends ObjectClassDef implements AgentClass, UnitWra
 	}
 
 	protected Frame getReal() {
-		super.setReal(env.getAgentClassOperations().getAgentSubClass(super.getRealRef().getName()));
+		Frame f = env.getAgentClassOperations().getAgentSubClass(super.getRealRef().getName());
+        precondition(this, f);
+		super.setReal(f);
 		return super.getRealRef();
 	}
 

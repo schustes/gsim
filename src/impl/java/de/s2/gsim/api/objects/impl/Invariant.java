@@ -7,10 +7,10 @@ import de.s2.gsim.GSimException;
 public abstract class Invariant {
 	
 	public static void precondition(ManagedObject f, Object... params) {
+		objectNotDestroyed(f);
 		for (Object o : params) {
 			Objects.requireNonNull(o);
 		}
-		objectNotDestroyed(f);
 	}
 
 	public static void intervalIntegrity(double from, double to) {

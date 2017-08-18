@@ -1,29 +1,15 @@
 package de.s2.gsim.api.impl;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
 import de.s2.gsim.GSimException;
-import de.s2.gsim.api.objects.impl.AgentClassDef;
-import de.s2.gsim.api.objects.impl.AgentInstanceDef;
-import de.s2.gsim.api.objects.impl.ObjectClassDef;
-import de.s2.gsim.api.objects.impl.ObjectInstanceDef;
-import de.s2.gsim.api.objects.impl.UnitWrapper;
+import de.s2.gsim.api.objects.impl.*;
 import de.s2.gsim.def.ModelDefinitionEnvironment;
-import de.s2.gsim.environment.Environment;
-import de.s2.gsim.environment.Frame;
-import de.s2.gsim.environment.GSimDefException;
-import de.s2.gsim.environment.GenericAgent;
-import de.s2.gsim.environment.GenericAgentClass;
-import de.s2.gsim.environment.HierarchyTree;
-import de.s2.gsim.environment.Instance;
+import de.s2.gsim.environment.*;
 import de.s2.gsim.objects.AgentClass;
 import de.s2.gsim.objects.AgentInstance;
 import de.s2.gsim.objects.ObjectClass;
 import de.s2.gsim.objects.ObjectInstance;
+
+import java.util.*;
 
 /**
  * This class hides the interna of the gsim frame and instance approach and exports only more comprehensible objects that the api publishes.
@@ -55,12 +41,10 @@ public class EnvironmentWrapper implements ModelDefinitionEnvironment {
     @Override
     public AgentClass createAgentClass(String name, String parent) throws GSimException {
         try {
-        	
-        	if (wrapperAgents.containsKey(name)) {
-        		throw new GSimDefException("Agent with name " + name + " exists already! Choose a unique name.");
-        	}
 
-        	GenericAgentClass g = parent != null ? env.getContainer().getAgentSubClass(parent) : env.getContainer().getAgentClass();
+            ensureAgentClassDoesNotExist(name);
+
+            GenericAgentClass g = parent != null ? env.getContainer().getAgentSubClass(parent) : env.getContainer().getAgentClass();
 
             if (g == null) {
                 g = env.getContainer().getAgentClass();
@@ -82,6 +66,17 @@ public class EnvironmentWrapper implements ModelDefinitionEnvironment {
             
         } catch (Exception e) {
             throw new GSimException("Exception", e);
+        }
+    }
+
+    private void ensureAgentClassDoesNotExist(String name) {
+        if (wrapperAgents.containsKey(name)) {
+            ManagedObject e = wrapperAgents.get(name);
+            if (e.isDestroyed()) {
+                wrapperAgents.remove(name);
+            } else {
+                throw new GSimDefException("Agent with name " + name + " exists already! Choose a unique name.");
+            }
         }
     }
 
@@ -160,10 +155,15 @@ public class EnvironmentWrapper implements ModelDefinitionEnvironment {
     public AgentClass getAgentClass(String name) throws GSimException {
         try {
 
-        	if (wrapperAgents.containsKey(name)) {
-        		return wrapperAgents.get(name);
-        	}
-        	
+            AgentClass c = extractFromLocalCache(name);
+            if (c != null) {
+                return c;
+            }
+
+            if (!env.getAgentClassOperations().containsAgentSubClass(name) ) {
+                return null;
+            }
+
             GenericAgentClass a = env.getAgentClassOperations().getAgentSubClass(name);
 
             if (a == null) {
@@ -177,6 +177,21 @@ public class EnvironmentWrapper implements ModelDefinitionEnvironment {
         } catch (Exception e) {
             throw new GSimException("Exception", e);
         }
+    }
+
+    private AgentClass extractFromLocalCache(String name) {
+        if (wrapperAgents.containsKey(name)) {
+            AgentClassDef c = wrapperAgents.get(name);
+            if (!c.isDestroyed()) {
+                return c;
+            } else {
+                wrapperAgents.remove(name);
+                return null;
+            }
+        }
+
+        return null;
+
     }
 
     @Override
@@ -458,9 +473,27 @@ public class EnvironmentWrapper implements ModelDefinitionEnvironment {
     }
 
     @Override
+    public void removeAgentClass(AgentClass cls) {
+        String key = cls.getName();
+        if (env.getAgentClassOperations().containsAgentSubClass(cls.getName())) {
+            cls.destroy();
+        }
+        this.wrapperAgents.remove(key);
+    }
+
+    @Override
+    public void removeObjectClass(ObjectClass cls) {
+
+        if (env.getObjectClassOperations().containsObjectSubClass(cls.getName())) {
+            cls.destroy();
+        }
+        this.wrapperObjects.remove(cls.getName());
+
+    }
+
+    @Override
     public void destroy() {
     	this.env = null;
     }
-
 
 }
