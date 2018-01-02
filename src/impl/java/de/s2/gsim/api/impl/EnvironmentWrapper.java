@@ -4,10 +4,8 @@ import de.s2.gsim.GSimException;
 import de.s2.gsim.api.objects.impl.*;
 import de.s2.gsim.def.ModelDefinitionEnvironment;
 import de.s2.gsim.environment.*;
-import de.s2.gsim.objects.AgentClass;
-import de.s2.gsim.objects.AgentInstance;
-import de.s2.gsim.objects.ObjectClass;
-import de.s2.gsim.objects.ObjectInstance;
+import de.s2.gsim.objects.*;
+import de.s2.gsim.objects.attribute.DomainAttribute;
 
 import java.util.*;
 
@@ -440,6 +438,14 @@ public class EnvironmentWrapper implements ModelDefinitionEnvironment {
             throw new GSimException("Exception", e);
         }
 
+    }
+
+    @Override
+    public AgentInstance[] randomiseAttribute(AgentClass agentClass, String attrPath, double standardVariation, int count) throws GSimException {
+        Path<DomainAttribute> attr = Path.attributePath(attrPath.split("/"));
+        GenericAgentClass ga = (GenericAgentClass) ((UnitWrapper) agentClass).toUnit();
+        env.getAgentInstanceOperations().randomiseNormalDistributedAttribute(ga, attr, 0, standardVariation);
+        return getAgents(agentClass.getName());
     }
 
     @Override

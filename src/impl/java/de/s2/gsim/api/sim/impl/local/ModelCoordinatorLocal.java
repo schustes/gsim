@@ -466,6 +466,9 @@ public class ModelCoordinatorLocal implements Simulation, Steppable {
 	@Override
 	public void addApplicationAgent(ApplicationAgent agent) {
 		this.appAgents.put(agent.getName(), agent);
+		if (agent instanceof AgentType) {
+            messenger.addAgentToHandle((AgentType) agent);
+        }
 	}
 
 }

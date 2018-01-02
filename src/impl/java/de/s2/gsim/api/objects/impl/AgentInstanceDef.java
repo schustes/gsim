@@ -282,7 +282,7 @@ public class AgentInstanceDef extends ObjectInstanceDef implements AgentInstance
 			}
 			a.setFrom(from);
 			a.setTo(to);
-			real = env.getAgentInstanceOperations().modifyAgentAttribute((GenericAgent) real, Path.attributePath( list, a.getName()), a);
+			real = env.getAgentInstanceOperations().modifyAgentAttribute((GenericAgent) real, Path.attributeListPath( list), a);
 		} catch (Exception e) {
 			throw new GSimException(e);
 		}
@@ -302,7 +302,7 @@ public class AgentInstanceDef extends ObjectInstanceDef implements AgentInstance
 				a = (NumericalAttribute) real.getAttribute(list, attName);
 			}
 			a.setValue(value);
-			real = env.getAgentInstanceOperations().modifyAgentAttribute((GenericAgent) real, Path.attributePath( list, a.getName()), a);
+			real = env.getAgentInstanceOperations().modifyAgentAttribute((GenericAgent) real, Path.attributeListPath( list), a);
 		} catch (Exception e) {
 			throw new GSimException(e);
 		}
@@ -346,7 +346,7 @@ public class AgentInstanceDef extends ObjectInstanceDef implements AgentInstance
 				a = new StringAttribute(attName, value);
 			}
 			a.setValue(value);
-			real = env.getAgentInstanceOperations().modifyAgentAttribute((GenericAgent) real, Path.attributePath( list, a.getName()), a);
+			real = env.getAgentInstanceOperations().modifyAgentAttribute((GenericAgent) real, Path.attributeListPath( list), a);
 		} catch (Exception e) {
 			throw new GSimException(e);
 		}

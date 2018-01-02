@@ -220,6 +220,9 @@ public interface ModelDefinitionEnvironment {
     public AgentInstance[] instanciateAgentsNormallyDistributed(AgentClass parent, String prefix, double standardVariation, int count)
             throws GSimException;
 
+    public AgentInstance[] randomiseAttribute(AgentClass agentClass, String attrPath, double standardVariation, int count)
+            throws GSimException;
+
     /**
      * Creates a list of agents.
      * 

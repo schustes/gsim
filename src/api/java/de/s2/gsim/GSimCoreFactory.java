@@ -8,10 +8,7 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.*;
-import java.nio.file.FileSystem;
-import java.nio.file.FileSystems;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import java.nio.file.*;
 import java.util.*;
 import java.util.jar.JarEntry;
 import java.util.jar.JarInputStream;
@@ -126,8 +123,10 @@ public abstract class GSimCoreFactory {
                     name = dir.getName().toLowerCase();
 
                     URI uri = new URI("jar:" + dir.toURI());
-                    FileSystem system = FileSystems.newFileSystem(uri, Collections.<String, Object>emptyMap());
-                    if (name.endsWith(".zip") || name.endsWith(".jar")) {
+                    FileSystem system = getFileSystem(uri);
+
+                    if ( (name.endsWith(".zip") || name.endsWith(".jar")
+                            && !token.contains("javax")  && !token.contains("org") && !token.contains("common") && !token.contains("google") && !token.contains("jre") && !token.contains("jdk") && !token.contains("spring") && !token.contains("apache"))) {
                         foundFactory = lookInArchiveRek(factoryName, uri, system, classloader);
                         if (foundFactory != null) {
                             factories.put(factoryName, foundFactory);
@@ -138,6 +137,14 @@ public abstract class GSimCoreFactory {
             }
             factories.put(factoryName, foundFactory);
             return foundFactory;
+        }
+
+        private static FileSystem getFileSystem(URI uri) throws IOException {
+            try {
+                return FileSystems.getFileSystem(uri);
+            } catch (FileSystemNotFoundException e) {
+                return FileSystems.newFileSystem(uri, Collections.<String, Object>emptyMap());
+            }
         }
 
         public static void main(String... args) throws Exception {
@@ -159,12 +166,13 @@ public abstract class GSimCoreFactory {
 
                 for (Iterator<Path> it = walk.iterator(); it.hasNext();){
                     Path p = it.next();
-                    if (p.toString().endsWith(".jar") && !p.toString().contains("spring") && !p.toString().contains("apache") ) {
+                    if (p.toString().endsWith(".jar") && !p.toString().contains("google") && !p.toString().contains("jre") && !p.toString().contains("jdk") && !p.toString().contains("spring") && !p.toString().contains("apache") ) {
                         GSimCoreFactory f = lookInArchive0(factoryName, uri, p, classloader);
                         if (f != null) {
                             return f;
                         }
-                    } else if (p.toString().endsWith(".class")) {
+                    } else if (!p.toString().contains("google") && !p.toString().contains("google") && !p.toString().contains("oracle") && !p.toString().contains("javax") && !p.toString().contains("spring") && !p.toString().contains("apache") && !p.toString().contains("sun") && !p.toString().contains("org")
+                            && p.toString().endsWith(".class")) {
                         String entry = pathToClassName(p.toString());
                         GSimCoreFactory factory =  loadClassIfFactoryAnnotationPresent(factoryName, classloader, entry);
                         if (factory != null) {
@@ -172,7 +180,6 @@ public abstract class GSimCoreFactory {
                         }
                     } else if (!p.toString().contains(".") && !p.toString().contains("/")) {
                         URI nextUri = new URI("jar:file:" + p.toString());
-                        System.out.println("-> NEXT -> " + nextUri);
                         FileSystem nextSystem = FileSystems.newFileSystem(nextUri, Collections.<String, Object>emptyMap());
                         lookInArchiveRek(factoryName, nextUri, nextSystem, classloader);
                     }
@@ -256,6 +263,8 @@ public abstract class GSimCoreFactory {
                     System.out.println(">>>PROBLEM>>>" + e.getMessage() + " [" + e.getClass().getSimpleName() + "]");
                     LOG.debug("Ignore Error");
                 }
+            } catch (Error e) {
+               // System.out.println(">>>>"  +  entryName);
             }
             return null;
         }

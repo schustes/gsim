@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 
 import de.s2.gsim.objects.Path;
 import de.s2.gsim.objects.attribute.Attribute;
+import de.s2.gsim.objects.attribute.DomainAttribute;
 
 public class AgentInstanceOperations {
 
@@ -72,6 +73,17 @@ public class AgentInstanceOperations {
         a = Generator.randomiseNormalDistributedAttributeValues(a, svar);
         container.addAgent(a);
         return (GenericAgent) a.clone();
+    }
+
+    public void randomiseNormalDistributedAttribute(GenericAgentClass cls, Path<DomainAttribute> attr, double mean, double svar) {
+        Path<List<DomainAttribute>> attrList = Path.withoutLastAttributeOrObject(attr, Path.Type.ATTRIBUTE);
+        String listName = attrList.getName();
+        DomainAttribute da = cls.resolvePath(attr);
+        for (GenericAgent genericAgent : container.getAllInstancesOfClass(cls, GenericAgent.class)) {
+            Attribute att = genericAgent.resolvePath(Path.attributePath(attr.toStringArray()));
+            this.replaceAgent((GenericAgent)Generator.randomiseAttributeNormallyDistributed(genericAgent, svar, listName, da, att));
+        }
+
     }
 
     public GenericAgent instanciateAgentWithUniformDistributedAttributes(GenericAgentClass cls, String name) {
