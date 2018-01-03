@@ -100,10 +100,10 @@ public class JessHandlerUtils {
 				assertConstantsInstanceRef(rete, owner, n);
 			}
 		}
-		assertConstantsAttRef(rete, owner, n);
+		assertConstantsAttRefIfReferencesInstance(rete, owner, n);
 	}
 
-	private static void assertConstantsAttRef(Rete rete, Instance owner, String n) {
+	private static void assertConstantsAttRefIfReferencesInstance(Rete rete, Instance owner, String n) {
 
 		Optional<Path<?>> childAttr = BuildingUtils.extractChildAttributePathWithoutParent(owner.getDefinition(), n);
 		if (!childAttr.isPresent()) {
@@ -117,7 +117,7 @@ public class JessHandlerUtils {
 
 		if (n.contains("{")) {
 			String attRef = n.substring(n.indexOf("{") + 1, n.lastIndexOf("}"));
-			Attribute ref = (Attribute) owner.resolvePath(path);
+			Attribute ref = owner.resolvePath(path);
 			if (ref instanceof IntervalAttribute) {
 				double val = ((IntervalAttribute) ref).getValue();
 				assertParameter(rete, attRef, String.valueOf(val));
@@ -126,7 +126,7 @@ public class JessHandlerUtils {
 			}
 		} else {
 			try {
-				Attribute ref = (Attribute) owner.resolvePath(path);
+				Attribute ref = owner.resolvePath(path);
 				if (ref instanceof IntervalAttribute) {
 					double val = ((IntervalAttribute) ref).getValue();
 					assertParameter(rete, att, String.valueOf(val));
@@ -134,7 +134,7 @@ public class JessHandlerUtils {
 					assertParameter(rete, att, ref.toValueString());
 				}
 			} catch (GSimDefException notExisiting) {
-				System.out.println("No object exists for given path " + path.toString());
+			    //this can happen if the condition refers to a class pattern. Ignore in this case, because it is not a constant, but is resolved e.g. in a rule or expansion later 
 			}
 		}
 
@@ -143,7 +143,7 @@ public class JessHandlerUtils {
 	private static void assertConstantsInstanceRef(Rete rete, Instance owner, String n) {
 
 		String listName = BuildingUtils.resolveList(n);
-		String objectWithList = BuildingUtils.resolveChildFrameWithList(owner.getDefinition(), n);// ParsingUtils.resolveObjectClassNoList(n);
+		String objectWithList = BuildingUtils.resolveChildFrameWithList(owner.getDefinition(), n);
 
 		for (Instance inst : owner.getChildInstances(listName)) {
 			assertObjectParam(rete, objectWithList, inst.getName());

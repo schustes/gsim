@@ -19,8 +19,6 @@ import de.s2.gsim.api.sim.agent.impl.RuntimeAgent;
 import de.s2.gsim.environment.BehaviourFrame;
 import de.s2.gsim.environment.ConditionDef;
 import de.s2.gsim.environment.ExpansionDef;
-import de.s2.gsim.environment.Frame;
-import de.s2.gsim.environment.GSimDefException;
 import de.s2.gsim.environment.Instance;
 import de.s2.gsim.environment.RLRule;
 import de.s2.gsim.environment.RLRuleFrame;
@@ -61,7 +59,7 @@ public class BehaviourEngine implements java.io.Serializable {
 
 	private boolean DEBUG = true;
 
-	private String debugDir = "/home/gsim/tmp";
+	private String debugDir = "/var/log/simulations/gsim";
 
 	private boolean dirty = false;
 
