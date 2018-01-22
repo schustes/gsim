@@ -441,7 +441,7 @@ public class EnvironmentWrapper implements ModelDefinitionEnvironment {
     }
 
     @Override
-    public AgentInstance[] randomiseAttribute(AgentClass agentClass, String attrPath, double standardVariation, int count) throws GSimException {
+    public AgentInstance[] randomiseAttribute(AgentClass agentClass, String attrPath, double standardVariation) throws GSimException {
         Path<DomainAttribute> attr = Path.attributePath(attrPath.split("/"));
         GenericAgentClass ga = (GenericAgentClass) ((UnitWrapper) agentClass).toUnit();
         env.getAgentInstanceOperations().randomiseNormalDistributedAttribute(ga, attr, 0, standardVariation);
