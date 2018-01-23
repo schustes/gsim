@@ -9,8 +9,24 @@ public abstract class Invariant {
 	public static void precondition(ManagedObject f, Object... params) {
 		objectNotDestroyed(f);
 		for (Object o : params) {
-			Objects.requireNonNull(o);
+			Objects.requireNonNull(o, "For managed object " + f + ", params=" + toString(params) + " all params must not be null!");
 		}
+	}
+
+	private static String toString(Object[] params) {
+	    StringBuilder b = new StringBuilder("{");
+		for (Object o: params) {
+		    if (b.length() > 1) {
+		        b.append(", ");
+            }
+		    if (o != null) {
+		        b.append(o.toString());
+            } else {
+                b.append("NULL");
+            }
+        }
+        b.append("}");
+        return b.toString();
 	}
 
 	public static void intervalIntegrity(double from, double to) {

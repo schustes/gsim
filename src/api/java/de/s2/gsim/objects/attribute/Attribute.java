@@ -114,7 +114,11 @@ public abstract class Attribute implements Cloneable {
 
     @Override
     public String toString() {
-        return new StringBuilder().append("(value=").append(toValueString()).append(")").toString();
+        return new StringBuilder()
+                .append("name=").append(name)
+                .append(", ")
+                .append("value=").append(toValueString())
+                .toString();
     }
 
 

@@ -28,7 +28,7 @@ public class ObjectClassDef extends Observable implements ObjectClass, UnitWrapp
 
 	protected Environment env;
 
-	private Frame real;
+	protected Frame real;
 
 	private ObjectClassReadOperations readOperations;
 

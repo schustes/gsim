@@ -340,5 +340,9 @@ public class AgentClassDef extends ObjectClassDef implements AgentClass, UnitWra
 
 	}
 
+    public String toString() {
+	    return "Wrapper type=" + getClass().getSimpleName() +", wrapped class=" + real.getClass().getSimpleName() +", object name=" + real.getName();
+    }
+
 
 }

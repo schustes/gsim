@@ -1,17 +1,12 @@
 package de.s2.gsim.environment;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.NoSuchElementException;
-
-import javax.validation.constraints.NotNull;
-
 import de.s2.gsim.objects.Path;
 import de.s2.gsim.objects.attribute.Attribute;
 import de.s2.gsim.objects.attribute.AttributeFactory;
 import de.s2.gsim.objects.attribute.DomainAttribute;
+
+import javax.validation.constraints.NotNull;
+import java.util.*;
 
 /**
  * An instance is the instantiation of a domain entity or frame. Instances extend frames by assigning concrete value to the attributes. Instances
@@ -698,5 +693,14 @@ public class Instance extends Unit<Instance, Attribute> {
 		return false;
 
 	}
+
+	public String toString() {
+	    return new StringBuilder("name=")
+                .append(this.getName())
+                .append(", ")
+                .append("type=")
+                .append(this.frame.getName())
+                .toString();
+    }
 
 }
