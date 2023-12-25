@@ -1,18 +1,5 @@
 package de.s2.gsim.api.objects.impl;
 
-import static de.s2.gsim.api.objects.impl.Invariant.intervalIntegrity;
-import static de.s2.gsim.api.objects.impl.Invariant.precondition;
-import static de.s2.gsim.api.objects.impl.Invariant.setIntegrity;
-import static de.s2.gsim.api.objects.impl.ObserverUtils.observeDependentObjectInstance;
-import static de.s2.gsim.api.objects.impl.ObserverUtils.stopObservingDependentObjectInstance;
-
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Observable;
-import java.util.Observer;
-
 import de.s2.gsim.GSimException;
 import de.s2.gsim.api.objects.impl.behaviour.BehaviourClass;
 import de.s2.gsim.api.objects.impl.behaviour.BehaviourInstance;
@@ -32,6 +19,19 @@ import de.s2.gsim.objects.attribute.IntervalAttribute;
 import de.s2.gsim.objects.attribute.NumericalAttribute;
 import de.s2.gsim.objects.attribute.SetAttribute;
 import de.s2.gsim.objects.attribute.StringAttribute;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
+
+import static de.s2.gsim.api.objects.impl.Invariant.intervalIntegrity;
+import static de.s2.gsim.api.objects.impl.Invariant.precondition;
+import static de.s2.gsim.api.objects.impl.Invariant.setIntegrity;
+import static de.s2.gsim.api.objects.impl.ObserverUtils.observeDependentObjectInstance;
+import static de.s2.gsim.api.objects.impl.ObserverUtils.stopObservingDependentObjectInstance;
 
 /**
  * AgentInstance implementation used to wrap agents during simulation time.
@@ -151,12 +151,15 @@ public class AgentInstanceSim extends Observable
 
 		precondition(this, list, objectName);
 
-		Instance in = real.getChildInstance(list, objectName);
-		if (in != null) {
-			return new DependentObjectInstance(this, list, in);
-		} else {
-			return null;
-		}
+		synchronized (real) {
+
+            Instance in = real.getChildInstance(list, objectName);
+            if (in != null) {
+                return new DependentObjectInstance(this, list, in);
+            } else {
+                return null;
+            }
+        }
 	}
 
 	@Override
@@ -267,7 +270,7 @@ public class AgentInstanceSim extends Observable
 			} else if (o instanceof ArrayList) {
 				return ((ArrayList<?>) o).clone();
 			} else {
-				throw new GSimException("Can't handle return value " + o);
+				throw new GSimException("Can't handle return port " + o);
 			}
 
 		} catch (Exception e) {
@@ -408,7 +411,7 @@ public class AgentInstanceSim extends Observable
 	}
 
 	@Override
-	public Unit<?, ?> toUnit() {
+	public Unit<Instance, Attribute> toUnit() {
 		return real;
 	}
 

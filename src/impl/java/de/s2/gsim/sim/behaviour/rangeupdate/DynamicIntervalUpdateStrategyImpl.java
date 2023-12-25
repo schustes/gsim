@@ -1,18 +1,5 @@
 package de.s2.gsim.sim.behaviour.rangeupdate;
 
-import static de.s2.gsim.sim.behaviour.bra.StateFactHelper.addStateFactIntervalElemFromStatefact;
-import static de.s2.gsim.sim.behaviour.rangeupdate.DynamicValueRangeExtensionRuleBuilder.increaseIntervalRangeInExperimentalRule;
-import static de.s2.gsim.sim.behaviour.util.FactUtils.getFloatSlotValue;
-import static de.s2.gsim.sim.behaviour.util.FactUtils.getStringSlotValue;
-import static de.s2.gsim.sim.behaviour.util.RuleEngineHelper.deleteFactByName;
-import static de.s2.gsim.sim.behaviour.util.RuleEngineHelper.deleteRule;
-import static de.s2.gsim.sim.behaviour.util.RuleEngineHelper.getStateFactsElems;
-import static de.s2.gsim.sim.behaviour.util.RuleEngineHelper.getStateFactsForRootRule;
-
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
-
 import de.s2.gsim.api.sim.agent.impl.RuntimeAgent;
 import de.s2.gsim.environment.ExpansionDef;
 import de.s2.gsim.environment.Frame;
@@ -31,15 +18,28 @@ import jess.Fact;
 import jess.JessException;
 import jess.Rete;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import static de.s2.gsim.sim.behaviour.bra.StateFactHelper.addStateFactIntervalElemFromStatefact;
+import static de.s2.gsim.sim.behaviour.rangeupdate.DynamicValueRangeExtensionRuleBuilder.increaseIntervalRangeInExperimentalRule;
+import static de.s2.gsim.sim.behaviour.util.FactUtils.getFloatSlotValue;
+import static de.s2.gsim.sim.behaviour.util.FactUtils.getStringSlotValue;
+import static de.s2.gsim.sim.behaviour.util.RuleEngineHelper.deleteFactByName;
+import static de.s2.gsim.sim.behaviour.util.RuleEngineHelper.deleteRule;
+import static de.s2.gsim.sim.behaviour.util.RuleEngineHelper.getStateFactsElems;
+import static de.s2.gsim.sim.behaviour.util.RuleEngineHelper.getStateFactsForRootRule;
+
 /**
- * Strategy implementation for interval attributes.
+ * Strategy implementation for interval attributeDistribution.
  * 
  * @author stephan
  *
  */
 public class DynamicIntervalUpdateStrategyImpl implements DynamicValueRangeUpdateStrategy {
 
-	private static String debugDir = "/home/gsim/tmp/trees";
+    private static String debugDir = "/var/log/simulations/gsim";
 
 	@Override
 	public void apply(RuntimeAgent agent, String baseRuleName, ExpansionDef expansion, RLParameterRanges rlRanges, Context context) {
@@ -156,7 +156,7 @@ public class DynamicIntervalUpdateStrategyImpl implements DynamicValueRangeUpdat
 	        DomainAttribute domainAttribute, RLParameterRanges rlRanges) {
 
 		if (!(attr instanceof NumericalAttribute)) {
-			throw new IllegalArgumentException("This strategy can only be applied to numerical attributes!");
+			throw new IllegalArgumentException("This strategy can only be applied to numerical attributeDistribution!");
 		}
 
 		double currentMin = Double.parseDouble(domainAttribute.getFillers().get(0));
@@ -174,8 +174,8 @@ public class DynamicIntervalUpdateStrategyImpl implements DynamicValueRangeUpdat
 	}
 
 	/**
-	 * Finds all statesfact elems that have either an upper limit greater than the given max value or a lower limit less than the given min
-	 * value.
+	 * Finds all statesfact elems that have either an upper limit greater than the given max port or a lower limit less than the given min
+	 * port.
 	 * 
 	 * @param states the states to look at
 	 * @param min the minimum of the elem

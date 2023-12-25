@@ -1,23 +1,22 @@
 package de.s2.gsim.environment;
 
+import de.s2.gsim.objects.Path;
+import de.s2.gsim.objects.attribute.AttributeType;
+import de.s2.gsim.objects.attribute.DomainAttribute;
+import de.s2.gsim.objects.attribute.NumericalAttribute;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
+
+import java.util.List;
+import java.util.Optional;
+
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
-
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
-
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-
-import de.s2.gsim.objects.Path;
-import de.s2.gsim.objects.attribute.AttributeType;
-import de.s2.gsim.objects.attribute.DomainAttribute;
-import de.s2.gsim.objects.attribute.NumericalAttribute;
+import static org.hamcrest.Matchers.nullValue;
 
 public class EnvironmentTest {
 
@@ -32,7 +31,7 @@ public class EnvironmentTest {
 		expected.expect(GSimDefException.class);
 
 		DomainAttribute attr = new DomainAttribute("test", AttributeType.STRING);
-		// The attribute test (value=) could not be added. Probably the path test/test specifies an non-existing object.
+		// The attribute test (port=) could not be added. Probably the path test/test specifies an non-existing object.
 		expected.expectMessage(
 				"The attribute " + attr.toString() 
 				+ " could not be added. Probably the path " 
@@ -86,10 +85,7 @@ public class EnvironmentTest {
 	}
 
 	@Test
-	public void agentclass_not_found_throws_nosuch_element_exception() {
-
-		expected.expect(NoSuchElementException.class);
-		expected.expectMessage("No value present");
+	public void agentclass_not_found_returns_null() {
 
 		Environment env = new Environment("test");
 
@@ -99,7 +95,8 @@ public class EnvironmentTest {
 			agentOperations.createAgentSubclass(String.valueOf(i), agentOperations.getGenericAgentClass());
 		}
 
-		agentOperations.getAgentSubClass("50");
+		GenericAgentClass ac = agentOperations.getAgentSubClass("50");
+		assertThat(ac, nullValue());
 
 	}
 
@@ -111,33 +108,33 @@ public class EnvironmentTest {
 		AgentClassOperations agentOperations = env.getAgentClassOperations();
 
 		GenericAgentClass p0 = agentOperations.createAgentSubclass("p0", agentOperations.getGenericAgentClass());
-		p0.defineAttributeList("p0-attributes");
+		p0.defineAttributeList("p0-attributeDistribution");
 		Frame f = Frame.newFrame("p0-TestFrame");
 		DomainAttribute a = new DomainAttribute("p0-attribute", AttributeType.STRING);
 		p0.defineObjectList("p0-framelist", f);
 		a.setDefault("p0-attr");
-		p0.addOrSetAttribute("p0-attributes", a);
+		p0.addOrSetAttribute("p0-attributeDistribution", a);
 
-		f.addOrSetAttribute("p0-child-attributes", a);
+		f.addOrSetAttribute("p0-child-attributeDistribution", a);
 		p0.addOrSetChildFrame("p0-framelist", f);
-		DomainAttribute astroke = f.getAttribute("p0-child-attributes", a.getName());
+		DomainAttribute astroke = f.getAttribute("p0-child-attributeDistribution", a.getName());
 		astroke.setDefault("c0");
-		f.addOrSetAttribute("p0-child-attributes", astroke);
+		f.addOrSetAttribute("p0-child-attributeDistribution", astroke);
 		p0.addOrSetChildFrame("p0-framelist", f);
 
-		String test1AttrVal = p0.getAttribute("p0-attributes", a.getName()).getDefaultValue();
-		String test2AttrVal = p0.<DomainAttribute> resolvePath(Path.attributePath("p0-framelist", "p0-TestFrame", "p0-child-attributes", a.getName()))
+		String test1AttrVal = p0.getAttribute("p0-attributeDistribution", a.getName()).getDefaultValue();
+		String test2AttrVal = p0.<DomainAttribute> resolvePath(Path.attributePath("p0-framelist", "p0-TestFrame", "p0-child-attributeDistribution", a.getName()))
 				.getDefaultValue();
 
-		assertThat("By-value", false, equalTo(test1AttrVal.equals(test2AttrVal)));
+		assertThat("By-port", false, equalTo(test1AttrVal.equals(test2AttrVal)));
 
-		GenericAgentClass p1 = agentOperations.createAgentSubclass("p1", p0);
+		GenericAgentClass p1 = agentOperations.createAgentSubclass("f1", p0);
 		a.setDefault("over");
-		p1.addOrSetAttribute("p0-attributes", a);
-		test1AttrVal = p0.getAttribute("p0-attributes", a.getName()).getDefaultValue();
-		test2AttrVal = p1.getAttribute("p0-attributes", a.getName()).getDefaultValue();
+		p1.addOrSetAttribute("p0-attributeDistribution", a);
+		test1AttrVal = p0.getAttribute("p0-attributeDistribution", a.getName()).getDefaultValue();
+		test2AttrVal = p1.getAttribute("p0-attributeDistribution", a.getName()).getDefaultValue();
 		System.out.println(test1AttrVal + "->" + test2AttrVal);
-		assertThat("No backpropagation of overloaded child attributes", test1AttrVal, not(equalTo(test2AttrVal)));
+		assertThat("No backpropagation of overloaded child attributeDistribution", test1AttrVal, not(equalTo(test2AttrVal)));
 
 	}
 
@@ -152,7 +149,7 @@ public class EnvironmentTest {
 		GenericAgentClass agentClass = agentClassOperations.createAgentSubclass("agent", agentClassOperations.getGenericAgentClass());
 		DomainAttribute a = new DomainAttribute("attribute", AttributeType.NUMERICAL);
 		a.setDefault(String.valueOf(numericalVal));
-		agentClass.addOrSetAttribute("attributes", a);
+		agentClass.addOrSetAttribute("attributeDistribution", a);
 
 		double svar = 0.5;
 		int popSize = 50;
@@ -199,15 +196,13 @@ public class EnvironmentTest {
 	@Test
 	public void verify_delete_agent() {
 
-		expected.expect(NoSuchElementException.class);
-
 		Environment env = new Environment("test");
 		AgentClassOperations agentOperations = env.getAgentClassOperations();
 		GenericAgentClass sub = agentOperations.createAgentSubclass("TestSub", null);
 		agentOperations.removeAgentClass(sub);
 
-		agentOperations.getAgentSubClass(sub.getName());
-
+		GenericAgentClass ac = agentOperations.getAgentSubClass(sub.getName());
+        assertThat(ac, nullValue());
 	}
 
 	@Test

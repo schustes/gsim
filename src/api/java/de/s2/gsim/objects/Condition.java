@@ -27,9 +27,9 @@ public interface Condition {
     String getParameterName() throws GSimException;
 
     /**
-     * Get the parameter value of the condition.
+     * Get the parameter port of the condition.
      * 
-     * @return the value
+     * @return the port
      * @throws GSimException if a problem occurs
      */
     String getParameterValue() throws GSimException;
@@ -51,9 +51,9 @@ public interface Condition {
     void setParameterName(String paramName) throws GSimException;
 
     /**
-     * Sets the parameter value.
+     * Sets the parameter port.
      * 
-     * @param paramVal the parameter value
+     * @param paramVal the parameter port
      * @throws GSimException if a problem occurs
      */
     void setParameterValue(String paramVal) throws GSimException;

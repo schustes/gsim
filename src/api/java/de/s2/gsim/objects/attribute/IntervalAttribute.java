@@ -1,7 +1,7 @@
 package de.s2.gsim.objects.attribute;
 
 /**
- * An interval attribute specifies a range of values it can take and optionally a concrete value it has at the moment.
+ * An interval attribute specifies a range of values it can take and optionally a concrete port it has at the moment.
  * 
  * @author stephan
  *
@@ -31,7 +31,7 @@ public class IntervalAttribute extends NumericalAttribute {
      * @param name name of the attribute
      * @param from lower bound
      * @param to upper bound
-     * @param value the value of the attribute
+     * @param value the port of the attribute
      */
     public IntervalAttribute(String name, double from, double to, double value) {
         super(name, value);

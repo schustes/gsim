@@ -11,7 +11,7 @@ public abstract class CommunicationProtocolRespond extends AbstractCommunication
 
     protected transient AgentType agent;
 
-    private double commId = 0;
+    private String commId = "";
 
     private String initiator;
 
@@ -24,7 +24,7 @@ public abstract class CommunicationProtocolRespond extends AbstractCommunication
     }
 
     @Override
-    public double getCommId() {
+    public String getCommId() {
         return commId;
     }
 
@@ -47,7 +47,7 @@ public abstract class CommunicationProtocolRespond extends AbstractCommunication
         agent = a;
     }
 
-    public void setCommId(double id) {
+    public void setCommId(String id) {
         commId = id;
     }
 

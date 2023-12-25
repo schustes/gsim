@@ -1,5 +1,15 @@
 package de.s2.gsim.api.sim.impl.local;
 
+import de.s2.gsim.environment.Environment;
+import de.s2.gsim.sim.GSimEngineException;
+import de.s2.gsim.sim.Simulation;
+import de.s2.gsim.sim.SimulationController;
+import de.s2.gsim.sim.SimulationId;
+import de.s2.gsim.sim.SimulationListener;
+import de.s2.gsim.sim.SimulationScheduler;
+import de.s2.gsim.sim.Steppable;
+import org.apache.log4j.Logger;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -10,19 +20,8 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Semaphore;
 
-import org.apache.log4j.Logger;
-
-import de.s2.gsim.environment.Environment;
-import de.s2.gsim.sim.GSimEngineException;
-import de.s2.gsim.sim.Simulation;
-import de.s2.gsim.sim.SimulationController;
-import de.s2.gsim.sim.SimulationId;
-import de.s2.gsim.sim.SimulationListener;
-import de.s2.gsim.sim.SimulationScheduler;
-import de.s2.gsim.sim.Steppable;
-
 /**
- * Executes one model instance at a time, i.e. all repetitions are processed in sequence.
+ * Executes one common instance at a time, i.e. all repetitions are processed in sequence.
  */
 public class SimulationInstanceContainerLocal implements SimulationController {
 
@@ -140,7 +139,7 @@ public class SimulationInstanceContainerLocal implements SimulationController {
 		}
 
 		schedulers.clear();
-		sims.clear();
+		//sims.clear();
 		listeners.clear();
 
 		instances.remove(ns);
@@ -196,7 +195,7 @@ public class SimulationInstanceContainerLocal implements SimulationController {
 			notifyInstanceFinished(uid);
 
 			try {
-				((Steppable) svm).destroy();
+				//((Steppable) svm).destroy();
 				SimulationScheduler c = schedulers.remove(uid);
 				c.shutdown();
 				c = null;
@@ -205,7 +204,7 @@ public class SimulationInstanceContainerLocal implements SimulationController {
 			}
 			svm = null;
 			finished.add(uid);
-			sims.remove(uid);
+			//sims.remove(uid);
 			if (blockingSema.availablePermits() == 0) {
 				blockingSema.release();
 			}

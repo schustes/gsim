@@ -1,9 +1,5 @@
 package de.s2.gsim.sim.behaviour.rulebuilder;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-
 import cern.jet.random.Uniform;
 import de.s2.gsim.environment.ActionDef;
 import de.s2.gsim.environment.ConditionDef;
@@ -13,9 +9,13 @@ import de.s2.gsim.environment.RLRule;
 import de.s2.gsim.environment.UserRule;
 import de.s2.gsim.sim.behaviour.util.BuildingUtils;
 
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+
 /**
  * Maintains a map from agent objects to variable names in the rule program. This is necessary if the same agent objects have to be referenced in
- * different lines of the rule program to match the proper facts in the rule base. Therefore it is important that the semantically same attributes and
+ * different lines of the rule program to match the proper facts in the rule base. Therefore it is important that the semantically same attributeDistribution and
  * objects are bound to the same variables during runtime; neither must the semantically identical objects be bound to different variable names nor
  * different a objects to the same variable name.
  * 

@@ -1,19 +1,5 @@
 package de.s2.gsim.api.objects.impl;
 
-import static de.s2.gsim.api.objects.impl.Invariant.intervalIntegrity;
-import static de.s2.gsim.api.objects.impl.Invariant.precondition;
-import static de.s2.gsim.api.objects.impl.Invariant.setIntegrity;
-import static de.s2.gsim.api.objects.impl.ObserverUtils.observeDependentObjectInstance;
-import static de.s2.gsim.api.objects.impl.ObserverUtils.stopObservingDependentObjectInstance;
-
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Observable;
-import java.util.Observer;
-
-import org.apache.log4j.Logger;
-
 import de.s2.gsim.GSimException;
 import de.s2.gsim.api.objects.impl.behaviour.BehaviourInstance;
 import de.s2.gsim.environment.BehaviourDef;
@@ -32,6 +18,19 @@ import de.s2.gsim.objects.attribute.IntervalAttribute;
 import de.s2.gsim.objects.attribute.NumericalAttribute;
 import de.s2.gsim.objects.attribute.SetAttribute;
 import de.s2.gsim.objects.attribute.StringAttribute;
+import org.apache.log4j.Logger;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
+
+import static de.s2.gsim.api.objects.impl.Invariant.intervalIntegrity;
+import static de.s2.gsim.api.objects.impl.Invariant.precondition;
+import static de.s2.gsim.api.objects.impl.Invariant.setIntegrity;
+import static de.s2.gsim.api.objects.impl.ObserverUtils.observeDependentObjectInstance;
+import static de.s2.gsim.api.objects.impl.ObserverUtils.stopObservingDependentObjectInstance;
 
 /**
  * Definition time agent instance implementation. Notifies other agents referring to this agent of any changes.
@@ -226,7 +225,7 @@ public class AgentInstanceDef extends ObjectInstanceDef implements AgentInstance
 			} else if (o instanceof ArrayList) {
 				return ((ArrayList<?>) o).clone();
 			} else {
-				throw new GSimException("Can't handle return value " + o);
+				throw new GSimException("Can't handle return port " + o);
 			}
 
 		} catch (Exception e) {

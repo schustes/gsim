@@ -1,15 +1,16 @@
 package de.s2.gsim.sim.behaviour;
 
-import java.util.HashMap;
-
 import de.s2.gsim.api.objects.impl.AgentInstanceSim;
 import de.s2.gsim.api.sim.agent.impl.RtExecutionContextImpl;
 import de.s2.gsim.api.sim.agent.impl.RuntimeAgent;
 import de.s2.gsim.objects.AgentInstance;
-import de.s2.gsim.sim.GSimEngineException;
-import de.s2.gsim.sim.communication.CommunicationProtocol;
+import de.s2.gsim.sim.communication.Communicator;
 
-public class Context implements java.io.Serializable {
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Optional;
+
+public class SimulationRuntimeContextImpl implements Serializable, SimulationRuntimeContext {
 
     private static final long serialVersionUID = 1L;
 
@@ -19,7 +20,7 @@ public class Context implements java.io.Serializable {
 
     private int sigCounter = 0;
 
-    public Context() {
+    public SimulationRuntimeContextImpl() {
     }
 
     public void addObject(String object) {
@@ -27,26 +28,28 @@ public class Context implements java.io.Serializable {
         sigCounter++;
     }
 
-    public RuntimeAgent getAgent() {
-        return exCtx.getOwner();
-    }
-
-    public AgentInstance getAgentIF() {
+    public AgentInstance getAgent() {
         return new AgentInstanceSim(exCtx.getOwner());
     }
 
-    public RtExecutionContextImpl getExcecutionContext() {
-        return exCtx;
+    RuntimeAgent getAgentInternal() {
+        return exCtx.getOwner();
     }
 
-    public String getObject(int pos) {
-        return objects.get(pos);
+    @Override
+    public Communicator getCommunicator() {
+        return exCtx.getOwner().getMessagingComponent();
     }
 
-    public String[] getObjects() {
+    public String[] getParameters() {
         String[] res = new String[objects.size()];
         objects.values().toArray(res);
         return res;
+    }
+
+    @Override
+    public Optional<String> getLastAction() {
+        return exCtx.getOwner().getLastAction();
     }
 
     public void setAgent(Object p) {
@@ -55,10 +58,6 @@ public class Context implements java.io.Serializable {
 
     public void setExecutionContext(RtExecutionContextImpl c) {
         exCtx = c;
-    }
-
-    public void startConversation(CommunicationProtocol p) throws GSimEngineException {
-        getAgent().getMessagingComponent().createConversation(p).start();
     }
 
 }

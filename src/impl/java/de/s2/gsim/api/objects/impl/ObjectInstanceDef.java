@@ -1,12 +1,5 @@
 package de.s2.gsim.api.objects.impl;
 
-import static de.s2.gsim.api.objects.impl.Invariant.intervalIntegrity;
-import static de.s2.gsim.api.objects.impl.Invariant.precondition;
-import static de.s2.gsim.api.objects.impl.Invariant.setIntegrity;
-
-import java.util.List;
-import java.util.Observable;
-
 import de.s2.gsim.GSimException;
 import de.s2.gsim.environment.Environment;
 import de.s2.gsim.environment.Frame;
@@ -20,6 +13,13 @@ import de.s2.gsim.objects.attribute.IntervalAttribute;
 import de.s2.gsim.objects.attribute.NumericalAttribute;
 import de.s2.gsim.objects.attribute.SetAttribute;
 import de.s2.gsim.objects.attribute.StringAttribute;
+
+import java.util.List;
+import java.util.Observable;
+
+import static de.s2.gsim.api.objects.impl.Invariant.intervalIntegrity;
+import static de.s2.gsim.api.objects.impl.Invariant.precondition;
+import static de.s2.gsim.api.objects.impl.Invariant.setIntegrity;
 
 /**
  * Implementation of definition object instance. Notifies any agents holding a relationship to it about changes.
@@ -329,7 +329,7 @@ public class ObjectInstanceDef extends Observable implements ObjectInstance, Uni
 	}
 
 	@Override
-	public Unit<?, ?> toUnit() {
+	public Unit<Instance, Attribute> toUnit() {
 		return real;
 	}
 

@@ -9,7 +9,7 @@ import de.s2.gsim.sim.Simulation;
  * implement the execute method.
  *
  * A ScenarioEvent is identified by two parameter target and action. The idea was that the target object could be any object on which something should
- * be executed, but in practice it's more or less only an additional identificator like the string action - because usually a reference to the model,
+ * be executed, but in practice it's more or less only an additional identificator like the string action - because usually a reference to the common,
  * and with this to any object in the simulation can be set (was more practical). The field optionalParameter can be used to handle possible arguments
  * (the reason for this was to have a common interface for a UI, but I don't know if this makes really sense).
  *

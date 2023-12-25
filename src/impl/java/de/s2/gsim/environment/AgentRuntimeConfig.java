@@ -1,6 +1,10 @@
 package de.s2.gsim.environment;
 
+import de.s2.gsim.sim.agent.ApplicationAgent;
+
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -40,6 +44,8 @@ public class AgentRuntimeConfig {
      * Caches the system agents active during a simulation.
      */
     private final Map<String, String> systemAgents = new HashMap<String, String>();
+
+    private final List<ApplicationAgent> applicationAgents = new ArrayList<>();
 
     public Map<String, String> getActionMappings() {
         return actionMappings;
@@ -81,12 +87,12 @@ public class AgentRuntimeConfig {
         this.agentRtClassMappings.put(agentClassName, rtName);
     }
 
-    public Map<String, String> getSystemAgents() {
-        return systemAgents;
+    public List<ApplicationAgent> getSystemAgents() {
+        return applicationAgents;
     }
 
-    public void addSystemAgents(String name, String cls) {
-        this.systemAgents.put(name, cls);
+    public void addSystemAgent(ApplicationAgent agent) {
+        this.applicationAgents.add(agent);
     }
     
     public void addOrSetAgentMapping(String agentName, String[] roleNames) {
@@ -99,10 +105,6 @@ public class AgentRuntimeConfig {
 
     public void addOrSetRuntimeRoleMapping(String role, String cls) {
         agentRtClassMappings.put(role, cls);
-    }
-
-    public void addOrSetSystemAgent(String name, String cls) {
-        systemAgents.put(name, cls);
     }
 
 

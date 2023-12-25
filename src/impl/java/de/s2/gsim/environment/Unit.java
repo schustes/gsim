@@ -30,6 +30,10 @@ public abstract class Unit<U,A> implements Cloneable {
     	this(name, isMutable, isSystem, new HashMap<>(), new TypedMap<>());
     }
 
+    public U entity() {
+        return (U)this;
+    }
+
     private Unit(String name, boolean isMutable, boolean isSystem, Map<String,List<A>> attributes, TypedMap<U> objects) {
     	this.name = name;
     	this.isMutable = isMutable;

@@ -2,7 +2,7 @@ package de.s2.gsim.objects.attribute;
 
 
 /**
- * Factory class to create attributes.
+ * Factory class to create attributeDistribution.
  * 
  * TODO might be moved to implementation!
  * 

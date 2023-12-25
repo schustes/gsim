@@ -12,7 +12,7 @@ import de.s2.gsim.objects.attribute.DomainAttribute;
  */
 public class ConditionFrame extends Frame {
 
-    public final static String ATTR_LIST_ATTRS = "attributes";
+    public final static String ATTR_LIST_ATTRS = "attributeDistribution";
 
     public final static String ATTR_LIST_PARAM = "parameter";
 
@@ -23,11 +23,11 @@ public class ConditionFrame extends Frame {
     static final long serialVersionUID = 8165736680329194821L;
 
     /**
-     * Creates a condition frame for a certain operand (attribute) and default operator and value.
+     * Creates a condition frame for a certain operand (attribute) and default operator and port.
      * 
      * @param var the operand (e.g. lists/numerical-attr-1)
      * @param op the operator (e.g. '=' or '>')
-     * @param val the value (e.g. a constant like '1')
+     * @param val the port (e.g. a constant like '1')
      * @return the frame
      */
     public static ConditionFrame newConditionFrame(String var, String op, String val) {
@@ -74,7 +74,7 @@ public class ConditionFrame extends Frame {
         b.addFiller(">=");
         b.addFiller("<=");
         b.addFiller("=");
-        DomainAttribute c = new DomainAttribute("parameter-value", AttributeType.STRING);
+        DomainAttribute c = new DomainAttribute("parameter-port", AttributeType.STRING);
         a0.setDefault(forParameter);
         a.setDefault("");
         b.setDefault("=");
@@ -130,7 +130,7 @@ public class ConditionFrame extends Frame {
     }
 
     public String getParameterValue() {
-        return this.getAttribute("parameter-value").getDefaultValue();
+        return this.getAttribute("parameter-port").getDefaultValue();
     }
 
     @Override
@@ -143,7 +143,7 @@ public class ConditionFrame extends Frame {
         DomainAttribute a0 = this.getAttribute("parameter-name");
         a0.setDefault(parameterName);
 
-        DomainAttribute b = this.getAttribute("parameter-value");
+        DomainAttribute b = this.getAttribute("parameter-port");
         b.setDefault(parameterValue);
 
         DomainAttribute c = this.getAttribute("operator");
@@ -167,7 +167,7 @@ public class ConditionFrame extends Frame {
     }
 
     public void setParameterValue(String parameterValue) {
-        DomainAttribute a0 = this.getAttribute("parameter-value");
+        DomainAttribute a0 = this.getAttribute("parameter-port");
         a0.setDefault(parameterValue);
         addOrSetAttribute(ATTR_LIST_PARAM, a0);
     }

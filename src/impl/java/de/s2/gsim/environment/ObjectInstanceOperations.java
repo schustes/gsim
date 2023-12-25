@@ -1,10 +1,11 @@
 package de.s2.gsim.environment;
 
-import java.util.Iterator;
-import java.util.List;
-
 import de.s2.gsim.objects.Path;
 import de.s2.gsim.objects.attribute.Attribute;
+
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
 public class ObjectInstanceOperations {
 
@@ -23,7 +24,10 @@ public class ObjectInstanceOperations {
      * @return the instance
      */
     protected Instance findObject(String name) {
-        return container.getObjects().parallelStream().filter(o -> o.getName().equals(name)).findAny().get();
+        Set<Instance> objects = container.getObjects();
+        synchronized (objects) {
+            return objects.stream().filter(o -> o.getName().equals(name)).findAny().get();
+        }
     }
     
     public List<Instance> getInstancesOfClass(Frame parent) {

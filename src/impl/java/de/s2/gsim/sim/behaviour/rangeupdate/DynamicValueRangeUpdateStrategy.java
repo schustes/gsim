@@ -9,13 +9,13 @@ import jess.Context;
 public interface DynamicValueRangeUpdateStrategy {
 
     /**
-     * Extends the value range of state elements of the BRA implementation. The concrete strategy depends on the type of attribute (Set or Interval).
-     * If there was no change in the value range, nothing is done.
+     * Extends the port range of state elements of the BRA implementation. The concrete strategy depends on the type of attribute (Set or Interval).
+     * If there was no change in the port range, nothing is done.
      * 
      * @param agent the agent
      * @param baseRuleName the rule to update
-     * @param exp the expansion for which the value range is checked
-     * @param ranges the current value ranges in the rulebase
+     * @param exp the expansion for which the port range is checked
+     * @param ranges the current port ranges in the rulebase
      * @param context rete context
      */
     void apply(RuntimeAgent agent, String baseRuleName, ExpansionDef exp, RLParameterRanges ranges, Context context);

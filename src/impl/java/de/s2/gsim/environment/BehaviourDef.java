@@ -261,7 +261,7 @@ public class BehaviourDef extends Instance {
     }
 
     public void setMaxNodes(int n) {
-        NumericalAttribute a = (NumericalAttribute) this.getAttribute("max-value");
+        NumericalAttribute a = (NumericalAttribute) this.getAttribute("max-port");
         a.setValue(n);
         this.setAttribute(a);
     }

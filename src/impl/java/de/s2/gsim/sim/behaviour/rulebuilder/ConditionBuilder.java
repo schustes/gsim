@@ -1,13 +1,5 @@
 package de.s2.gsim.sim.behaviour.rulebuilder;
 
-import static de.s2.gsim.sim.behaviour.util.BuildingUtils.extractChildAttributePathWithoutParent;
-import static de.s2.gsim.sim.behaviour.util.BuildingUtils.referencesChildFrame;
-import static de.s2.gsim.sim.behaviour.util.BuildingUtils.resolveChildFrameWithList;
-import static de.s2.gsim.sim.behaviour.util.BuildingUtils.resolveList;
-
-import java.util.List;
-import java.util.Optional;
-
 import cern.jet.random.Uniform;
 import de.s2.gsim.environment.ConditionDef;
 import de.s2.gsim.environment.Instance;
@@ -17,9 +9,17 @@ import de.s2.gsim.objects.attribute.NumericalAttribute;
 import de.s2.gsim.sim.GSimEngineException;
 import de.s2.gsim.util.Utils;
 
+import java.util.List;
+import java.util.Optional;
+
+import static de.s2.gsim.sim.behaviour.util.BuildingUtils.extractChildAttributePathWithoutParent;
+import static de.s2.gsim.sim.behaviour.util.BuildingUtils.referencesChildFrame;
+import static de.s2.gsim.sim.behaviour.util.BuildingUtils.resolveChildFrameWithList;
+import static de.s2.gsim.sim.behaviour.util.BuildingUtils.resolveList;
+
 /**
- * All conditions may have a variable or constant LHS. That is, on the LHS either attributes of the agent, or attributes of object types contained by
- * the agent can be referenced. On the RHS three cases are distinguished - Atom conditions: The RHS resolves directly to a constant attribute value
+ * All conditions may have a variable or constant LHS. That is, on the LHS either attributeDistribution of the agent, or attributeDistribution of object types contained by
+ * the agent can be referenced. On the RHS three cases are distinguished - Atom conditions: The RHS resolves directly to a constant attribute port
  * number or string - Attribute conditions: The RHS refers to an attribute of the agent - Variable conditions: The RHS refers to an attribute of an
  * objects in one of the agent's object lists.
  *
@@ -31,15 +31,9 @@ public abstract class ConditionBuilder {
 	}
 
 	/**
-	 * Call this method if the attribute spec contains a reference to another attribute
-	 * 
-	 * @param cond
-	 * @param objRefs
-	 * @param nRule_1
-	 * @return
-	 * @throws GSimEngineException
+	 * Call this method if the attribute modelconfig contains a reference to another attribute
 	 */
-	public static String createAttributeCondition(Instance owner, ConditionDef cond, Object2JessVariableBindingTable objRefs,
+	static String createAttributeCondition(Instance owner, ConditionDef cond, Object2JessVariableBindingTable objRefs,
 	        String nRule_1) throws GSimEngineException {
 
 		String nRule = "";
@@ -56,8 +50,8 @@ public abstract class ConditionBuilder {
 			vars[0] = var;
 		}
 
-		String replace = expr;// expr.substring(0, p1)+" ?value"+(k+1)+"
-		// "+expr.substring(p2+1);
+		String replace = expr;// expr.substring(0, f1)+" ?value"+(k+1)+"
+		// "+expr.substring(f2+1);
 		for (int r = 0; r < vars.length; r++) {
 			if (vars[r].length() > 0) {
 				if (vars[r].contains("}")) {
@@ -83,7 +77,7 @@ public abstract class ConditionBuilder {
 
 	}
 
-	public static String createCategoricalAtomCondition(Instance owner, String attName, String selectedFiller,
+	static String createCategoricalAtomCondition(Instance owner, String attName, String selectedFiller,
 	        Object2JessVariableBindingTable objRefs, String nRule_1) throws GSimEngineException {
 
 		String nRule = "";
@@ -104,7 +98,7 @@ public abstract class ConditionBuilder {
 
 	}
 
-	public static String createCategoricalAtomCondition(Instance owner, String attName, List<String> selectedFillers,
+	static String createCategoricalAtomCondition(Instance owner, String attName, List<String> selectedFillers,
 	        Object2JessVariableBindingTable objRefs, String nRule_1) throws GSimEngineException {
 
 		if (selectedFillers.size() == 1) {
@@ -167,12 +161,8 @@ public abstract class ConditionBuilder {
 	 * condition reads 'object::atribute EXISTS b', it is interpreted as: if there exists an object with attribute value b (no matter how
 	 * many of them), but it is also possible to ommit the value on the rhs of EXISTS, and the attribute, then it would be interpreted as
 	 * 'if there exists an object of type object'
-	 * 
-	 * @param cond
-	 * @param refs
-	 * @return
 	 */
-	public static String createExistsQuantifiedCondition(Instance agent, ConditionDef cond, Object2JessVariableBindingTable refs) {
+	static String createExistsQuantifiedCondition(Instance agent, ConditionDef cond, Object2JessVariableBindingTable refs) {
 
 
 		int variableIndex = Uniform.staticNextIntFromTo(0, 1000);
@@ -288,14 +278,8 @@ public abstract class ConditionBuilder {
 
 	/**
 	 * Creates a condition for any specification on the LHS, and a value on the RHS
-	 * 
-	 * @param cond
-	 * @param objRefs
-	 * @param nRule_1
-	 * @return
-	 * @throws GSimEngineException
 	 */
-	public static String createAtomCondition(Instance owner, ConditionDef cond, Object2JessVariableBindingTable objRefs, String nRule_1)
+	static String createAtomCondition(Instance owner, ConditionDef cond, Object2JessVariableBindingTable objRefs, String nRule_1)
 	        throws GSimEngineException {
 
 		String nRule = "";
@@ -327,18 +311,9 @@ public abstract class ConditionBuilder {
 	}
 
 	/**
-	 * Creates atom condition with a value range from min to max.
-	 * 
-	 * @param owner
-	 * @param attributeName
-	 * @param min
-	 * @param max
-	 * @param objRefs
-	 * @param nRule1
-	 * @return
-	 * @throws GSimEngineException
+	 * Creates atom condition with a port range from min to max.
 	 */
-	public static String createIntervalAtomCondition(Instance owner, String attributeName, double min, double max,
+	static String createIntervalAtomCondition(Instance owner, String attributeName, double min, double max,
 	        Object2JessVariableBindingTable objRefs, String nRule1, boolean inclusiveBounds) throws GSimEngineException {
 
 		StringBuilder nRule = new StringBuilder();
@@ -349,9 +324,13 @@ public abstract class ConditionBuilder {
 
 		String upper = inclusiveBounds ? "<= " : "< ";
 		int variableIndex = variableIndexBase + 1251;
-		nRule.append( "(value ?value")
+        //(numberp ?x" + (variableIdx + 200) + ")
+        nRule.append( "(value ?value")
 		        .append(variableIndex)
-		        .append("&:(and (>= ?value")
+		        .append("&:")
+                .append("(and ")
+                .append("(numberp ?value").append(variableIndex).append( ") ")
+                .append("(>= ?value")
 		        .append(variableIndex)
 		        .append(" ")
 		        .append(String.valueOf(min))
@@ -364,20 +343,14 @@ public abstract class ConditionBuilder {
 		        .append(String.valueOf(max))
 		        .append(") ) ))\n");
 
-		// nRule += "(value ?value" + k + 1251
-		// + "&:(and (>= ?value"+ k + 1251 + " " + String.valueOf(min) + " ) "
-		// + " (< ?value" + k + 1251 + " " + String.valueOf(max) + " ) ) "
-		//
-		// + " ))\n";
-
 		return nRule.toString();
 
 	}
 
 	/**
-	 * Creates conditions for variable or constant LHS, and variable RHS, that is on the LHS attributes of any other object can be
+	 * Creates conditions for variable or constant LHS, and variable RHS, that is on the LHS attributeDistribution of any other object can be
 	 * referenced, as well as on the RHS. Example: For all objects of type x with attribute v whose value equals the attribute w of objects
-	 * of type y. Or: For attribute a whose value is not equal to values of attributes b of objects of type x.
+	 * of type y. Or: For attribute a whose value is not equal to values of attributeDistribution b of objects of type x.
 	 * 
 	 * @param owner the agent
 	 * @param cond the condition to be parsed
@@ -386,7 +359,7 @@ public abstract class ConditionBuilder {
 	 * @return the string with the jess expression for that condition
 	 * @throws GSimEngineException
 	 */
-	public static String createVariableCondition(Instance owner, ConditionDef cond, Object2JessVariableBindingTable objRefs, String nRule_1)
+	static String createVariableCondition(Instance owner, ConditionDef cond, Object2JessVariableBindingTable objRefs, String nRule_1)
 	        throws GSimEngineException {
 
 		int k = Uniform.staticNextIntFromTo(0, 1000);
@@ -459,8 +432,18 @@ public abstract class ConditionBuilder {
 			}
 
 			String s0 = " (object-parameter (object-class \"" + object + "\") (instance-name " + binding + "))\n";
-			String s1 = " (parameter (name ?x" + (variableIdx + 200) + "&:(eq ?x" + (variableIdx + 200) + " (str-cat \"" + list + "/\" "
-			        + binding + " \"/" + att + "\"))) ";
+
+//			String s1 = " (parameter (name ?x" + (variableIdx + 200) + "&:(eq ?x" + (variableIdx + 200) + " (str-cat \"" + list + "/\" "
+//			        + binding + " \"/" + att + "\"))) ";
+
+    		String s1 = " (parameter (name ?x" + (variableIdx + 200) + "&:(eq ?x" + (variableIdx + 200)
+                    //+ " (and (numberp ?x" + (variableIdx + 200) + ") "
+                    + " (join " + "\"/\""
+                    + " \"" + list + "\" "
+			        + binding
+                    + " \"" + att + "\" "
+                    +")"
+                    +")) ";
 
 			if (!nRule_1.contains(s0)) {
 				nRule += s0 + s1;

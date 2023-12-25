@@ -1,15 +1,15 @@
 package de.s2.gsim.environment;
 
+import de.s2.gsim.objects.attribute.AttributeType;
+import de.s2.gsim.objects.attribute.DomainAttribute;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import de.s2.gsim.objects.attribute.AttributeType;
-import de.s2.gsim.objects.attribute.DomainAttribute;
-
 public class UserRuleFrame extends Frame {
 
-    public static final String ATTR_LIST_ATTRS = "attributes";
+    public static final String ATTR_LIST_ATTRS = "attributeDistribution";
 
     public static final String CATEGORY = "rule";
 

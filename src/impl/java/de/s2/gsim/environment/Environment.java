@@ -15,7 +15,7 @@ public class Environment implements Cloneable {
 	private EntitiesContainer container;
 
 	/**
-	 * Name space of the model.
+	 * Name space of the common.
 	 */
 	private final String ns;
 
@@ -47,7 +47,7 @@ public class Environment implements Cloneable {
 	/**
 	 * Constructor.
 	 * 
-	 * @param ns name space of the model
+	 * @param ns name space of the common
 	 */
 	public Environment(String ns) {
 		this.ns = ns;
@@ -86,7 +86,7 @@ public class Environment implements Cloneable {
 			this.getAgentRuntimeConfig().getAgentMappings().putAll(env.getAgentRuntimeConfig().getAgentMappings());
 			this.getAgentRuntimeConfig().getAgentOrder().putAll(env.getAgentRuntimeConfig().getAgentOrder());
 			this.getAgentRuntimeConfig().getAgentRtClassMappings().putAll(env.getAgentRuntimeConfig().getAgentRtClassMappings());
-			this.getAgentRuntimeConfig().getSystemAgents().putAll(env.getAgentRuntimeConfig().getSystemAgents());
+			this.getAgentRuntimeConfig().getSystemAgents().addAll(env.getAgentRuntimeConfig().getSystemAgents());
 		} catch (Exception e) {
 			throw new GSimDefException("Error in copy env", e);
 		}

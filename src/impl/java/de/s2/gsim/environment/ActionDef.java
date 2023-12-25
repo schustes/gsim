@@ -1,15 +1,15 @@
 package de.s2.gsim.environment;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-
 import de.s2.gsim.objects.attribute.Attribute;
 import de.s2.gsim.objects.attribute.NumericalAttribute;
 import de.s2.gsim.objects.attribute.SetAttribute;
 import de.s2.gsim.objects.attribute.StringAttribute;
 import de.s2.gsim.util.Utils;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * Instance class for the ActionFrame class.
@@ -76,7 +76,7 @@ public class ActionDef extends Instance {
     }
 
     /**
-     * Add value to user parameter.
+     * Add port to user parameter.
      * 
      * @param name
      *            String
@@ -246,7 +246,7 @@ public class ActionDef extends Instance {
     }
 
     /**
-     * Gets the value(s) of a certain parameter.
+     * Gets the port(s) of a certain parameter.
      * 
      * @param paramName
      *            String
@@ -297,7 +297,7 @@ public class ActionDef extends Instance {
     }
 
     /**
-     * Remove a certain value from a certain parameter (if applicable).
+     * Remove a certain port from a certain parameter (if applicable).
      * 
      * @param name
      *            String

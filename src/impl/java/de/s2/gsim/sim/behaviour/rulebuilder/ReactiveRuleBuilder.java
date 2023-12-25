@@ -1,12 +1,5 @@
 package de.s2.gsim.sim.behaviour.rulebuilder;
 
-import static de.s2.gsim.sim.behaviour.rulebuilder.ConditionBuilder.createAtomCondition;
-import static de.s2.gsim.sim.behaviour.rulebuilder.ConditionBuilder.createAttributeCondition;
-import static de.s2.gsim.sim.behaviour.rulebuilder.ConditionBuilder.createExistsQuantifiedCondition;
-import static de.s2.gsim.sim.behaviour.rulebuilder.ConditionBuilder.createVariableCondition;
-import static de.s2.gsim.sim.behaviour.util.BuildingUtils.getDefiningRoleForRule;
-import static de.s2.gsim.sim.behaviour.util.BuildingUtils.referencesChildFrame;
-
 import cern.jet.random.Uniform;
 import de.s2.gsim.api.sim.agent.impl.RuntimeAgent;
 import de.s2.gsim.environment.ActionDef;
@@ -14,10 +7,18 @@ import de.s2.gsim.environment.ConditionDef;
 import de.s2.gsim.environment.Instance;
 import de.s2.gsim.environment.UserRule;
 import de.s2.gsim.sim.GSimEngineException;
-import de.s2.gsim.sim.behaviour.Context;
-import de.s2.gsim.sim.behaviour.SimAction;
+import de.s2.gsim.sim.behaviour.SimulationActionExecutor;
+import de.s2.gsim.sim.behaviour.SimulationRuntimeAction;
+import de.s2.gsim.sim.behaviour.SimulationRuntimeContextImpl;
 import jess.JessException;
 import jess.Rete;
+
+import static de.s2.gsim.sim.behaviour.rulebuilder.ConditionBuilder.createAtomCondition;
+import static de.s2.gsim.sim.behaviour.rulebuilder.ConditionBuilder.createAttributeCondition;
+import static de.s2.gsim.sim.behaviour.rulebuilder.ConditionBuilder.createExistsQuantifiedCondition;
+import static de.s2.gsim.sim.behaviour.rulebuilder.ConditionBuilder.createVariableCondition;
+import static de.s2.gsim.sim.behaviour.util.BuildingUtils.getDefiningRoleForRule;
+import static de.s2.gsim.sim.behaviour.util.BuildingUtils.referencesChildFrame;
 
 public class ReactiveRuleBuilder {
 
@@ -126,14 +127,24 @@ public class ReactiveRuleBuilder {
 
                         String ns = agent.getNameSpace().split("/")[0];
                         nRule += " =>\n";
-                        nRule += " (bind ?res (call " + SimAction.class.getName() + " valueOf \"" + c.getClassName() + "\" \"" + ns + "\") )\n";
-                        nRule += " (bind ?ctx (new " + Context.class.getName() + "))\n";
-                        // nRule += " (set ?ctx agent (?*agent*))\n";
+
+
+                        nRule += " (bind ?executor (new " + SimulationActionExecutor.class.getName() + "))\n";
+                        nRule += " (bind ?ctx (new " + SimulationRuntimeContextImpl.class.getName() + "))\n";
+                        nRule += " (set ?ctx executionContext (?*agent* getExecutionContext(new java.lang.String \"" + role + "\")))\n";
+                        nRule += ctxString;
+                        nRule += " (set ?executor context ?ctx)\n";
+                        nRule += " (bind ?action " + c.getClassName() + ")\n";
+                        nRule += " (call ?executor execute ?action))\n";
+
+                        /*
+                        nRule += " (bind ?res (call " + SimulationActionExecutor.class.getName() + " valueOf \"" + c.getClassName() + "\" \"" + ns + "\") )\n";
+                        nRule += " (bind ?ctx (new " + SimulationRuntimeContextImpl.class.getName() + "))\n";
                         nRule += " (set ?ctx executionContext (?*agent* getExecutionContext(new java.lang.String \"" + role + "\")))\n";
                         nRule += ctxString;
                         nRule += " (set ?res context ?ctx)\n";
-                        // nRule += " (assert (executed-" + ruleIdent + "))\n";
-						nRule += " (call ?res doExecute))\n";
+						nRule += " (call ?res execute))\n";
+						*/
 
                         res += nRule + "\n";
                     }
@@ -193,8 +204,8 @@ public class ReactiveRuleBuilder {
 
             String ns = agent.getNameSpace().split("/")[0];
             nRule += " =>\n";
-            nRule += " (bind ?res (call " + SimAction.class.getName() +" valueOf \"" + consequence.getClassName() + "\" \"" + ns + "\") )\n";
-            nRule += " (bind ?ctx (new " + Context.class.getName() + "))\n";
+            nRule += " (bind ?res (call " + SimulationRuntimeAction.class.getName() +" valueOf \"" + consequence.getClassName() + "\" \"" + ns + "\") )\n";
+            nRule += " (bind ?ctx (new " + SimulationRuntimeContextImpl.class.getName() + "))\n";
             nRule += " (set ?ctx executionContext (?*agent* getExecutionContext(new java.lang.String \"" + role + "\")))\n";
             // nRule += " (set ?ctx executionContext (?*agent* getExecutionContext(new java.lang.String \"" + role + "\")))\n";
             nRule += ctxString;

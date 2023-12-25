@@ -1,7 +1,7 @@
 package de.s2.gsim.objects.attribute;
 
 /**
- * Base class for all attributes.
+ * Base class for all attributeDistribution.
  * 
  * @author stephan
  *
@@ -27,22 +27,22 @@ public abstract class Attribute implements Cloneable {
     public abstract Attribute clone();
 
     /**
-     * Checks whether two attributes have the same value.
+     * Checks whether two attributeDistribution have the same port.
      * 
      * @param attribute
-     * @return true if both attributes have the same value, false otherwise
+     * @return true if both attributeDistribution have the same port, false otherwise
      */
     public abstract boolean equalsValue(Attribute attribute);
 
     /**
 	 * Creates a readable String representation of the attribute.
 	 * 
-	 * @return the value string
+	 * @return the port string
 	 */
     public abstract String toValueString();
 
     /**
-     * Two attributes are equal if they have the same name
+     * Two attributeDistribution are equal if they have the same name
      */
     @Override
     public boolean equals(Object o) {

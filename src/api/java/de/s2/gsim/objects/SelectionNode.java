@@ -40,14 +40,14 @@ public interface SelectionNode extends Rule {
 
     /**
      * Adds a new action, specified by the formattedString parameter. The formattedString ($action::$object:attribute) contains an action and
-     * optionally an object and attribute. Together with the given operator and value, a condition from the object and attribute is created. If the
+     * optionally an object and attribute. Together with the given operator and port, a condition from the object and attribute is created. If the
      * condition already exists, the action is added to the consequents, otherwise a new condition is added.
      * 
      * This is shorthand for the more accurate method addNodeRef(...) below.
      * 
      * @param formattedString a string containing action, object and the attribute used for the LHS rule evaluations ($action::$object:attribute)
      * @param op Rule operator
-     * @param val Rule criterion value
+     * @param val Rule criterion port
      * @throws GSimException if a problem occurs
      */
     void addNodeRefWithCondition(String formattedString, String op, String val) throws GSimException;
@@ -60,7 +60,7 @@ public interface SelectionNode extends Rule {
      * @param objectRef the object under evaluation of the node
      * @param relativeAttPath the attribute path in the object to be evaluated
      * @param op Rule operator
-     * @param val criterion value
+     * @param val criterion port
      * @throws GSimException if a problem occurs
      */
     void addNodeRefWithCondition(String actionRef, String objectRef, String relativeAttPath, String op, String val) throws GSimException;
@@ -77,9 +77,9 @@ public interface SelectionNode extends Rule {
     void addNodeRefWithoutCondition(String actionRef, String objectRef, String relativeAttPath) throws GSimException;
 
     /**
-     * Gets all referenced attributes an objects of the the RL node as their string representation.
+     * Gets all referenced attributeDistribution an objects of the the RL node as their string representation.
      * 
-     * @return a list of attributes in the condition part of the rule
+     * @return a list of attributeDistribution in the condition part of the rule
      * @throws GSimException if a problem occurs
      */
     String[] getNodeRefs() throws GSimException;
@@ -102,7 +102,7 @@ public interface SelectionNode extends Rule {
     Action[] getReferencedActions() throws GSimException;
 
     /**
-     * Gets all referenced object attributes that the referenced action takes as parameters.
+     * Gets all referenced object attributeDistribution that the referenced action takes as parameters.
      * 
      * @param actionRef the name of the action
      * @return the parameter list

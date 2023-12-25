@@ -7,7 +7,12 @@ import de.s2.gsim.api.objects.impl.AgentClassSim;
 import de.s2.gsim.environment.Environment;
 import de.s2.gsim.environment.Frame;
 import de.s2.gsim.environment.GenericAgentClass;
-import de.s2.gsim.objects.*;
+import de.s2.gsim.objects.Action;
+import de.s2.gsim.objects.AgentClass;
+import de.s2.gsim.objects.AgentInstance;
+import de.s2.gsim.objects.Behaviour;
+import de.s2.gsim.objects.Condition;
+import de.s2.gsim.objects.ObjectClass;
 import de.s2.gsim.objects.attribute.AttributeType;
 import de.s2.gsim.objects.attribute.DomainAttribute;
 import org.junit.Before;
@@ -20,7 +25,9 @@ import java.util.HashMap;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.startsWith;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.nullValue;
 
 public class EnvTest {
 
@@ -184,11 +191,15 @@ public class EnvTest {
         AgentClass subClass = env.createAgentClass("sub", agentClass.getName());
         AgentInstance inst = env.instanciateAgent(subClass, "agent_instance");
 
+        assertThat(inst.getObjects("list").length, equalTo(1));
+
         agentClass.removeObject("list", objClass);
 
         assertThat("attribute of child object should be empty", subClass.getAttributes("list").length, equalTo(0));
 
-        inst.getObject("list", "att-1");
+        assertThat(inst.getObjects("list").length, equalTo(0));
+
+        inst.getObject("list", "obj-class");
 
     }
 

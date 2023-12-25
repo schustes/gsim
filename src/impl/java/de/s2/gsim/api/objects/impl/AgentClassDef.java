@@ -1,28 +1,18 @@
 package de.s2.gsim.api.objects.impl;
 
-import static de.s2.gsim.api.objects.impl.Invariant.precondition;
-import static de.s2.gsim.api.objects.impl.ObserverUtils.observeDependentObject;
-import static de.s2.gsim.api.objects.impl.ObserverUtils.stopObservingDependent;
-import static de.s2.gsim.api.objects.impl.ObserverUtils.stopObservingDependentObject;
-
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Observable;
-import java.util.Observer;
-
 import de.s2.gsim.GSimException;
 import de.s2.gsim.api.objects.impl.behaviour.BehaviourClass;
-import de.s2.gsim.environment.BehaviourFrame;
-import de.s2.gsim.environment.Environment;
-import de.s2.gsim.environment.Frame;
-import de.s2.gsim.environment.GenericAgentClass;
-import de.s2.gsim.environment.TypedList;
+import de.s2.gsim.environment.*;
 import de.s2.gsim.objects.AgentClass;
 import de.s2.gsim.objects.Behaviour;
 import de.s2.gsim.objects.ObjectClass;
 import de.s2.gsim.objects.Path;
 import de.s2.gsim.objects.attribute.DomainAttribute;
+
+import java.util.*;
+
+import static de.s2.gsim.api.objects.impl.Invariant.precondition;
+import static de.s2.gsim.api.objects.impl.ObserverUtils.*;
 
 /**
  * Definition time agent class. Notifies related objects (agent classes, agent instance) of any changes.
@@ -269,7 +259,7 @@ public class AgentClassDef extends ObjectClassDef implements AgentClass, UnitWra
 			} else if (o instanceof ArrayList) {
 				return ((ArrayList<?>) o).clone();
 			} else {
-				throw new GSimException("Can't handle return value " + o);
+				throw new GSimException("Can't handle return port " + o);
 			}
 		} catch (Exception e) {
 			throw new GSimException(e);

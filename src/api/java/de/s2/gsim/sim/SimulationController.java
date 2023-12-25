@@ -14,7 +14,7 @@ public interface SimulationController {
     void clearListeners();
 
     /**
-     * Gets the simulation ids of the simulations instances currently running for the model.
+     * Gets the simulation ids of the simulations instances currently running for the common.
      * 
      * @return List of SimulationID @
      */
@@ -30,30 +30,30 @@ public interface SimulationController {
 
 
     /**
-     * Returns the current state of a model being run in a simulation.
+     * Returns the current state of a common being run in a simulation.
      * 
      * @param uid id of the simulation
-     * @return ModelState an object containing information about the current state of the model @
+     * @return ModelState an object containing information about the current state of the common @
      */
     Simulation getModelState(SimulationId uid);
 
     /**
-     * Starts a model run by starting all simulation instances.
+     * Starts a common run by starting all simulation instances.
      */
     void start();
 
     /**
-     * Pauses the model run by pausing all simulation instances.
+     * Pauses the common run by pausing all simulation instances.
      */
     void pause();
 
     /**
-     * Resumes a model run by resuming all simulation instances.
+     * Resumes a common run by resuming all simulation instances.
      */
     void resume();
 
     /**
-     * Shuts down a model run and all its simulations.
+     * Shuts down a common run and all its simulations.
      */
     void shutdown();
 

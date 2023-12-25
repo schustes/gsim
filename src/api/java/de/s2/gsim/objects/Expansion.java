@@ -4,9 +4,9 @@ import de.s2.gsim.GSimException;
 
 /**
  * An Expansion is a special kind of condition that can be split up into more conditions during runtime. This requires that the original expansion
- * object can be defined in terms of value lists or ranges. The BRA extension will then split these ranges into smaller ones.
+ * object can be defined in terms of port lists or ranges. The BRA extension will then split these ranges into smaller ones.
  * 
- * A rule with expansion condition looks like. say, if (value> min and value < max) then do ...
+ * A rule with expansion condition looks like. say, if (port> min and port < max) then do ...
  * 
  * @author Stephan
  *
@@ -14,7 +14,7 @@ import de.s2.gsim.GSimException;
 public interface Expansion {
 
     /**
-     * Add a filler (component) to a value list.
+     * Add a filler (component) to a port list.
      * 
      * @param filler the filler
      * @throws GSimException if a problem occurs
@@ -22,7 +22,7 @@ public interface Expansion {
     void addFiller(String filler) throws GSimException;
 
     /**
-     * Gets all fillers (components of a value list) if this expension i defined in terms of a value list.
+     * Gets all fillers (components of a port list) if this expension i defined in terms of a port list.
      * 
      * @return the fillers
      * @throws GSimException if a problem occurs
@@ -30,17 +30,17 @@ public interface Expansion {
     String[] getFillers() throws GSimException;
 
     /**
-     * Gets the maximum value if this expansion if defined in terms of a numeric range.
+     * Gets the maximum port if this expansion if defined in terms of a numeric range.
      * 
-     * @return the max value
+     * @return the max port
      * @throws GSimException if a problem occurs
      */
     String getMax() throws GSimException;
 
     /**
-     * Gets the minimum value if this expansion if defined in terms of a numeric range.
+     * Gets the minimum port if this expansion if defined in terms of a numeric range.
      * 
-     * @return the min value
+     * @return the min port
      * @throws GSimException if a problem occurs
      */
     String getMin() throws GSimException;
@@ -62,17 +62,17 @@ public interface Expansion {
     boolean isNumerical() throws GSimException;
 
     /**
-     * Set the max value if the expansion is numeric.
+     * Set the max port if the expansion is numeric.
      * 
-     * @param parameterValue the max value
+     * @param parameterValue the max port
      * @throws GSimException if a problem occurs
      */
     void setMax(String parameterValue) throws GSimException;
 
     /**
-     * Set the min value if the expansion is numeric.
+     * Set the min port if the expansion is numeric.
      * 
-     * @param parameterValue the max value
+     * @param parameterValue the max port
      * @throws GSimException if a problem occurs
      */
     void setMin(String parameterValue) throws GSimException;

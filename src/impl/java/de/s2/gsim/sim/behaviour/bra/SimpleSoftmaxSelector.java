@@ -1,11 +1,5 @@
 package de.s2.gsim.sim.behaviour.bra;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
-import org.apache.log4j.Logger;
-
 import jess.Fact;
 import jess.JessException;
 import jess.RU;
@@ -13,6 +7,11 @@ import jess.Token;
 import jess.Userfunction;
 import jess.Value;
 import jess.ValueVector;
+import org.apache.log4j.Logger;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 public class SimpleSoftmaxSelector implements Userfunction, java.io.Serializable {
 

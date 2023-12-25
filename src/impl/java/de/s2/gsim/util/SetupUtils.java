@@ -2,15 +2,14 @@ package de.s2.gsim.util;
 
 //import gsim.sim.engine.remote.ServerRegistryInitializer;
 
+import org.apache.log4j.Logger;
+
+import javax.naming.Context;
+import javax.naming.InitialContext;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.Hashtable;
 import java.util.Properties;
-
-import javax.naming.Context;
-import javax.naming.InitialContext;
-
-import org.apache.log4j.Logger;
 
 public class SetupUtils {
 
@@ -43,9 +42,9 @@ public class SetupUtils {
 
         Hashtable<String, String> env = new Hashtable<String, String>();
 
-        // env.put(Context.INITIAL_CONTEXT_FACTORY,"org.jnp.interfaces.NamingContextFactory");
+        // env.put(SimulationRuntimeContextImpl.INITIAL_CONTEXT_FACTORY,"org.jnp.interfaces.NamingContextFactory");
         env.put(Context.PROVIDER_URL, "localhost:1100");
-        // env.put(Context.URL_PKG_PREFIXES,
+        // env.put(SimulationRuntimeContextImpl.URL_PKG_PREFIXES,
         // "org.jboss.naming:org.jnp.interfaces:org.jboss.invocation.jnp.interfaces");
 
         InputStream s = null;
@@ -204,7 +203,7 @@ public class SetupUtils {
      * 
      * Properties props = new Properties(); props.load(s);
      * 
-     * String p = props.getProperty("model.prefetch", "false"); logger.debug(p); boolean b = Boolean.parseBoolean(p);
+     * String p = props.getProperty("common.prefetch", "false"); logger.debug(p); boolean b = Boolean.parseBoolean(p);
      * 
      * return b;
      * 
@@ -216,7 +215,7 @@ public class SetupUtils {
      * 
      * Properties props = new Properties(); props.load(s);
      * 
-     * String p = props.getProperty("model.persistentCacheThreshold", "1000"); return Integer.parseInt(p);
+     * String p = props.getProperty("common.persistentCacheThreshold", "1000"); return Integer.parseInt(p);
      * 
      * } catch (Exception e) { return 1000; }
      * 
@@ -226,7 +225,7 @@ public class SetupUtils {
      * 
      * Properties props = new Properties(); props.load(s);
      * 
-     * String p = props.getProperty("model.maxCacheSize", "1000"); return Integer.parseInt(p);
+     * String p = props.getProperty("common.maxCacheSize", "1000"); return Integer.parseInt(p);
      * 
      * } catch (Exception e) { return 1000; }
      * 
@@ -391,7 +390,7 @@ public class SetupUtils {
      */
     /**
      * 
-     * Creates default properties to initialise a model from a - possibly remote - client. This means, an explicit jndi-provider is expected from
+     * Creates default properties to initialise a common from a - possibly remote - client. This means, an explicit jndi-provider is expected from
      * server.properties, because it cannot be assumed that autodiscovery will work.
      * 
      * @return
@@ -423,7 +422,7 @@ public class SetupUtils {
 
             gprops.put(GSimProperties.DB_MANAGER, props.getProperty("db.connectionpool", "java:gsim-ds"));
 
-            // also specified by implementor, but not in the model, but on the server
+            // also specified by implementor, but not in the common, but on the server
             // props.put(GSimProperties.DB_CONNECTIONPOOL, "java:gsim-ds");
 
             gprops.put(GSimProperties.JNDICONTEXT, createClientContextEnvironment());
@@ -431,7 +430,7 @@ public class SetupUtils {
             // don't need to be specified if don't care
             gprops.put(GSimProperties.ACTION_POLICY, POLICY_SERIAL);
             gprops.put(GSimProperties.PARTITION_SIZE, "100");
-            gprops.put(GSimProperties.DB_CLEAR, new Boolean(true));
+            gprops.put(GSimProperties.DB_CLEAR, Boolean.TRUE);
 
             gprops.put(GSimProperties.MAX_REWARD, String.valueOf(1));
 
@@ -484,7 +483,7 @@ public class SetupUtils {
 
             gprops.put(GSimProperties.DB_CONNECTIONPOOL, dataSourceName);
 
-            // also specified by implementor, but not in the model, but on the server
+            // also specified by implementor, but not in the common, but on the server
             // props.put(GSimProperties.DB_CONNECTIONPOOL, "java:gsim-ds");
 
             gprops.put(GSimProperties.JNDICONTEXT, createClientContextEnvironment());
@@ -492,7 +491,7 @@ public class SetupUtils {
             // don't need to be specified if don't care
             gprops.put(GSimProperties.ACTION_POLICY, POLICY_SERIAL);
             gprops.put(GSimProperties.PARTITION_SIZE, "100");
-            gprops.put(GSimProperties.DB_CLEAR, new Boolean(false));
+            gprops.put(GSimProperties.DB_CLEAR, Boolean.FALSE);
 
             gprops.put(GSimProperties.MAX_REWARD, String.valueOf(1));
 
@@ -558,7 +557,7 @@ public class SetupUtils {
     }
 
     /*
-     * public static javax.naming.Context createLocalJMSContext() {
+     * public static javax.naming.SimulationRuntimeContextImpl createLocalJMSContext() {
      * 
      * Hashtable env = new Hashtable();
      * 
@@ -572,10 +571,10 @@ public class SetupUtils {
      * props.getProperty("jndi.url_pkg_prefixes", "org.jboss.naming:org.jnp.interfaces"); String provider = props.getProperty("jndi.initial_factory",
      * "org.jnp.interfaces.NamingContextFactory");
      * 
-     * env.put(Context.PROVIDER_URL, jndiPrURL + ":" + jndiPort); // cluster-port env.put(Context.URL_PKG_PREFIXES, pre);
-     * env.put(Context.INITIAL_CONTEXT_FACTORY, provider);
+     * env.put(SimulationRuntimeContextImpl.PROVIDER_URL, jndiPrURL + ":" + jndiPort); // cluster-port env.put(SimulationRuntimeContextImpl.URL_PKG_PREFIXES, pre);
+     * env.put(SimulationRuntimeContextImpl.INITIAL_CONTEXT_FACTORY, provider);
      * 
-     * Context ctx = new InitialContext(env);
+     * SimulationRuntimeContextImpl ctx = new InitialContext(env);
      * 
      * return ctx; } catch (Exception e) { e.printStackTrace(); System.exit(0); return null;// very well.. } }
      */

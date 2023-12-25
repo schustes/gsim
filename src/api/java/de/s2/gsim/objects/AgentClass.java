@@ -96,7 +96,7 @@ public interface AgentClass extends ObjectClass {
      * 
      * @param path the path
      * @return Object an Attribute if the name specified an attribute; an ObjectClass if it specified an ObjectClass; a {@link java.util.List} of
-     * attributes if an attribute list was specified; a {@link java.util.List} of ObjectClasses if an object-list was specified; or null if the path
+     * attributeDistribution if an attribute list was specified; a {@link java.util.List} of ObjectClasses if an object-list was specified; or null if the path
      * did not specify a valid object/attribute/list.
      * @throws GSimException
      */

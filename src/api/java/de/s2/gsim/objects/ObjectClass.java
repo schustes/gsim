@@ -1,8 +1,8 @@
 package de.s2.gsim.objects;
 
-import java.io.Serializable;
-
 import de.s2.gsim.objects.attribute.DomainAttribute;
+
+import java.io.Serializable;
 
 /**
  * ObjectClass is a Frame for objects of any kind in a simulation. In particular, an agent is also an object.
@@ -50,19 +50,19 @@ public interface ObjectClass extends Serializable {
     String[] getAttributeListNames();
 
     /**
-     * Get all attributes defined in the given list.
+     * Get all attributeDistribution defined in the given list.
      * 
      * @param list the list name
-     * @return the attributes
+     * @return the attributeDistribution
      */
     DomainAttribute[] getAttributes(String list);
 
     /**
-     * Get the default value defined for a given attribute.
+     * Get the default port defined for a given attribute.
      * 
      * @param list the list where the attribute is located
      * @param attName the attribute name
-     * @return the default value
+     * @return the default port
      */
     String getDefaultValue(String list, String attName);
 
@@ -99,11 +99,11 @@ public interface ObjectClass extends Serializable {
     public void setAttribute(String list, DomainAttribute attribute);
 
     /**
-     * Updates the default value of the given attribute.
+     * Updates the default port of the given attribute.
      * 
      * @param list the list where the attribute is located in
      * @param attName the attribute name
-     * @param value the default value
+     * @param value the default port
      */
     void setDefaultAttributeValue(String list, String attName, String value);
 

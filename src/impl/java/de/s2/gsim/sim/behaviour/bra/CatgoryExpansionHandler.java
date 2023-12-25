@@ -68,10 +68,10 @@ public class CatgoryExpansionHandler implements java.io.Serializable {
 			if (unexpandedElemsSpec.facts.size() == 0) {
 				Logger.getLogger(Rete.class).debug(" Statefact " + stateFactName + " is now fully expanded.");
 				return false;
-			} // this means that there are no elems of this state with a value for
+			} // this means that there are no elems of this state with a port for
 			// this
 			// parameter --> the selected fact is the last, and because there is only
-			// one value, nothing can be expanded
+			// one port, nothing can be expanded
 
 			int oldDepth = (int) stateFact.getSlotValue("depth").floatValue(context);
 
@@ -85,11 +85,11 @@ public class CatgoryExpansionHandler implements java.io.Serializable {
 					oldDepth + 1, copy);
 			String stateNameExpanded_New = newStateFactSplit_1.getSlotValue("name").stringValue(context);
 
-			// the extracted value (=1 elem)
+			// the extracted port (=1 elem)
             Fact stateFactElem_1 = addStateFactCategoryElemFromStatefact(newStateFactSplit_1,
 					toExpand.getSlotValue("param-name").stringValue(context), cat1, context);
 
-			// StateFacts of other, non-selected attributes
+			// StateFacts of other, non-selected attributeDistribution
 			if (existsEquivalent(stateFact, new Fact[] { stateFactElem_1 }, context)) {
 				return false;
 			}
@@ -105,8 +105,8 @@ public class CatgoryExpansionHandler implements java.io.Serializable {
 			// the state
 			for (Fact s : unexpandedElemsSpec.facts) {
 				String cat2 = s.getSlotValue("category").stringValue(context);
-				// as spec holds the rest, stateFactElem_2 holds the elements disjunct
-				// from the parameter value specified in stateFactElem_1. The union is the
+				// as modelconfig holds the rest, stateFactElem_2 holds the elements disjunct
+				// from the parameter port specified in stateFactElem_1. The union is the
 				// set of parameter values defined by the parent state.
 				Fact stateFactElem_2 = addStateFactCategoryElemFromStatefact(newStateFactSplit_2,
 						toExpand.getSlotValue("param-name").stringValue(context), cat2, context);
@@ -121,7 +121,7 @@ public class CatgoryExpansionHandler implements java.io.Serializable {
 			Fact[] remaining = new Fact[allElemsList.size()];
 			allElemsList.toArray(remaining);
 
-			// append state-elems of additional attributes (if more than 1 attribute present)
+			// append state-elems of additional attributeDistribution (if more than 1 attribute present)
 			appendRemainingStateFactElems(allElemsList, stateNameExpanded_New, context);
 			appendRemainingStateFactElems(allElemsList, stateNameExpanded_Siblings, context);
 

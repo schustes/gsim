@@ -1,5 +1,9 @@
 package de.s2.gsim.environment;
 
+import de.s2.gsim.objects.Path;
+import de.s2.gsim.objects.attribute.Attribute;
+import de.s2.gsim.objects.attribute.DomainAttribute;
+
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -7,10 +11,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-
-import de.s2.gsim.objects.Path;
-import de.s2.gsim.objects.attribute.Attribute;
-import de.s2.gsim.objects.attribute.DomainAttribute;
 
 public class AgentInstanceOperations {
 
@@ -118,7 +118,7 @@ public class AgentInstanceOperations {
     }
 
     /**
-     * Creates an agent using a function for generating agents (e.g. using generator methods for specific attribute value distributions).
+     * Creates an agent using a function for generating agents (e.g. using generator_gsim methods for specific attribute port distributions).
      * 
      * @param template the agent class to generate the instance from
      * @param prefix optional name prefix

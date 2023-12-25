@@ -1,9 +1,9 @@
 package de.s2.gsim.sim.behaviour.rulebuilder;
 
-import java.util.Map;
-
 import jess.JessException;
 import jess.Rete;
+
+import java.util.Map;
 
 public class GlobalsBuilder {
 
@@ -17,7 +17,9 @@ public class GlobalsBuilder {
             + "(deftemplate state-fact-category (slot name) (slot state-fact-name) (slot elem-parent) (slot param-name) (slot category) (slot value))\n"
             + "(deftemplate parameter (slot name) (slot value))\n";
 
-    private String endPart = "(set-reset-globals FALSE)\n" + "(defglobal ?*agent* = (fetch AGENT))\n" + "(defglobal ?*current-time* = -1)\n";
+    private String endPart = "(set-reset-globals FALSE)\n"
+            + "(defglobal ?*agent* = (fetch AGENT))\n"
+            + "(defglobal ?*current-time* = -1)\n";
 
     private String functions = "";
 

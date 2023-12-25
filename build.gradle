@@ -1,146 +1,121 @@
+plugins {
+    id "com.jfrog.artifactory" version "4.21.0"
+}
+
 apply plugin: "java"
-apply plugin: "maven"
+apply plugin: "maven-publish"
+apply plugin: "com.jfrog.artifactory"
 apply plugin: "jacoco"
-//apply plugin: "org.sonarqube"
 
 group = "de.2s.sim"
 version = "2.0-SNAPSHOT"
 
 repositories {
-	mavenCentral()
-
+    mavenCentral()
     maven {
-        url 'https://plugins.gradle.org/m2/'
-    }	
-    maven {
-		url 'http://nexus.measurementsolutions.de/content/repositories/snapshots/'
-	}    
-    maven {
-		url 'http://nexus.measurementsolutions.de/content/repositories/releases/'
-	}    
-    maven {
-		url 'http://nexus.measurementsolutions.de/content/repositories/thirdparty/'
-	}    
-}
-
-sourceSets.all { set ->
-    def jarTask = task("${set.name}Jar", type: Jar) {
-        baseName = baseName + "-$set.name"
-        from set.output
-    } 
-
-    def sourcesJar = task("${set.name}Sources",  type: Jar) {
-        classifier = 'sources'
-        from "src/api/java"
-        from "src/impl/java"
-//        from sourceSets.api.output
-//        from sourceSets.impl.output
-    }
-
-    artifacts {
-        archives jarTask 
-        archives sourcesJar
+        allowInsecureProtocol = true
+        name = "s2"
+        url "http://2s-server:8082/artifactory/s2-maven/"
+        credentials {
+            username = "admin"
+            password = "1.Mansur"
+        }
     }
 }
-
 
 sourceSets {
     api
     impl
 }
 
+sourceSets.all { set ->
+    def jarTask = task("${set.name}Jar", type: Jar) {
+        archiveBaseName = "$archiveBaseName-$set.name"
+        from set.output
+    }
+
+    def sourcesJar = task("${set.name}Sources", type: Jar) {
+        archiveClassifier = 'sources'
+        from "src/api/java"
+        from "src/impl/java"
+    }
+
+    artifacts {
+        archives jarTask
+        archives sourcesJar
+    }
+}
+
+configurations {
+    testImplementation.extendsFrom implImplementation
+}
+
 dependencies {
-    //classpath "org.sonarqube.gradle:gradle-sonarqube-plugin:1.0"
-    //classpath "org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.0.1"
-    //classpath 'org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.1'
 
-    apiCompile 'commons-codec:commons-codec:1.5'
-	apiCompile 'cern:colt:1.0'
-	apiCompile 'log4j:log4j:1.2.17'
-	apiCompile 'org.checkerframework:checker:1.9.12'
+    apiImplementation 'commons-codec:commons-codec:1.5'
+    apiImplementation 'cern:colt:1.0'
+    apiImplementation 'log4j:log4j:1.2.17'
+    apiImplementation 'org.checkerframework:checker:1.9.12'
 
-    implCompile sourceSets.api.output
-    implCompile 'commons-lang:commons-lang:2.6'
-    implCompile 'jdom:jdom:0.7'
-	implCompile 'log4j:log4j:1.2.17'
-	implCompile 'jgraph:jgraph:5.13.0.0'
-    implCompile 'jess:jess:7.0'
-    implCompile 'cern:colt:1.0'
-    implCompile 'org.checkerframework:checker:1.9.12'
-    
+    implImplementation sourceSets.api.output
+    implImplementation 'commons-lang:commons-lang:2.6'
+    implImplementation 'jdom:jdom:0.7'
+    implImplementation 'log4j:log4j:1.2.17'
+    implImplementation 'jgraph:jgraph:5.13.0.0'
+    implImplementation 'jess:jess:7.0'
+    implImplementation 'cern:colt:1.0'
+    implImplementation 'org.checkerframework:checker:1.9.12'
 
-    testCompile 'org.hamcrest:hamcrest-all:1.3'    
-    testCompile ('junit:junit:4.11') {
-    	exclude group: 'org.hamcrest'
+    testImplementation 'org.hamcrest:hamcrest-all:1.3'
+    testImplementation('junit:junit:4.11') {
+        exclude group: 'org.hamcrest'
     }
-    testCompile ('org.mockito:mockito-core:2.0.2-beta') {
-    	exclude group: 'org.hamcrest', module:'hamcrest-core'
+    testImplementation('org.mockito:mockito-core:2.0.2-beta') {
+        exclude group: 'org.hamcrest', module: 'hamcrest-core'
     }
 
-    testCompile sourceSets.api.output
-    testCompile sourceSets.impl.output
-    
-    runtime configurations.apiRuntime
-    runtime configurations.implRuntime
-}    
+    testImplementation sourceSets.api.output
+    testImplementation sourceSets.impl.output
+
+}
 
 jar {
     from sourceSets.api.output
     from sourceSets.impl.output
 }
 
-jacoco {
-    toolVersion = "0.7.6.201602180812"
-    reportsDir = file("$buildDir/customJacocoReportDir")
-}
-
 test {
-	ignoreFailures = true
+    ignoreFailures = true
+    finalizedBy jacocoTestReport
+    jacoco {
+        includes = ['de.s2.*']
+    }
+}
+jacoco {
+    toolVersion = "0.8.9"
 }
 
 jacocoTestReport {
-
-    classDirectories = fileTree(dir: "${buildDir}/classes",  excludes: ['**/*Test*'])
-    sourceDirectories = files('src/impl/java')
-    executionData = files("${buildDir}/jacoco/test.exec")
-    
+    classDirectories.from = files(project.sourceSets.impl.output)
     reports {
-        xml.enabled false
-        csv.enabled false
-        html.destination "${buildDir}/jacocoHtml"
+        xml.required = false
+        csv.required = false
+        html.outputLocation = layout.buildDirectory.dir('jacocoHtml')
     }
 }
 
-//sonarqube {
-  //  properties {
-        //property "sonar.jacoco.reportPath", "${buildDir}/jacoco/test.exec"
-    //}
-//}
-uploadArchives {
+publishing {
     repositories {
-        mavenDeployer {
-			repository(url: "http://nexus.measurementsolutions.de/content/repositories/snapshots") {
-				authentication(userName: "ems", password: "18e1042ms")
-			}
-
-           	def priority = 0
-
-            addFilter("main") { artifact, file -> artifact.name == project.name }
-            addFilter("sources") { artifact, file -> artifact.name.endsWith("-sources") }
-            ["api", "impl"].each { type ->
-                addFilter(type) { artifact, file -> artifact.name.endsWith("-$type") }
-                
-                // We now have to map our configurations to the correct maven scope for each pom
-                
-                ["compile", "runtime"].each { scope ->
-                    configuration = configurations[type + scope.capitalize()]
-                    ["main", type].each { pomName ->
-                        pom(pomName).scopeMappings.addMapping priority, configuration, scope
-	                    priority++
-                    }
-                }
+        publications {
+            maven(MavenPublication) {
+                from components.java
             }
-
+        }
+        maven {
+            name = "s2"
+            allowInsecureProtocol = true
+            url = uri("http://2s-server:8082/artifactory/s2-maven/snapshots")
+            credentials(PasswordCredentials)
         }
     }
 }

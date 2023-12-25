@@ -109,7 +109,7 @@ public interface RLActionNode {
     Expansion[] getExpansions();
 
     /**
-     * Gets the step size at which the average reward value gets updated.
+     * Gets the step size at which the average reward port gets updated.
      * 
      * @return the step size
      */

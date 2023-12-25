@@ -1,15 +1,13 @@
 package de.s2.gsim;
 
+import de.s2.gsim.def.ModelDefinitionEnvironment;
+import de.s2.gsim.sim.SimulationController;
+
 import java.io.InputStream;
 import java.util.Map;
 
-import de.s2.gsim.def.ModelDefinitionEnvironment;
-import de.s2.gsim.sim.BatchManager;
-import de.s2.gsim.sim.Executable;
-import de.s2.gsim.sim.SimulationController;
-
 /**
- * The core is a central class managing model and simulation objects. New models are created by one of the create methods. A simulation is created by
+ * The core is a central class managing common and simulation objects. New models are created by one of the create methods. A simulation is created by
  * passing the Environment object to the createScenarioManager method, which then instantiates a simulation.
  * 
  * @author Stephan
@@ -20,7 +18,7 @@ public interface GSimCore {
     /**
      * Create a gsim Environment.
      * 
-     * @param ns namespace (a unique identifier) of the model
+     * @param ns namespace (a unique identifier) of the common
      * @param props property table
      * @return environment
      * @throws GSimException
@@ -29,10 +27,10 @@ public interface GSimCore {
 
     /**
      * 
-     * Create a gsim Environment from an existing model file.
+     * Create a gsim Environment from an existing common file.
      * 
-     * @param ns nameSpace (a unique identifier) of the model
-     * @param setup input-stream of the model file
+     * @param ns nameSpace (a unique identifier) of the common
+     * @param setup input-stream of the common file
      * @param props property table
      * @return DefinitionEnvironment
      * @throws GSimException
@@ -52,7 +50,7 @@ public interface GSimCore {
     SimulationController createScenarioManager(ModelDefinitionEnvironment env, Map<String, Object> props, int steps, int runs) throws GSimException;
 
     /**
-     * Utility method to open a file containing a model definition in xml format.
+     * Utility method to open a file containing a common definition in xml format.
      * 
      * return input-stream
      * 

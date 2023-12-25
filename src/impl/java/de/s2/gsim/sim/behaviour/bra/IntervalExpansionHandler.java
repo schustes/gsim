@@ -1,21 +1,20 @@
 package de.s2.gsim.sim.behaviour.bra;
 
+import de.s2.gsim.api.sim.agent.impl.RuntimeAgent;
+import de.s2.gsim.environment.RLRule;
+import de.s2.gsim.sim.behaviour.GSimBehaviourException;
+import jess.Context;
+import jess.Fact;
+import org.apache.log4j.Logger;
+
+import java.util.List;
+
 import static de.s2.gsim.sim.behaviour.bra.StateFactHelper.addStateFactIntervalElemFromParentElem;
 import static de.s2.gsim.sim.behaviour.bra.StateFactHelper.appendRemainingStateFactElems;
 import static de.s2.gsim.sim.behaviour.bra.StateFactHelper.existsEquivalent;
 import static de.s2.gsim.sim.behaviour.bra.StateFactHelper.expandStateDescription;
 import static de.s2.gsim.sim.behaviour.bra.StateFactHelper.insertNewActionNodes;
 import static de.s2.gsim.sim.behaviour.rangeupdate.DynamicValueRangeExtensionRuleBuilder.createNewExperimentalRule;
-
-import java.util.List;
-
-import org.apache.log4j.Logger;
-
-import de.s2.gsim.api.sim.agent.impl.RuntimeAgent;
-import de.s2.gsim.environment.RLRule;
-import de.s2.gsim.sim.behaviour.GSimBehaviourException;
-import jess.Context;
-import jess.Fact;
 
 public class IntervalExpansionHandler implements java.io.Serializable {
 
@@ -63,7 +62,7 @@ public class IntervalExpansionHandler implements java.io.Serializable {
 			context.getEngine().assertFact(stateFactElem_split1);
 			context.getEngine().assertFact(stateFactElem_split2);
 
-			// append state-elems of additional attributes (if more than 1 attribute present)
+			// append state-elems of additional attributeDistribution (if more than 1 attribute present)
 			appendRemainingStateFactElems(allElems, newStateName1, context);
 			appendRemainingStateFactElems(allElems, newStateName2, context);
 

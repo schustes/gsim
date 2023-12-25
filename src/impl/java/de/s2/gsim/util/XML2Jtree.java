@@ -1,16 +1,16 @@
 package de.s2.gsim.util;
 
-import java.util.Enumeration;
-import java.util.Vector;
-
-import javax.swing.tree.DefaultMutableTreeNode;
-
-// Copyright (C) 2001 Xtensible Technologies Corporation
-// All rights reserved.
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
+
+import javax.swing.tree.DefaultMutableTreeNode;
+import java.util.Enumeration;
+import java.util.Vector;
+
+// Copyright (C) 2001 Xtensible Technologies Corporation
+// All rights reserved.
 
 public class XML2Jtree implements ContentHandler {
 
@@ -61,7 +61,7 @@ public class XML2Jtree implements ContentHandler {
     @Override
     public void endDocument() throws SAXException {
         // logger.debug("Number of elements: " + numberOfElements);
-        // logger.debug("Number of attributes: " + numberOfAttributes);
+        // logger.debug("Number of attributeDistribution: " + numberOfAttributes);
         // logger.debug("Number of processing instructions: "
         // + numberOfProcessingInstructions);
         // logger.debug("Number of characters of plain text: "
@@ -111,8 +111,7 @@ public class XML2Jtree implements ContentHandler {
             if (otnsIdx > 0) {
                 Notns = otns.substring(0, otnsIdx);
                 idxs = otns.substring(otnsIdx + 1, otnsEnx);
-                Integer I = new Integer(idxs);
-                idx = I.intValue();
+                idx = Integer.parseInt(idxs);
             } else {
                 Notns = otns;
             }

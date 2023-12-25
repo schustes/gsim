@@ -1,13 +1,5 @@
 package de.s2.gsim.sim;
 
-import java.util.HashMap;
-import java.util.concurrent.Semaphore;
-
-import org.hamcrest.MatcherAssert;
-import org.hamcrest.Matchers;
-import org.junit.Before;
-import org.junit.Test;
-
 import de.s2.gsim.GSimCore;
 import de.s2.gsim.GSimCoreFactory;
 import de.s2.gsim.api.impl.EnvironmentWrapper;
@@ -23,7 +15,15 @@ import de.s2.gsim.environment.RLRuleFrame;
 import de.s2.gsim.objects.Path;
 import de.s2.gsim.objects.attribute.AttributeType;
 import de.s2.gsim.objects.attribute.DomainAttribute;
-import de.s2.gsim.sim.behaviour.SimAction;
+import de.s2.gsim.sim.behaviour.SimulationRuntimeAction;
+import de.s2.gsim.sim.behaviour.SimulationRuntimeContext;
+import org.hamcrest.MatcherAssert;
+import org.hamcrest.Matchers;
+import org.junit.Before;
+import org.junit.Test;
+
+import java.util.HashMap;
+import java.util.concurrent.Semaphore;
 
 public class ConditionBuilderTest {
     GSimCore core;
@@ -227,16 +227,20 @@ public class ConditionBuilderTest {
     }
 
 	@SuppressWarnings({ "serial" })
-	public static class TestAction extends SimAction {
+	public static class TestAction implements SimulationRuntimeAction {
 
 		public TestAction() {
 			super();
 		}
 
-		@Override
-		public Object execute() {
+        @Override
+        public String getName() {
+            return getClass().getSimpleName();
+        }
+
+        @Override
+		public void execute(SimulationRuntimeContext ctx) {
 			counter++;
-			return null;
 		}
 
 	}

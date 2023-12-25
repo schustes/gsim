@@ -1,8 +1,5 @@
 package de.s2.gsim.sim.behaviour.rulebuilder;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import cern.jet.random.Uniform;
 import de.s2.gsim.api.sim.agent.impl.RuntimeAgent;
 import de.s2.gsim.environment.ActionDef;
@@ -10,10 +7,13 @@ import de.s2.gsim.environment.ConditionDef;
 import de.s2.gsim.environment.Instance;
 import de.s2.gsim.environment.RLRule;
 import de.s2.gsim.sim.GSimEngineException;
-import de.s2.gsim.sim.behaviour.Context;
-import de.s2.gsim.sim.behaviour.SimAction;
+import de.s2.gsim.sim.behaviour.SimulationActionExecutor;
+import de.s2.gsim.sim.behaviour.SimulationRuntimeContextImpl;
 import de.s2.gsim.sim.behaviour.util.BuildingUtils;
 import de.s2.gsim.util.Utils;
+
+import java.util.HashSet;
+import java.util.Set;
 
 public abstract class RLRulesBuilder {
 
@@ -57,12 +57,20 @@ public abstract class RLRulesBuilder {
 
         String nRule = "(deffunction execute(?action ?ctxName) \n";
         nRule += "  (bind $?param (fact-slot-value ?action arg))\n";
-        nRule += "  (bind ?res (call " + SimAction.class.getName() +" valueOf (fact-slot-value ?action action-name) \"" + ns + "\"))\n";
-        nRule += "  (bind ?ctx (new " + Context.class.getName() + "))\n";
+
+        //nRule += "  (bind ?res (call " + SimulationRuntimeAction.class.getName() +" valueOf (fact-slot-value ?action action-name) \"" + ns + "\"))\n";
+        //nRule += "  (bind ?ctx (new " + SimulationRuntimeContextImpl.class.getName() + "))\n";
+
+        nRule += " (bind ?executor (new " + SimulationActionExecutor.class.getName() + "))\n";
+        nRule += " (bind ?ctx (new " + SimulationRuntimeContextImpl.class.getName() + "))\n";
+        nRule += " (bind ?action " + "(fact-slot-value ?action action-name)"  + ")\n";
+
         nRule += "  (set ?ctx executionContext (?*agent* getExecutionContext(new java.lang.String ?ctxName)))\n";
         nRule += "  (foreach ?object $?param (call ?ctx addObject ?object))\n";
-        nRule += "  (call ?res setContext ?ctx)\n";
-		nRule += "  (call ?res doExecute) )\n ";
+        nRule += " (set ?executor context ?ctx)\n";
+
+        nRule += " (call ?executor execute ?action))\n";
+        //nRule += "  (call ?res doExecute) )\n ";
 
         return nRule;
     }

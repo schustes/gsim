@@ -1,8 +1,8 @@
 package de.s2.gsim.objects;
 
-import java.io.Serializable;
-
 import de.s2.gsim.objects.attribute.Attribute;
+
+import java.io.Serializable;
 
 /**
  * ObjectInstance represents an instanciation of an {@link ObjectClass}.
@@ -49,10 +49,10 @@ public interface ObjectInstance extends Serializable {
     String[] getAttributeListNames();
 
     /**
-     * Gets all attributes from the given list.
+     * Gets all attributeDistribution from the given list.
      * 
      * @param list the list name
-     * @return the attributes
+     * @return the attributeDistribution
      */
     Attribute[] getAttributes(String list);
 
@@ -82,11 +82,11 @@ public interface ObjectInstance extends Serializable {
     String getName();
 
     /**
-     * Tries to cast the given attribute to a numerical attribute and retrieves its value.
+     * Tries to cast the given attribute to a numerical attribute and retrieves its port.
      * 
      * @param list the attribute list name.
      * @param attName the attribute name
-     * @return the value of the attribute
+     * @return the port of the attribute
      */
     double getNumericalAttribute(String list, String attName);
 
@@ -100,11 +100,11 @@ public interface ObjectInstance extends Serializable {
     String[] getSetAttributeValues(String list, String attName);
 
     /**
-     * Tries to cast the given attribute to a string attribute and retrieves its value.
+     * Tries to cast the given attribute to a string attribute and retrieves its port.
      * 
      * @param list the attribute list name.
      * @param attName the attribute name
-     * @return the value of the attribute
+     * @return the port of the attribute
      */
     String getStringAttribute(String list, String attName);
 
@@ -148,7 +148,7 @@ public interface ObjectInstance extends Serializable {
      * 
      * @param list the list name
      * @param name the name of the attribute
-     * @param value the value of the attribute
+     * @param value the port of the attribute
      */
     void setNumericalAttributeValue(String list, String name, double value);
 
@@ -166,7 +166,7 @@ public interface ObjectInstance extends Serializable {
      * 
      * @param list the list name
      * @param name the name of the attribute
-     * @param value the value of the attribute
+     * @param value the port of the attribute
      */
     void setStringAttributeValue(String list, String name, String value);
 

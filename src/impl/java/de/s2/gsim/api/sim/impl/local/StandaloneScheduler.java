@@ -1,43 +1,48 @@
 package de.s2.gsim.api.sim.impl.local;
 
-import java.util.Iterator;
-import java.util.concurrent.CopyOnWriteArrayList;
-
-import org.apache.log4j.Logger;
-
 import de.s2.gsim.sim.SimulationScheduler;
 import de.s2.gsim.sim.Steppable;
 
+import java.util.Iterator;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
+
 public class StandaloneScheduler implements SimulationScheduler {
 
-    private static Logger logger = Logger.getLogger(StandaloneScheduler.class);
+    private static final int SCHEDULE_INTERVAL_MILLIS = 3;
 
-    // Listeners
+    private static final int SCHEDULE_START_DELAY = 0;
+
+    // Simulation Listeners
     private CopyOnWriteArrayList<SimulationInstanceListener> listeners = new CopyOnWriteArrayList<SimulationInstanceListener>();
 
     // What the scheduler schedules
     private Steppable model;
 
-    private boolean run = false;
-
-    // Scheduler proper
-    private ScheduleThread runner = null;
-
-    private boolean step = false;
-
-    private boolean stop = false;
-
-    // Control variables for schedulingthread.
-    private boolean stopThread = false;
-
     // Model-Time set by caller when the execution has to stop
     private long stopTime = Long.MAX_VALUE;
 
-    // Current time of the model to be scheduled
+    // Current discrete time step of the execution
     private int time = 0;
+
+    ScheduledFuture<?> scheduledFuture;
+
+    // The scheduler running the model at interval SCHEDULE_INTERVAL_MILLIS
+    private ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
+
+    enum State {INACTIVE, PAUSED, RUNNING, STOPPED};
+
+    private State state = State.INACTIVE;
 
     public StandaloneScheduler(Steppable model) {
         this.model = model;
+    }
+
+    public void registerSimulationInstanceListener(SimulationInstanceListener l) {
+        listeners.add(l);
     }
 
     @Override
@@ -46,33 +51,8 @@ public class StandaloneScheduler implements SimulationScheduler {
     }
 
     @Override
-    public void pause() {
-        run = false;
-        step = false;
-    }
-
-    public void registerSimulationInstanceListener(SimulationInstanceListener l) {
-        listeners.add(l);
-    }
-
-    @Override
-    public void resume() {
-        run = true;
-    }
-
-    @Override
-    public void run(long t) {
-
-        stopTime = t + 1;
-
-        if (runner == null) {
-            runner = new ScheduleThread();
-            runner.start();
-        }
-
-        run = true;
-        step = false;
-
+    public Steppable getSteppable() {
+        return model;
     }
 
     @Override
@@ -81,91 +61,73 @@ public class StandaloneScheduler implements SimulationScheduler {
     }
 
     @Override
-    public void shutdown() {
-        stop();
-        exitSim();
-    }
+    public void run(long requiredSteps) {
 
-    private void exitSim() {
-        if (runner != null) {
-            stopThread = true;
-            run = false;
-            step = false;
-            stop = true;
-            runner = null;
-        }
-    }
+        stopTime = requiredSteps;
 
-    private void notifyStep() {
-        Iterator iter = listeners.iterator();
-        while (iter.hasNext()) {
-            SimulationInstanceListener l = (SimulationInstanceListener) iter.next();
-            try {
-            l.onStep(time);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-    }
+        scheduledFuture = this.executor.scheduleAtFixedRate(new SteppableExecutor()
+                , SCHEDULE_START_DELAY
+                , SCHEDULE_INTERVAL_MILLIS
+                , TimeUnit.MILLISECONDS);
 
-    private void stop() {
-        stop = true;
-        run = false;
-        step = false;
-    }
-
-    private class ScheduleThread extends Thread {
-
-        long alive = System.currentTimeMillis();
-
-        boolean commandFinished = false;
-
-        public ScheduleThread() {
-            super(String.valueOf(Math.random()));
-        }
-
-        @Override
-        public void run() {
-
-            try {
-
-                while (!stopThread || (stopThread && !commandFinished)) {
-
-                    if (run && time == stopTime) {
-                        stop = true;
-                        run = false;
-                    } else if (!step && run) {
-
-                        model.preStep(time);
-                        model.step();
-                        model.postStep();
-
-                        notifyStep();
-
-                        time++;
-                    } else if (stop) {
-                        stop = false;
-                        run = false;
-                        step = false;
-                    } else {
-                        commandFinished = true;
-                        logger.debug("StandaloneController says: I have nothing to do right now!");
-                    }
-                    sleep(1);
-                }
-
-            } catch (Exception e) {
-                logger.error(e);
-                e.printStackTrace();
-            }
-
-        }
+        this.state = State.RUNNING;
 
     }
 
     @Override
-    public Steppable getSteppable() {
-        return model;
+    public void pause() {
+        this.state = State.PAUSED;
     }
+
+    @Override
+    public void resume() {
+        this.state = State.RUNNING;
+    }
+
+
+    @Override
+    public void shutdown() {
+        this.state = State.STOPPED;
+        scheduledFuture.cancel(false);
+        executor.shutdown();
+    }
+
+    private class SteppableExecutor implements Runnable {
+
+        @Override
+        public void run() {
+
+            if (state == State.RUNNING) {
+                model.preStep(time);
+                model.step();
+                model.postStep();
+
+                stepFinished();
+
+                time++;
+            }
+
+            if (time == stopTime) {
+                state = State.STOPPED;
+                stepFinished();
+            }
+
+
+        }
+
+    }
+
+    private void stepFinished() {
+        Iterator iter = listeners.iterator();
+        while (iter.hasNext()) {
+            SimulationInstanceListener l = (SimulationInstanceListener) iter.next();
+            try {
+                l.onStep(time);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
 
 }

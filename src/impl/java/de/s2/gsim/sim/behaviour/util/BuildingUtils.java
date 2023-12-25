@@ -1,11 +1,5 @@
 package de.s2.gsim.sim.behaviour.util;
 
-import java.util.ArrayDeque;
-import java.util.Deque;
-import java.util.Optional;
-import java.util.function.Function;
-import java.util.function.Supplier;
-
 import de.s2.gsim.api.sim.agent.impl.RuntimeAgent;
 import de.s2.gsim.environment.Frame;
 import de.s2.gsim.environment.GSimDefException;
@@ -15,18 +9,24 @@ import de.s2.gsim.objects.Path;
 import de.s2.gsim.objects.attribute.Attribute;
 import de.s2.gsim.objects.attribute.DomainAttribute;
 
+import java.util.ArrayDeque;
+import java.util.Deque;
+import java.util.Optional;
+import java.util.function.Function;
+import java.util.function.Supplier;
+
 public class BuildingUtils {
 
 	public static String getDefiningRoleForRLRule(RuntimeAgent agent, String ruleName) {
 		GenericAgentClass def = (GenericAgentClass) agent.getDefinition();
 
-		if (def.getBehaviour().getDeclaredRLRule(ruleName) != null) {
+		if (def.getBehaviour().getDeclaredRLRule(ruleName).isPresent()) {
 			return def.getName();
 		}
 
 		for (Frame f : def.getAncestors()) {
 			GenericAgentClass agentClass = (GenericAgentClass) f;
-			if (agentClass.getBehaviour().getDeclaredRLRule(ruleName) != null) {
+			if (agentClass.getBehaviour().getDeclaredRLRule(ruleName).isPresent()) {
 				return agentClass.getName();
 			}
 		}

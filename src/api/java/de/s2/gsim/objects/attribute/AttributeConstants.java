@@ -1,7 +1,7 @@
 package de.s2.gsim.objects.attribute;
 
 /**
- * Contants class for attributes.
+ * Contants class for attributeDistribution.
  * 
  * @author stephan
  *

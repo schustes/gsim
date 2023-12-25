@@ -1,12 +1,5 @@
 package de.s2.gsim.sim.behaviour.util;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-
 import de.s2.gsim.api.sim.agent.impl.RuntimeAgent;
 import de.s2.gsim.environment.ActionDef;
 import de.s2.gsim.environment.BehaviourDef;
@@ -26,6 +19,13 @@ import jess.RU;
 import jess.Rete;
 import jess.Value;
 import jess.ValueVector;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 public abstract class RuleEngineHelper {
 

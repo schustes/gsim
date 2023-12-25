@@ -1,17 +1,5 @@
 package de.s2.gsim.api.sim.impl.local;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Random;
-
-import org.apache.log4j.Logger;
-
 import de.s2.gsim.api.impl.EnvironmentWrapper;
 import de.s2.gsim.api.sim.agent.impl.RuntimeAgent;
 import de.s2.gsim.def.ModelDefinitionEnvironment;
@@ -29,10 +17,25 @@ import de.s2.gsim.sim.SimulationId;
 import de.s2.gsim.sim.Steppable;
 import de.s2.gsim.sim.agent.ApplicationAgent;
 import de.s2.gsim.sim.agent.RtAgent;
-import de.s2.gsim.sim.behaviour.SimAction;
 import de.s2.gsim.sim.communication.AgentType;
 import de.s2.gsim.sim.engine.common.RuntimeAgentFactory;
 import de.s2.gsim.sim.engine.common.SimpleClassLoader;
+import org.apache.log4j.Logger;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Queue;
+import java.util.Random;
+import java.util.Set;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
  * Local implementation, and runs for the most part as one would expect from a standalone simulation.
@@ -80,29 +83,32 @@ public class ModelCoordinatorLocal implements Simulation, Steppable {
 
 		try {
 			ns = env.getNamespace() + "/" + getId().toString();
-			// this.agentOrder = env.getAgentOrdering();
 
-			ArrayList<AgentType> r = new ArrayList<AgentType>();
+			Set<AgentType> agentTypes = new HashSet<>();
 
 			String[] path = (String[]) props.get("jars");
 			SimpleClassLoader cl = new SimpleClassLoader(path);
 			RuntimeAgentFactory factory = new RuntimeAgentFactory(cl);
-			SimAction.putCL(env.getNamespace(), cl);
-
-			logger.debug("===== Free memory before agent-create: " + Runtime.getRuntime().freeMemory() / 1024d);
+			//SimulationRuntimeAction.putCL(env.getNamespace(), cl);
 
 			RuntimeAgent[] a = factory.createAgentsWithRulebase(env, getId().toString(), props);
 
 			for (RuntimeAgent element : a) {
-				r.add(element);
-				if (element.inheritsFromOrIsOfType("GP")) {
-				}
+				agentTypes.add(element);
 				agents.put(element.getName(), element);
 			}
 
-			logger.debug("===== Free memory after agent-create: " + Runtime.getRuntime().freeMemory() / 1024d);
+			for (ApplicationAgent applicationAgent: env.getAgentRuntimeConfig().getSystemAgents()) {
+			    agentTypes.add((AgentType)applicationAgent);
+            }
 
-			messenger = new LocalMessenger(r);
+            this.messenger = new LocalMessenger(agentTypes);
+
+            for (ApplicationAgent applicationAgent: env.getAgentRuntimeConfig().getSystemAgents()) {
+                addApplicationAgent(applicationAgent);
+            }
+
+
         } catch (GSimDefException e) {
 			logger.error("Def-exception", e);
 		} catch (Exception e2) {
@@ -218,9 +224,9 @@ public class ModelCoordinatorLocal implements Simulation, Steppable {
 	}
 
 	@Override
-	public List<RtAgent> getAllAgents() throws GSimEngineException {
+	public Collection<RtAgent> getAllAgents() throws GSimEngineException {
 		Iterator iter = agents.values().iterator();
-		ArrayList<RtAgent> list = new ArrayList<RtAgent>();
+		Queue<RtAgent> list = new ConcurrentLinkedQueue<>();
 		while (iter.hasNext()) {
 			RuntimeAgent a = (RuntimeAgent) iter.next();
 			list.add(a);
@@ -229,11 +235,11 @@ public class ModelCoordinatorLocal implements Simulation, Steppable {
 	}
 
 	@Override
-	public List<RtAgent> getAllAgents(int count, int offset) throws GSimEngineException {
+	public Collection<RtAgent> getAllAgents(int count, int offset) throws GSimEngineException {
 
-		ArrayList<RuntimeAgent> allList = new ArrayList<RuntimeAgent>();
+        List<RuntimeAgent> allList = new ArrayList<>();
 
-		ArrayList<RtAgent> list = new ArrayList<RtAgent>();
+        Collection<RtAgent> list = new ConcurrentLinkedQueue<>();
 
 		if (offset > agents.size()) {
 
@@ -338,19 +344,14 @@ public class ModelCoordinatorLocal implements Simulation, Steppable {
 		double l = System.currentTimeMillis();
 
 		HashMap<String, Object> map = createGlobals();
-		Iterator iter = agents.values().iterator();
-
-		iter = agents.values().iterator();
 
 		List<String> ordered = orderRoles();
 		for (String roleName : ordered) {
 			int interval = Integer.parseInt(getPauseInterval(roleName));
 			if ((time) % interval == 0) {
-				iter = agents.values().iterator();
-				while (iter.hasNext()) {
-					RuntimeAgent a = (RuntimeAgent) iter.next();
-					a.execute(map, roleName);
-				}
+				agents.values().stream().forEach(a -> {
+                    a.execute(map, roleName);
+                });
 			}
 		}
 

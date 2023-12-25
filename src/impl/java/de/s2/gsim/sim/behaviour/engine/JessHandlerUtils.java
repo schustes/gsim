@@ -1,8 +1,5 @@
 package de.s2.gsim.sim.behaviour.engine;
 
-import java.util.Optional;
-import java.util.Set;
-
 import de.s2.gsim.api.sim.agent.impl.RuntimeAgent;
 import de.s2.gsim.environment.ActionDef;
 import de.s2.gsim.environment.GSimDefException;
@@ -17,6 +14,9 @@ import jess.JessException;
 import jess.RU;
 import jess.Rete;
 import jess.Value;
+
+import java.util.Optional;
+import java.util.Set;
 
 public class JessHandlerUtils {
 

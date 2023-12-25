@@ -1,13 +1,14 @@
 package de.s2.gsim.objects.attribute;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 
 /**
  * A DomainAttribute serves as the template or frame for concrete {@link Attribute}s. A DomainAttribute defines the type and the possible values or
- * value range and a default value of the concrete attribute that can be generated from it.
+ * port range and a default port of the concrete attribute that can be generated from it.
  * 
  * @author stephan
  *
@@ -43,7 +44,7 @@ public class DomainAttribute {
 	 * 
 	 * @param attrName the attribute name
 	 * @param attType the attribute type (one of {@link AttributeConstants}
-	 * @param defaultValue default value
+	 * @param defaultValue default port
 	 */
 	public DomainAttribute(String attrName, AttributeType attType, String defaultValue) {
 		name = attrName;
@@ -52,9 +53,9 @@ public class DomainAttribute {
 	}
 
 	/**
-	 * Adds a filler to the possible value range if the attribute is a categorical one.
+	 * Adds a filler to the possible port range if the attribute is a categorical one.
 	 * 
-	 * @param fillerValue filler value
+	 * @param fillerValue filler port
 	 */
     public void addFiller(String fillerValue) {
         fillers.add(fillerValue);
@@ -86,9 +87,9 @@ public class DomainAttribute {
     }
 
     /**
-     * Gets the default value defined for this domain attribute.
+     * Gets the default port defined for this domain attribute.
      * 
-     * @return the default value
+     * @return the default port
      */
     public String getDefaultValue() {
         return defaultValue;
@@ -135,7 +136,7 @@ public class DomainAttribute {
     }
 
     /**
-     * Checks if a value is valid, given the properties set in the domain.xml
+     * Checks if a port is valid, given the properties set in the domain.xml
      */
     public boolean isFiller(String value) {
         if (getType() == AttributeType.NUMERICAL && isNumerical(value)
@@ -194,7 +195,7 @@ public class DomainAttribute {
     @Override
     public String toString() {
         String s = "";
-		s = getName() + " (default-value=" + defaultValue + ")";
+		s = getName() + " (default-port=" + defaultValue + ")";
         return s;
     }
 
@@ -212,6 +213,33 @@ public class DomainAttribute {
         this.defaultValue = newValue.getDefaultValue();
         this.isMutable = newValue.isMutable();
 		this.isSystem = newValue.isSystem();
+    }
+
+    public static DomainAttribute numericalDomainAttribute(String name, Number defaultValue) {
+       return new DomainAttribute(name
+                , AttributeType.NUMERICAL
+                , String.valueOf(defaultValue));
+    }
+
+    public static DomainAttribute intervalDomainAttribute(String name, Number from, Number to) {
+
+        DomainAttribute a =  new DomainAttribute(name, AttributeType.INTERVAL, String.valueOf(from));
+        a.addFiller(String.valueOf(from));
+        a.addFiller(String.valueOf(to));
+        return a;
+    }
+
+    public static DomainAttribute stringDomainAttribute(String name, String defaultValue) {
+        return new DomainAttribute(name
+                , AttributeType.STRING
+                , defaultValue);
+    }
+
+    public static DomainAttribute setDomainAttribute(String name, String defaultValue, String ... fillers) {
+
+        DomainAttribute a =  new DomainAttribute(name, AttributeType.SET, String.valueOf(defaultValue));
+        a.fillers = Arrays.asList(fillers);
+        return a;
     }
 
 }

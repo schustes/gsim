@@ -32,7 +32,7 @@ public class SetAttribute extends Attribute {
     /**
      * Adds an entry.
      * 
-     * @param value the value to add
+     * @param value the port to add
      */
     public void addEntry(String value) {
         if (value.length() > 0 && !entries.contains(value)) {

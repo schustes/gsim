@@ -1,8 +1,8 @@
 package de.s2.gsim.objects;
 
-import java.io.Serializable;
-
 import de.s2.gsim.GSimException;
+
+import java.io.Serializable;
 
 /**
  * The <code>Behaviour</code> class is the interface representing both behaviour frames and instances. It contains the whole behaviour of the agent,
@@ -95,7 +95,7 @@ public interface Behaviour extends Serializable {
     /**
      * Gets the probability with which existing BRA paths become re-activated.
      * 
-     * @return the probability value
+     * @return the probability port
      * @throws GSimException
      */
     double getRevaluationProb() throws GSimException;
@@ -104,7 +104,7 @@ public interface Behaviour extends Serializable {
      * Gets the cost (zeta) that is used by BRA to determine whether a state successor should be expanded or not. The smaller this parameter, the
      * smaller the likelihood that nodes that were already expanded, are expanded again in the future.
      * 
-     * @return the cost parameter value.
+     * @return the cost parameter port.
      * @throws GSimException
      */
     double getRevisitCostFraction() throws GSimException;

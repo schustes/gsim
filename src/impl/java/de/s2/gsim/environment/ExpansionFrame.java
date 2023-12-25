@@ -8,7 +8,7 @@ import de.s2.gsim.objects.attribute.DomainAttribute;
 
 public class ExpansionFrame extends Frame {
 
-    public final static String ATTR_LIST_ATTRS = "attributes";
+    public final static String ATTR_LIST_ATTRS = "attributeDistribution";
 
     public final static String CATEGORY = "expansion";
 

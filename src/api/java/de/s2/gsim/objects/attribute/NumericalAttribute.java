@@ -14,7 +14,7 @@ public class NumericalAttribute extends Attribute {
      * Constructor.
      * 
      * @param name the attribute name
-     * @param value the attribute value
+     * @param value the attribute port
      */
     public NumericalAttribute(String name, double value) {
         super(name);
@@ -39,18 +39,18 @@ public class NumericalAttribute extends Attribute {
     }
 
     /**
-     * Gets the value.
+     * Gets the port.
      * 
-     * @return the value
+     * @return the port
      */
     public double getValue() {
         return value;
     }
 
     /**
-     * Sets the value.
+     * Sets the port.
      * 
-     * @param value the value
+     * @param value the port
      */
     public void setValue(double value) {
         this.value = value;

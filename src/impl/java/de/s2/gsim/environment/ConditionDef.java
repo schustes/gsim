@@ -28,7 +28,7 @@ public class ConditionDef extends Instance {
     	
         super.setAttribute(new StringAttribute("parameter-name", parameterName));
         super.setAttribute(new StringAttribute("operator", operator));
-        super.setAttribute(new StringAttribute("parameter-value", parameterValue));
+        super.setAttribute(new StringAttribute("parameter-port", parameterValue));
     }
 
     public boolean equals1(Object o) {
@@ -66,7 +66,7 @@ public class ConditionDef extends Instance {
     }
 
     public String getParameterValue() {
-        return this.getAttribute("parameter-value").toValueString();
+        return this.getAttribute("parameter-port").toValueString();
     }
 
     @Override
@@ -85,7 +85,7 @@ public class ConditionDef extends Instance {
     }
 
     public void setParameterValue(String str) {
-        StringAttribute s = new StringAttribute("parameter-value", str);
+        StringAttribute s = new StringAttribute("parameter-port", str);
         this.setAttribute(s);
     }
 

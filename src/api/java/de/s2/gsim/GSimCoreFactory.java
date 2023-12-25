@@ -76,6 +76,22 @@ public abstract class GSimCoreFactory {
         return factory;
     }
 
+    private static List<String> getRootUrls () {
+        List<String> result = new ArrayList<> ();
+
+        ClassLoader cl = Thread.currentThread().getContextClassLoader();
+        while (cl != null) {
+            if (cl instanceof URLClassLoader) {
+                URL[] urls = ((URLClassLoader) cl).getURLs();
+                for (URL u: urls) {
+                    result.add(u.getFile());
+                }
+            }
+            cl = cl.getParent();
+        }
+        return result;
+    }
+
     private static final Logger LOG = Logger.getLogger(ClassSearchUtils.class);
 
     private static class ClassSearchUtils {
@@ -101,6 +117,9 @@ public abstract class GSimCoreFactory {
             if (classpath == null) {
                 classpath = System.getProperty("java.class.path");
             }
+
+            List<String> urls = getRootUrls();
+            //classpath = String.join(";", urls);
 
             StringTokenizer tokenizer = new StringTokenizer(classpath, File.pathSeparator);
             String token;
@@ -135,7 +154,9 @@ public abstract class GSimCoreFactory {
                     }
                 }
             }
-            factories.put(factoryName, foundFactory);
+            if (foundFactory != null) {
+                factories.put(factoryName, foundFactory);
+            }
             return foundFactory;
         }
 
@@ -148,7 +169,7 @@ public abstract class GSimCoreFactory {
         }
 
         public static void main(String... args) throws Exception {
-            //System.setProperty("java.class.path", "/home/stephan/projects/discrimination/discrimination-scenario/build/libs/discrimination-scenario-1.0.jar");
+            //System.setProperty("java.class.path", "/home/stephan/projects/discrimination/discrimination-simulator/build/libs/discrimination-simulator-1.0.jar");
             System.setProperty("java.class.path", "file:///home/stephan/projects/gsim/build/libs/gsim-2.0-SNAPSHOT.jar");
             ClassLoader urlClassLoader = new URLClassLoader(new URL[]{new URL("file:///home/stephan/projects/gsim/build/libs/gsim-2.0-SNAPSHOT.jar")});
             GSimCoreFactory f = find(null, urlClassLoader);
@@ -166,12 +187,43 @@ public abstract class GSimCoreFactory {
 
                 for (Iterator<Path> it = walk.iterator(); it.hasNext();){
                     Path p = it.next();
-                    if (p.toString().endsWith(".jar") && !p.toString().contains("google") && !p.toString().contains("jre") && !p.toString().contains("jdk") && !p.toString().contains("spring") && !p.toString().contains("apache") ) {
+                    if (p.toString().endsWith(".jar")
+                            && !p.toString().contains("google")
+                            && !p.toString().contains("jre")
+                            && !p.toString().contains("jdk")
+                            && !p.toString().contains("spring")
+                            && !p.toString().contains("org")
+                            && !p.toString().contains("jackson")
+                            && !p.toString().contains("swagger")
+                            && !p.toString().contains("sun")
+                            && !p.toString().contains("commons")
+                            && !p.toString().contains("rabbitmq")
+                            && !p.toString().contains("h2database")
+                            && !p.toString().contains("javax")
+                            && !p.toString().contains("junit")
+                            && !p.toString().contains("glassfish")
+                            && !p.toString().contains("jboss")
+                            && !p.toString().contains("apache") ) {
                         GSimCoreFactory f = lookInArchive0(factoryName, uri, p, classloader);
                         if (f != null) {
                             return f;
                         }
-                    } else if (!p.toString().contains("google") && !p.toString().contains("google") && !p.toString().contains("oracle") && !p.toString().contains("javax") && !p.toString().contains("spring") && !p.toString().contains("apache") && !p.toString().contains("sun") && !p.toString().contains("org")
+                    } else if (!p.toString().contains("google")
+                            && !p.toString().contains("oracle")
+                            && !p.toString().contains("javax")
+                            && !p.toString().contains("spring")
+                            && !p.toString().contains("apache")
+                            && !p.toString().contains("sun")
+                            && !p.toString().contains("jackson")
+                            && !p.toString().contains("swagger")
+                            && !p.toString().contains("sun")
+                            && !p.toString().contains("commons")
+                            && !p.toString().contains("rabbitmq")
+                            && !p.toString().contains("h2database")
+                            && !p.toString().contains("net.sf")
+                            && !p.toString().contains("org")
+                            && !p.toString().contains("junit")
+                            && !p.toString().contains("glassfish")
                             && p.toString().endsWith(".class")) {
                         String entry = pathToClassName(p.toString());
                         GSimCoreFactory factory =  loadClassIfFactoryAnnotationPresent(factoryName, classloader, entry);

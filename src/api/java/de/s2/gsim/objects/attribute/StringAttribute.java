@@ -1,7 +1,7 @@
 package de.s2.gsim.objects.attribute;
 
 /**
- * A StringAttribute holds a simple string value.
+ * A StringAttribute holds a simple string port.
  * 
  * @author stephan
  *
@@ -14,7 +14,7 @@ public class StringAttribute extends Attribute {
      * Constructor.
      * 
      * @param name the attribute name
-     * @param value the attribute value
+     * @param value the attribute port
      */
     public StringAttribute(String name, String value) {
         super(name);
@@ -22,18 +22,18 @@ public class StringAttribute extends Attribute {
     }
 
     /**
-     * Gets the attribute value.
+     * Gets the attribute port.
      * 
-     * @return the value
+     * @return the port
      */
     public String getValue() {
         return value;
     }
 
     /**
-     * Sets the value
+     * Sets the port
      * 
-     * @param value the value
+     * @param value the port
      */
     public void setValue(String value) {
         this.value = value;

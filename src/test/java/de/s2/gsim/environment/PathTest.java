@@ -24,7 +24,7 @@ public class PathTest {
 
         String pathString = path.toString();
         assertThat("Path string is returned", pathString, notNullValue());
-		assertThat("Path string matches expected value", pathString, equalTo("list-1/C1/list-2/C2/attr-list/attr"));
+		assertThat("Path string matches expected port", pathString, equalTo("list-1/C1/list-2/C2/attr-list/attr"));
 
     }
 
@@ -38,7 +38,7 @@ public class PathTest {
         Frame c1 = Frame.newFrame("C1");
         Frame c2 = Frame.newFrame("C2");
         DomainAttribute a1 = new DomainAttribute("attr", AttributeType.STRING);
-        a1.setDefault("default-value");
+        a1.setDefault("default-port");
         c2.addOrSetAttribute("attr-list", a1);
         c1.addOrSetChildFrame("list-2", c2);
         f.addOrSetChildFrame("list-1", c1);
@@ -82,7 +82,7 @@ public class PathTest {
         Frame c1 = Frame.newFrame("C1");
         Frame c2 = Frame.newFrame("C2");
         DomainAttribute a1 = new DomainAttribute("attr", AttributeType.STRING);
-        a1.setDefault("default-value");
+        a1.setDefault("default-port");
         c2.addOrSetAttribute("attr-list", a1);
         c1.addOrSetChildFrame("list-2", c2);
         f.addOrSetChildFrame("list-1", c1);
@@ -103,7 +103,7 @@ public class PathTest {
         Frame c1 = Frame.inherit(Arrays.asList(f), "C1", Optional.empty());
         Frame c2 = Frame.newFrame("C2");
         DomainAttribute a1 = new DomainAttribute("attr", AttributeType.STRING);
-        a1.setDefault("default-value");
+        a1.setDefault("default-port");
         c2.addOrSetAttribute("attr-list", a1);
         f.addOrSetChildFrame("list-2", c2);
 
@@ -125,7 +125,7 @@ public class PathTest {
         Frame c1 = Frame.newFrame("C1");
         DomainAttribute a1 = new DomainAttribute("attr", AttributeType.STRING);
         DomainAttribute a2 = new DomainAttribute("attr2", AttributeType.STRING);
-        a1.setDefault("default-value");
+        a1.setDefault("default-port");
         c1.addOrSetAttribute(listName, a1);
         c1.addOrSetAttribute(listName, a2);
         f.addOrSetChildFrame("list-1", c1);

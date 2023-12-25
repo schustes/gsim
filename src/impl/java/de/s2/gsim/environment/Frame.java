@@ -1,24 +1,12 @@
 package de.s2.gsim.environment;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import javax.validation.constraints.NotNull;
-
-import org.apache.log4j.Logger;
-
 import de.s2.gsim.objects.Path;
 import de.s2.gsim.objects.attribute.DomainAttribute;
+import org.apache.log4j.Logger;
+
+import javax.validation.constraints.NotNull;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Frame class. A frame is a template for any object or agent classes.
@@ -46,7 +34,7 @@ public class Frame extends Unit<Frame , DomainAttribute> {
 	}
 
 	/**
-	 * Construct a top-level frame without any attributes and children.
+	 * Construct a top-level frame without any attributeDistribution and children.
 	 * 
 	 * @param name name
 	 * @param category category
@@ -77,7 +65,7 @@ public class Frame extends Unit<Frame , DomainAttribute> {
 	/**
 	 * Creates a frame that inherits from the given list of parent frames.
 	 *
-	 * The inheritance mechanism puts all parent lists, object and attributes in its own container; these objects are not copied into the new frame.
+	 * The inheritance mechanism puts all parent lists, object and attributeDistribution in its own container; these objects are not copied into the new frame.
 	 * Any operations that do not operate on declared entities, are thus implicitly operations on these parent objects. It means also that operations
 	 * on parents are immediately visible. Modifications applied to this frame are not propagated to the parents.
 	 * 
@@ -117,7 +105,7 @@ public class Frame extends Unit<Frame , DomainAttribute> {
 	}
 
 	/**
-	 * Like #inherit(), but sets additional mutable and system attributes.
+	 * Like #inherit(), but sets additional mutable and system attributeDistribution.
 	 * 
 	 * @param parents parents to inherit from
 	 * @param name name
@@ -189,7 +177,7 @@ public class Frame extends Unit<Frame , DomainAttribute> {
 	}
 
 	/**
-	 * Copies the attributes and child frames from one frame to another.
+	 * Copies the attributeDistribution and child frames from one frame to another.
 	 * 
 	 * @param from the frame to copy from
 	 * @param to the frame to copy to
@@ -445,10 +433,10 @@ public class Frame extends Unit<Frame , DomainAttribute> {
 	}
 
 	/**
-	 * Gets all attributes from a list.
+	 * Gets all attributeDistribution from a list.
 	 * 
 	 * @param listname the attribute list name
-	 * @return the attributes or empty list if no attributes are in the list or the list does not exist
+	 * @return the attributeDistribution or empty list if no attributeDistribution are in the list or the list does not exist
 	 */
 	public List<DomainAttribute> getAttributes(@NotNull String listname) {
 
@@ -547,7 +535,7 @@ public class Frame extends Unit<Frame , DomainAttribute> {
 	}
 
 	/**
-	 * Gets an attribute from the given list declared in this frame (attributes
+	 * Gets an attribute from the given list declared in this frame (attributeDistribution
 	 * of the same list name in ancestors are ignored).
 	 * 
 	 * @param listname
@@ -562,10 +550,10 @@ public class Frame extends Unit<Frame , DomainAttribute> {
 	}
 
 	/**
-	 * Get the attributes declared on this frame for the given list.
+	 * Get the attributeDistribution declared on this frame for the given list.
 	 * 
-	 * @param listname the list name to retrieve the attributes from
-	 * @return a list of attributes
+	 * @param listname the list name to retrieve the attributeDistribution from
+	 * @return a list of attributeDistribution
 	 */
 	public List<DomainAttribute> getDeclaredAttributes(@NotNull String listname) {
 		return getAttributeLists().get(listname).stream().filter(a -> a instanceof DomainAttribute).map(da -> (DomainAttribute) da)
@@ -623,7 +611,7 @@ public class Frame extends Unit<Frame , DomainAttribute> {
 	 * @return a list of names or empty list if no lists are defined
 	 */
 	public List<String> getDeclaredFrameListNames() {
-		return new ArrayList<String>(getObjectLists().keySet());
+		return new ArrayList<>(getObjectLists().keySet());
 	}
 
 	/**
@@ -918,7 +906,7 @@ public class Frame extends Unit<Frame , DomainAttribute> {
 	}
 
 	/**
-	 * Removes the attribute identified by {@link Path} somewhere in the tree of attributes or child attributes.
+	 * Removes the attribute identified by {@link Path} somewhere in the tree of attributeDistribution or child attributeDistribution.
 	 * 
 	 * @param path the path
 	 * @return true if the attribute was removed, false if none with the given attribute path could be found and/or deleted

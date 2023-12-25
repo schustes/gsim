@@ -9,7 +9,7 @@ import javax.validation.constraints.NotNull;
 import java.util.*;
 
 /**
- * An instance is the instantiation of a domain entity or frame. Instances extend frames by assigning concrete value to the attributes. Instances
+ * An instance is the instantiation of a domain entity or frame. Instances extend frames by assigning concrete port to the attributeDistribution. Instances
  * represent similar to objects inheritance hierarchies. If an attributelist is not found in the current instance, it is looked in the superclasses
  * until it is found.
  *
@@ -89,7 +89,7 @@ public class Instance extends Unit<Instance, Attribute> {
 	}
 
 	/**
-	 * Instanciates an instance. The instance is constructed using the frame and its default value as template.
+	 * Instanciates an instance. The instance is constructed using the frame and its default port as template.
 	 * 
 	 * @param frame the frame to instanciate from
 	 */
@@ -227,10 +227,10 @@ public class Instance extends Unit<Instance, Attribute> {
 	}
 
 	/**
-	 * Return all attributes in the list with the specified name.
+	 * Return all attributeDistribution in the list with the specified name.
 	 * 
 	 * @param listname the name of the attribute list
-	 * @return a list of attributes or empty list if the list is empty or does not exist
+	 * @return a list of attributeDistribution or empty list if the list is empty or does not exist
 	 */
 
 	public List<Attribute> getAttributes(@NotNull String listname) {
@@ -473,7 +473,7 @@ public class Instance extends Unit<Instance, Attribute> {
 	}
 
 	/**
-	 * Sets the attribute that equals the specified attribute (by name). If the attribute is present in different lists, all attributes are replaced. If the attribute is not defined, it will not be added.
+	 * Sets the attribute that equals the specified attribute (by name). If the attribute is present in different lists, all attributeDistribution are replaced. If the attribute is not defined, it will not be added.
 	 * 
 	 * @param a the attribute to set
 	 * @return true if the attribute was set, false if this was not possible, because, e.g. it was not defined by its frame
@@ -598,7 +598,7 @@ public class Instance extends Unit<Instance, Attribute> {
 	}
 
 	/**
-	 * Removes the attribute identified by {@link Path} somewhere in the tree of attributes or child attributes.
+	 * Removes the attribute identified by {@link Path} somewhere in the tree of attributeDistribution or child attributeDistribution.
 	 * 
 	 * @param path the path
 	 * @return true if the attribute was removed, false if none with the given attribute path could be found and/or deleted
@@ -633,7 +633,7 @@ public class Instance extends Unit<Instance, Attribute> {
 	}
 
 	/**
-	 * Sets the frame to the new frame, and then checks if any attributes and frames have been added or removed and updates the instance accordingly.
+	 * Sets the frame to the new frame, and then checks if any attributeDistribution and frames have been added or removed and updates the instance accordingly.
 	 * Note: If a list in this instance is defined that the frame does not contain, this list is also removed.
 	 * 
 	 * @param frame the frame to set

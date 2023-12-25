@@ -1,5 +1,7 @@
 package de.s2.gsim.sim.communication;
 
+import java.util.UUID;
+
 public abstract class CommunicationProtocol extends AbstractCommunicationProtocol implements java.io.Serializable {
 
     /**
@@ -9,7 +11,7 @@ public abstract class CommunicationProtocol extends AbstractCommunicationProtoco
 
     public long timeOut = 100000;
 
-    private double commId = 0;
+    private String commId = UUID.randomUUID().toString();
 
     private String ownName;
 
@@ -32,7 +34,7 @@ public abstract class CommunicationProtocol extends AbstractCommunicationProtoco
     }
 
     @Override
-    public double getCommId() {
+    public String getCommId() {
         return commId;
     }
 
@@ -57,7 +59,7 @@ public abstract class CommunicationProtocol extends AbstractCommunicationProtoco
         return 1;
     }
 
-    public void setCommId(double id) {
+    public void setCommId(String id) {
         commId = id;
     }
 

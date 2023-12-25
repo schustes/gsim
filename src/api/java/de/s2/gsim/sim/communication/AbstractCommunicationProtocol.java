@@ -2,7 +2,7 @@ package de.s2.gsim.sim.communication;
 
 public abstract class AbstractCommunicationProtocol {
 
-    public abstract double getCommId();
+    public abstract String getCommId();
 
     public abstract String getOwnName();
 

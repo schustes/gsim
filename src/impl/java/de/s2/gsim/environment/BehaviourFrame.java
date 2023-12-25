@@ -1,17 +1,17 @@
 package de.s2.gsim.environment;
 
+import de.s2.gsim.objects.attribute.AttributeType;
+import de.s2.gsim.objects.attribute.DomainAttribute;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
-import de.s2.gsim.objects.attribute.AttributeType;
-import de.s2.gsim.objects.attribute.DomainAttribute;
 
 public class BehaviourFrame extends Frame {
 
     public final static String ACTION_LIST = "available actions";
 
-    public final static String ATTR_LIST = "attributes";
+    public final static String ATTR_LIST = "attributeDistribution";
 
     public final static String BREADTH_FIRST = "breadth-first";
 
@@ -194,17 +194,21 @@ public class BehaviourFrame extends Frame {
         return uf;
     }
 
-    public UserRuleFrame getDeclaredRLRule(String name) {
+    public Optional<UserRuleFrame> getDeclaredRLRule(String name) {
         RLRuleFrame[] frs = getDeclaredRLRules();
         for (int i = 0; i < frs.length; i++) {
             if (frs[i].getName().equals(name)) {
-                return frs[i];
+                return Optional.of(frs[i]);
             }
         }
-        return null;
+        return Optional.empty();
     }
 
     public RLRuleFrame[] getDeclaredRLRules() {
+        if (!getDeclaredFrameListNames().contains(RL_LIST)) {
+            return new RLRuleFrame[0];
+        }
+
         List<Frame> f = getDeclaredChildFrames(RL_LIST);
         if (f.isEmpty()) {
             return new RLRuleFrame[0];

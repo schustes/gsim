@@ -391,7 +391,7 @@ public class AgentClassOperations {
 					}
 				}
 				for (RLRuleFrame f : behaviourFrame.getRLRule()) {
-					if (f.isDirty() && sb.getDeclaredRLRule(f.getName()) != null) {
+					if (f.isDirty() && sb.getDeclaredRLRule(f.getName()).isPresent()) {
 						sb.addOrSetRule(f);
 					}
 				}
@@ -595,8 +595,8 @@ public class AgentClassOperations {
 	}
 
 	/**
-	 * Replaces attributes of all members (immediate successors) with the
-	 * default value of the given domain attribute.
+	 * Replaces attributeDistribution of all members (immediate successors) with the
+	 * default port of the given domain attribute.
 	 * 
 	 * @param agentClass
 	 *            the class of the members to replace.

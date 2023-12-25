@@ -1,9 +1,5 @@
 package de.s2.gsim.environment;
 
-import java.util.List;
-
-import javax.management.ObjectInstance;
-
 import de.s2.gsim.api.objects.impl.UnitWrapper;
 import de.s2.gsim.objects.attribute.Attribute;
 import de.s2.gsim.objects.attribute.DomainAttribute;
@@ -11,6 +7,9 @@ import de.s2.gsim.objects.attribute.IntervalAttribute;
 import de.s2.gsim.objects.attribute.NumericalAttribute;
 import de.s2.gsim.objects.attribute.OrderedSetAttribute;
 import de.s2.gsim.objects.attribute.SetAttribute;
+
+import javax.management.ObjectInstance;
+import java.util.List;
 
 /**
  * TODO use list / stream operations.
@@ -29,7 +28,7 @@ public abstract class Generator {
 	}
 
 	/**
-	 * Randomises attribute values of agent itself and all contained objects, for attributes that are declared as 'mutable'.
+	 * Randomises attribute values of agent itself and all contained objects, for attributeDistribution that are declared as 'mutable'.
 	 * 
 	 * @param a GenericAgent
 	 * @param svar double
@@ -142,7 +141,7 @@ public abstract class Generator {
 
 	/**
 	 * Randomises attribute values. For this, 'svar' is interpreted as the percentage of variation in the values of the default values of
-	 * the domain attributes, which are seen as mean values of the normal distribution from which the values are drawn. This means that svar
+	 * the domain attributeDistribution, which are seen as mean values of the normal distribution from which the values are drawn. This means that svar
 	 * is expected to be >0 and <1.
 	 * 
 	 * @param obj Instance

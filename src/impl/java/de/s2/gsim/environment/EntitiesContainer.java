@@ -1,5 +1,8 @@
 package de.s2.gsim.environment;
 
+import de.s2.gsim.objects.Path;
+import de.s2.gsim.objects.attribute.DomainAttribute;
+
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -10,9 +13,6 @@ import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import de.s2.gsim.objects.Path;
-import de.s2.gsim.objects.attribute.DomainAttribute;
 
 /**
  * EntitesContainer holds all components of an {@link Environment}. An environment is the simulation and setup specific object system that manages agents, objects and their relations to each other.
@@ -60,7 +60,7 @@ public class EntitiesContainer {
     /**
      * Set of object instances.
      */
-    private final Set<Instance> objects = new LinkedHashSet<Instance>();
+    private final Set<Instance> objects = new LinkedHashSet<>();
 
     /**
      * Set of object classes.
@@ -196,7 +196,9 @@ public class EntitiesContainer {
     }
     
     public void addAgent(GenericAgent agent) {
-        this.agents.put(agent.getName(), agent);
+        synchronized (agents) {
+            this.agents.put(agent.getName(), agent);
+        }
     }
 
     public Set<GenericAgentClass> getAgentSubClasses() {
@@ -262,7 +264,9 @@ public class EntitiesContainer {
     }
 
     public void addObject(Instance object) {
-        this.objects.add(object);
+        synchronized (objects) {
+            this.objects.add(object);
+        }
     }
 
     public Set<Frame> getObjectSubClasses() {
@@ -315,13 +319,21 @@ public class EntitiesContainer {
 
     public void remove(Unit<?, ?> removed) {
         if (removed instanceof GenericAgent) {
-            this.agents.remove(removed.getName());
+            synchronized (agents) {
+                this.agents.remove(removed.getName());
+            }
         } else if (removed instanceof GenericAgentClass) {
-            this.agentSubClasses.remove(removed.getName());
+            synchronized (agentSubClasses) {
+                this.agentSubClasses.remove(removed.getName());
+            }
         } else if (removed instanceof Frame) {
-            this.objectSubClasses.remove(removed.getName());
+            synchronized (objectSubClasses) {
+                this.objectSubClasses.remove(removed.getName());
+            }
         } else if (removed instanceof Instance) {
-            this.objects.remove(removed.getName());
+            synchronized (objects) {
+                this.objects.remove(removed.getName());
+            }
         } else {
             throw new GSimDefException("No unit with name " + removed.getName() + " was removed. Does it exist and is it not a root agent/object?");
         }

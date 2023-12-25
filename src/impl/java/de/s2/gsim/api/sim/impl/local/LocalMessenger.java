@@ -1,10 +1,5 @@
 package de.s2.gsim.api.sim.impl.local;
 
-import java.util.HashMap;
-import java.util.List;
-
-import org.apache.log4j.Logger;
-
 import de.s2.gsim.sim.GSimEngineException;
 import de.s2.gsim.sim.communication.AgentType;
 import de.s2.gsim.sim.communication.BroadcastProtocol;
@@ -15,6 +10,11 @@ import de.s2.gsim.sim.communication.Communicator;
 import de.s2.gsim.sim.communication.Conversation;
 import de.s2.gsim.sim.communication.Message;
 import de.s2.gsim.sim.communication.Messenger;
+import org.apache.log4j.Logger;
+
+import java.util.HashMap;
+import java.util.Set;
+import java.util.UUID;
 
 public class LocalMessenger implements Messenger, java.io.Serializable, Communicator {
 
@@ -22,13 +22,13 @@ public class LocalMessenger implements Messenger, java.io.Serializable, Communic
 
     private static final long serialVersionUID = 1L;
 
-    private List<AgentType> handledAgents;
+    private Set<AgentType> handledAgents;
 
     private HashMap<Conversation, CommunicationProtocol> openCommunications1;
 
     private HashMap<Conversation, CommunicationProtocolRespond> openCommunications2;
 
-    public LocalMessenger(List<AgentType> handledAgents) {
+    public LocalMessenger(Set<AgentType> handledAgents) {
         this.handledAgents = handledAgents;
 
         openCommunications1 = new HashMap<Conversation, CommunicationProtocol>();
@@ -45,11 +45,6 @@ public class LocalMessenger implements Messenger, java.io.Serializable, Communic
     }
 
     @Override
-    public void addAgentToHandle(AgentType r) {
-        handledAgents.add(r);
-    }
-
-    @Override
     public void broadcast(BroadcastProtocol p) {
         Message m = p.broadcast();
 
@@ -63,13 +58,13 @@ public class LocalMessenger implements Messenger, java.io.Serializable, Communic
 
     @Override
     public Conversation createConversation(CommunicationProtocol initiator) throws GSimEngineException {
-        double l = cern.jet.random.Uniform.staticNextDouble();
-
+        //double l = cern.jet.random.Uniform.staticNextDouble();
+        String id = UUID.randomUUID().toString();
         Conversation c = new Conversation(initiator, this);
-        initiator.setCommId(l);
+        initiator.setCommId(id);
 
         CommunicationProtocolRespond receiverProtocol = initiator.getReceiverProtocol();
-        receiverProtocol.setCommId(l);
+        receiverProtocol.setCommId(id);
         receiverProtocol.setPartnerName(initiator.getOwnName());
 
         String partnername = initiator.getPartnerName();
@@ -80,6 +75,11 @@ public class LocalMessenger implements Messenger, java.io.Serializable, Communic
         openCommunications2.put(c, receiverProtocol);
 
         return c;
+    }
+
+    @Override
+    public void addAgentToHandle(AgentType r) {
+        this.handledAgents.add(r);
     }
 
     @Override
@@ -105,11 +105,6 @@ public class LocalMessenger implements Messenger, java.io.Serializable, Communic
     @Override
     public Communicator getCommunicationInterface() {
         return this;
-    }
-
-    @Override
-    public String getNamespace() {
-        return null;
     }
 
     public int getPendingConversationCount(String agentName) {
@@ -141,11 +136,6 @@ public class LocalMessenger implements Messenger, java.io.Serializable, Communic
     }
 
     @Override
-    public void setHandledAgents(List<AgentType> list) {
-        handledAgents = list;
-    }
-
-    @Override
     public void startConversation(Conversation commId) {
 
         logger.debug("Start conversation commid=" + commId);
@@ -155,7 +145,7 @@ public class LocalMessenger implements Messenger, java.io.Serializable, Communic
         CommunicationProtocol p1 = openCommunications1.get(commId);
         CommunicationProtocolRespond p2 = openCommunications2.get(commId);
 
-        // if (p1.getPartnerName().equals(m.getReceiver())) {
+        // if (f1.getPartnerName().equals(m.getReceiver())) {
         Message resp = p2.respond(m);
         if (resp != null) {
             resp.setReceiver(p1.getOwnName());

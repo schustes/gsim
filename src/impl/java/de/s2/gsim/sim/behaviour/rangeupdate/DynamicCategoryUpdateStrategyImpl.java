@@ -1,16 +1,5 @@
 package de.s2.gsim.sim.behaviour.rangeupdate;
 
-import static cern.jet.random.Uniform.staticNextIntFromTo;
-import static de.s2.gsim.sim.behaviour.bra.StateFactHelper.addStateFactCategoryElemFromStatefact;
-import static de.s2.gsim.sim.behaviour.rangeupdate.DynamicValueRangeExtensionRuleBuilder.addCategoryToExperimentalRule;
-import static de.s2.gsim.sim.behaviour.util.FactUtils.getFloatSlotValue;
-import static de.s2.gsim.sim.behaviour.util.RuleEngineHelper.deleteRule;
-import static de.s2.gsim.sim.behaviour.util.RuleEngineHelper.getStateFactsCategories;
-import static de.s2.gsim.sim.behaviour.util.RuleEngineHelper.getStateFactsForRootRule;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import de.s2.gsim.api.sim.agent.impl.RuntimeAgent;
 import de.s2.gsim.environment.ExpansionDef;
 import de.s2.gsim.environment.Frame;
@@ -27,15 +16,26 @@ import jess.Fact;
 import jess.JessException;
 import jess.Rete;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import static cern.jet.random.Uniform.staticNextIntFromTo;
+import static de.s2.gsim.sim.behaviour.bra.StateFactHelper.addStateFactCategoryElemFromStatefact;
+import static de.s2.gsim.sim.behaviour.rangeupdate.DynamicValueRangeExtensionRuleBuilder.addCategoryToExperimentalRule;
+import static de.s2.gsim.sim.behaviour.util.FactUtils.getFloatSlotValue;
+import static de.s2.gsim.sim.behaviour.util.RuleEngineHelper.deleteRule;
+import static de.s2.gsim.sim.behaviour.util.RuleEngineHelper.getStateFactsCategories;
+import static de.s2.gsim.sim.behaviour.util.RuleEngineHelper.getStateFactsForRootRule;
+
 /**
- * Strategy implementation for interval attributes.
+ * Strategy implementation for interval attributeDistribution.
  * 
  * @author stephan
  *
  */
 public class DynamicCategoryUpdateStrategyImpl implements DynamicValueRangeUpdateStrategy {
 
-	private static String debugDir = "/home/gsim/tmp/trees";
+	private static String debugDir = "/var/log/simulations/gsim";
 
 	@Override
 	public void apply(RuntimeAgent agent, String baseRuleName, ExpansionDef exp, RLParameterRanges rlRanges, Context context) {

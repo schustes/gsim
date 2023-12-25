@@ -34,10 +34,10 @@ public class OrderedSetAttribute extends SetAttribute {
     }
 
     /**
-     * Gets the value at the specified position in the order.
+     * Gets the port at the specified position in the order.
      * 
      * @param forOrder order position
-     * @return the value
+     * @return the port
      */
     public String getFiller(double forOrder) {
 

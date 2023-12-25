@@ -1,10 +1,11 @@
 package de.s2.gsim.sim;
 
-import java.util.List;
-
 import de.s2.gsim.def.ModelDefinitionEnvironment;
 import de.s2.gsim.sim.agent.ApplicationAgent;
 import de.s2.gsim.sim.agent.RtAgent;
+
+import java.util.Collection;
+import java.util.List;
 
 /**
  * A Simulation is an actual running simulation instance. It gets created by the simulation engine by a {@link ModelDefinitionEnvironment} that is
@@ -54,27 +55,27 @@ public interface Simulation {
     RtAgent getAgent(String agentName);
 
     /**
-     * Get all agents in the simulation.
+     * Get all agents in the simulation. The collection is thread-safe.
      * 
      * @return list of agents
      */
-    List<RtAgent> getAllAgents();
+    Collection<RtAgent> getAllAgents();
 
     /**
-     * Get a partial list of agents in the simulation.
+     * Get a partial list of agents in the simulation. The collection is thread-safe.
      * 
      * @param count the number of agents to get
      * @param offset the offset from where to get the agents
      * @return list of agents
      */
-    List<RtAgent> getAllAgents(int count, int offset);
+    Collection<RtAgent> getAllAgents(int count, int offset);
 
     /**
      * Gets all application agents.
      * 
      * @return the agents
      */
-	List<ApplicationAgent> getAppAgents();
+    Collection<ApplicationAgent> getAppAgents();
 
     /**
      * Retrieves a particular application agent.

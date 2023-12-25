@@ -1,11 +1,11 @@
 package de.s2.gsim.environment;
 
-import java.util.List;
-
 import de.s2.gsim.objects.attribute.Attribute;
 
+import java.util.List;
+
 /**
- * Provides a basic implementation of the Agent class. This agent type can be used for anything in a model, but some logic will have to be provided.
+ * Provides a basic implementation of the Agent class. This agent type can be used for anything in a common, but some logic will have to be provided.
  */
 public class GenericAgent extends Instance {
 

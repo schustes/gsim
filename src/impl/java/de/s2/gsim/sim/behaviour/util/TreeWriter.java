@@ -1,17 +1,16 @@
 package de.s2.gsim.sim.behaviour.util;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.util.ArrayList;
-import java.util.Iterator;
-
-import org.jdom.Element;
-import org.jdom.output.XMLOutputter;
-
 import jess.Fact;
 import jess.Rete;
 import jess.Value;
 import jess.ValueVector;
+import org.jdom.Element;
+import org.jdom.output.XMLOutputter;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.util.ArrayList;
+import java.util.Iterator;
 
 public class TreeWriter {
 

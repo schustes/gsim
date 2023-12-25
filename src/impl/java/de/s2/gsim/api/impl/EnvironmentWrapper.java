@@ -6,6 +6,7 @@ import de.s2.gsim.def.ModelDefinitionEnvironment;
 import de.s2.gsim.environment.*;
 import de.s2.gsim.objects.*;
 import de.s2.gsim.objects.attribute.DomainAttribute;
+import de.s2.gsim.sim.agent.ApplicationAgent;
 
 import java.util.*;
 
@@ -479,6 +480,18 @@ public class EnvironmentWrapper implements ModelDefinitionEnvironment {
     }
 
     @Override
+    public void removeObjectInstances(String className) {
+        try {
+            Frame objectClass = env.getObjectClassOperations().getObjectSubClass(className);
+            for (Instance a : env.getObjectInstanceOperations().getInstancesOfClass(objectClass)) {
+                env.getObjectInstanceOperations().removeObject(a);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
     public void removeAgentClass(AgentClass cls) {
         String key = cls.getName();
         if (env.getAgentClassOperations().containsAgentSubClass(cls.getName())) {
@@ -500,6 +513,11 @@ public class EnvironmentWrapper implements ModelDefinitionEnvironment {
     @Override
     public void destroy() {
     	this.env = null;
+    }
+
+
+    public void addSystemAgent(ApplicationAgent agent) {
+        this.env.getAgentRuntimeConfig().addSystemAgent(agent);
     }
 
 }

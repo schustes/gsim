@@ -1,23 +1,12 @@
 package de.s2.gsim.sim;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.greaterThanOrEqualTo;
-import static org.hamcrest.Matchers.lessThanOrEqualTo;
-import static org.hamcrest.Matchers.not;
-
-import java.util.HashMap;
-import java.util.Random;
-import java.util.concurrent.Semaphore;
-
-import org.junit.Before;
-import org.junit.Test;
-
 import de.s2.gsim.GSimCore;
 import de.s2.gsim.GSimCoreFactory;
-import de.s2.gsim.api.sim.agent.impl.RuntimeAgent;
+import de.s2.gsim.api.objects.impl.AgentInstanceSim;
 import de.s2.gsim.def.ModelDefinitionEnvironment;
 import de.s2.gsim.environment.Generator;
+import de.s2.gsim.environment.Instance;
+import de.s2.gsim.environment.Unit;
 import de.s2.gsim.objects.Action;
 import de.s2.gsim.objects.AgentClass;
 import de.s2.gsim.objects.AgentInstance;
@@ -35,8 +24,21 @@ import de.s2.gsim.objects.attribute.NumericalAttribute;
 import de.s2.gsim.objects.attribute.SetAttribute;
 import de.s2.gsim.objects.attribute.StringAttribute;
 import de.s2.gsim.sim.agent.RtAgent;
-import de.s2.gsim.sim.behaviour.SimAction;
+import de.s2.gsim.sim.behaviour.SimulationRuntimeAction;
+import de.s2.gsim.sim.behaviour.SimulationRuntimeContext;
 import de.s2.gsim.testutils.NormalDistributedUtil;
+import org.junit.Before;
+import org.junit.Test;
+
+import java.util.HashMap;
+import java.util.Random;
+import java.util.concurrent.Semaphore;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.greaterThanOrEqualTo;
+import static org.hamcrest.Matchers.lessThanOrEqualTo;
+import static org.hamcrest.Matchers.not;
 
 public class SimTest {
 
@@ -50,8 +52,8 @@ public class SimTest {
 	static final String AGENT_NAME = "test";
 	static final String AGENT_CLASS_NAME = "test-class";
 
-	static double rewardAction0 = 0.9;
-	static double rewardAction1 = 0.001;
+	static double rewardAction0 = 0.999999;
+	static double rewardAction1 = 0.000001;
 	static String action0Name = "Test-Action0";
 	static String action1Name = "Test-Action1";
 
@@ -390,7 +392,12 @@ public class SimTest {
 		agentClass.defineObjectList("object-list", objectClass);
 
 		Expansion expansion = rule.createExpansion("object-list/test/" + ATTR_LIST + "/wealth", "0", "1");
-		rule.addOrSetExpansion(expansion);
+        expansion.setMin("0");
+        expansion.setMax("1");
+        expansion.addFiller("0");
+        expansion.addFiller("1");
+
+        rule.addOrSetExpansion(expansion);
 
 		Action action = behaviour.createAction("Test-Action", AddNewNumberAction.class.getName());
 		Rule rrule = behaviour.createRule("Test-Rule");
@@ -407,6 +414,7 @@ public class SimTest {
 		ObjectInstance inst = env.createObjectInstance("something", objectClass);
 		agent.addOrSetObject("object-list", inst);
 		// add a fresh instance in object child list so that framename <> instancename
+
 
 		for (int i = 0; i < samples; i++) {
 			double counterAction = runRLsimulation(agent, alpha, steps);
@@ -534,7 +542,7 @@ public class SimTest {
 	}
 	public double runRLsimulation(AgentInstance testAgent, double alpha, int steps) throws Exception {
 
-		SimulationController m = core.createScenarioManager(env, new HashMap<String, Object>(), steps, 1);
+		SimulationController m = core.createScenarioManager(env, new HashMap<>(), steps, 1);
 		SimulationId id = m.getSimulationInstances()[0];
 		Simulation sim = m.getModelState(id);
 		RtAgent rt = sim.getAgent(AGENT_NAME);
@@ -595,9 +603,9 @@ public class SimTest {
 		String after = rt.getAgent().getAttribute(ATTR_NAME_1).toValueString();
 
 		assertThat("Simulation changed agent state", after, not(equalTo(initialValue)));
-		assertThat("New value is " + TestAction0.newValue, TestAction0.newValue, equalTo(after));
+		assertThat("New port is " + TestAction0.newValue, TestAction0.newValue, equalTo(after));
 
-		assertThat("Agent definition has still old value " + initialValue, ((StringAttribute)agent.getAttribute(ATTR_NAME_1)).getValue(), equalTo(initialValue));
+		assertThat("Agent definition has still old port " + initialValue, ((StringAttribute)agent.getAttribute(ATTR_NAME_1)).getValue(), equalTo(initialValue));
 	}
 
 	private void blockUntilSimulationFinished(SimulationController m)
@@ -646,97 +654,121 @@ public class SimTest {
 		sema.acquire();
 	}
 
-	public static class TestAction0 extends SimAction {
+	public static class TestAction0 implements SimulationRuntimeAction {
 		private static final long serialVersionUID = 1L;
 
 		static String newValue = "Test1";
 
-		public Object execute() {
-			RuntimeAgent agent = super.getContext().getAgent();
+        @Override
+        public String getName() {
+            return getClass().getSimpleName();
+        }
+
+        public void execute(SimulationRuntimeContext ctx) {
+			AgentInstance agent = ctx.getAgent();
 		
 			StringAttribute instanciated = (StringAttribute)agent.getAttribute(ATTR_NAME_1);
 			instanciated.setValue(newValue);
-			agent.addOrSetAttribute(ATTR_LIST, instanciated);
+			agent.setStringAttributeValue(ATTR_LIST, ATTR_NAME_1, newValue);
 
 			NumericalAttribute counter = (NumericalAttribute) agent.getAttribute(COUNTER0);
 			counter.setValue(counter.getValue() + 1);
-			agent.addOrSetAttribute(ATTR_LIST, instanciated);
+            agent.setStringAttributeValue(ATTR_LIST, ATTR_NAME_1, newValue);
 
 			shuffleAttributes(agent);
 
-			return null;			
 		}
 	}
 
-	public static class TestAction1 extends SimAction {
+	public static class TestAction1 implements SimulationRuntimeAction {
 		private static final long serialVersionUID = 1L;
 
 		static String newValue = "Test2";
 
-		public Object execute() {
-			RuntimeAgent agent = super.getContext().getAgent();
+        @Override
+        public String getName() {
+            return getClass().getSimpleName();
+        }
+
+        public void execute(SimulationRuntimeContext ctx) {
+			AgentInstance agent = ctx.getAgent();
 			StringAttribute instanciated = (StringAttribute)agent.getAttribute(ATTR_NAME_1);
 			instanciated.setValue(newValue);
-			agent.addOrSetAttribute(ATTR_LIST, instanciated);
+            agent.setStringAttributeValue(ATTR_LIST, ATTR_NAME_1, newValue);
 
 			NumericalAttribute counter = (NumericalAttribute) agent.getAttribute(COUNTER1);
 			counter.setValue(counter.getValue() + 1);
-			agent.addOrSetAttribute(ATTR_LIST, instanciated);
+            agent.setStringAttributeValue(ATTR_LIST, ATTR_NAME_1, newValue);
 
 			shuffleAttributes(agent);
 
-			return null;			
 		}
 
 	}
 
-	public static class TestAction1a extends SimAction {
+	public static class TestAction1a implements SimulationRuntimeAction {
 		private static final long serialVersionUID = 1L;
 
 		static String newValue = "Test2";
 
-		public Object execute() {
-			RuntimeAgent agent = super.getContext().getAgent();
+        @Override
+        public String getName() {
+            return getClass().getSimpleName();
+        }
+
+        public void execute(SimulationRuntimeContext ctx) {
+			AgentInstance agent = ctx.getAgent();
 			StringAttribute instanciated = (StringAttribute)agent.getAttribute(ATTR_NAME_1);
 			instanciated.setValue(newValue);
-			agent.addOrSetAttribute(ATTR_LIST, instanciated);
+			agent.setStringAttributeValue(ATTR_LIST, ATTR_NAME_1, newValue);
 
 			NumericalAttribute counter = (NumericalAttribute) agent.getAttribute(COUNTER1);
 			counter.setValue(counter.getValue() + 1);
-			agent.addOrSetAttribute(ATTR_LIST, instanciated);
+            agent.setStringAttributeValue(ATTR_LIST, ATTR_NAME_1, newValue);
 
 			shuffleAttributes(agent);
-			
-			NumericalAttribute a = (NumericalAttribute) agent.resolvePath(Path.attributePath("object-list", "test", ATTR_LIST, "wealth"));
+
+            NumericalAttribute a = (NumericalAttribute) agent.resolveName("object-list/test/"+ATTR_LIST+"/wealth");
+
+			//NumericalAttribute a = (NumericalAttribute) agent.resolvePath(Path.attributePath("object-list", "test", ATTR_LIST, "wealth"));
 			a.setValue(new Random().doubles(1, 20, 30).reduce(0, (x, y) -> x));
-			return null;			
 		}
 
 	}
 
-	public static class AddNewCatAction extends SimAction {
+	public static class AddNewCatAction implements SimulationRuntimeAction {
 		private static final long serialVersionUID = 1L;
-		public Object execute() {
-			RuntimeAgent agent = super.getContext().getAgent();
+
+        @Override
+        public String getName() {
+            return AddNewCatAction.class.getSimpleName();
+        }
+
+        public void execute(SimulationRuntimeContext ctx) {
+			AgentInstance agent = ctx.getAgent();
 			SetAttribute categories = (SetAttribute)agent.getAttribute("Letters");
 			categories.removeAllEntries();
 			categories.addEntry("X");
-			agent.addOrSetAttribute(ATTR_LIST, categories);
-			return null;			
+			agent.setSetAttributeValues(ATTR_LIST, "Letters", "X");
 		}
 
 	}
 
 	static int av = 0;
-	public static class AddNewNumberAction extends SimAction {
+	public static class AddNewNumberAction implements SimulationRuntimeAction {
 		private static final long serialVersionUID = 1L;
 
-		public Object execute() {
+        @Override
+        public String getName() {
+            return AddNewNumberAction.class.getSimpleName();
+        }
 
-			RuntimeAgent agent = super.getContext().getAgent();
+        public void execute(SimulationRuntimeContext ctx) {
+
+			AgentInstance agent = ctx.getAgent();
 
 			Path<Attribute> p = Path.attributePath("object-list", "something", ATTR_LIST, "wealth");
-			NumericalAttribute a = (NumericalAttribute) agent.resolvePath(p);
+			NumericalAttribute a = (NumericalAttribute) agent.resolveName(p.toString());
 			double current = a.getValue();
 
 			if (av == 2) {
@@ -757,43 +789,42 @@ public class SimTest {
 
 			a.setValue(current);
 			// a.setValue(new Random().doubles(1, 20, 30).reduce(0, (x, y) -> y));
-			agent.replaceChildAttribute(p, a);
+            agent.getObject("object-list", "something").setNumericalAttributeValue(ATTR_LIST, "wealth", current);
 
 			av++;
 
-			return null;
 		}
 
 	}
 
-	private static void shuffleAttributes(RuntimeAgent agent) {
-		Generator.randomiseUniformDistributedAttributeValues(agent, VAL_LIST);
+	private static void shuffleAttributes(AgentInstance agent) {
+        AgentInstanceSim base = (AgentInstanceSim)agent;
+	    Unit<Instance, Attribute> inst = base.toUnit();
+		Generator.randomiseUniformDistributedAttributeValues(inst.entity(), VAL_LIST);
 	}
 
-	public static class RewardComputation extends SimAction {
+	public static class RewardComputation implements SimulationRuntimeAction {
 		private static final long serialVersionUID = 1L;
 
-		public Object execute() {
+        @Override
+        public String getName() {
+            return RewardComputation.class.getSimpleName();
+        }
 
-			RuntimeAgent agent = super.getContext().getAgent();
-			if (!agent.getLastAction().isPresent()) {
-				return null;
-			}
+        public void execute(SimulationRuntimeContext ctx) {
 
-			String lastAction = agent.getLastAction().get();
+			AgentInstance agent = ctx.getAgent();
+			ctx.getLastAction().ifPresent(action -> {
+                String lastAction = ctx.getLastAction().get();
+                double reward = 0;
+                if (lastAction.equals(action0Name)) {
+                    reward = rewardAction0;
+                } else {
+                    reward = rewardAction1;
+                }
+                agent.setNumericalAttributeValue(ATTR_LIST, EVAL_ATTR, reward);
+            });
 
-			double reward = 0;
-			if (lastAction.equals(action0Name)) {
-				reward = rewardAction0;
-			} else {
-				reward = rewardAction1;
-			}
-
-			NumericalAttribute rewardVariable = (NumericalAttribute) agent.getAttribute(EVAL_ATTR);
-			rewardVariable.setValue(reward);
-			agent.addOrSetAttribute(ATTR_LIST, rewardVariable);
-
-			return reward;
 		}
 	}
 

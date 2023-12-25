@@ -3,7 +3,7 @@ package de.s2.gsim.sim;
 /**
  * Steppable is an interface that allows a {@link SimulationScheduler} to proceed a {@link Simulation} stepwise. Specific simulation engine
  * implementations (e.g. stand alone or distributed) provide their own ways of handling this. By implementing this interface, they expose the control
- * of these implementation to external callers.
+ * of these implementation to downstream callers.
  * 
  * @author stephan
  *

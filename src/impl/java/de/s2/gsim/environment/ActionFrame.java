@@ -1,13 +1,13 @@
 package de.s2.gsim.environment;
 
-import java.util.List;
-import java.util.Optional;
-
 import de.s2.gsim.objects.attribute.AttributeType;
 import de.s2.gsim.objects.attribute.DomainAttribute;
 
+import java.util.List;
+import java.util.Optional;
+
 /**
- * ActionFrame (and ActionInstance) are classes that represent actions and translate later, together with conditions into rules. Actions in the model
+ * ActionFrame (and ActionInstance) are classes that represent actions and translate later, together with conditions into rules. Actions in the common
  * core are not restricted to a static implementation. As convention, every action can be applied selectively. For this each action can be declared
  * with a special parameter 'object parameter to be applied on' in the action.xml file. If this parameter is declared, the objects will be delivered
  * in the context of the rule it was fired. The translation into the rule system will later take care of the proper application of the rules once the
@@ -16,7 +16,7 @@ import de.s2.gsim.objects.attribute.DomainAttribute;
  */
 public class ActionFrame extends Frame {
 
-    public final static String ATTR_LIST_ATTRS = "attributes";
+    public final static String ATTR_LIST_ATTRS = "attributeDistribution";
 
     public final static String ATTR_LIST_PARAMS = "parameters";
 
@@ -60,7 +60,7 @@ public class ActionFrame extends Frame {
      * Top level constructor.
      * 
      * @param name the name of the action
-     * @param defaultClass the SimAction class to execute
+     * @param defaultClass the SimulationRuntimeAction class to execute
      */
     private ActionFrame(String name, String defaultClass) {
         super(name, Optional.of(CATEGORY), true, false);
@@ -143,7 +143,7 @@ public class ActionFrame extends Frame {
     }
 
     /**
-     * Add a value to a specified user-parameter (defined as list).
+     * Add a port to a specified user-parameter (defined as list).
      * 
      * @param name
      *            String
@@ -260,7 +260,7 @@ public class ActionFrame extends Frame {
     }
 
     /**
-     * Get the default value for a certain parameter.
+     * Get the default port for a certain parameter.
      * 
      * @param paramName
      *            String

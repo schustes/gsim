@@ -13,7 +13,7 @@ public abstract class ExperimentationRuleBuilder {
 		// static class
 	}
 
-	public static String buildExperimentationRule(RuntimeAgent agent, RLRule rule, String stateName, String condStr) throws GSimEngineException {
+	static String buildExperimentationRule(RuntimeAgent agent, RLRule rule, String stateName, String condStr) throws GSimEngineException {
 
 		String ownerRule = createRuleIdentifier(rule);
 		String ruleName = "experimental_rule_" + ownerRule + "@" + stateName + "@";// +
@@ -44,8 +44,8 @@ public abstract class ExperimentationRuleBuilder {
 
 			nRule += "  =>\n";
 			String realOwnerName = createRuleIdentifier(rule);
-			// nRule += " (printout t >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>)\n";
 			nRule += " (bind ?action (selectBestAction_" + realOwnerName + " ?sfn))\n";
+			//nRule += " (printout  t _____ SELECTED _____ ?action)\n";
 			nRule += " (if (neq ?action NIL) then\n";
 			nRule += "  (bind ?c (fact-slot-value ?action count))\n";
 			nRule += "  (execute ?action \"" + role + "\")\n";

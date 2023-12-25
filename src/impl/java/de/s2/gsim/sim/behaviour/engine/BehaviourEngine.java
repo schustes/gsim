@@ -1,20 +1,6 @@
 package de.s2.gsim.sim.behaviour.engine;
 
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-
-import org.apache.log4j.Logger;
-
 import de.s2.gsim.api.sim.agent.impl.RuntimeAgent;
 import de.s2.gsim.environment.BehaviourFrame;
 import de.s2.gsim.environment.ConditionDef;
@@ -35,6 +21,7 @@ import de.s2.gsim.sim.behaviour.bra.Expand;
 import de.s2.gsim.sim.behaviour.bra.SimpleSoftmaxSelector;
 import de.s2.gsim.sim.behaviour.rangeupdate.DynamicValueRangeUpdateStrategy;
 import de.s2.gsim.sim.behaviour.rulebuilder.GlobalsBuilder;
+import de.s2.gsim.sim.behaviour.rulebuilder.Join;
 import de.s2.gsim.sim.behaviour.rulebuilder.ReactiveRuleBuilder;
 import de.s2.gsim.sim.behaviour.util.BuildingUtils;
 import de.s2.gsim.sim.behaviour.util.RuleEngineHelper;
@@ -46,6 +33,19 @@ import jess.RU;
 import jess.Rete;
 import jess.Value;
 import jess.ValueVector;
+import org.apache.log4j.Logger;
+
+import java.io.File;
+import java.io.FileWriter;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 
 public class BehaviourEngine implements java.io.Serializable {
 
@@ -155,7 +155,7 @@ public class BehaviourEngine implements java.io.Serializable {
 
 			Constant roleParameter = new Constant("executing-role", role);
 
-			System.out.println("Running agent " + owner.getName());
+			logger.debug("Running agent " + owner.getName());
 
 			reset();
 
@@ -222,8 +222,8 @@ public class BehaviourEngine implements java.io.Serializable {
 
 			printTree(role);
 
-			System.out.println("EXECUTE RULES FOR AGENT " + owner.getName() + ", role:" + role + ": "
-			        + ((System.currentTimeMillis() - total) / 1000d));
+			//System.out.println("EXECUTE RULES FOR AGENT " + owner.getName() + ", role:" + role + ": "
+			  //      + ((System.currentTimeMillis() - total) / 1000d));
 
 
 			dirty = true;
@@ -595,6 +595,7 @@ public class BehaviourEngine implements java.io.Serializable {
 
 		// rete.addUserfunction(new ComparisonSelector());
 		rete.addUserfunction(new SimpleSoftmaxSelector(maxReward));
+		rete.addUserfunction(new Join());
 		// rete.addUserfunction(new ToInstPath());
 		rete.addUserfunction(new Expand());
 

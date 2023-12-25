@@ -42,7 +42,7 @@ public class ServerPropertiesReader {
     public int getDefinitionCount() {
         try {
 
-            String p = props.getProperty("model.definition.count", "1");
+            String p = props.getProperty("common.definition.count", "1");
             return Integer.parseInt(p);
 
         } catch (Exception e) {
@@ -66,7 +66,7 @@ public class ServerPropertiesReader {
     public double getListenerFraction() {
         try {
 
-            String p = props.getProperty("model.messaging.agentListenerFactor", "0");
+            String p = props.getProperty("common.messaging.agentListenerFactor", "0");
             return Double.parseDouble(p);
 
         } catch (Exception e) {
@@ -91,7 +91,7 @@ public class ServerPropertiesReader {
     public int getMaxCacheSize() {
         try {
 
-            String p = props.getProperty("model.data.maxCacheSize", "1000");
+            String p = props.getProperty("common.data.maxCacheSize", "1000");
             return Integer.parseInt(p);
 
         } catch (Exception e) {
@@ -115,7 +115,7 @@ public class ServerPropertiesReader {
     public double getMessagingFraction() {
         try {
 
-            String p = props.getProperty("model.messaging.agentMessagingFactor", "1");
+            String p = props.getProperty("common.messaging.agentMessagingFactor", "1");
             return Double.parseDouble(p);
 
         } catch (Exception e) {
@@ -139,7 +139,7 @@ public class ServerPropertiesReader {
     public int getNotificationOption() {
         try {
 
-            String p = props.getProperty("model.messaging.notification", "NEVER");
+            String p = props.getProperty("common.messaging.notification", "NEVER");
             if (p.equals("NEVER")) {
                 return -1;
             }
@@ -157,7 +157,7 @@ public class ServerPropertiesReader {
     public int getPersistentCacheThreshold() {
         try {
 
-            String p = props.getProperty("model.data.persistentCacheThreshold", "1000");
+            String p = props.getProperty("common.data.persistentCacheThreshold", "1000");
             return Integer.parseInt(p);
 
         } catch (Exception e) {
@@ -182,7 +182,7 @@ public class ServerPropertiesReader {
     public int getSimulationPartitionSize() {
         try {
 
-            String p = props.getProperty("model.runtime.partition", "100");
+            String p = props.getProperty("common.runtime.partition", "100");
             return Integer.parseInt(p);
 
         } catch (Exception e) {

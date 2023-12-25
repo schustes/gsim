@@ -29,10 +29,10 @@ public class Conversation implements java.io.Serializable {
         if (!(o instanceof Conversation)) {
             return false;
         }
-        return ((Conversation) o).getCommId() == getCommId();
+        return ((Conversation) o).getCommId().equals(getCommId());
     }
 
-    public final double getCommId() {
+    public final String getCommId() {
         if (p != null) {
             return p.getCommId();
         }

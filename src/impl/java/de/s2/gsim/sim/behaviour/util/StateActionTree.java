@@ -1,18 +1,8 @@
 package de.s2.gsim.sim.behaviour.util;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Rectangle;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-
-import javax.swing.BorderFactory;
-import javax.swing.JFrame;
-import javax.swing.JScrollPane;
-
+import de.s2.gsim.util.Utils;
+import jess.Fact;
+import jess.Rete;
 import org.jgraph.JGraph;
 import org.jgraph.graph.ConnectionSet;
 import org.jgraph.graph.DefaultEdge;
@@ -22,9 +12,12 @@ import org.jgraph.graph.DefaultPort;
 import org.jgraph.graph.GraphConstants;
 import org.jgraph.graph.GraphModel;
 
-import de.s2.gsim.util.Utils;
-import jess.Fact;
-import jess.Rete;
+import javax.swing.*;
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 public class StateActionTree extends JFrame {
 
@@ -106,7 +99,7 @@ public class StateActionTree extends JFrame {
             DefaultEdge edge = new DefaultEdge();
 
             // TODO this will probably not work
-			Map<?, ?> edgeAttrib = GraphConstants.createAttributes(edge, "key2", "value");
+			Map<?, ?> edgeAttrib = GraphConstants.createAttributes(edge, "key2", "port");
             attributes.put(edge, edgeAttrib);
 
             int arrow = GraphConstants.ARROW_CLASSIC;
@@ -116,10 +109,10 @@ public class StateActionTree extends JFrame {
 
             DefaultPort p1 = new DefaultPort();
             self.add(p1);
-            // p1.setUserObject(key);
+            // f1.setUserObject(key);
             DefaultPort p2 = new DefaultPort();
             child.add(p2);
-            // p2.setUserObject(key2);
+            // f2.setUserObject(key2);
 
             ConnectionSet cs = new ConnectionSet(edge, p1, p2);
             Object[] connections = new Object[] { edge, self, child };
@@ -143,7 +136,7 @@ public class StateActionTree extends JFrame {
                     if (key.length() > 20) {
                         key = key.substring(0, 20);
                     }
-                    key += "-" + g.getSlotValue("value").atomValue(rete.getGlobalContext());
+                    key += "-" + g.getSlotValue("port").atomValue(rete.getGlobalContext());
                     if (key.length() > 24) {
                         key = key.substring(0, 24);
                     }
@@ -154,7 +147,7 @@ public class StateActionTree extends JFrame {
                 if (key2.length() > 20) {
                     key2 = key2.substring(0, 20);
                 }
-                key2 += "-" + f.getSlotValue("value").atomValue(rete.getGlobalContext());
+                key2 += "-" + f.getSlotValue("port").atomValue(rete.getGlobalContext());
                 if (key2.length() > 24) {
                     key2 = key2.substring(0, 24);
                 }
@@ -165,7 +158,7 @@ public class StateActionTree extends JFrame {
 
                 DefaultEdge edge = new DefaultEdge();
                 // TODO this will probably not work
-                Map edgeAttrib = GraphConstants.createAttributes(edge, "key2", "value");
+                Map edgeAttrib = GraphConstants.createAttributes(edge, "key2", "port");
                 attributes.put(edge, edgeAttrib);
 
                 int arrow = GraphConstants.ARROW_CLASSIC;
@@ -204,7 +197,7 @@ public class StateActionTree extends JFrame {
                 if (key.length() > 20) {
                     key = key.substring(0, 20);
                 }
-                key = key + "-" + fact.getSlotValue("value").atomValue(rete.getGlobalContext());
+                key = key + "-" + fact.getSlotValue("port").atomValue(rete.getGlobalContext());
                 if (key.length() > 24) {
                     key = key.substring(0, 24);
                 }
@@ -220,7 +213,7 @@ public class StateActionTree extends JFrame {
 
             DefaultGraphCell cell = new DefaultGraphCell(key);
             // TODO this will probably not work
-            Map cellAttrib = GraphConstants.createAttributes(cell, "key", "value");
+            Map cellAttrib = GraphConstants.createAttributes(cell, "key", "port");
             attributes.put(cell, cellAttrib);
             Rectangle cellBounds = position; // scale(wProp, hProp,
             // position);
@@ -272,7 +265,7 @@ public class StateActionTree extends JFrame {
                 if (key2.length() > 10) {
                     key2 = key2.substring(0, 10);
                 }
-                key2 += "-" + f.getSlotValue("value").atomValue(rete.getGlobalContext());
+                key2 += "-" + f.getSlotValue("port").atomValue(rete.getGlobalContext());
                 if (key2.length() > 15) {
                     key2 = key2.substring(0, 15);
                 }
@@ -281,7 +274,7 @@ public class StateActionTree extends JFrame {
 
                 DefaultGraphCell cell0 = new DefaultGraphCell(key2);
                 // TODO this will probably not work
-                Map cellAttrib0 = GraphConstants.createAttributes(cell, "key", "value");
+                Map cellAttrib0 = GraphConstants.createAttributes(cell, "key", "port");
                 attributes.put(cell0, cellAttrib0);
                 Rectangle position2 = new Rectangle(newOffset2.o, ot, cellW, cellH);
                 newOffset2.o += cellW + 10;

@@ -5,6 +5,7 @@ import de.s2.gsim.objects.AgentClass;
 import de.s2.gsim.objects.AgentInstance;
 import de.s2.gsim.objects.ObjectClass;
 import de.s2.gsim.objects.ObjectInstance;
+import de.s2.gsim.sim.agent.ApplicationAgent;
 
 /**
  * The <code>ModelDefinitionEnvironment</code> is a wrapper for the actual gsim environment managing agents and objects. Agents are instanciated by
@@ -20,41 +21,41 @@ import de.s2.gsim.objects.ObjectInstance;
 public interface ModelDefinitionEnvironment {
 
     /**
-     * Constant for creating random attributes and weights (weights are only for fuzzy matching utility) during instanciation using a normal
+     * Constant for creating random attributeDistribution and weights (weights are only for fuzzy matching utility) during instanciation using a normal
      * distribution.
      */
-    public static final int RAND_ATT_AND_WEIGHT = 1;
+    static final int RAND_ATT_AND_WEIGHT = 1;
 
     /**
-     * Constant for creating random attributes and weights (weights are only for fuzzy matching utility) during instanciation using a uniform
+     * Constant for creating random attributeDistribution and weights (weights are only for fuzzy matching utility) during instanciation using a uniform
      * distribution.
      */
-    public static final int RAND_ATT_AND_WEIGHT_UNIFORM = 5;
+    static final int RAND_ATT_AND_WEIGHT_UNIFORM = 5;
 
     /**
-     * Constant for creating only random attributes during instanciation using a normal distribution.
+     * Constant for creating only random attributeDistribution during instanciation using a normal distribution.
      */
-    public static final int RAND_ATT_ONLY = 2;
+    static final int RAND_ATT_ONLY = 2;
 
     /**
-     * Constant for creating random attributes during instanciation using a uniform distribution.
+     * Constant for creating random attributeDistribution during instanciation using a uniform distribution.
      */
-    public static final int RAND_ATT_ONLY_UNIFORM = 6;
+    static final int RAND_ATT_ONLY_UNIFORM = 6;
 
     /**
-     * Constant specifying that no attributes should be varied during instanciation.
+     * Constant specifying that no attributeDistribution should be varied during instanciation.
      */
-    public static final int RAND_NONE = 4;
+    static final int RAND_NONE = 4;
 
     /**
      * Constant for creating random weights (only for fuzzy matching utility) during instanciation using a normal distribution.
      */
-    public static final int RAND_WEIGHT_ONLY = 3;
+    static final int RAND_WEIGHT_ONLY = 3;
 
     /**
      * Constant for creating random weights (only for fuzzy matching utility) during instanciation using a uniform distribution.
      */
-    public static final int RAND_WEIGHT_ONLY_UNIFORM = 7;
+    static final int RAND_WEIGHT_ONLY_UNIFORM = 7;
 
     /**
      * Creates an AgentClass.
@@ -64,7 +65,7 @@ public interface ModelDefinitionEnvironment {
      * @return AgentClassIF
      * @throws GSimException
      */
-    public AgentClass createAgentClass(String name, String parentName) throws GSimException;
+    AgentClass createAgentClass(String name, String parentName) throws GSimException;
 
     /**
      * Creates an AgentClass and sets the execution order, i.e. the position in which this agent is executed.
@@ -75,7 +76,7 @@ public interface ModelDefinitionEnvironment {
      * @return AgentClassIF
      * @throws GSimException
      */
-    public AgentClass createAgentClass(String name, String parentName, int order) throws GSimException;
+    AgentClass createAgentClass(String name, String parentName, int order) throws GSimException;
 
     /**
      * Creates an ObjectClass.
@@ -85,7 +86,7 @@ public interface ModelDefinitionEnvironment {
      * @return ObjectClassIF
      * @throws GSimException
      */
-    public ObjectClass createObjectClass(String name, String parent) throws GSimException;
+    ObjectClass createObjectClass(String name, String parent) throws GSimException;
 
     /**
      * Instanciates an object.
@@ -95,12 +96,12 @@ public interface ModelDefinitionEnvironment {
      * @return ObjectInstanceIF
      * @throws GSimException
      */
-    public ObjectInstance createObjectInstance(String name, ObjectClass parent) throws GSimException;
+    ObjectInstance createObjectInstance(String name, ObjectClass parent) throws GSimException;
 
     /**
      * Destroys the environment and frees up any resources connected with it.
      */
-    public void destroy();
+    void destroy();
 
     /**
      * Returns an agent from the environment.
@@ -109,7 +110,7 @@ public interface ModelDefinitionEnvironment {
      * @return AgentInstanceIF
      * @throws GSimException
      */
-    public AgentInstance getAgent(String name) throws GSimException;
+    AgentInstance getAgent(String name) throws GSimException;
 
     /**
      * Return a particular agent class.
@@ -117,7 +118,7 @@ public interface ModelDefinitionEnvironment {
      * @param name name of the agent class
      * @return AgentClassIF
      */
-    public AgentClass getAgentClass(String name) throws GSimException;
+    AgentClass getAgentClass(String name) throws GSimException;
 
     /**
      * Return agent classes. If parent is null, all subclasses are returned.
@@ -125,7 +126,7 @@ public interface ModelDefinitionEnvironment {
      * @param parent a parent frame
      * @return List of AgentClassIF
      */
-    public AgentClass[] getAgentClasses(String parent) throws GSimException;
+    AgentClass[] getAgentClasses(String parent) throws GSimException;
 
     /**
      * Returns the name of all agents with the given parent.
@@ -133,7 +134,7 @@ public interface ModelDefinitionEnvironment {
      * @param parent the name of the parent agent
      * @return the names of all subtypes of the parent
      */
-    public String[] getAgentNames(String parent) throws GSimException;
+    String[] getAgentNames(String parent) throws GSimException;
 
     /**
      * Returns a list of agent instances. All instances of lower levels of the frame hierarchy are returned. If very many agents are expected, use
@@ -142,7 +143,7 @@ public interface ModelDefinitionEnvironment {
      * @param parent a parent frame (if null, all agents are returned)
      * @return List of AgentInstanceIF
      */
-    public AgentInstance[] getAgents(String parent) throws GSimException;
+    AgentInstance[] getAgents(String parent) throws GSimException;
 
     /**
      * Returns a list of agent instances of a particular type. All instances of lower levels of the frame hierarchy are returned. The offset and count
@@ -154,7 +155,7 @@ public interface ModelDefinitionEnvironment {
      * @return List of AgentInstanceIF
      * @throws GSimException
      */
-    public AgentInstance[] getAgents(String parent, int offset, int count) throws GSimException;
+    AgentInstance[] getAgents(String parent, int offset, int count) throws GSimException;
 
     /**
      * Return a particular object class.
@@ -162,7 +163,7 @@ public interface ModelDefinitionEnvironment {
      * @param name the name of the object class
      * @return ObjectClassIF
      */
-    public ObjectClass getObjectClass(String name) throws GSimException;
+    ObjectClass getObjectClass(String name) throws GSimException;
 
     /**
      * Return object classes. If parent is null, all subclasses are returned.
@@ -170,7 +171,7 @@ public interface ModelDefinitionEnvironment {
      * @param parent the parent class
      * @return ObjectClassIF[]
      */
-    public ObjectClass[] getObjectClasses(String parent) throws GSimException;
+    ObjectClass[] getObjectClasses(String parent) throws GSimException;
 
     /**
      * 
@@ -178,7 +179,7 @@ public interface ModelDefinitionEnvironment {
      * @return list of ObjectInstanceIF
      * @throws GSimException
      */
-    public ObjectInstance[] getObjects(String parent) throws GSimException;
+    ObjectInstance[] getObjects(String parent) throws GSimException;
 
     /**
      * Return the generic root (the system object from which all agent classes must inherit their properties)
@@ -186,7 +187,7 @@ public interface ModelDefinitionEnvironment {
      * @return AgentClassIF
      * @throws GSimException
      */
-    public AgentClass getTopAgentClass() throws GSimException;
+    AgentClass getTopAgentClass() throws GSimException;
 
     /**
      * Return the top level object class from which all objects must inherit.
@@ -194,7 +195,7 @@ public interface ModelDefinitionEnvironment {
      * @return ObjectClassIF
      * @throws GSimException
      */
-    public ObjectClass getTopObjectClass() throws GSimException;
+    ObjectClass getTopObjectClass() throws GSimException;
 
     /**
      * Instanciate a single agent.
@@ -204,23 +205,23 @@ public interface ModelDefinitionEnvironment {
      * @return AgentInstanceIF
      * @throws GSimException
      */
-    public AgentInstance instanciateAgent(AgentClass parent, String name) throws GSimException;
+    AgentInstance instanciateAgent(AgentClass parent, String name) throws GSimException;
 
     /**
      * Creates a list of agents.
      * 
      * @param parent the frame from which the agent is created
      * @param prefix common name prefix, to which a running number will be appended
-     * @param method method constant defining what to do with the attributes (e.g. vary randomly)
+     * @param method method constant defining what to do with the attributeDistribution (e.g. vary randomly)
      * @param standardVariation standard variation (only needed if method is based on normal distribution)
      * @param count number of agents to instanciate
      * @return List of AgentInstanceIF
      * @throws GSimException
      */
-    public AgentInstance[] instanciateAgentsNormallyDistributed(AgentClass parent, String prefix, double standardVariation, int count)
+    AgentInstance[] instanciateAgentsNormallyDistributed(AgentClass parent, String prefix, double standardVariation, int count)
             throws GSimException;
 
-    public AgentInstance[] randomiseAttribute(AgentClass agentClass, String attrPath, double standardVariation)
+    AgentInstance[] randomiseAttribute(AgentClass agentClass, String attrPath, double standardVariation)
             throws GSimException;
 
     /**
@@ -228,28 +229,36 @@ public interface ModelDefinitionEnvironment {
      * 
      * @param parent the frame from which the agent is created
      * @param prefix common name prefix, to which a running number will be appended
-     * @param method method constant defining what to do with the attributes (e.g. vary randomly)
+     * @param method method constant defining what to do with the attributeDistribution (e.g. vary randomly)
      * @param standardVariation standard variation (only needed if method is based on normal distribution)
      * @param count number of agents to instanciate
      * @return List of AgentInstanceIF
      * @throws GSimException
      */
-    public AgentInstance[] instanciateAgentsUniformDistributed(AgentClass parent, String prefix, int count)
+    AgentInstance[] instanciateAgentsUniformDistributed(AgentClass parent, String prefix, int count)
             throws GSimException;
 
     /**
      * Clears the environment from agents.
      */
-    public void removeAgentInstances();
+    void removeAgentInstances();
+
+
+    /**
+     * Clears the environment from objects.
+     */
+    void removeObjectInstances(String className);
 
     /**
      * Removes agent class, all of its subclasses and instance from the environment.
      */
-    public void removeAgentClass(AgentClass cls);
+    void removeAgentClass(AgentClass cls);
 
     /**
      * Removes object class, all of its subclasses and instance from the environment.
      */
-    public void removeObjectClass(ObjectClass cls);
+    void removeObjectClass(ObjectClass cls);
+
+    void addSystemAgent(ApplicationAgent agent);
 
 }

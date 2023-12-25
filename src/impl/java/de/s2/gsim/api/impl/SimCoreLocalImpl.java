@@ -1,5 +1,12 @@
 package de.s2.gsim.api.impl;
 
+import de.s2.gsim.GSimCore;
+import de.s2.gsim.GSimException;
+import de.s2.gsim.api.sim.impl.local.SimulationInstanceContainerLocal;
+import de.s2.gsim.def.ModelDefinitionEnvironment;
+import de.s2.gsim.environment.Environment;
+import de.s2.gsim.sim.SimulationController;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FilenameFilter;
@@ -7,13 +14,6 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.Properties;
-
-import de.s2.gsim.GSimCore;
-import de.s2.gsim.GSimException;
-import de.s2.gsim.api.sim.impl.local.SimulationInstanceContainerLocal;
-import de.s2.gsim.def.ModelDefinitionEnvironment;
-import de.s2.gsim.environment.Environment;
-import de.s2.gsim.sim.SimulationController;
 
 public class SimCoreLocalImpl implements GSimCore {
 
@@ -89,14 +89,18 @@ public class SimCoreLocalImpl implements GSimCore {
     }
 
     @Override
-    public SimulationController createScenarioManager(ModelDefinitionEnvironment env, Map<String, Object> props, int steps, int runs) throws GSimException {
+    public SimulationController createScenarioManager(ModelDefinitionEnvironment env
+            , Map<String, Object> props
+            , int steps
+            , int runs) throws GSimException {
 
         if (env instanceof EnvironmentWrapper) {
-            SimulationController m = new SimulationInstanceContainerLocal(((EnvironmentWrapper) env).getComplicatedInterface(), this.ns, props, steps, runs);
+            SimulationController m = new SimulationInstanceContainerLocal(((EnvironmentWrapper) env).getComplicatedInterface()
+                    , this.ns, props, steps, runs);
             return m;
         } else {
             throw new GSimException(
-                    "Tried to create a local implemenation of scenario-manager, but received a remote" + " implementation of the environment");
+                    "Tried to create a local implemenation of simulator-manager, but received a remote" + " implementation of the environment");
         }
     }
 
@@ -194,7 +198,7 @@ public class SimCoreLocalImpl implements GSimCore {
     private class Filter implements FilenameFilter {
         @Override
         public boolean accept(File f, String s) {
-            if (s.endsWith("model")) {
+            if (s.endsWith("common")) {
                 return true;
             }
 

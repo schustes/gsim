@@ -1,13 +1,13 @@
 package de.s2.gsim.sim.engine.common;
 
+import org.apache.log4j.Logger;
+
 import java.io.BufferedInputStream;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.util.Hashtable;
 import java.util.jar.JarFile;
 import java.util.zip.ZipEntry;
-
-import org.apache.log4j.Logger;
 
 public class SimpleClassLoader extends ClassLoader implements Serializable {
 
@@ -28,7 +28,7 @@ public class SimpleClassLoader extends ClassLoader implements Serializable {
     }
 
     /**
-     * This is a simple version for external clients since they will always want the class resolved before it is returned to them.
+     * This is a simple version for downstream clients since they will always want the class resolved before it is returned to them.
      */
     @SuppressWarnings("unchecked")
     @Override

@@ -254,7 +254,7 @@ public class AgentClassSim extends Observable implements AgentClass, ObjectClass
 			} else if (o instanceof ArrayList) {
 				return ((ArrayList<?>) o).clone();
 			} else {
-				throw new GSimException("Can't handle return value " + o);
+				throw new GSimException("Can't handle return port " + o);
 			}
 		} catch (Exception e) {
 			throw new GSimException(e);

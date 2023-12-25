@@ -90,7 +90,7 @@ public class Message implements Serializable {
         Iterator<String> keys = messageContents.keySet().iterator();
         while (keys.hasNext()) {
             String key = (String) keys.next();
-            s += "Object-Type: " + key + ", value: " + messageContents.get(key) + "\n";
+            s += "Object-Type: " + key + ", port: " + messageContents.get(key) + "\n";
         }
         s += "\nMessage-End\n";
         return s;

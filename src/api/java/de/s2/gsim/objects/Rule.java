@@ -26,7 +26,7 @@ public interface Rule {
      * 
      * @param paramName the condition parameter name
      * @param op operator
-     * @param val value
+     * @param val port
      * @return the condition
      */
     Condition createCondition(String paramName, String op, String val);
