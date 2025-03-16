@@ -6,7 +6,7 @@
 .settings/
 .metadata/
 .idea/
-gradle*
+#gradle*
 /**/*.iml
 /**/out
 
