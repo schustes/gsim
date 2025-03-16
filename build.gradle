@@ -1,10 +1,6 @@
-plugins {
-    id "com.jfrog.artifactory" version "4.21.0"
-}
 
 apply plugin: "java"
 apply plugin: "maven-publish"
-apply plugin: "com.jfrog.artifactory"
 apply plugin: "jacoco"
 
 group = "de.2s.sim"
@@ -12,15 +8,6 @@ version = "2.0-SNAPSHOT"
 
 repositories {
     mavenCentral()
-    maven {
-        allowInsecureProtocol = true
-        name = "s2"
-        url "http://2s-server:8082/artifactory/s2-maven/"
-        credentials {
-            username = "admin"
-            password = "1.Mansur"
-        }
-    }
 }
 
 sourceSets {
@@ -53,7 +40,7 @@ configurations {
 dependencies {
 
     apiImplementation 'commons-codec:commons-codec:1.5'
-    apiImplementation 'cern:colt:1.0'
+    apiImplementation files('libs/colt.jar')
     apiImplementation 'log4j:log4j:1.2.17'
     apiImplementation 'org.checkerframework:checker:1.9.12'
 
@@ -62,8 +49,8 @@ dependencies {
     implImplementation 'jdom:jdom:0.7'
     implImplementation 'log4j:log4j:1.2.17'
     implImplementation 'jgraph:jgraph:5.13.0.0'
-    implImplementation 'jess:jess:7.0'
-    implImplementation 'cern:colt:1.0'
+    implImplementation files('libs/j.jar')
+    implImplementation files('libs/colt.jar')
     implImplementation 'org.checkerframework:checker:1.9.12'
 
     testImplementation 'org.hamcrest:hamcrest-all:1.3'
