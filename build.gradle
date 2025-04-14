@@ -104,5 +104,12 @@ publishing {
             url = uri("http://2s-server:8082/artifactory/s2-maven/snapshots")
             credentials(PasswordCredentials)
         }
+        maven {
+            name = "gh"
+            allowInsecureProtocol = true
+            url = uri("https://maven.pkg.github.com/schustes/gsim")
+            credentials(PasswordCredentials)
+        }
+
     }
 }
