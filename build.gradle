@@ -4,7 +4,7 @@ apply plugin: "maven-publish"
 apply plugin: "jacoco"
 
 group = "de.2s.sim"
-version = "2.0-SNAPSHOT"
+version = "2.0.1-SNAPSHOT"
 
 repositories {
     mavenCentral()
@@ -102,13 +102,19 @@ publishing {
             name = "s2"
             allowInsecureProtocol = true
             url = uri("http://2s-server:8082/artifactory/s2-maven/snapshots")
-            credentials(PasswordCredentials)
+            credentials {
+                username = System.getenv("LOCAL_REPO_USER_NAME")
+                password = System.getenv("LOCAL_REPO_USER_PW")
+            }
         }
         maven {
             name = "gh"
             allowInsecureProtocol = true
             url = uri("https://maven.pkg.github.com/schustes/gsim")
-            credentials(PasswordCredentials)
+            credentials {
+                username = System.getenv("GITHUB_ACTOR")
+                password = System.getenv("GITHUB_TOKEN")
+            }
         }
 
     }
