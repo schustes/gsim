@@ -4,7 +4,7 @@ apply plugin: "maven-publish"
 apply plugin: "jacoco"
 
 group = "de.2s.sim"
-version = "2.0.1-SNAPSHOT"
+version = "2.0.2-SNAPSHOT"
 
 repositories {
     mavenCentral()
