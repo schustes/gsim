@@ -29,4 +29,5 @@ jobs:
           echo "New version: ${NEW_VERSION}"
           echo "Github username: ${GITHUB_ACTOR}"
           echo "Token size: ${#GITHUB_TOKEN}"
-          ./gradlew -Pversion=${NEW_VERSION} publishMavenPublicationToGhRepository
+          #./gradlew -Pversion=${NEW_VERSION} publishMavenPublicationToGhRepository
+          ./gradlew publishMavenPublicationToGhRepository
